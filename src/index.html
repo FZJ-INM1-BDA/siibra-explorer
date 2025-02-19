@@ -3,24 +3,124 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="google-site-verification" content="fkW3HNDR3bwEn8fdtO-W41KNwbM-RoiL2TSWQAmbK6w" />
+  <meta name="google-site-verification" content="a1eQjVVvbKEjbe4k4kCGrzJnMzZcrartwKLvJxbxFWY" />
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="description" content="siibra-explorer is a browser based 3D viewer for exploring human, macaque, rat, and mouse brain atlases that cover different spatial resolutions and modalities.">
+  <meta name="og:title" content="siibra explorer">
+  <meta name="og:image" content="https://raw.githubusercontent.com/FZJ-INM1-BDA/siibra-explorer/master/docs/images/siibra-explorer-square.jpeg">
+  <meta name="og:description" content="siibra-explorer is a browser based 3D viewer for exploring human, macaque, rat, and mouse brain atlases that cover different spatial resolutions and modalities.">
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+  <link rel="stylesheet" href="assets/fontawesome/css/all.min.css">
+  <link rel="stylesheet" href="assets/academicons/css/academicons.min.css">
   <link rel="stylesheet" href="icons/iav-icons.css">
-  <link rel="stylesheet" href="main.css">
   <link rel="stylesheet" href="version.css">
   <link rel="icon" type="image/png" href="assets/favicons/favicon-128-light.png"/>
   <script src="extra_js.js"></script>
-  <script src="https://unpkg.com/kg-dataset-previewer@1.2.0/dist/kg-dataset-previewer/kg-dataset-previewer.js" defer></script>
-  <script src="https://unpkg.com/three-surfer@0.0.13/dist/bundle.js" defer></script>
-  <script type="module" src="https://unpkg.com/ng-layer-tune@0.0.13/dist/ng-layer-tune/ng-layer-tune.esm.js"></script>
+  <script src="https://unpkg.com/three-surfer@0.0.17/dist/bundle.js" defer></script>
+  <script type="module" src="https://unpkg.com/ng-layer-tune@0.0.30/dist/ng-layer-tune/ng-layer-tune.esm.js"></script>
   <script type="module" src="https://unpkg.com/hbp-connectivity-component@0.6.6/dist/connectivity-component/connectivity-component.js" ></script>
-  <script defer src="https://unpkg.com/mathjax@3.1.2/es5/tex-svg.js"></script>
-  <script defer src="https://unpkg.com/d3@6.2.0/dist/d3.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.24.1.min.js" charset="utf-8"></script>
+  <script src="main.bundle.js" charset="utf-8"></script> <!-- export_nehuba -->
   <title>Siibra Explorer</title>
 </head>
 <body>
+  <noscript>
+    <div class="jumbotron bg-light text-center mb-0">
+      <div>
+        <h1 class="mb-3">
+          <i class="fas fa-exclamation-triangle"></i> Javascript disabled
+        </h1>
+        <p>
+          siibra-explorer requires javascript to be enabled.
+          Please <a href="https://support.google.com/adsense/answer/12654?hl=en" alt="Link to enable javascript in Chrome browser"> enable javascript</a>.
+        </p>
+    
+      </div>
+    </div>
+
+    <section class="carousel-anchors">
+      <a href="#img-1"></a>
+      <a href="#img-2"></a>
+      <a href="#img-3"></a>
+    </section>
+    <section class="carousel-viewport">
+      <div class="carousel">
+        <div class="img-container" id="img-1">
+          <span class="label">Preview of Julich Brain Cytoarchitectonic map in MNI Colin 27 space</span>
+          <img src="assets/images/1.png" alt="Preview of Julich Brain Cytoarchitectonic map in MNI Colin 27 space">
+        </div>
+        <div class="img-container" id="img-2">
+          <span class="label">Preview of Big Brain 2015 Release</span>
+          <img src="assets/images/2.png" alt="Preview of Big Brain 2015 Release">
+        </div>
+        <div class="img-container" id="img-3">
+          <span class="label">Preview of Waxholm Rat V2.0</span>
+          <img src="assets/images/3.png" alt="Preview of Waxholm Rat V2.0">
+        </div>
+      </div>
+    </section>
+
+    <style>
+      .carousel-anchors
+      {
+        display: flex;
+        justify-content: center;
+      }
+      .carousel-anchors a
+      {
+        display: inline-block;
+        margin: 1rem;
+        width: 1rem;
+        height: 1rem;
+        border-radius: 50%;
+        background-color: rgba(128,128,128, 1);
+        opacity: 0.5;
+      }
+      
+      .carousel-anchors a:hover
+      {
+        opacity: 1;
+      }
+
+      .carousel-viewport
+      {
+        width: 100rem;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .carousel
+      {
+        display: flex;
+
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+      }
+      .carousel .img-container
+      {
+        scroll-snap-align: start;
+        flex: 0 0 100rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .carousel .label
+      {
+        margin: 2rem;
+      }
+      .carousel .img-container img
+      {
+        max-width: 100%;
+        max-height: 50dvh;
+      }
+      atlas-viewer
+      {
+        display: none;
+      }
+    </style>
+  </noscript>
   <atlas-viewer>
     <h1 class="text-center loadingIndicator" id="iav-inner">
       <span class="homeAnimationDots loadingAnimationDots">&bull;</span>

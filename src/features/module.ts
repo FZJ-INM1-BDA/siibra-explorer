@@ -1,10 +1,5 @@
 import { CommonModule } from "@angular/common";
 import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from "@angular/core";
-import { MatCardModule } from "@angular/material/card";
-import { MatRippleModule } from "@angular/material/core";
-import { MatExpansionModule } from "@angular/material/expansion";
-import { MatListModule } from "@angular/material/list";
-import { MatTooltipModule } from "@angular/material/tooltip";
 import { SpinnerModule } from "src/components/spinner";
 import { UtilModule } from "src/util";
 import { EntryComponent } from './entry/entry.component'
@@ -12,40 +7,50 @@ import { FeatureNamePipe } from "./featureName.pipe";
 import { CategoryAccDirective } from './category-acc.directive';
 import { SapiViewsFeatureConnectivityModule } from "./connectivity";
 import { ScrollingModule } from "@angular/cdk/scrolling";
-import { MatButtonModule } from "@angular/material/button"
-import { MatIconModule } from "@angular/material/icon";
-import { MatDividerModule } from "@angular/material/divider";
 import { MarkdownModule } from "src/components/markdown";
-import { MatTableModule } from "@angular/material/table";
 import { FeatureViewComponent } from "./feature-view/feature-view.component";
-import { TransformPdToDsPipe } from "./transform-pd-to-ds.pipe";
 import { NgLayerCtlModule } from "src/viewerModule/nehuba/ngLayerCtlModule/module";
 import { VoiBboxDirective } from "./voi-bbox.directive";
 import { FilterCategoriesPipe } from "./filterCategories.pipe";
 import { ListDirective } from "./list/list.directive";
-import { MatChipsModule } from "@angular/material/chips";
 import { FeatureFilterDirective } from "./feature.filter.directive";
 import { GroupFeaturesToName } from "./grpFeatToName.pipe";
+import { ReadmoreModule } from "src/components/readmore";
+import { GroupFeatureTallyPipe } from "./grpFeatToTotal.pipe";
+import { PlotlyComponent } from "./plotly";
+import { AngularMaterialModule } from "src/sharedModules";
+// import { AtlasColorMapIntents } from "./atlas-colormap-intents";
+import { CompoundFeatureIndicesModule } from "./compoundFeatureIndices"
+import { FEATURE_CONCEPT_TOKEN, FeatureConcept, TPRB } from "./util";
+import { BehaviorSubject } from "rxjs";
+import { TPBRViewCmp } from "./TPBRView/TPBRView.component";
+import { DialogModule } from "src/ui/dialogInfo";
+import { CodeSnippet } from "src/atlasComponents/sapi/codeSnippets/codeSnippet.directive";
+import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.directive";
+import { ExperimentalService } from "src/experimental/experimental.service";
 
 @NgModule({
   imports: [
     CommonModule,
-    MatCardModule,
-    MatExpansionModule,
     SpinnerModule,
-    MatListModule,
-    MatTooltipModule,
     UtilModule,
-    MatRippleModule,
     SapiViewsFeatureConnectivityModule,
     ScrollingModule,
-    MatButtonModule,
-    MatIconModule,
-    MatDividerModule,
     MarkdownModule,
-    MatTableModule,
     NgLayerCtlModule,
-    MatChipsModule,
+    ReadmoreModule,
+    AngularMaterialModule,
+    CompoundFeatureIndicesModule,
+    DialogModule,
+    
+    /**
+     * standalone components
+     */
+    PlotlyComponent,
+    // AtlasColorMapIntents,
+    TPBRViewCmp,
+    CodeSnippet,
+    ExperimentalFlagDirective,
   ],
   declarations: [
     EntryComponent,
@@ -58,14 +63,28 @@ import { GroupFeaturesToName } from "./grpFeatToName.pipe";
     VoiBboxDirective,
 
     FeatureNamePipe,
-    TransformPdToDsPipe,
     GroupFeaturesToName,
+    GroupFeatureTallyPipe,
   ],
   exports: [
     EntryComponent,
     FeatureViewComponent,
     VoiBboxDirective,
     ListDirective,
+  ],
+  providers: [
+    {
+      provide: FEATURE_CONCEPT_TOKEN,
+      useFactory: () => {
+        const obs = new BehaviorSubject<{ id: string, concept: TPRB}>({id: null, concept: {}})
+        const returnObj: FeatureConcept = {
+          register: (id, concept) => obs.next({ id, concept }),
+          concept$: obs.asObservable()
+        }
+        return returnObj
+      }
+    },
+    ExperimentalService,
   ],
   schemas: [
     CUSTOM_ELEMENTS_SCHEMA,

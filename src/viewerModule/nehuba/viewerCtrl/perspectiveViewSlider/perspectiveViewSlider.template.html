@@ -1,4 +1,7 @@
 <div class="range-container"
+  (mousemove)="mousemove($event)"
+  (mousedown)="mousedown()"
+  (mousewheel)="mousewheel($event)"
   *ngIf="sliceviewIsNormal$ | async else resetOrientationTmpl">
   <img *ngIf="previewImageUrl$ | async as url" [src]="url">
 

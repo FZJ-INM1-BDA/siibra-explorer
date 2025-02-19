@@ -1,0 +1,76 @@
+<ng-template [ngIf]="view$ | async" let-view>
+
+    <mat-form-field>
+        <mat-label>Atlas</mat-label>
+        <mat-select (valueChange)="selectAtlas($event)"
+            [value]="view.atlas.id">
+            <mat-option *ngFor="let atlas of allAtlases"
+                [value]="atlas.id">
+                <span class="option-container">
+                    {{ atlas.name }}
+                </span>
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+    
+    <mat-form-field>
+        <mat-label>Template</mat-label>
+        <mat-select (valueChange)="selectTemplate($event)"
+            [value]="view.template.id">
+            <mat-option *ngFor="let template of view.availableTemplates"
+                [value]="template.id">
+                <span class="option-container">
+                    {{ template.name }}
+                </span>
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+    
+    <button
+        class="sxplr-custom-cmp text"
+        mat-icon-button
+        sxplr-dialog
+        [sxplr-dialog-size]="null"
+        [sxplr-dialog-data]="{
+            title: view.template.name,
+            descMd: view.template.desc,
+            actions: view.template | parcTmplDoiPipe
+        }">
+        <i class="fas fa-info"></i>
+    </button>
+    
+    <mat-form-field>
+        <mat-label>Parcellation</mat-label>
+        <mat-select (valueChange)="selectParcellation($event)"
+            [value]="view.parcellation.id">
+            <mat-optgroup *ngFor="let group of view.groupParcs"
+                [label]="group.name">
+                <mat-option *ngFor="let parcellation of group.parcellations"
+                    [value]="parcellation.id">
+                    <span class="option-container">
+                        {{ parcellation.shortName }}
+                    </span>
+                </mat-option>
+            </mat-optgroup>
+            <mat-option *ngFor="let parcellation of view.noGroupParcs"
+                [value]="parcellation.id">
+                <span class="option-container">
+                    {{ parcellation.shortName }}
+                </span>
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <button
+        class="sxplr-custom-cmp text"
+        mat-icon-button
+        sxplr-dialog
+        [sxplr-dialog-size]="null"
+        [sxplr-dialog-data]="{
+            title: view.parcellation.name,
+            descMd: view.parcellation.desc,
+            actions: view.parcellation | parcTmplDoiPipe
+        }">
+        <i class="fas fa-info"></i>
+    </button>
+</ng-template>

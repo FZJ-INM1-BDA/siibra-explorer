@@ -12,7 +12,6 @@ export type TPolyJsonSpec = {
 } & TBaseAnnotationGeomtrySpec
 
 export class Polygon extends IAnnotationGeometry{
-  public id: string
   public annotationType = 'Polygon'
 
   public points: Point[] = []
@@ -94,11 +93,12 @@ export class Polygon extends IAnnotationGeometry{
   }
 
   toSands(): TSandsPolyLine{
+    const { id } = this.space
     return {
       "@id": this.id,
       "@type": 'tmp/poly',
       coordinateSpace: {
-        '@id': this.space["@id"],
+        '@id': id,
       },
       coordinates: this.points.map(p => {
         const { x, y, z } = p

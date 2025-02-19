@@ -1,32 +1,13 @@
-<!-- n.b. div wrapper is required for scrolling to work properly -->
-<div class="h-100 w-100 overflow-auto">
+<h4>
+  siibra-explorer
+</h4>
 
-  <div
-    #parentContainer
-    class="p-5 w-100 d-flex flex-column flex-wrap justify-content-center align-items-stretch pe-all">
-    <mat-card
-      (click)="selectAtlas(atlas)"
-      matRipple
-      *ngFor="let atlas of atlases$ | async"
-      class="m-3 col-md-12 col-lg-12 pe-all">
-      <mat-card-header>
-        <mat-card-title class="text-nowrap font-stretch">
-          {{ atlas.name }}
-        </mat-card-title>
-      </mat-card-header>
-
-      <!-- required... or on ripple, angular adds 16px margin to the bottom -->
-      <!-- see https://github.com/angular/components/issues/10898 -->
-      <mat-card-footer>
-      </mat-card-footer>
-    </mat-card>
-
-    <ng-template [ngIf]="!finishedLoading">
-      <div class="d-flex align-items-center sxplr-p-4">
-        <h1 class="mat-h1">
-          <spinner-cmp></spinner-cmp>
-        </h1>
-      </div>
-    </ng-template>
-  </div>
-</div>
+<mat-card *ngFor="let atlas of atlases$ | async"
+  mat-ripple
+  (click)="selectAtlas(atlas)">
+  <mat-card-header>
+    <mat-card-title>
+      {{ atlas.name }}
+    </mat-card-title>
+  </mat-card-header>
+</mat-card>

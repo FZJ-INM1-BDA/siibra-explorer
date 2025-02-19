@@ -2,13 +2,13 @@ import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http";
 import { PriorityHttpInterceptor } from "src/util/priority";
-import { MatSnackBarModule } from "@angular/material/snack-bar";
+import { AngularMaterialModule } from "src/sharedModules";
 
 @NgModule({
   imports: [
     CommonModule,
     HttpClientModule,
-    MatSnackBarModule,
+    AngularMaterialModule,
   ],
   declarations: [
   ],

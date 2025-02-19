@@ -1,25 +1,25 @@
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
-import { MatRippleModule } from "@angular/material/core";
-import { MatMenuModule } from "@angular/material/menu";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { SmartChip } from "./component/smartChip.component";
 import { HasSubMenuPipe } from "./hasSubmenu.pipe";
 import { SmartChipContent } from "./smartChip.content.directive";
 import { SmartChipHeader } from "./smartChip.header.directive";
 import { SmartChipMenu } from "./smartChip.menu.directive";
+import { SmartChipAction } from "./smartChip.action.directive";
+import { AngularMaterialModule } from "src/sharedModules";
 
 @NgModule({
   imports: [
     CommonModule,
-    MatMenuModule,
     BrowserAnimationsModule,
-    MatRippleModule,
+    AngularMaterialModule,
   ],
   declarations: [
     SmartChipMenu,
     SmartChipContent,
     SmartChipHeader,
+    SmartChipAction,
     SmartChip,
     HasSubMenuPipe,
   ],
@@ -27,6 +27,7 @@ import { SmartChipMenu } from "./smartChip.menu.directive";
     SmartChipMenu,
     SmartChipContent,
     SmartChipHeader,
+    SmartChipAction,
     SmartChip,
   ]
 })

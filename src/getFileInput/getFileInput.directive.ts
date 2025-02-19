@@ -1,5 +1,5 @@
 import { Directive, EventEmitter, HostListener, Input, Output, TemplateRef } from "@angular/core";
-import { MatDialog, MatDialogRef } from "@angular/material/dialog";
+import { MatDialog, MatDialogRef } from "src/sharedModules/angularMaterial.exports";
 import { FileInputModal } from "./fileInputModal/fileInputModal.component";
 import { IFileInputConfig, TFileInputEvent } from "./type";
 

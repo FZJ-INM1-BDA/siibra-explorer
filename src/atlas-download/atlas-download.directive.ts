@@ -1,12 +1,13 @@
 import { Directive, HostListener } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatSnackBar } from 'src/sharedModules/angularMaterial.exports'
 import { Store, select } from '@ngrx/store';
 import { Subject, concat, of } from 'rxjs';
 import { distinctUntilChanged, shareReplay, take } from 'rxjs/operators';
-import { SAPI } from 'src/atlasComponents/sapi';
-import { MainState } from 'src/state';
+import { IDS, SAPI } from 'src/atlasComponents/sapi';
+import { MainState, userInteraction, userInterface } from 'src/state';
 import { fromRootStore, selectors } from "src/state/atlasSelection"
 import { wait } from "src/util/fn"
+import { DialogService } from 'src/services/dialogService.service';
 
 @Directive({
   selector: '[sxplrAtlasDownload]',
@@ -17,11 +18,16 @@ export class AtlasDownloadDirective {
   @HostListener('click')
   async onClick(){
     try {
-
+      
       this.#busy$.next(true)
       const { parcellation, template } = await this.store.pipe(
         fromRootStore.distinctATP(),
         take(1)
+      ).toPromise()
+
+      const bbox = await this.store.pipe(
+        select(selectors.currentViewport),
+        take(1),
       ).toPromise()
 
       const selectedRegions = await this.store.pipe(
@@ -29,7 +35,12 @@ export class AtlasDownloadDirective {
         take(1)
       ).toPromise()
 
-      const endpoint = await SAPI.BsEndpoint$.pipe(
+      const selectedFeature = await this.store.pipe(
+        select(userInteraction.selectors.selectedFeature),
+        take(1)
+      ).toPromise()
+
+      const endpoint = await this.sapi.sapiEndpoint$.pipe(
         take(1)
       ).toPromise()
 
@@ -38,14 +49,58 @@ export class AtlasDownloadDirective {
         parcellation_id: parcellation.id,
         space_id: template.id,
       }
+
+      if (template.id === IDS.TEMPLATES.BIG_BRAIN) {
+
+        const mode = await this.store.pipe(
+          select(userInterface.selectors.panelMode),
+          take(1)
+        ).toPromise()
+
+        /**
+         * default value of mode is null
+         */
+        if (mode && mode !== "FOUR_PANEL") {
+          await this.dialogSvc.getUserConfirm({
+            markdown: `Download current view only works in \`four panel\` mode. \n\nContinue the download - as if \`four panel\` view was active?`,
+          })
+        }
+      }
+
+      if (bbox) {
+        query['bbox'] = JSON.stringify([bbox.minpoint, bbox.maxpoint])
+      }
+
       if (selectedRegions.length === 1) {
         query['region_id'] = selectedRegions[0].name
+      }
+      if (selectedFeature) {
+        query['feature_id'] = selectedFeature.id
       }
       for (const key in query) {
         url.searchParams.set(key, query[key])
       }
   
       const resp = await fetch(url)
+      const ct = resp.headers.get("content-type")
+      if (ct === "application/octet-stream") {
+        const cd = resp.headers.get("content-disposition") || "filename=download.zip"
+        const filename = cd.split("=")[1]
+        const blob = await resp.blob()
+        const url = URL.createObjectURL(blob)
+        
+        const a = document.createElement("a")
+        a.href = url
+        a.download = filename
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        URL.revokeObjectURL(url)
+        
+        this.#busy$.next(false)
+        return
+      }
+
       const { task_id } = await resp.json()
   
       if (!task_id) {
@@ -91,6 +146,6 @@ export class AtlasDownloadDirective {
   #error$ = new Subject<string>()
   error$ = this.#error$.pipe()
 
-  constructor(private store: Store<MainState>, private snackbar: MatSnackBar) { }
+  constructor(private store: Store<MainState>, private snackbar: MatSnackBar, private sapi: SAPI, private dialogSvc: DialogService) { }
 
 }

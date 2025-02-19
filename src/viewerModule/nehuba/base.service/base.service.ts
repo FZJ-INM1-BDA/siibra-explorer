@@ -49,7 +49,12 @@ export class BaseService {
             
             for (const { name, label } of region) {
               const actualRegion = regionmap.get(name) || (() => {
-                console.log(`region with name ${name} cannot be found. Viewer may not behave properly`)
+                // TODO 
+                // >= 0.3.18 siibra-api /maps endpoint populates *both* full region name as well as short names
+                // This is a side effect of mixing both versions of siibra-python.
+                // and expected to end at >= 0.4. By then, restore this warning for debugging purposes
+
+                // console.log(`region with name ${name} cannot be found. Viewer may not behave properly`)
                 return { name, id: '', parentIds: [], type: 'SxplrRegion' }
               })()
               const ngId = getParcNgId(atlas, template, parcellation, actualRegion)

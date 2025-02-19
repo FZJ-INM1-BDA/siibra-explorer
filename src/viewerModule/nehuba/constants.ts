@@ -35,3 +35,10 @@ export type TNehubaViewerUnit = {
 export const SET_MESHES_TO_LOAD = new InjectionToken<Observable<IMeshesToLoad>>('SET_MESHES_TO_LOAD')
 
 export const PMAP_LAYER_NAME = 'regional-pmap'
+
+/**
+ * since export_nehuba@0.1.0 onwards (the big update that changed a lot of neuroglancer's internals)
+ * there is now a multiplier bewteen old and new perspective views
+ * to maintain interop with previous states, translate the multiplier
+ */
+export const PERSPECTIVE_ZOOM_FUDGE_FACTOR = 82.842712474619

@@ -1,4 +1,4 @@
-import { SxplrAtlas, SxplrTemplate, SxplrParcellation, SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes"
+import { SxplrAtlas, SxplrTemplate, SxplrParcellation, SxplrRegion, BoundingBox } from "src/atlasComponents/sapi/sxplrTypes"
 import { TSandsPoint, TFace } from "src/util/types"
 
 export const nameSpace = `[state.atlasSelection]`
@@ -13,6 +13,8 @@ export type AtlasSelectionState = {
   selectedTemplate: SxplrTemplate
   selectedParcellation: SxplrParcellation
   selectedParcellationAllRegions: SxplrRegion[]
+
+  currentViewport: BoundingBox
 
   selectedRegions: SxplrRegion[]
   standAloneVolumes: string[]

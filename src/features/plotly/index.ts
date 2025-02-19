@@ -1,0 +1,1 @@
+export { PlotComponent as PlotlyComponent } from "./plot/plot.component"

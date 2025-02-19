@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: sxplr-redis
+    role: cache
+  name: redis-cache-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sxplr-redis
+  template:
+    metadata:
+      labels:
+        app: sxplr-redis
+        role: cache
+    spec:
+      containers:
+      - image: docker-registry.ebrains.eu/monitoring/redis:alpine3.17
+        imagePullPolicy: IfNotPresent
+        name: sxplr-redis
+        ports:
+        - containerPort: 6379
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 200m
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+      restartPolicy: Always

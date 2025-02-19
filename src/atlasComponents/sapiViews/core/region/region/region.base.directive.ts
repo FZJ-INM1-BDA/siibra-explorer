@@ -3,9 +3,9 @@ import { SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate } from "src/a
 import { translateV3Entities } from "src/atlasComponents/sapi/translateV3"
 import { rgbToHsl } from 'common/util'
 import { SAPI } from "src/atlasComponents/sapi/sapi.service";
-import { BehaviorSubject, combineLatest } from "rxjs";
-import { SAPIRegion } from "src/atlasComponents/sapi/core";
-import { map, switchMap } from "rxjs/operators";
+import { BehaviorSubject, combineLatest, forkJoin, from, of } from "rxjs";
+import { catchError, map, switchMap } from "rxjs/operators";
+import { DecisionCollapse } from "src/atlasComponents/sapi/decisionCollapse.service";
 
 @Directive({
   selector: `[sxplr-sapiviews-core-region]`,
@@ -95,7 +95,7 @@ export class SapiViewsCoreRegionRegionBase {
       /**
        * color
        */
-      const rgb = SAPIRegion.GetDisplayColor(this.region) || [200, 200, 200]
+      const rgb = this.region?.color || [200, 200, 200]
       this.regionRgbString = `rgb(${rgb.join(',')})`
       const [ /* _h */, /* _s */, l] = rgbToHsl(...rgb)
       this.regionDarkmode = l < 0.4
@@ -130,7 +130,68 @@ export class SapiViewsCoreRegionRegionBase {
     ).toPromise()
   }
 
-  constructor(protected sapi: SAPI){
+  protected async fetchRelated(region: SxplrRegion){
+    const getPage = (page: number) => this.sapi.v3Get("/regions/{region_id}/related", {
+      path: {
+        region_id: region.name
+      },
+      query: {
+        parcellation_id: this.parcellation.id,
+        page
+      }
+    })
+    return getPage(1).pipe(
+      switchMap(resp => this.sapi.iteratePages(resp, getPage)),
+      switchMap(arr => forkJoin(
+        arr.map(({ qualification, assigned_structure, assigned_structure_parcellation }) => forkJoin({
+          qualification: of(qualification),
+          region: translateV3Entities.translateRegion(assigned_structure),
+          parcellation: translateV3Entities.translateParcellation(assigned_structure_parcellation),
+        }))
+      )),
+      switchMap(relatedRegions => {
+        
+        const uniqueParc = relatedRegions.map(v => v.parcellation).reduce(
+          (acc, curr) => acc.map(v => v.id).includes(curr.id) ? acc : acc.concat(curr),
+          [] as SxplrParcellation[]
+        )
+        
+        return forkJoin(
+          uniqueParc.map(parc =>
+            from(this.collapser.collapseParcId(parc.id)).pipe(
+              switchMap(collapsed => forkJoin(
+                collapsed.spaces.map(space =>
+                  from(this.sapi.getLabelledMap(parc, space)).pipe(
+                    catchError(() => of(null))
+                  )
+                )
+              )),
+              map(labelMap => ({
+                parcellation: parc,
+                mappedRegions: labelMap
+                  .filter(v => !!v)
+                  .map(m => Object.keys(m.indices))
+                  .flatMap(v => v),
+              })),
+            )
+          )
+        ).pipe(
+          map(allMappedRegions => {
+            const regMap: Record<string, string[]> = {}
+            for (const { parcellation, mappedRegions } of allMappedRegions) {
+              regMap[parcellation.id] = mappedRegions
+            }
+            return relatedRegions.map(prev => ({
+              ...prev,
+              mapped: (regMap[prev.parcellation.id] || []).includes(prev.region.name)
+            }))
+          })
+        )
+      })
+    ).toPromise()
+  }
+
+  constructor(protected sapi: SAPI, private collapser: DecisionCollapse){
 
   }
 }

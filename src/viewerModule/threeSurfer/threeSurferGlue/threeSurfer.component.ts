@@ -1,12 +1,10 @@
-import { Component, Output, EventEmitter, ElementRef, OnDestroy, AfterViewInit, Inject, Optional, ChangeDetectionStrategy } from "@angular/core";
+import { Component, Output, EventEmitter, ElementRef, OnDestroy, AfterViewInit, Optional, ChangeDetectionStrategy } from "@angular/core";
 import { EnumViewerEvt, IViewer, TViewerEvent } from "src/viewerModule/viewer.interface";
-import { combineLatest, concat, forkJoin, from, merge, NEVER, Observable, of, Subject } from "rxjs";
-import { catchError, debounceTime, distinctUntilChanged, filter, map, scan, shareReplay, switchMap, withLatestFrom } from "rxjs/operators";
-import { ComponentStore } from "src/viewerModule/componentStore";
+import { BehaviorSubject, combineLatest, concat, forkJoin, from, merge, NEVER, Observable, of, Subject, throwError } from "rxjs";
+import { catchError, debounceTime, distinctUntilChanged, filter, map, scan, shareReplay, startWith, switchMap, tap, withLatestFrom } from "rxjs/operators";
+import { ComponentStore, LockError } from "src/viewerModule/componentStore";
 import { select, Store } from "@ngrx/store";
-import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
-import { MatSnackBar } from "@angular/material/snack-bar";
-import { CONST } from 'common/constants'
+import { MatSnackBar } from "src/sharedModules/angularMaterial.exports"
 import { getUuid, switchMapWaitFor } from "src/util/fn";
 import { AUTO_ROTATE, TInteralStatePayload, ViewerInternalStateSvc } from "src/viewerModule/viewerInternalState.service";
 import { atlasAppearance, atlasSelection } from "src/state";
@@ -27,7 +25,7 @@ type TInternalState = {
   mode: string
   hemisphere: 'left' | 'right' | 'both'
 }
-const pZoomFactor = 5e3
+const pZoomFactor = 7e3
 
 type THandlingCustomEv = {
   regions: SxplrRegion[]
@@ -97,9 +95,23 @@ type TThreeSurfer = {
   loadColormap: (url: string) => Promise<GiiInstance>
   setupAnimation: () => void
   dispose: () => void
+  loadVertexData: (url: string) => Promise<{
+    vertex: number[]
+    labels: {
+      index: number
+      name: string
+      color: number[]
+      vertices: number[]
+    }[]
+    readonly vertexLabels: Uint16Array
+    readonly colormap: Map<number, number[]>
+  }>
   control: any
   camera: any
   customColormap: WeakMap<TThreeGeometry, any>
+  gridHelper: {
+    visible: boolean
+  }
 }
 
 type LateralityRecord<T> = Record<string, T>
@@ -107,11 +119,15 @@ type LateralityRecord<T> = Record<string, T>
 const threshold = 1e-3
 
 function cameraNavsAreSimilar(c1: TCameraOrientation, c2: TCameraOrientation){
-  if (c1 === c2) return true
-  if (!!c1 && !!c2) return true
 
-  if (!c1 && !!c2) return false
-  if (!c2 && !!c1) return false
+  // if same reference, return true
+  if (c1 === c2) return true
+
+  // if both falsy, return true
+  if (!c1 && !c2) return true
+
+  if (!c1 && c2) return false
+  if (!c2 && c1) return false
 
   if (Math.abs(c1.perspectiveZoom - c2.perspectiveZoom) > threshold) return false
   if ([0, 1, 2, 3].some(
@@ -141,9 +157,57 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
   viewerEvent = new EventEmitter<TViewerEvent<'threeSurfer'>>()
 
   private domEl: HTMLElement
-  private mainStoreCameraNav: TCameraOrientation = null
-  private localCameraNav: TCameraOrientation = null
 
+  #storeNavigation = this.store$.pipe(
+    select(atlasSelection.selectors.navigation)
+  )
+
+  #componentStoreNavigation = this.navStateStoreRelay.select(s => s)
+  
+  #internalNavigation = this.#cameraEv$.pipe(
+    filter(v => !!v && !!(this.tsRef?.camera?.matrix)),
+    map(() => {
+      const { tsRef } = this
+      return {
+        _po: null,
+        _pz: null,
+        _calculate(){
+          if (!tsRef) return
+          const THREE = (window as any).ThreeSurfer.THREE
+          
+          const q = new THREE.Quaternion()
+          const t = new THREE.Vector3()
+          const s = new THREE.Vector3()
+
+          /**
+           * ThreeJS interpretes the scene differently to neuroglancer in subtle ways. 
+           * At [0, 0, 0, 1] decomposed camera quaternion, for example,
+           * - ThreeJS: view from superior -> inferior, anterior as top, right hemisphere as right
+           * - NG: view from from inferior -> superior, posterior as top, left hemisphere as right
+           * 
+           * multiplying the exchange factor [-1, 0, 0, 0] converts ThreeJS convention to NG convention
+           */
+          const cameraM = tsRef.camera.matrix
+          cameraM.decompose(t, q, s)
+          const exchangeFactor = new THREE.Quaternion(-1, 0, 0, 0)
+          this._po = q.multiply(exchangeFactor).toArray()
+          this._pz = t.length() * pZoomFactor // use zoom as used in main store
+        },
+        get perspectiveOrientation(){
+          if (!this._po) {
+            this._calculate()
+          }
+          return this._po
+        },
+        get perspectiveZoom() {
+          if (!this._pz) {
+            this._calculate()
+          }
+          return this._pz
+        }
+      } as TCameraOrientation
+    })
+  )
 
   private internalStateNext: (arg: TInteralStatePayload<TInternalState>) => void
 
@@ -199,7 +263,9 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
   )
 
   private vertexIndexLayers$: Observable<ThreeSurferCustomLabelLayer[]> = this.customLayers$.pipe(
-    map(layers => layers.filter(l => l.clType === "baselayer/threesurfer-label") as ThreeSurferCustomLabelLayer[]),
+    map(layers => layers.filter(l => 
+      l.clType === "baselayer/threesurfer-label/gii-label" || l.clType === "baselayer/threesurfer-label/annot"
+    ) as ThreeSurferCustomLabelLayer[]),
     distinctUntilChanged(arrayEqual((o, n) => o.id === n.id)),
   )
 
@@ -212,22 +278,37 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
     ),
     switchMap(layers => 
       forkJoin(
-        layers.map(layer => 
-          from(
-            this.tsRef.loadColormap(layer.source)
-          ).pipe(
-            map(giiInstance => {
-              let vertexIndices: number[] = giiInstance[0].getData()
-              if (giiInstance[0].attributes.DataType === 'NIFTI_TYPE_INT16') {
-                vertexIndices = (window as any).ThreeSurfer.GiftiBase.castF32UInt16(vertexIndices)
-              }
-              return {
-                indexLayer: layer,
-                vertexIndices
-              }
-            })
-          )
-        )
+        layers.map(layer => {
+          if (layer.clType === "baselayer/threesurfer-label/gii-label") {
+            return from(
+              this.tsRef.loadColormap(layer.source)
+            ).pipe(
+              map(giiInstance => {
+                let vertexIndices: number[] = giiInstance[0].getData()
+                if (giiInstance[0].attributes.DataType === 'NIFTI_TYPE_INT16') {
+                  vertexIndices = (window as any).ThreeSurfer.GiftiBase.castF32UInt16(vertexIndices)
+                }
+                return {
+                  indexLayer: layer,
+                  vertexIndices
+                }
+              })
+            )
+          }
+          if (layer.clType === "baselayer/threesurfer-label/annot") {
+            return from(
+              this.tsRef.loadVertexData(layer.source)
+            ).pipe(
+              map(v => {
+                return {
+                  indexLayer: layer,
+                  vertexIndices: v.vertexLabels
+                }
+              })
+            )
+          }
+          return throwError(() => new Error(`layer is neither annot nor gii-label`))
+        })
       )
     ),
     map(layers => {
@@ -264,8 +345,13 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
           const { label, region } = curr
           
           let key : 'left' | 'right'
-          if ( /left/i.test(region.name) ) key = 'left'
-          if ( /right/i.test(region.name) ) key = 'right'
+          if (
+            /left/i.test(region.name) || /^lh/i.test(region.name)
+          ) key = 'left'
+          if (
+            /right/i.test(region.name) || /^rh/i.test(region.name)
+          ) key = 'right'
+
           if (!key) {
             /**
              * TODO
@@ -301,6 +387,9 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
     map(([ latIdxReg, cms ]) => {
       const cm = cms[0]
       const returnValue: TLatCm = {}
+      if (!cm) {
+        return returnValue
+      }
       for (const lat in latIdxReg) {
         returnValue[lat] = {
           labelIndices: [],
@@ -336,13 +425,12 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
 
   constructor(
     private effect: ThreeSurferEffects,
-    private el: ElementRef,
+    el: ElementRef,
     private store$: Store,
-    private navStateStoreRelay: ComponentStore<{ perspectiveOrientation: [number, number, number, number], perspectiveZoom: number }>,
+    private navStateStoreRelay: ComponentStore<TCameraOrientation>,
     private sapi: SAPI,
     private snackbar: MatSnackBar,
     @Optional() intViewerStateSvc: ViewerInternalStateSvc,
-    @Optional() @Inject(CLICK_INTERCEPTOR_INJECTOR) clickInterceptor: ClickInterceptor,
   ){
     if (intViewerStateSvc) {
       const {
@@ -372,120 +460,88 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
       this.onDestroyCb.push(() => done())
     }
 
-    /**
-     * intercept click and act
-     */
-    if (clickInterceptor) {
-      const handleClick = (ev: MouseEvent) => {
-
-        // if does not click inside container, ignore
-        if (!(this.el.nativeElement as HTMLElement).contains(ev.target as HTMLElement)) {
-          return true
-        }
-        
-        if (this.mouseoverRegions.length === 0) return true
-        if (this.mouseoverRegions.length > 1) {
-          this.snackbar.open(CONST.DOES_NOT_SUPPORT_MULTI_REGION_SELECTION, 'Dismiss', {
-            duration: 3000
-          })
-          return true
-        }
-
-        const regions = this.mouseoverRegions.slice(0, 1) as any[]
-        this.store$.dispatch(
-          atlasSelection.actions.setSelectedRegions({ regions })
-        )
-        return true
-      }
-      const { register, deregister } = clickInterceptor
-      register(handleClick)
-      this.onDestroyCb.push(
-        () => { deregister(register) }
-      )
-    }
     
-    this.domEl = this.el.nativeElement
+    this.domEl = el.nativeElement
 
     /**
      * subscribe to camera custom event
      */
-    const cameraSub = this.#cameraEv$.pipe(
-      filter(v => !!v),
-      debounceTime(160)
-    ).subscribe(() => {
-      
-      const THREE = (window as any).ThreeSurfer.THREE
-      
-      const q = new THREE.Quaternion()
-      const t = new THREE.Vector3()
-      const s = new THREE.Vector3()
-
-      /**
-       * ThreeJS interpretes the scene differently to neuroglancer in subtle ways. 
-       * At [0, 0, 0, 1] decomposed camera quaternion, for example,
-       * - ThreeJS: view from superior -> inferior, anterior as top, right hemisphere as right
-       * - NG: view from from inferior -> superior, posterior as top, left hemisphere as right
-       * 
-       * multiplying the exchange factor [-1, 0, 0, 0] converts ThreeJS convention to NG convention
-       */
-      const cameraM = this.tsRef.camera.matrix
-      cameraM.decompose(t, q, s)
-      const exchangeFactor = new THREE.Quaternion(-1, 0, 0, 0)
-
+    const setReconcilState = merge(
+      this.#internalNavigation.pipe(
+        filter(v => !!v),
+        tap(() => {
+          try {
+            this.releaseRelayLock = this.navStateStoreRelay.getLock()
+          } catch (e) {
+            if (!(e instanceof LockError)) {
+              throw e
+            }
+          }
+        }),
+        debounceTime(160),
+        tap(() => {
+          if (this.releaseRelayLock) {
+            this.releaseRelayLock()
+            this.releaseRelayLock = null
+          } else {
+            console.warn(`this.releaseRelayLock not aquired, component may not function properly`)
+          }  
+        })
+      ),
+      this.#storeNavigation,
+    ).pipe(
+      filter(v => !!v)
+    ).subscribe(nav => {
       try {
         this.navStateStoreRelay.setState({
-          perspectiveOrientation: q.multiply(exchangeFactor).toArray(),
-          perspectiveZoom: t.length()
+          perspectiveOrientation: nav.perspectiveOrientation,
+          perspectiveZoom: nav.perspectiveZoom
         })
-      } catch (_e) {
-        // LockError, ignore
+      } catch (e) {
+        if (!(e instanceof LockError)) {
+          throw e
+        }
       }
     })
 
     this.onDestroyCb.push(
-      () => cameraSub.unsubscribe()
+      () => setReconcilState.unsubscribe()
     )
 
     /**
      * subscribe to navstore relay store and negotiate setting global state
      */
-    const navStateSub = this.navStateStoreRelay.select(s => s).subscribe(v => {
-      this.store$.dispatch(
-        atlasSelection.actions.setNavigation({
+    const reconciliatorSub = combineLatest([
+      this.#storeNavigation.pipe(
+        startWith(null as TCameraOrientation)
+      ),
+      this.#componentStoreNavigation.pipe(
+        startWith(null as TCameraOrientation),
+      ),
+      this.#internalNavigation.pipe(
+        startWith(null as TCameraOrientation),
+      )
+    ]).pipe(
+      debounceTime(160),
+      filter(() => !this.navStateStoreRelay.isLocked)
+    ).subscribe(([ storeNav, reconcilNav, internalNav ]) => {
+      if (!cameraNavsAreSimilar(storeNav, reconcilNav) && reconcilNav) {
+        this.store$.dispatch(atlasSelection.actions.setNavigation({
           navigation: {
             position: [0, 0, 0],
             orientation: [0, 0, 0, 1],
             zoom: 1e6,
-            perspectiveOrientation: v.perspectiveOrientation,
-            perspectiveZoom: v.perspectiveZoom * pZoomFactor
+            perspectiveOrientation: reconcilNav.perspectiveOrientation,
+            perspectiveZoom: reconcilNav.perspectiveZoom
           }
-        })
-      )
-    })
-
-    this.onDestroyCb.push(
-      () => navStateSub.unsubscribe()
-    )
-
-    /**
-     * subscribe to main store and negotiate with relay to set camera
-     */
-    const navSub = this.store$.pipe(
-      select(atlasSelection.selectors.navigation),
-      filter(v => !!v),
-    ).subscribe(nav => {
-      const { perspectiveOrientation, perspectiveZoom } = nav
-      this.mainStoreCameraNav = {
-        perspectiveOrientation,
-        perspectiveZoom
+        }))
       }
 
-      if (!cameraNavsAreSimilar(this.mainStoreCameraNav, this.localCameraNav)) {
-        this.relayStoreLock = this.navStateStoreRelay.getLock()
+      if (!cameraNavsAreSimilar(reconcilNav, internalNav) && reconcilNav) {
         const THREE = (window as any).ThreeSurfer.THREE
         
-        const cameraQuat = new THREE.Quaternion(...this.mainStoreCameraNav.perspectiveOrientation)
-        const cameraPos = new THREE.Vector3(0, 0, this.mainStoreCameraNav.perspectiveZoom / pZoomFactor)
+        const cameraQuat = new THREE.Quaternion(...reconcilNav.perspectiveOrientation)
+        const cameraPos = new THREE.Vector3(0, 0, reconcilNav.perspectiveZoom / pZoomFactor)
         
         /**
          * ThreeJS interpretes the scene differently to neuroglancer in subtle ways. 
@@ -501,19 +557,18 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
         cameraPos.applyQuaternion(cameraQuat)
         this.toTsRef(tsRef => {
           tsRef.camera.position.copy(cameraPos)
-          if (this.relayStoreLock) this.relayStoreLock()
         })
       }
     })
 
     this.onDestroyCb.push(
-      () => navSub.unsubscribe()
+      () => reconciliatorSub.unsubscribe()
     )
   }
 
   private tsRef: TThreeSurfer
 
-  private relayStoreLock: () => void = null
+  private releaseRelayLock: () => void = null
   private tsRefInitCb: ((tsRef: any) => void)[] = []
   private toTsRef(callback: (tsRef: any) => void) {
     if (this.tsRef) {
@@ -613,7 +668,7 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
         this.tsRef.applyColorMap(mesh, vertexIndices, {
           custom: actualApplyMap
         })
-        return
+        continue
       }
 
       const highlightIdx = new Set<number>()
@@ -670,8 +725,8 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
     const { evDetail: detail, latMeshRecord, latLblIdxRecord, latLblIdxReg, meshVisibility } = arg
     const evMesh = detail.mesh && {
       faceIndex: detail.mesh.faceIndex,
-      // typo in three-surfer
-      verticesIndicies: detail.mesh.verticesIdicies
+      verticesIndicies: detail.mesh.verticesIndicies,
+      vertexIndex: detail.mesh.vertexIndex,
     }
     const custEv: THandlingCustomEv = {
       regions: [],
@@ -684,9 +739,8 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
 
     const {
       geometry: evGeometry,
-      // typo in three-surfer
-      verticesIdicies: evVerticesIndicies,
-    } = detail.mesh as { geometry: TThreeGeometry, verticesIdicies: number[] }
+      vertexIndex
+    } = detail.mesh as { geometry: TThreeGeometry, verticesIndicies: number[], vertexIndex: number }
 
     for (const laterality in latMeshRecord) {
       const meshRecord = latMeshRecord[laterality]
@@ -715,13 +769,21 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
        * translate vertex indices to label indicies via set, to remove duplicates
        */
       const labelIndexSet = new Set<number>()
-      for (const idx of evVerticesIndicies){
-        const labelOfInterest = labelIndexRecord.vertexIndices[idx]
-        if (!labelOfInterest) {
-          continue
-        }
-        labelIndexSet.add(labelOfInterest)
+      if (labelIndexRecord.vertexIndices[vertexIndex]) {
+        labelIndexSet.add(labelIndexRecord.vertexIndices[vertexIndex])
       }
+
+      /**
+       * old implementation (perhaps less CPU intensive)
+       * gets all vertices and label them
+       */
+      // for (const idx of evVerticesIndicies){
+      //   const labelOfInterest = labelIndexRecord.vertexIndices[idx]
+      //   if (!labelOfInterest) {
+      //     continue
+      //   }
+      //   labelIndexSet.add(labelOfInterest)
+      // }
 
       /**
        * decode label index to region
@@ -774,11 +836,13 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
       () => this.domEl.removeEventListener((window as any).ThreeSurfer.CUSTOM_EVENTNAME_UPDATED, customEvHandler)
     )
     this.tsRef = new (window as any).ThreeSurfer(this.domEl, {highlightHovered: true})
+    window['tsViewer'] = this.tsRef
 
     this.onDestroyCb.push(
       () => {
         this.tsRef.dispose()
         this.tsRef = null
+        window['tsViewer'] = null
       }
     )
     this.tsRef.control.enablePan = false
@@ -854,13 +918,9 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
       }
     })
     this.mouseoverText = ''
-    if (mouseover.length > 0) {
-      this.mouseoverText += mouseover.map(el => el.name).join(' / ')
-    }
     if (error) {
       this.mouseoverText += `::error: ${error}`
     }
-    if (this.mouseoverText === '') this.mouseoverText = null
   }
 
   public toggleMeshVis(label: string) {
@@ -876,6 +936,12 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
         variant
       })
     )
+  }
+
+  gridVisible$ = new BehaviorSubject<boolean>(true)
+  setGridVisibility(newFlag: boolean){
+    this.tsRef.gridHelper.visible = newFlag
+    this.gridVisible$.next(newFlag)
   }
 
   private onDestroyCb: (() => void) [] = []

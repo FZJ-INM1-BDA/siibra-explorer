@@ -1,7 +1,10 @@
 <ng-container *ngIf="meetsRequirement; else doesNotMeetReqTemplate">
 
-  <ng-container *ngTemplateOutlet="viewerBody">
-  </ng-container>
+  <ng-template [ngIf]="sapiError$ | async" let-data [ngIfElse]="viewerBody">
+    <ng-template [ngTemplateOutlet]="errorTmpl" [ngTemplateOutletContext]="{ message: data }">
+    </ng-template>
+  </ng-template>
+
 </ng-container>
 
 <!-- cookie -->
@@ -23,7 +26,11 @@
 
 <!-- atlas template -->
 <ng-template #viewerBody>
+  <div class="w-100 h-100" *ngIf="freemode">
+    <freemode-ui></freemode-ui>
+  </div>
   <div class="w-100 h-100"
+    *ngIf="!freemode"
     quick-tour
     [quick-tour-position]="quickTourFinale.position"
     [quick-tour-description]="quickTourFinale.description"
@@ -55,4 +62,9 @@
 </ng-template>
 
 <ng-template #emptyArrowTmpl>
+</ng-template>
+
+<ng-template #errorTmpl let-message="message">
+  <not-supported-component [errorString]="message">
+  </not-supported-component>
 </ng-template>

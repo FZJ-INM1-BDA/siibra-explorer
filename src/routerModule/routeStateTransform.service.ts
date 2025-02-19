@@ -1,15 +1,22 @@
-import { Injectable } from "@angular/core";
+import { Inject, Injectable } from "@angular/core";
 import { UrlSegment, UrlTree } from "@angular/router";
 import { map } from "rxjs/operators";
 import { SAPI } from "src/atlasComponents/sapi";
 import { translateV3Entities } from "src/atlasComponents/sapi/translateV3";
 import { SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes"
-import { atlasSelection, defaultState, MainState, plugins, userInteraction } from "src/state";
-import { getParcNgId } from "src/viewerModule/nehuba/config.service";
+import { atlasAppearance, atlasSelection, defaultState, MainState, plugins, userInteraction, userInterface } from "src/state";
 import { decodeToNumber, encodeNumber, encodeURIFull, separator } from "./cipher";
 import { TUrlAtlas, TUrlPathObj, TUrlStandaloneVolume } from "./type";
 import { decodePath, encodeId, decodeId, encodePath } from "./util";
-import { QuickHash } from "src/util/fn";
+import { QuickHash, decodeBool, encodeBool, isNullish } from "src/util/fn";
+import { NEHUBA_CONFIG_SERVICE_TOKEN, NehubaConfigSvc } from "src/viewerModule/nehuba/config.service";
+
+type ViewerConfigState = {
+  panelMode: userInterface.PanelMode
+  panelOrder: string
+  octantRemoval: boolean
+  showDelineation: boolean
+}
 
 @Injectable()
 export class RouteStateTransformSvc {
@@ -20,7 +27,11 @@ export class RouteStateTransformSvc {
     return arr[0]
   }
 
-  constructor(private sapi: SAPI){}
+  constructor(
+    private sapi: SAPI,
+    @Inject(NEHUBA_CONFIG_SERVICE_TOKEN)
+    private nehubaCfgSvc: NehubaConfigSvc,
+  ){}
   
   private async getATPR(obj: TUrlPathObj<string[], TUrlAtlas<string[]>>){
     const selectedAtlasId = decodeId( RouteStateTransformSvc.GetOneAndOnlyOne(obj.a) )
@@ -93,7 +104,7 @@ export class RouteStateTransformSvc {
 
       for (const { region } of [...Object.values(ngMap), ...Object.values(threeMap)]) {
         const actualRegion = regionMap.get(region[0].name)
-        const ngId = getParcNgId(selectedAtlas, selectedTemplate, selectedParcellation, actualRegion)
+        const ngId = this.nehubaCfgSvc.getParcNgId(selectedAtlas, selectedTemplate, selectedParcellation, actualRegion)
 
         if (!json[ngId]) {
           continue
@@ -177,7 +188,22 @@ export class RouteStateTransformSvc {
         console.error(`cannot parse navigation state`, e)
       }
     }
+    const viewerConfigState = returnObj['vs'] && returnObj['vs'][0]
+    if (viewerConfigState) {
 
+      const { panelMode, panelOrder } = !!viewerConfigState
+      ? this.decodeMiscState(viewerConfigState)
+      : { panelMode: "FOUR_PANEL" as const, panelOrder: "0123" }
+  
+      returnState['[state.ui]'].panelMode = panelMode
+      returnState['[state.ui]'].panelOrder = panelOrder
+
+      // TODO restoring octant removal and hidedelination is still quite buggy
+      // enable in future update
+      // returnState["[state.atlasAppearance]"].showDelineation = showDelineation
+      // returnState["[state.atlasAppearance]"].octantRemoval = octantRemoval  
+  
+    }
     // pluginState should always be defined, regardless if standalone volume or not
     const pluginStates = fullPath.queryParams['pl']
     if (pluginStates) {
@@ -241,6 +267,74 @@ export class RouteStateTransformSvc {
     return returnState
   }
 
+  public stateVersion = 'v1'
+
+  encodeMiscState(config: ViewerConfigState): string {
+    const { panelMode, panelOrder, octantRemoval, showDelineation } = config
+    if (isNullish(panelOrder) && isNullish(panelMode)) {
+      return null
+    }
+    let panelModeVal = 1
+    if (panelMode === "PIP_PANEL") {
+      panelModeVal = 2
+    }
+    let panelOrderVal = 4
+    if (("0123".split("")).includes(panelOrder[0])){
+      panelOrderVal = parseInt(panelOrder[0])
+    }
+    const encodedBools = encodeBool(octantRemoval, showDelineation)
+    const array = new Uint8Array([
+      panelModeVal,
+      panelOrderVal,
+      encodedBools
+    ])
+    const encodedVal = window.btoa(new Uint8Array(array.buffer).reduce((data, v) => data + String.fromCharCode(v), ''))
+    return `${this.stateVersion}-${encodedVal}`
+  }
+
+  decodeMiscState(val: string){
+    if (!val.startsWith(`${this.stateVersion}-`)) {
+      throw new Error(`version must start with "${this.stateVersion}-"`)
+    }
+    const trimStart = new RegExp(`^${this.stateVersion}-`)
+    const encodedVal = val.replace(trimStart, "")
+    const array = Uint8Array.from(window.atob(encodedVal), v => v.charCodeAt(0))
+
+    const returnVal: Partial<ViewerConfigState> = {}
+
+    const panelModeVal = array[0]
+    if (panelModeVal === 1) {
+      returnVal.panelMode = "FOUR_PANEL"
+    } else if (panelModeVal) {
+      returnVal.panelMode = "PIP_PANEL"
+    } else {
+      console.warn(`panelmode set to ${panelModeVal}, which is unknown, set to default (4 panel)`)
+      returnVal.panelMode = "FOUR_PANEL"
+    }
+    
+    let panelOrderVal = array[1]
+    let panelOrder = ""
+    while (panelOrder.length < 4) {
+      panelOrder += `${panelOrderVal % 4}`
+      panelOrderVal ++
+    }
+    if (
+      panelOrder.split("").some(
+        v => !("0123".split("")).includes(v)
+      )
+    ) {
+      console.warn(`panelOrder=${panelOrder} contains strings that is not in 0123, set to default (0123)`)
+      panelOrder = "0123"
+    }
+    returnVal.panelOrder = panelOrder
+
+    const [ octantRemoval, showDelineation ] = decodeBool(array[2])
+    returnVal.octantRemoval = octantRemoval
+    returnVal.showDelineation = showDelineation
+    
+    return returnVal
+  }
+
   async cvtStateToRoute(_state: MainState) {
     
     /**
@@ -257,6 +351,11 @@ export class RouteStateTransformSvc {
     const standaloneVolumes = atlasSelection.selectors.standaloneVolumes(state)
     const navigation = atlasSelection.selectors.navigation(state)
     const selectedFeature = userInteraction.selectors.selectedFeature(state)
+
+    const panelMode = userInterface.selectors.panelMode(state)
+    const panelOrder = userInterface.selectors.panelOrder(state)
+    const octantRemoval = atlasAppearance.selectors.octantRemoval(state)
+    const showDelineation = !(atlasAppearance.selectors.showDelineation(state))
 
     const searchParam = new URLSearchParams()
   
@@ -297,7 +396,8 @@ export class RouteStateTransformSvc {
               .replace(/:/g, '~')
           )
         )
-      })()
+      })(),
+      vs: this.encodeMiscState({ octantRemoval, panelMode, panelOrder, showDelineation })
     }
   
     /**

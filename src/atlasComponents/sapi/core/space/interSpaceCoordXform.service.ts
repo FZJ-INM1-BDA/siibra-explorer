@@ -1,11 +1,13 @@
-import { Injectable } from "@angular/core";
+import { Inject, Injectable } from "@angular/core";
 import { HttpClient, HttpHeaders, HttpErrorResponse } from "@angular/common/http";
 import { catchError, timeout, map } from "rxjs/operators";
 import { of, Observable } from "rxjs";
 import { environment } from 'src/environments/environment'
 import { IDS } from "src/atlasComponents/sapi/constants"
+import { GET_ATTR_TOKEN, GetAttr } from "src/util/constants";
+import { CONST } from "common/constants"
 
-type ITemplateCoordXformResp = {
+export type ITemplateCoordXformResp = {
   status: 'pending' | 'error' | 'completed' | 'cached'
   statusText?: string
   result? : [number, number, number]
@@ -15,7 +17,7 @@ export const VALID_TEMPLATE_SPACE_NAMES = {
   MNI152: 'MNI 152 ICBM 2009c Nonlinear Asymmetric',
   COLIN27: 'MNI Colin 27',
   BIG_BRAIN: 'Big Brain (Histology)',
-  INFANT: 'Infant Atlas',
+  // INFANT: 'Infant Atlas',
 } as const
 
 export type ValidTemplateSpaceName = typeof VALID_TEMPLATE_SPACE_NAMES[keyof typeof VALID_TEMPLATE_SPACE_NAMES]
@@ -49,9 +51,11 @@ export class InterSpaceCoordXformSvc {
     }
   }
 
-  constructor(private httpClient: HttpClient) {}
+  constructor(private httpClient: HttpClient, @Inject(GET_ATTR_TOKEN) getAttr: GetAttr) {
+    this.url = (getAttr(CONST.OVERWRITE_SPATIAL_BACKEND_ATTR) || environment.SPATIAL_TRANSFORM_BACKEND).replace(/\/$/, '') + '/v1/transform-points'
+  }
 
-  private url = `${environment.SPATIAL_TRANSFORM_BACKEND.replace(/\/$/, '')}/v1/transform-points`
+  private url: string
 
   // jasmine marble cannot test promise properly
   // see https://github.com/ngrx/platform/issues/498#issuecomment-337465179

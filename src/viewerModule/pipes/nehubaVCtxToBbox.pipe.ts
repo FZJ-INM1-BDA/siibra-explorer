@@ -1,4 +1,4 @@
-import { TContextArg } from './../viewer.interface';
+import { TViewerEvtCtxData } from './../viewer.interface';
 import { Pipe, PipeTransform } from "@angular/core";
 
 type Point = [number, number, number]
@@ -12,26 +12,33 @@ const MAGIC_RADIUS = 256
 })
 
 export class NehubaVCtxToBbox implements PipeTransform{
-  public transform(event: TContextArg<'nehuba' | 'threeSurfer'>, unit: string = "mm"): BBox{
+  public transform(event: TViewerEvtCtxData<'nehuba' | 'threeSurfer'>, boxDims: [number, number, number]=null, unit: string = "mm"): BBox{
     if (!event) {
       return null
     }
     if (event.viewerType === 'threeSurfer') {
       return null
     }
-    let divisor = 1
-    if (unit === "mm") {
-      divisor = 1e6
+    if (!boxDims) {
+      boxDims = [MAGIC_RADIUS, MAGIC_RADIUS, MAGIC_RADIUS]
     }
-    const { payload } = event as TContextArg<'nehuba'>
+    
+    let divisor = 1
+    if (unit !== "mm") {
+      console.warn(`unit other than mm is not yet supported`)
+      return null
+    }
+    divisor = 1e6
+    const { payload } = event as TViewerEvtCtxData<'nehuba'>
     
     if (!payload.nav) return null
 
     const { position, zoom } = payload.nav
     // position is in nm
     // zoom can be directly applied as a multiple
-    const min = position.map(v => (v - (MAGIC_RADIUS * zoom)) / divisor) as Point
-    const max = position.map(v => (v + (MAGIC_RADIUS * zoom)) / divisor) as Point
+    // divide by 2, since we are applying "radius" rather than "diameter"
+    const min = position.map((v, idx) => (v - (boxDims[idx] / 2 * zoom)) / divisor) as Point
+    const max = position.map((v, idx) => (v + (boxDims[idx] / 2 * zoom)) / divisor) as Point
     return [min, max]
   }
 }

@@ -4,6 +4,7 @@
     (iav-window-resize-event)="handleWindowResize()"
     [style.width]="tourCardWidth"
     [style.transform]="tourCardTransform"
+    class="sxplr-custom-cmp text"
     #quickTourDialog>
     <mat-card-content>
         <markdown-dom *ngIf="descriptionMd$ | async as md; else plainTxtTmpl"
@@ -48,7 +49,7 @@
         </ng-template>
 
         <!-- progress dots -->
-        <span class="muted d-inline-flex align-items-center">
+        <span class="progress-dots-container">
             <i *ngFor="let active of quickTourProgress$ | async; let index = index"
                 (click)="ff(index)"
                 [ngClass]="{ 'fa-xs muted-3': !active }"

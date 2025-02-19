@@ -3,6 +3,7 @@ import { DomSanitizer, SafeUrl } from "@angular/platform-browser";
 
 @Directive({
   selector: '[floatingMouseContextualContainerDirective]',
+  standalone: true,
 })
 
 export class FloatingMouseContextualContainerDirective {

@@ -1,9 +1,8 @@
 import { APP_INITIALIZER, NgModule } from "@angular/core";
 import { NehubaViewerContainerDirective } from './nehubaViewerInterface/nehubaViewerInterface.directive'
-import { IMPORT_NEHUBA_INJECT_TOKEN, NehubaViewerUnit } from "./nehubaViewer/nehubaViewer.component";
+import { NehubaViewerUnit } from "./nehubaViewer/nehubaViewer.component";
 import { CommonModule } from "@angular/common";
-import { APPEND_SCRIPT_TOKEN } from "src/util/constants";
-import { importNehubaFactory, NEHUBA_INSTANCE_INJTKN } from "./util";
+import { NEHUBA_INSTANCE_INJTKN } from "./util";
 import { NehubaViewerTouchDirective } from "./nehubaViewerInterface/nehubaViewerTouch.directive";
 import { StoreModule } from "@ngrx/store";
 import { NEHUBA_VIEWER_FEATURE_KEY } from "./constants";
@@ -12,14 +11,13 @@ import { NehubaGlueCmp } from "./nehubaViewerGlue/nehubaViewerGlue.component";
 import { UtilModule } from "src/util";
 import { ComponentsModule } from "src/components";
 import { AngularMaterialModule } from "src/sharedModules";
-import { MouseoverModule } from "src/mouseoverModule";
 import { StatusCardComponent } from "./statusCard/statusCard.component";
 import { ShareModule } from "src/share";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { BehaviorSubject } from "rxjs";
 import { StateModule } from "src/state";
 import { AuthModule } from "src/auth";
-import {QuickTourModule} from "src/ui/quickTour/module";
+import { QuickTourModule } from "src/ui/quickTour/module";
 import { WindowResizeModule } from "src/util/windowResize";
 import { EffectsModule } from "@ngrx/effects";
 import { MeshEffects } from "./mesh.effects/mesh.effects";
@@ -28,6 +26,10 @@ import { NgAnnotationService } from "./annotation/service";
 import { NgAnnotationEffects } from "./annotation/effects";
 import { NehubaViewerContainer } from "./nehubaViewerInterface/nehubaViewerContainer.component";
 import { NehubaUserLayerModule } from "./userLayers";
+import { DialogModule } from "src/ui/dialogInfo";
+import { CoordTextBox } from "src/components/coordTextBox";
+import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.directive";
+import { MediaQueryDirective } from "src/util/directives/mediaQuery.directive";
 
 @NgModule({
   imports: [
@@ -37,10 +39,10 @@ import { NehubaUserLayerModule } from "./userLayers";
     UtilModule,
     AngularMaterialModule,
     ComponentsModule,
-    MouseoverModule,
     ShareModule,
     WindowResizeModule,
     NehubaUserLayerModule,
+    MediaQueryDirective,
 
     /**
      * should probably break this into its own...
@@ -58,6 +60,10 @@ import { NehubaUserLayerModule } from "./userLayers";
     ]),
     QuickTourModule,
     NehubaLayoutOverlayModule,
+    DialogModule,
+
+    CoordTextBox,
+    ExperimentalFlagDirective
   ],
   declarations: [
     NehubaViewerContainerDirective,
@@ -74,12 +80,6 @@ import { NehubaUserLayerModule } from "./userLayers";
     StatusCardComponent,
   ],
   providers: [
-    
-    {
-      provide: IMPORT_NEHUBA_INJECT_TOKEN,
-      useFactory: importNehubaFactory,
-      deps: [ APPEND_SCRIPT_TOKEN ]
-    },
     {
       provide: NEHUBA_INSTANCE_INJTKN,
       useValue: new BehaviorSubject(null)

@@ -66,8 +66,9 @@ export class NehubaViewerContainer implements AfterViewInit, OnDestroy {
                   labelIndices: [ Number(v.segmentId) ],
                   regions: (() => {
                     const record = multiNgIdsRegionsLabelIndexMap[v.layer.name] || {}
-                    if (!record) return []
-                    return [record[Number(v.segmentId)]]
+                    const region = record[Number(v.segmentId)]
+                    if (!record || !region) return []
+                    return [region]
                   })()
                 }
               })

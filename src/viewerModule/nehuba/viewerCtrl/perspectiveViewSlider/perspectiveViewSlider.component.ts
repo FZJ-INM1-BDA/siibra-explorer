@@ -1,11 +1,9 @@
-import { Component, OnDestroy, Inject, ViewChild, ChangeDetectionStrategy } from "@angular/core";
+import { Component, Inject, ViewChild, ChangeDetectionStrategy, inject, HostListener } from "@angular/core";
 import { FormControl } from "@angular/forms";
 import { select, Store } from "@ngrx/store";
-import { combineLatest, concat, NEVER, Observable, of, Subject, Subscription } from "rxjs";
-import { switchMap, distinctUntilChanged, map, debounceTime, shareReplay, take, withLatestFrom } from "rxjs/operators";
-import { SAPI } from "src/atlasComponents/sapi";
+import { BehaviorSubject, combineLatest, concat, merge, NEVER, Observable, of, Subject } from "rxjs";
+import { switchMap, distinctUntilChanged, map, debounceTime, shareReplay, take, withLatestFrom, filter, takeUntil } from "rxjs/operators";
 import { SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes"
-import { fromRootStore } from "src/state/atlasSelection";
 import { selectedTemplate } from "src/state/atlasSelection/selectors";
 import { panelMode, panelOrder } from "src/state/userInterface/selectors";
 import { ResizeObserverDirective } from "src/util/windowResize";
@@ -15,6 +13,9 @@ import { NEHUBA_INSTANCE_INJTKN } from "../../util";
 import { EnumClassicalView } from "src/atlasComponents/constants"
 import { atlasSelection } from "src/state";
 import { floatEquality } from "common/util"
+import { CURRENT_TEMPLATE_DIM_INFO, TemplateInfo } from "../../layerCtrl.service/layerCtrl.util";
+import { DestroyDirective } from "src/util/directives/destroy.directive";
+import { isNullish, isWheelEvent, switchMapWaitFor } from "src/util/fn"
 
 const MAX_DIM = 200
 
@@ -24,6 +25,11 @@ const anatOriToIdx: Record<AnatomicalOrientation, number> = {
   'rl': 0,
   'ap': 1,
   'si': 2
+}
+const anaOriAltAxis: Record<AnatomicalOrientation, (templateInfo: TemplateInfo, ratio: {x: number, y: number}) => {idx: number, value: number}> = {
+  'rl': (templateInfo, { y }) => ({ idx: 2, value: templateInfo.real[0] * (0.5 - y) }),
+  'ap': (templateInfo, { y }) => ({ idx: 2, value: templateInfo.real[1] * (0.5 - y) }),
+  'si': (templateInfo, { y }) => ({ idx: 0, value: templateInfo.real[2] * (y - 0.5) })
 }
 
 function getDim(triplet: number[], view: EnumClassicalView) {
@@ -38,26 +44,75 @@ function getDim(triplet: number[], view: EnumClassicalView) {
   }
 }
 
+type ModArr = {
+  idx: number
+  value: number
+}
+
 @Component({
   selector: 'nehuba-perspective-view-slider',
   templateUrl: './perspectiveViewSlider.template.html',
   styleUrls: ['./perspectiveViewSlider.style.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  hostDirectives: [
+    DestroyDirective,
+  ]
 })
 
-export class PerspectiveViewSlider implements OnDestroy {
+export class PerspectiveViewSlider {
+
+    #xr = new BehaviorSubject(null)
+    #yr = new BehaviorSubject(null)
+    #xyRatio = combineLatest([
+      this.#xr.pipe(distinctUntilChanged()),
+      this.#yr.pipe(distinctUntilChanged()),
+    ]).pipe(
+      map(([ x, y ]) => ({ x, y }))
+    )
+    mousemove(ev: MouseEvent){
+      this.#mousemove.next(ev)
+      const target = (ev.target as HTMLInputElement)
+      this.#xr.next(ev.offsetX / target.clientWidth)
+      this.#yr.next(ev.offsetY / target.clientHeight)
+    }
+
+    #mousemove = new Subject()
+    #mousedown = new Subject()
+    #mouseup = new Subject()
+    #dragging = this.#mousedown.pipe(
+      switchMap(() => this.#mousemove.pipe(
+        takeUntil(this.#mouseup)
+      ))
+    )
+    mousedown(){
+      this.#mousedown.next(true)
+    }
+
+    @HostListener('document:mouseup')
+    mouseup(){
+      this.#mouseup.next(true)
+    }
+
+    #zoom = new Subject<number>()
+    mousewheel(ev: Event){
+      if (!isWheelEvent(ev)) {
+        return
+      }
+      this.#zoom.next(ev.deltaY)
+    }
+
+    #destroy$ = inject(DestroyDirective).destroyed$
 
     @ViewChild(ResizeObserverDirective)
     resizeDirective: ResizeObserverDirective
 
-    public minimapControl = new FormControl()
+    public minimapControl = new FormControl<number>(0)
     public recalcViewportSize$ = new Subject()
 
     private selectedTemplate$ = this.store$.pipe(
       select(selectedTemplate),
       distinctUntilChanged((o, n) => o?.id === n?.id),
     )
-    private subscriptions: Subscription[] = []
     private maximisedPanelIndex$ = combineLatest([
       this.store$.pipe(
         select(panelMode),
@@ -69,6 +124,7 @@ export class PerspectiveViewSlider implements OnDestroy {
       ),
     ]).pipe(
       map(([ mode, order ]) => {
+        // TODO order can potentially be nullish
         if (!([EnumPanelMode.PIP_PANEL, EnumPanelMode.SINGLE_PANEL].includes(mode as EnumPanelMode))) {
           return null
         }
@@ -146,24 +202,8 @@ export class PerspectiveViewSlider implements OnDestroy {
       map(ctrl => ctrl?.rangeOrientation === "vertical")
     )
 
-    private currentTemplateSize$ = this.store$.pipe(
-      fromRootStore.distinctATP(),
-      switchMap(({ template }) => 
-        template
-          ? this.sapi.getVoxelTemplateImage(template).pipe(
-            switchMap(defaultImage => {
-              if (defaultImage.length == 0) {
-                // template hs no ng volume, which is the case for threesurfer
-                return NEVER
-              }
-              const img = defaultImage[0]
-              return of({
-                ...img.info || {},
-                transform: img.transform
-              })
-            })
-          )
-          : NEVER),
+    private currentTemplateSize$ = this.tmplInfo$.pipe(
+      filter(val => !!val)
     )
 
     private useMinimap$: Observable<EnumClassicalView> = this.maximisedPanelIndex$.pipe(
@@ -203,6 +243,11 @@ export class PerspectiveViewSlider implements OnDestroy {
       switchMap(templateSize => {
         return this.rangeControlSetting$.pipe(
           switchMap(orientation => this.navPosition$.pipe(
+            switchMap(
+              switchMapWaitFor({
+                condition: nav => !!nav && !!nav.real
+              })
+            ),
             take(1),
             map(nav => {
               if (!nav || !orientation || !templateSize) return null
@@ -229,12 +274,20 @@ export class PerspectiveViewSlider implements OnDestroy {
     public previewImageUrl$ = combineLatest([
       this.selectedTemplate$,
       this.useMinimap$,
+      this.navPosition$,
     ]).pipe(
-      map(([template, view]) => {
-        const url = getScreenshotUrl(template, view)
+      map(([template, view, nav]) => {
+        let useImgIdx = 0
+        if (view === EnumClassicalView.SAGITTAL) {
+          const { real } = nav || {}
+          const xPos = real?.[0] || 0
+          useImgIdx = xPos < 0 ? 0 : 1
+        }
+        const url = getScreenshotUrl(template, view, useImgIdx)
         if (!url) return null
         return `assets/images/persp-view/${url}`
-      })
+      }),
+      distinctUntilChanged()
     )
 
     public sliceviewIsNormal$ = this.store$.pipe(
@@ -259,7 +312,7 @@ export class PerspectiveViewSlider implements OnDestroy {
 
     public scrubberPosition$ = this.rangeControlMinMaxValue$.pipe(
       switchMap(minmaxval => concat(
-        of(null),
+        of(null as number),
         this.minimapControl.valueChanges,
       ).pipe(
         map(newval => {
@@ -345,39 +398,111 @@ export class PerspectiveViewSlider implements OnDestroy {
 
     constructor(
       private store$: Store,
-      private sapi: SAPI,
       @Inject(NEHUBA_INSTANCE_INJTKN) private nehubaViewer$: Observable<NehubaViewerUnit>,
+      @Inject(CURRENT_TEMPLATE_DIM_INFO) private tmplInfo$: Observable<TemplateInfo>,
     ) {
 
-      this.subscriptions.push(
-        combineLatest([
-          this.nehubaViewer$,
-          this.rangeControlSetting$,
-        ]).pipe(
-          switchMap(([ nehubaViewer, rangeCtrl ]) => this.minimapControl.valueChanges.pipe(
-            withLatestFrom(this.navPosition$.pipe(
-              map(value => value?.real)
-            )),
-            map(([newValue, currentPosition]) => ({ nehubaViewer, rangeCtrl, newValue, currentPosition }))
-          ))
-        ).subscribe(({ nehubaViewer, rangeCtrl, newValue, currentPosition }) => {
-          if (newValue === null) return
-          const { anatomicalOrientation } = rangeCtrl
-          if (!anatomicalOrientation) return
-          const idx = anatOriToIdx[anatomicalOrientation]
-          const newNavPosition = [...currentPosition]
-          newNavPosition[idx] = newValue
-          nehubaViewer.setNavigationState({
-            position: newNavPosition,
-            positionReal: true
+      const posMod$ = this.rangeControlSetting$.pipe(
+        switchMap(rangeCtrl => this.#dragging.pipe(
+          withLatestFrom(
+            this.minimapControl.valueChanges,
+            this.currentTemplateSize$,
+            this.#xyRatio,
+          ),
+          map(([_, newValue, currTmplSize, xyRatio]) => {
+            
+            const positionMod: ModArr[] = []
+
+            const { anatomicalOrientation } = rangeCtrl
+            if (!isNullish(anatomicalOrientation) && !isNullish(newValue)) {
+              const idx = anatOriToIdx[anatomicalOrientation]
+              positionMod.push({
+                idx,
+                value: newValue
+              })
+              
+            }
+
+            if (!isNullish(xyRatio.x) && !isNullish(xyRatio.y)) {
+              const { idx, value } = anaOriAltAxis[anatomicalOrientation](currTmplSize, xyRatio)
+              positionMod.push({
+                idx,
+                value
+              })
+            }
+            return { positionMod, zoom: null as number }
           })
-        }),
+        ))
       )
+
+      const zoom$ = this.nehubaViewer$.pipe(
+        switchMap(nehubaViewer => this.#zoom.pipe(
+          withLatestFrom(nehubaViewer
+          ? nehubaViewer.viewerPositionChange
+          : NEVER),
+          map(([zoom, posChange]) => {
+            const { zoom: currZoom } = posChange
+            return {
+              zoom: zoom > 0 ? currZoom * 1.2 : currZoom * 0.8,
+              positionMod: null as ModArr[]
+            }
+          })
+        ))
+      )
+
+      this.nehubaViewer$.pipe(
+        switchMap(nehubaViewer =>
+          merge(
+            posMod$,
+            zoom$,
+          ).pipe(
+            map(({ positionMod, zoom }) => ({
+              nehubaViewer, positionMod, zoom
+            }))
+          )
+        ),
+        withLatestFrom(
+          this.navPosition$.pipe(
+            map(value => value?.real)
+          ),
+        ),
+        takeUntil(this.#destroy$)
+      ).subscribe(([{ nehubaViewer, positionMod, zoom }, currentPosition]) => {
+
+        const newNavPosition = [...currentPosition]
+        if (!isNullish(positionMod)) {
+          for (const { idx, value } of positionMod) {
+            newNavPosition[idx] = value
+          }
+        }
+        nehubaViewer.setNavigationState({
+          position: newNavPosition,
+          ...(isNullish(zoom) ? {} : { zoom }),
+          positionReal: true
+        })
+      })
+
+      combineLatest([
+        this.sliceviewIsNormal$,
+        this.navPosition$,
+        this.maximisedPanelIndex$,
+      ]).pipe(
+        filter(([ sliceViewIsNormal ]) => sliceViewIsNormal),
+        map(([ _, ...rest ]) => rest),
+        takeUntil(this.#destroy$)
+      ).subscribe(([ navPos, maximisedIdx]) => {
+        const realPos = navPos?.real
+        if (!realPos) {
+          return
+        }
+        const pos = navPos.real[maximisedIdx === 0? 1 : maximisedIdx === 1? 0 : 2]
+        const diff = Math.abs(this.minimapControl.value - pos)
+        if (diff > 1e6) {
+          this.minimapControl.setValue(pos)
+        }
+      })
     }
 
-    ngOnDestroy(): void {
-      this.subscriptions.forEach(s => s.unsubscribe());
-    }
 
     resetSliceview() {
       this.store$.dispatch(
@@ -393,24 +518,24 @@ export class PerspectiveViewSlider implements OnDestroy {
 }
 
 const spaceIdToPrefix = {
-  "minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2": "icbm152",
-  "minds/core/referencespace/v1.0.0/7f39f7be-445b-47c0-9791-e971c0b6d992": "colin",
+  "minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2": "mni152",
+  "minds/core/referencespace/v1.0.0/7f39f7be-445b-47c0-9791-e971c0b6d992": "colin27",
   "minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588": "bigbrain",
-  "minds/core/referencespace/v1.0.0/MEBRAINS": "monkey",
-  "minds/core/referencespace/v1.0.0/265d32a0-3d84-40a5-926f-bf89f68212b9": "mouse",
-  "minds/core/referencespace/v1.0.0/d5717c4a-0fa1-46e6-918c-b8003069ade8": "rat"
+  "minds/core/referencespace/v1.0.0/MEBRAINS": "mebrains",
+  "minds/core/referencespace/v1.0.0/265d32a0-3d84-40a5-926f-bf89f68212b9": "allen",
+  "minds/core/referencespace/v1.0.0/d5717c4a-0fa1-46e6-918c-b8003069ade8": "waxholm"
 }
 
 const viewToSuffix = {
-  [EnumClassicalView.SAGITTAL]: 'sag',
+  [EnumClassicalView.SAGITTAL]: 'sagittal',
   [EnumClassicalView.AXIAL]: 'axial',
   [EnumClassicalView.CORONAL]: 'coronal',
 }
 
-function getScreenshotUrl(space: SxplrTemplate, requestedView: EnumClassicalView): string {
+function getScreenshotUrl(space: SxplrTemplate, requestedView: EnumClassicalView, imgIdx: number = 0): string {
   const prefix = spaceIdToPrefix[space?.id]
   if (!prefix) return null
   const suffix = viewToSuffix[requestedView]
   if (!suffix) return null
-  return `${prefix}-${suffix}.png`
+  return `${prefix}_${suffix}_${imgIdx}.png`
 }

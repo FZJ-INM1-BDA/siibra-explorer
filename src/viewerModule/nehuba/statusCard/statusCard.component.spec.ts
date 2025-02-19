@@ -3,19 +3,34 @@ import { CommonModule } from "@angular/common"
 import { AngularMaterialModule } from "src/sharedModules"
 import { StatusCardComponent } from "./statusCard.component"
 import { Directive, Component } from "@angular/core"
-import { of } from "rxjs"
+import { NEVER, of } from "rxjs"
 import { ShareModule } from "src/share"
 import { StateModule } from "src/state"
 import { MockStore, provideMockStore } from "@ngrx/store/testing"
-import { By } from "@angular/platform-browser"
-import { MatSlideToggle } from "@angular/material/slide-toggle"
 import { NoopAnimationsModule } from "@angular/platform-browser/animations"
 import { FormsModule, ReactiveFormsModule } from "@angular/forms"
 import { UtilModule } from "src/util"
-import * as configSvc from '../config.service'
-import {QuickTourModule} from "src/ui/quickTour/module";
+import { NEHUBA_CONFIG_SERVICE_TOKEN } from "../config.service"
+import { QuickTourModule } from "src/ui/quickTour/module";
 import { atlasSelection } from "src/state"
 import { SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes"
+import { NEHUBA_INSTANCE_INJTKN } from "../util"
+import { MediaQueryDirective } from "src/util/directives/mediaQuery.directive"
+import { InterSpaceCoordXformSvc } from "src/atlasComponents/sapi/core/space/interSpaceCoordXform.service"
+
+const mockNehubaConfig = {
+  dataset: {
+    initialNgState: {
+      navigation: {
+        pose: {
+          orientation: [0, 0, 0, 1],
+          position: [0, 0, 0]
+        },
+        zoomFactor: 1e6
+      }
+    }
+  }
+} as any
 
 @Directive({
   selector: '[iav-auth-auth-state]',
@@ -34,6 +49,7 @@ class MockIavAuthState{
 class MockSigninModal{}
 
 describe('> statusCard.component.ts', () => {
+  let getNavigationStateFromConfigSpy: jasmine.Spy = jasmine.createSpy('getNavigationStateFromConfig').and.returnValue(mockNehubaConfig)
   describe('> StatusCardComponent', () => {
     beforeEach(async () => {
       await TestBed.configureTestingModule({
@@ -46,7 +62,8 @@ describe('> statusCard.component.ts', () => {
           ReactiveFormsModule,
           NoopAnimationsModule,
           UtilModule,
-          QuickTourModule
+          QuickTourModule,
+          MediaQueryDirective,
         ],
         declarations: [
           StatusCardComponent,
@@ -60,7 +77,24 @@ describe('> statusCard.component.ts', () => {
                 fetchedTemplates: []
               }
             }
-          })
+          }),
+          {
+            provide: NEHUBA_CONFIG_SERVICE_TOKEN,
+            useValue: {
+              getNehubaConfig: getNavigationStateFromConfigSpy
+            }
+          },
+          {
+            provide: NEHUBA_INSTANCE_INJTKN,
+            useValue: NEVER
+          },
+          {
+            provide: InterSpaceCoordXformSvc,
+            useValue: {
+              TmplIdToValidSpaceName() {throw new Error()},
+              transform(){ throw new Error() }
+            }
+          }
         ]
       }).compileComponents()
     })
@@ -92,22 +126,6 @@ describe('> statusCard.component.ts', () => {
         fixture.detectChanges()
       })
 
-      it('> toggle can be found', () => {
-
-        const slider = fixture.debugElement.query( By.directive(MatSlideToggle) )
-        expect(slider).toBeTruthy()
-      })
-
-      it('> toggling voxel/real toggle also toggles statusPanelRealSpace flag', () => {
-
-        const prevFlag = fixture.componentInstance.statusPanelRealSpace
-        const sliderEl = fixture.debugElement.query( By.directive(MatSlideToggle) )
-        const slider = sliderEl.injector.get(MatSlideToggle)
-        slider.toggle()
-        fixture.detectChanges()
-        expect(fixture.componentInstance.statusPanelRealSpace).toEqual(!prevFlag)
-      })
-
       describe('> textNavigationTo', () => {
         it('> takes into account of statusPanelRealSpace panel', () => {
           const setNavigationStateSpy = jasmine.createSpy('setNavigationState')
@@ -115,18 +133,10 @@ describe('> statusCard.component.ts', () => {
             setNavigationState: setNavigationStateSpy,
           } as any
 
-          fixture.componentInstance.statusPanelRealSpace = true
           fixture.componentInstance.textNavigateTo('1, 0, 0')
           expect(setNavigationStateSpy).toHaveBeenCalledWith({
             position: [1e6, 0, 0],
             positionReal: true
-          })
-
-          fixture.componentInstance.statusPanelRealSpace = false
-          fixture.componentInstance.textNavigateTo('1, 0, 0')
-          expect(setNavigationStateSpy).toHaveBeenCalledWith({
-            position: [1, 0, 0],
-            positionReal: false
           })
         })
       })
@@ -142,28 +152,13 @@ describe('> statusCard.component.ts', () => {
         perspectiveOrientation: [1,0,0,0]
       }
 
-      const mockNehubaConfig = {
-        dataset: {
-          initialNgState: {
-            navigation: {
-              pose: {
-                orientation: [0, 0, 0, 1],
-                position: [0, 0, 0]
-              },
-              zoomFactor: 1e6
-            }
-          }
-        }
-      }
-
-      let getNavigationStateFromConfigSpy: jasmine.Spy = jasmine.createSpy('getNavigationStateFromConfig').and.returnValue(mockNehubaConfig)
+      
 
       beforeEach(() => {
         const mockStore = TestBed.inject(MockStore)
         mockStore.overrideSelector(atlasSelection.selectors.selectedTemplate, null)
         mockStore.overrideSelector(atlasSelection.selectors.navigation, mockCurrNavigation)
-
-        spyOnProperty(configSvc, 'getNehubaConfig').and.returnValue(getNavigationStateFromConfigSpy)
+        
         
         fixture = TestBed.createComponent(StatusCardComponent)
         fixture.detectChanges()

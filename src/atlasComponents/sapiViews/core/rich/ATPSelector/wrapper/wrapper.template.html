@@ -1,4 +1,6 @@
 <sxplr-pure-atp-selector
+  *ngIf="useUI === 'chip'"
+  [sxplr-pure-atp-selector-minimized]="minimized"
   [sxplr-pure-atp-selector-color-palette]="(darktheme$ | async) ? darkThemePalette : lightThemePalette"
   [sxplr-pure-atp-selector-selected-atp]="selectedATP$ | async"
   [sxplr-pure-atp-selector-atlases]="allAtlases$ | async"
@@ -6,6 +8,7 @@
   [sxplr-pure-atp-selector-parcellations]="parcs$ | async"
   [sxplr-pure-atp-selector-is-busy]="isBusy$ | async"
   (sxplr-pure-atp-selector-on-select)="selectLeaf($event)"
+  (sxplr-pure-atp-selector-menu-open)="menuOpen.emit($event)"
   >
   <button mat-icon-button
     (click)="toggleParcellationVisibility()"
@@ -16,3 +19,21 @@
     <i class="fas" [ngClass]="(parcellationVisibility$ | async) ? 'fa-eye' : 'fa-eye-slash'"></i>
   </button>
 </sxplr-pure-atp-selector>
+
+<sxplr-pure-atp-dropdown
+  *ngIf="useUI === 'dropdown'"
+  [sxplr-pure-atp-selector-minimized]="minimized"
+  [sxplr-pure-atp-selector-color-palette]="(darktheme$ | async) ? darkThemePalette : lightThemePalette"
+  [sxplr-pure-atp-selector-selected-atp]="selectedATP$ | async"
+  [sxplr-pure-atp-selector-atlases]="allAtlases$ | async"
+  [sxplr-pure-atp-selector-templates]="availableTemplates$ | async"
+  [sxplr-pure-atp-selector-parcellations]="parcs$ | async"
+  [sxplr-pure-atp-selector-is-busy]="isBusy$ | async"
+  (sxplr-pure-atp-selector-on-select)="selectLeaf($event)"
+  (sxplr-pure-atp-selector-menu-open)="menuOpen.emit($event)">
+
+</sxplr-pure-atp-dropdown>
+
+<ng-template [ngIf]="useUI !== 'chip' && useUI !== 'dropdown'">
+  Wrapper useUI is not chip nor dropdown!
+</ng-template>

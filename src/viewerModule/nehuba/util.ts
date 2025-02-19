@@ -1,7 +1,6 @@
 import { InjectionToken } from '@angular/core'
 import { Observable, pipe } from 'rxjs'
 import { filter, scan, take } from 'rxjs/operators'
-import { getViewer } from 'src/util/fn'
 import { NehubaViewerUnit } from './nehubaViewer/nehubaViewer.component'
 import { userInterface } from 'src/state'
 
@@ -179,18 +178,6 @@ export const isIdentityQuat = (ori: number[]): boolean => Math.abs(ori[0]) < 1e-
   && Math.abs(ori[2]) < 1e-6
   && Math.abs(ori[3] - 1) < 1e-6
 
-export const importNehubaFactory = (appendSrc: (src: string) => Promise<void>): () => Promise<void> => {
-  let pr: Promise<void>
-  return async () => {
-    if (!!(window as any).export_nehuba) return 
-
-    if (pr) return pr
-    pr = appendSrc('main.bundle.js')
-
-    return pr
-  }
-}
-
 export const takeOnePipe = () => {
 
   return pipe(
@@ -202,7 +189,7 @@ export const takeOnePipe = () => {
        *
        * 4 ???
        */
-      const panels = getViewer()['display']['panels']
+      const panels = window['viewer']['display']['panels']
       const panelEls = Array.from(panels).map(({ element }) => element)
 
       const identifySrcElement = (element: HTMLElement) => {

@@ -1,8 +1,30 @@
-<ng-template [ngIf]="selectedATP" let-ATP>
+<ng-template [ngIf]="view$ | async" let-view>
+  
+  <!-- fallback for parcellation info icon -->
+  <ng-template  [ngIf]="view.hideParcChip">
+    <sxplr-smart-chip
+      [items]="[]"
+      [noMenu]="true"
+      [color]="colorPalette[1]">
+      <ng-template sxplrSmartChipContent></ng-template>
+      <ng-template sxplrSmartChipAction>
+        <button mat-icon-button
+          sxplr-dialog
+          [sxplr-dialog-size]="null"
+          [sxplr-dialog-data]="{
+            title: view.parcellation.name,
+            descMd: view.parcellation.desc,
+            actions: view.parcellation | parcTmplDoiPipe
+          }">
+          <i class="fas fa-info"></i>
+        </button>
+      </ng-template>
+    </sxplr-smart-chip>
+  </ng-template>
 
   <!-- parcellation smart chip -->
-  <sxplr-smart-chip *ngIf="ATP.parcellation && parcAndGroup && parcAndGroup.length > 1"
-    [items]="parcAndGroup || []"
+  <sxplr-smart-chip *ngIf="!view.hideParcChip && !!view.parcellation"
+    [items]="view.parcAndGroup || []"
     [color]="colorPalette[2]"
     [getChildren]="getChildren"
     (itemClicked)="selectLeaf({ parcellation: $event })"
@@ -10,41 +32,48 @@
     [disabled]="isBusy">
 
     <ng-template sxplrSmartChipHeader>
-      <span>
+      <span class="header">
         Parcellation
       </span>
 
       <span class="sxplr-ml-1 text-muted">
-        ({{ parcellations.length }})
+        ({{ view.parcellations?.length }})
       </span>
     </ng-template>
 
-    <ng-template sxplrSmartChipContent>
-      <span class="chip-text">
-        {{ ATP.parcellation.shortName }}
-      </span>
-      <ng-content select="[parcellation-chip-suffix]">
-      </ng-content>
-
-      <button iav-stop="mousedown click"
+    <ng-template sxplrSmartChipAction>
+      <button
+        iav-stop="mousedown click"
         class="icons"
         mat-icon-button
         sxplr-dialog
         [sxplr-dialog-size]="null"
         [sxplr-dialog-data]="{
-          title: ATP.parcellation.name,
-          descMd: ATP.parcellation.desc,
-          actions: ATP.parcellation | parcellationDoiPipe
+          title: view.parcellation.name,
+          descMd: view.parcellation.desc,
+          actions: view.parcellation | parcTmplDoiPipe
         }">
         <i class="fas fa-info"></i>
       </button>
+    </ng-template>
+    
+    <ng-template sxplrSmartChipAction>
+      <ng-content select="[parcellation-chip-suffix]">
+      </ng-content>
+    </ng-template>
+
+    <ng-template sxplrSmartChipContent>
+      <span class="chip-text">
+        {{ view.parcellation.shortName }}
+      </span>
+
     </ng-template>
     <ng-template sxplrSmartChipMenu let-parc>
 
       <ng-container *ngTemplateOutlet="optionTmpl; context: {
         $implicit: parc,
         suffixText: (parc | isGroupedParcellation) && '(' + parc.parcellations.length  + ')' ,
-        overridePrefixIconTmpl: (parc | parcellationGroupSelected : ATP.parcellation)
+        overridePrefixIconTmpl: (parc | parcellationGroupSelected : view.parcellation)
           ? halfSelectedTmpl
           : null
       }">
@@ -52,28 +81,66 @@
     </ng-template>
   </sxplr-smart-chip>
 
+  
+  <!-- fallback for space info icon -->
+  <ng-template  [ngIf]="view.hideTmplChip">
+    <sxplr-smart-chip
+      [items]="[]"
+      [noMenu]="true"
+      [color]="colorPalette[1]">
+      <ng-template sxplrSmartChipContent></ng-template>
+      <ng-template sxplrSmartChipAction>
+        <button mat-icon-button
+          sxplr-dialog
+          [sxplr-dialog-size]="null"
+          [sxplr-dialog-data]="{
+            title: view.template.name,
+            descMd: view.template.desc,
+            actions: view.template | parcTmplDoiPipe
+          }">
+          <i class="fas fa-info"></i>
+        </button>
+      </ng-template>
+    </sxplr-smart-chip>
+  </ng-template>
+
   <!-- space smart chip -->
-  <sxplr-smart-chip *ngIf="ATP.template && availableTemplates && availableTemplates.length > 1"
-    [items]="availableTemplates || []"
+  <sxplr-smart-chip *ngIf="!view.hideTmplChip"
+    [items]="view.availableTemplates || []"
     [color]="colorPalette[1]"
     (itemClicked)="selectLeaf({ template: $event })"
     [elevation]="4"
     [disabled]="isBusy">
     
     <ng-template sxplrSmartChipHeader>
-      <span>
+      <span class="header">
         Template
       </span>
 
       <span class="sxplr-ml-1 text-muted">
-        ({{ availableTemplates.length }})
+        ({{ view.availableTemplates.length }})
       </span>
     </ng-template>
 
+    <ng-template sxplrSmartChipAction>
+      <button
+        iav-stop="mousedown click"
+        class="icons"
+        mat-icon-button
+        sxplr-dialog
+        [sxplr-dialog-size]="null"
+        [sxplr-dialog-data]="{
+          title: view.template.name,
+          descMd: view.template.desc,
+          actions: view.template | parcTmplDoiPipe
+        }">
+        <i class="fas fa-info"></i>
+      </button>
+    </ng-template>
 
     <ng-template sxplrSmartChipContent>
       <span class="chip-text">
-        {{ ATP.template.shortName }}
+        {{ view.template.shortName }}
       </span>
     </ng-template>
     <ng-template sxplrSmartChipMenu let-space>
@@ -82,7 +149,7 @@
   </sxplr-smart-chip>
 
   <!-- atlas smart chip -->
-  <sxplr-smart-chip *ngIf="ATP.atlas"
+  <sxplr-smart-chip *ngIf="view.atlas"
     [items]="allAtlases"
     [color]="colorPalette[0]"
     (itemClicked)="selectLeaf({ atlas: $event})"
@@ -93,7 +160,7 @@
     quick-tour-description="You can change atlas here.">
 
     <ng-template sxplrSmartChipHeader>
-      <span>
+      <span class="header">
         Atlas
       </span>
 
@@ -105,62 +172,62 @@
     
     <ng-template sxplrSmartChipContent>
       <span class="chip-text">
-        {{ ATP.atlas.name }}
+        {{ view.atlas.name }}
       </span>
     </ng-template>
     <ng-template sxplrSmartChipMenu let-atlas>
       <ng-container *ngTemplateOutlet="optionTmpl; context: { $implicit: atlas }"></ng-container>
     </ng-template>
   </sxplr-smart-chip>
+  
+  <!-- option template -->
+  <ng-template
+    #optionTmpl
+    let-item
+    let-overridePrefixIconTmpl="overridePrefixIconTmpl"
+    let-overrideSuffixIcon="overrideSuffixIcon"
+    let-suffixText="suffixText">
+
+    <div class="parent">
+      <!-- prefix -->
+      <ng-template [ngIf]="overridePrefixIconTmpl" [ngIfElse]="defaultPrefix">
+        <ng-template [ngTemplateOutlet]="overridePrefixIconTmpl"></ng-template>
+      </ng-template>
+      <ng-template #defaultPrefix>
+        <ng-template [ngIf]="view.selectedIds" let-selectedIds>
+          <mat-icon
+            class="icon"
+            fontSet="fas"
+            [fontIcon]="selectedIds.includes(item.id) ? 'fa-circle' : 'fa-none'"
+            >
+          </mat-icon>
+        </ng-template>
+      </ng-template>
+
+      <!-- button body -->
+      <span *ngIf="item" class="full-sized-button text"
+        [matTooltip]="item.version?.name || item.name || item.fullName"
+        [matTooltipPosition]="'above'">
+        {{ item.version?.name || item.shortName || item.name || item.fullName }}
+        <ng-template [ngIf]="suffixText">
+          <span class="text-muted">
+            {{ suffixText }}
+          </span>
+        </ng-template>
+      </span>
+
+      <!-- suffix -->
+      <ng-template [ngIf]="overrideSuffixIcon">
+        <i [class]="overrideSuffixIcon"></i>
+      </ng-template>
+    </div>
+
+  </ng-template>
+
 </ng-template>
 
 <!-- half selected -->
 <!-- only active in nested menus (e.g. parcellation groups) -->
 <ng-template #halfSelectedTmpl>
   <mat-icon fontSet="far" fontIcon="fa-circle"></mat-icon>
-</ng-template>
-
-<!-- option template -->
-<ng-template
-  #optionTmpl
-  let-item
-  let-overridePrefixIconTmpl="overridePrefixIconTmpl"
-  let-overrideSuffixIcon="overrideSuffixIcon"
-  let-suffixText="suffixText">
-
-  <!-- prefix -->
-  <ng-template [ngIf]="overridePrefixIconTmpl" [ngIfElse]="defaultPrefix">
-    <ng-template [ngTemplateOutlet]="overridePrefixIconTmpl"></ng-template>
-  </ng-template>
-  <ng-template #defaultPrefix>
-    <ng-template [ngIf]="selectedIds" let-selectedIds>
-      <mat-icon
-        fontSet="fas"
-        [fontIcon]="selectedIds.includes(item.id) ? 'fa-circle' : 'fa-none'"
-        >
-      </mat-icon>
-    </ng-template>
-  </ng-template>
-
-  <!-- button body -->
-  <span *ngIf="item" class="full-sized-button"
-    [matTooltip]="item.version?.name || item.name || item.fullName"
-    [matTooltipPosition]="'above'">
-    {{ item.version?.name || item.shortName || item.name || item.fullName }}
-    <ng-template [ngIf]="suffixText">
-      <span class="text-muted">
-        {{ suffixText }}
-      </span>
-    </ng-template>
-  </span>
-
-  <!-- suffix -->
-  <ng-template [ngIf]="overrideSuffixIcon">
-    <i [class]="overrideSuffixIcon"></i>
-  </ng-template>
-</ng-template>
-
-
-<ng-template #isBusyTmpl>
-
 </ng-template>

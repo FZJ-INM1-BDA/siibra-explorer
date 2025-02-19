@@ -15,7 +15,7 @@ import { ToolSelect } from "./select";
 import { ToolDelete } from "./delete";
 import { Polygon, ToolPolygon } from "./poly";
 import { ZipFilesOutputModule } from "src/zipFilesOutput/module";
-import { TextareaCopyExportCmp } from "./textareaCopyExport/textareaCopyExport.component";
+import { TextareaCopyExportCmp } from "src/components/textareaCopyExport/textareaCopyExport.component";
 
 @NgModule({
   imports: [
@@ -23,13 +23,14 @@ import { TextareaCopyExportCmp } from "./textareaCopyExport/textareaCopyExport.c
     AngularMaterialModule,
     UtilModule,
     ZipFilesOutputModule,
+
+    TextareaCopyExportCmp,
   ],
   declarations: [
     LineUpdateCmp,
     PolyUpdateCmp,
     PointUpdateCmp,
     ToFormattedStringPipe,
-    TextareaCopyExportCmp,
   ],
   exports: [
     LineUpdateCmp,

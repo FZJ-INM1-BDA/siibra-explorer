@@ -15,9 +15,8 @@ import { Observable, Subscription, merge, timer, fromEvent } from "rxjs";
 import { filter, delay, switchMapTo, take, startWith } from "rxjs/operators";
 
 import { colorAnimation } from "./atlasViewer.animation"
-import { MouseHoverDirective } from "src/mouseoverModule";
-import {MatSnackBar, MatSnackBarRef} from "@angular/material/snack-bar";
-import {MatDialog, MatDialogRef} from "@angular/material/dialog";
+import { MatSnackBar } from 'src/sharedModules/angularMaterial.exports'
+import { MatDialog, MatDialogRef } from "src/sharedModules/angularMaterial.exports";
 import { CONST } from 'common/constants'
 
 import { SlServiceService } from "src/spotlight/sl-service.service";
@@ -27,6 +26,7 @@ import { DOCUMENT } from "@angular/common";
 import { userPreference } from "src/state"
 import { DARKTHEME } from "src/util/injectionTokens";
 import { EnumQuickTourSeverity } from "src/ui/quickTour/constrants";
+import { SAPI } from "src/atlasComponents/sapi";
 
 
 @Component({
@@ -44,17 +44,15 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   public CONST = CONST
 
-  @ViewChild('cookieAgreementComponent', {read: TemplateRef}) public cookieAgreementComponent: TemplateRef<any>
+  sapiError$ = SAPI.ErrorMessage$
 
-  @ViewChild(MouseHoverDirective) private mouseOverNehuba: MouseHoverDirective
+  @ViewChild('cookieAgreementComponent', {read: TemplateRef}) public cookieAgreementComponent: TemplateRef<any>
 
   @ViewChild('idleOverlay', {read: TemplateRef}) idelTmpl: TemplateRef<any>
 
   @HostBinding('attr.ismobile')
   public ismobile: boolean = false
   public meetsRequirement: boolean = true
-
-  private snackbarRef: MatSnackBarRef<any>
 
   public onhoverLandmark$: Observable<{landmarkName: string, datasets: any} | null>
 
@@ -63,6 +61,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   public selectedParcellation: any
 
   private cookieDialogRef: MatDialogRef<any>
+
+  public freemode = !!this.el.nativeElement.getAttribute(CONST.FREE_MODE)
 
   constructor(
     private store: Store<any>,
@@ -76,11 +76,11 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     @Inject(DARKTHEME) private darktheme$: Observable<boolean>
   ) {
 
-    const error = this.el.nativeElement.getAttribute('data-error')
+    const error = this.el.nativeElement.getAttribute(CONST.DATA_ERROR_ATTR)
 
     if (error) {
       this.snackbar.open(error, 'Dismiss', { duration: 5000 })
-      this.el.nativeElement.removeAttribute('data-error')
+      this.el.nativeElement.removeAttribute(CONST.DATA_ERROR_ATTR)
     }
   }
 
@@ -120,6 +120,11 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       this.darktheme$.subscribe(flag => {
         this.rd.setAttribute(this.document.body, 'darktheme', this.meetsRequirement && flag.toString())
       }),
+      this.store.pipe(
+        select(userPreference.selectors.showExperimental)
+      ).subscribe(flag => {
+        this.rd.setAttribute(this.document.body, 'experimental', flag.toString())
+      })
     )
   }
 
@@ -178,12 +183,14 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     const gl = canvas.getContext('webgl2') as WebGLRenderingContext
 
     if (!gl) {
+      console.error(`Get GLContext failed!`)
       return false
     }
 
     const colorBufferFloat = gl.getExtension('EXT_color_buffer_float')
 
     if (!colorBufferFloat) {
+      console.error(`Get Extension failed!`)
       return false
     }
 

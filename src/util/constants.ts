@@ -1,5 +1,4 @@
 import { HttpHeaders } from "@angular/common/http"
-import { environment } from 'src/environments/environment'
 
 export const LOCAL_STORAGE_CONST = {
   GPU_LIMIT: 'fzj.xg.iv.GPU_LIMIT',
@@ -8,21 +7,10 @@ export const LOCAL_STORAGE_CONST = {
   AGREE_COOKIE: 'fzj.xg.iv.AGREE_COOKIE',
   AGREE_KG_TOS: 'fzj.xg.iv.AGREE_KG_TOS',
   QUICK_TOUR_VIEWED: 'fzj.dg.iv.QUICK_TOUR_VIEWED',
-
-  FAV_DATASET: 'fzj.xg.iv.FAV_DATASET_V2',
 }
 
 export const COOKIE_VERSION = '0.3.0'
 export const KG_TOS_VERSION = '0.3.0'
-export const BACKENDURL = (() => {
-  const { BACKEND_URL } = environment
-  if (!BACKEND_URL) return ``
-  if (/^http/.test(BACKEND_URL)) return BACKEND_URL
-
-  const url = new URL(window.location.href)
-  const { protocol, hostname, pathname } = url
-  return `${protocol}//${hostname}${pathname.replace(/\/$/, '')}/${BACKEND_URL}`
-})()
 
 export const MIN_REQ_EXPLAINER = `
 - Siibra explorer requires **webgl2.0**, and the \`EXT_color_buffer_float\` extension enabled.
@@ -33,7 +21,7 @@ export const MIN_REQ_EXPLAINER = `
 export const APPEND_SCRIPT_TOKEN: InjectionToken<(url: string) => Promise<HTMLScriptElement>> = new InjectionToken(`APPEND_SCRIPT_TOKEN`)
 
 export const appendScriptFactory = (document: Document, defer: boolean = false) => {
-  return src => new Promise((rs, rj) => {
+  return (src: string) => new Promise((rs, rj) => {
     const scriptEl = document.createElement('script')
     if (defer) {
       scriptEl.defer = true
@@ -73,43 +61,7 @@ export const getHttpHeader: () => HttpHeaders = () => {
 }
 
 export const COLORMAP_IS_JET = `// iav-colormap-is-jet`
-import { EnumColorMapName, mapKeyColorMap } from './colorMaps'
 import { InjectionToken } from "@angular/core"
-
-export const getShader = ({
-  colormap = EnumColorMapName.GREYSCALE,
-  lowThreshold = 0,
-  highThreshold = 1,
-  brightness = 0,
-  contrast = 0,
-  removeBg = false
-} = {}): string => {
-  const { header, main, premain } = mapKeyColorMap.get(colormap) || (() => {
-    return mapKeyColorMap.get(EnumColorMapName.GREYSCALE)
-  })()
-
-  // so that if lowthreshold is defined to be 0, at least some background removal will be done
-  const _lowThreshold = lowThreshold + 1e-10
-  return `${header}
-${premain}
-void main() {
-  float raw_x = toNormalized(getDataValue());
-  float x = (raw_x - ${_lowThreshold.toFixed(10)}) / (${highThreshold - _lowThreshold}) ${ brightness > 0 ? '+' : '-' } ${Math.abs(brightness).toFixed(10)};
-
-  ${ removeBg ? 'if(x>1.0){emitTransparent();}else if(x<0.0){emitTransparent();}else{' : '' }
-    vec3 rgb;
-    ${main}
-    emitRGB(rgb*exp(${contrast.toFixed(10)}));
-  ${ removeBg ? '}' : '' }
-}
-`
-}
-
-export const PMAP_DEFAULT_CONFIG = {
-  colormap: EnumColorMapName.VIRIDIS,
-  lowThreshold: 0.05,
-  removeBg: true
-}
 
 export const CYCLE_PANEL_MESSAGE = `[spacebar] to cycle through views`
 
@@ -144,6 +96,12 @@ export const speciesOrder = [
 ]
 
 export const parcBanList: string[] = [
-  "https://identifiers.org/neurovault.image:23262",
-  "https://doi.org/10.1016/j.jneumeth.2020.108983/mni152",
+  "https://identifiers.org/neurovault.image:23262", // dk
+  "https://doi.org/10.1016/j.jneumeth.2020.108983/mni152", // vep
+  "minds/core/parcellationatlas/v1.0.0/887da8eb4c36d944ef626ed5293db3ef", // marsatlas
+  "minds/core/parcellationatlas/v1.0.0/f2b1ac621421708c1bef422bb5058456", // voneconomo
 ]
+
+export const GET_ATTR_TOKEN = new InjectionToken("GET_ATTR_TOKEN")
+
+export type GetAttr = (attr: string) => string|null

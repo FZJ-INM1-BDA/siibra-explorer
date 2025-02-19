@@ -1,19 +1,22 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  Inject,
   Input,
+  Optional,
   TemplateRef,
 } from "@angular/core";
-import { Observable } from "rxjs";
+import { Observable, of } from "rxjs";
 import { map } from "rxjs/operators";
 import { AuthService } from "src/auth";
-import { MatDialog, MatDialogConfig, MatDialogRef } from "@angular/material/dialog";
-import { MatBottomSheet } from "@angular/material/bottom-sheet";
+import { MatBottomSheet, MatDialog, MatDialogConfig, MatDialogRef } from 'src/sharedModules/angularMaterial.exports'
 import { CONST, QUICKTOUR_DESC, ARIA_LABELS } from 'common/constants'
 import { IQuickTourData } from "src/ui/quickTour/constrants";
 import { TypeMatBtnColor, TypeMatBtnStyle } from "src/components/dynamicMaterialBtn/dynamicMaterialBtn.component";
 import { select, Store } from "@ngrx/store";
 import { userPreference } from "src/state";
+import { environment } from "src/environments/environment"
+import { SHOW_EXPERIMENTAL_TOKEN } from "src/experimental/experimental.module";
 
 @Component({
   selector: 'top-menu-cmp',
@@ -26,6 +29,17 @@ import { userPreference } from "src/state";
 
 export class TopMenuCmp {
 
+  public showExptToggle$ = environment.EXPERIMENTAL_FEATURE_FLAG
+  ? of (true)
+  : (this.showXplrToggle$ || of(false))
+  
+  setExperimentalFlag(flag: boolean){
+    this.store.dispatch(
+      userPreference.actions.setShowExperimental({
+        flag
+      })
+    )
+  }
   public experimentalFlag$ = this.store.pipe(
     select(userPreference.selectors.showExperimental)
   )
@@ -76,6 +90,7 @@ export class TopMenuCmp {
     private authService: AuthService,
     private dialog: MatDialog,
     public bottomSheet: MatBottomSheet,
+    @Optional() @Inject(SHOW_EXPERIMENTAL_TOKEN) private showXplrToggle$: Observable<boolean>,
   ) {
     this.user$ = this.authService.user$
 

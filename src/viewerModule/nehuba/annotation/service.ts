@@ -5,6 +5,7 @@ import { filter, map, pairwise, startWith } from "rxjs/operators";
 import { AnnotationLayer, TNgAnnotationAABBox, TNgAnnotationLine, TNgAnnotationPoint } from "src/atlasComponents/annotations";
 import { annotation } from "src/state";
 
+const ANNOTATION_LAYER_NAME = 'whale-annotation-layer'
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +14,6 @@ import { annotation } from "src/state";
 export class NgAnnotationService implements OnDestroy {
 
   private subs: Subscription[]  = []
-  static ANNOTATION_LAYER_NAME = 'whale-annotation-layer'
   static INIT_LAYERS: Set<string> = new Set<string>()
   static COLOR_MAP = new Map<keyof typeof annotation.AnnotationColor, string>([
     [annotation.AnnotationColor.WHITE, "#ffffff"],
@@ -24,7 +24,7 @@ export class NgAnnotationService implements OnDestroy {
   static GET_ANN_LAYER(ann: annotation.UnionAnnotation): AnnotationLayer {
     const color = ann.color || annotation.AnnotationColor.WHITE
     const layerEnum = annotation.AnnotationColor[color] || annotation.AnnotationColor.WHITE
-    const layerName = `${NgAnnotationService.ANNOTATION_LAYER_NAME}-${layerEnum}`
+    const layerName = `${ANNOTATION_LAYER_NAME}-${layerEnum}`
 
     const annLayer = AnnotationLayer.Get(layerName, NgAnnotationService.COLOR_MAP.get(color) || "#ffffff")
     NgAnnotationService.INIT_LAYERS.add(layerName)

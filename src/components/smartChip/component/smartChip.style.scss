@@ -6,13 +6,71 @@
   position: relative;
 }
 
+
+:host
+{
+  margin: 0;
+  min-height: 44px;
+}
+
+.smart-chip
+{ 
+  display: inline-flex;
+  flex-direction: row;
+  border-radius: 22px;
+  justify-content: center;
+
+  >.text
+  {
+    height: 0px;
+    overflow: visible;
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  >.icons
+  {
+    height: 0px;
+    overflow: visible;
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+.header
+{
+
+  font-size: 80%;
+  margin-top:-0.5rem;
+  margin-bottom:0.3rem;
+  flex-basis: 1rem;
+}
+
+.body
+{
+  width: 100%;
+  flex: 1 1 0;
+  display: flex;
+  align-items: flex-start;
+
+  >.body-content-wrapper
+  {
+    height: 1px;
+    width: 100%;
+    overflow: visible;
+    display: flex;
+    align-items: center;
+  }
+}
+
 .smart-chip
 {
   box-sizing: border-box;
   height: 100%;
 
   padding: 0.8rem 1.6rem;
-  border-radius: 1rem;
 
   display: inline-flex;
   flex-direction: row;

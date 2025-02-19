@@ -12,7 +12,7 @@ export const selectedAtlas = createSelector(
 
 export const selectedTemplate = createSelector(
   selectStore,
-  state => state.selectedTemplate
+  state => state?.selectedTemplate
 )
 
 export const selectedParcellation = createSelector(
@@ -68,4 +68,9 @@ export const relevantSelectedPoint = createSelector(
     }
     return null
   }
+)
+
+export const currentViewport = createSelector(
+  selectStore,
+  store => store.currentViewport
 )

@@ -106,7 +106,8 @@ export class CategoryAccDirective implements AfterContentInit, OnDestroy {
       if (filteredListCmps.length === 0) {
         return of(
           new ParentDatasource({
-            children: [] as PulledDataSource<TranslatedFeature>[]
+            children: [] as PulledDataSource<TranslatedFeature>[],
+            serialize: f => f.id
           })
         )
       }
@@ -114,7 +115,7 @@ export class CategoryAccDirective implements AfterContentInit, OnDestroy {
         filteredListCmps.map(cmp => cmp.datasource$)
       ).pipe(
         map(dss => {
-          this.datasource = new ParentDatasource({ children: dss })
+          this.datasource = new ParentDatasource({ children: dss, serialize: f => f.id })
           return this.datasource
         }),
       )
@@ -144,6 +145,12 @@ export class CategoryAccDirective implements AfterContentInit, OnDestroy {
       ).subscribe(async ({ total, current, ds }) => {
         if (total > current && current < 50) {
           try {
+            /**
+             * TODO Interaction between ParentDataSource and ListDatadirective, which both pulls seems
+             * to weirdly interact with each other. 
+             * For now, pulling twice seems to solve the issue
+             */
+            await ds.pull()
             await ds.pull()
           } catch (e) {
             // if already pulling, ignore

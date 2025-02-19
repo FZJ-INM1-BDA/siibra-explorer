@@ -1,6 +1,5 @@
 import { Injectable } from "@angular/core";
-import { MatBottomSheet, MatBottomSheetRef } from "@angular/material/bottom-sheet";
-import { MatSnackBar } from "@angular/material/snack-bar";
+import { MatSnackBar, MatBottomSheet, MatBottomSheetRef } from 'src/sharedModules/angularMaterial.exports'
 import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { select, Store } from "@ngrx/store";
 import { of } from "rxjs";
@@ -9,6 +8,7 @@ import { generalActionError } from "../actions";
 import { userInterface } from "..";
 import { selectors } from "../atlasSelection"
 import * as actions from "./actions"
+import { isNullish } from "src/util/fn";
 
 @Injectable()
 export class Effects{
@@ -71,18 +71,23 @@ export class Effects{
       )
     ),
     switchMap(([ { targetIndex }, panelMode ]) => {
-      const newMode: userInterface.PanelMode = panelMode === "FOUR_PANEL"
+      let newMode: userInterface.PanelMode
+      if (isNullish(panelMode)) {
+        newMode = "PIP_PANEL"
+      } else {
+        newMode = panelMode === "FOUR_PANEL"
         ? "PIP_PANEL"
         : "FOUR_PANEL"
+      }
       const newOrder = newMode === "FOUR_PANEL"
         ? "0123"
         : "0123".split("").map(v => ((Number(v) + targetIndex) % 4).toString()).join("")
       return of(
-        userInterface.actions.setPanelMode({
-          panelMode: newMode
-        }),
         userInterface.actions.setPanelOrder({
           order: newOrder
+        }),
+        userInterface.actions.setPanelMode({
+          panelMode: newMode
         })
       )
     })

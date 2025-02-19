@@ -1,0 +1,4967 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "siibra api",
+    "description": "This is the REST api for siibra tools",
+    "version": "3.0"
+  },
+  "servers": [
+    {
+      "url": "/v3_0"
+    }
+  ],
+  "paths": {
+    "/feature/{feature_id}/plotly": {
+      "get": {
+        "tags": [
+          "feature"
+        ],
+        "summary": "Get Single Feature Plot",
+        "description": "Get the plotly specification of the plot.\n            \nFor the appearance of the template, see [https://plotly.com/python/templates/](https://plotly.com/python/templates/)",
+        "operationId": "get_single_feature_plot_feature__feature_id__plotly_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Feature Id"
+            },
+            "name": "feature_id",
+            "in": "path"
+          },
+          {
+            "required": false,
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/PlotlyTemplate"
+                }
+              ],
+              "default": "plotly"
+            },
+            "name": "template",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/feature/{feature_id}/download": {
+      "get": {
+        "tags": [
+          "feature"
+        ],
+        "summary": "Get Single Feature Download",
+        "description": "Get a zip archive of the downloadables from a feature.",
+        "operationId": "get_single_feature_download_feature__feature_id__download_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Feature Id"
+            },
+            "name": "feature_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/atlases": {
+      "get": {
+        "tags": [
+          "atlas"
+        ],
+        "summary": "Get All Atlases",
+        "description": "HTTP get all atlases",
+        "operationId": "get_all_atlases_atlases_get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Page",
+              "default": 1
+            },
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Size",
+              "default": 50
+            },
+            "name": "size",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_SiibraAtlasModel_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/atlases/{atlas_id}": {
+      "get": {
+        "tags": [
+          "atlas"
+        ],
+        "summary": "Get Single Atlas",
+        "description": "HTTP get a single atlas",
+        "operationId": "get_single_atlas_atlases__atlas_id__get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Atlas Id"
+            },
+            "name": "atlas_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiibraAtlasModel"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spaces": {
+      "get": {
+        "tags": [
+          "space"
+        ],
+        "summary": "Get All Spaces",
+        "description": "HTTP get all spaces",
+        "operationId": "get_all_spaces_spaces_get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Page",
+              "default": 1
+            },
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Size",
+              "default": 50
+            },
+            "name": "size",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_CommonCoordinateSpaceModel_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spaces/{space_id}": {
+      "get": {
+        "tags": [
+          "space"
+        ],
+        "summary": "Get Single Space",
+        "description": "HTTP get a single space",
+        "operationId": "get_single_space_spaces__space_id__get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Space Id"
+            },
+            "name": "space_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonCoordinateSpaceModel"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/parcellations": {
+      "get": {
+        "tags": [
+          "parcellation"
+        ],
+        "summary": "Get All Parcellations",
+        "description": "HTTP get all parcellations",
+        "operationId": "get_all_parcellations_parcellations_get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Page",
+              "default": 1
+            },
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Size",
+              "default": 50
+            },
+            "name": "size",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_SiibraParcellationModel_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/parcellations/{parcellation_id}": {
+      "get": {
+        "tags": [
+          "parcellation"
+        ],
+        "summary": "Get Single Parcellation",
+        "description": "HTTP get a single parcellation",
+        "operationId": "get_single_parcellation_parcellations__parcellation_id__get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Parcellation Id"
+            },
+            "name": "parcellation_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiibraParcellationModel"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/regions": {
+      "get": {
+        "tags": [
+          "region"
+        ],
+        "summary": "Get All Regions",
+        "description": "HTTP get all regions",
+        "operationId": "get_all_regions_regions_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Parcellation Id"
+            },
+            "name": "parcellation_id",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Find"
+            },
+            "name": "find",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Page",
+              "default": 1
+            },
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Size",
+              "default": 50
+            },
+            "name": "size",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_ParcellationEntityVersionModel_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/regions/{region_id}/features": {
+      "get": {
+        "tags": [
+          "region"
+        ],
+        "summary": "Get All Features Region",
+        "description": "HTTP get all features of a single region",
+        "operationId": "get_all_features_region_regions__region_id__features_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Region Id"
+            },
+            "name": "region_id",
+            "in": "path"
+          },
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Parcellation Id"
+            },
+            "name": "parcellation_id",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Page",
+              "default": 1
+            },
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Size",
+              "default": 50
+            },
+            "name": "size",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_Union_SiibraVoiModel__SiibraCorticalProfileModel__SiibraRegionalConnectivityModel__SiibraReceptorDensityFp__SiibraTabularModel__SiibraEbrainsDataFeatureModel__"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/regions/{region_id}/related": {
+      "get": {
+        "tags": [
+          "region"
+        ],
+        "summary": "Get Related Region",
+        "description": "HTTP get_related_regions of the specified region",
+        "operationId": "get_related_region_regions__region_id__related_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Region Id"
+            },
+            "name": "region_id",
+            "in": "path"
+          },
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Parcellation Id"
+            },
+            "name": "parcellation_id",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Page",
+              "default": 1
+            },
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Size",
+              "default": 50
+            },
+            "name": "size",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_RegionRelationAsmtModel_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/regions/{region_id}": {
+      "get": {
+        "tags": [
+          "region"
+        ],
+        "summary": "Get Single Regions",
+        "description": "HTTP get a single region",
+        "operationId": "get_single_regions_regions__region_id__get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Region Id"
+            },
+            "name": "region_id",
+            "in": "path"
+          },
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Parcellation Id"
+            },
+            "name": "parcellation_id",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Space Id"
+            },
+            "name": "space_id",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParcellationEntityVersionModel"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/map": {
+      "get": {
+        "tags": [
+          "maps"
+        ],
+        "summary": "Get Siibra Map",
+        "description": "Get map according to specification",
+        "operationId": "get_siibra_map_map_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Parcellation Id"
+            },
+            "name": "parcellation_id",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Space Id"
+            },
+            "name": "space_id",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/MapType"
+            },
+            "name": "map_type",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MapModel"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/map/resampled_template": {
+      "get": {
+        "tags": [
+          "maps",
+          "maps"
+        ],
+        "summary": "Get Resampled Map",
+        "description": "Return a resampled template volume, based on labelled parcellation map.",
+        "operationId": "get_resampled_map_map_resampled_template_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Parcellation Id"
+            },
+            "name": "parcellation_id",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Space Id"
+            },
+            "name": "space_id",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/map/labelled_map.nii.gz": {
+      "get": {
+        "tags": [
+          "maps",
+          "maps"
+        ],
+        "summary": "Get Parcellation Labelled Map",
+        "description": "Returns a labelled map if region_id is not provided.\n\nReturns a mask if a region_id is provided.\n\nregion_id MAY refer to ANY region on the region hierarchy, and a combined mask will be returned.",
+        "operationId": "get_parcellation_labelled_map_map_labelled_map_nii_gz_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Parcellation Id"
+            },
+            "name": "parcellation_id",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Space Id"
+            },
+            "name": "space_id",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Region Id"
+            },
+            "name": "region_id",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/map/statistical_map.nii.gz": {
+      "get": {
+        "tags": [
+          "maps",
+          "maps"
+        ],
+        "summary": "Get Region Statistical Map",
+        "description": "Returns a statistic map.\n\nregion_id MUST refer to leaf region on the region hierarchy.",
+        "operationId": "get_region_statistical_map_map_statistical_map_nii_gz_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Parcellation Id"
+            },
+            "name": "parcellation_id",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Space Id"
+            },
+            "name": "space_id",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Region Id"
+            },
+            "name": "region_id",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/map/statistical_map.info.json": {
+      "get": {
+        "tags": [
+          "maps",
+          "maps"
+        ],
+        "summary": "Get Region Statistical Map Metadata",
+        "description": "Get metadata of statistical map according to specification",
+        "operationId": "get_region_statistical_map_metadata_map_statistical_map_info_json_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Parcellation Id"
+            },
+            "name": "parcellation_id",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Space Id"
+            },
+            "name": "space_id",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Region Id"
+            },
+            "name": "region_id",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatisticModelInfo"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/map/assign": {
+      "get": {
+        "tags": [
+          "maps",
+          [
+            "maps"
+          ]
+        ],
+        "summary": "Get Assign Point",
+        "description": "Perform assignment according to specification",
+        "operationId": "get_assign_point_map_assign_get",
+        "parameters": [
+          {
+            "name": "parcellation_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "title": "Parcellation Id",
+              "type": "string"
+            }
+          },
+          {
+            "name": "space_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "title": "Space Id",
+              "type": "string"
+            }
+          },
+          {
+            "name": "point",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "title": "Point",
+              "type": "string"
+            }
+          },
+          {
+            "name": "assignment_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "title": "Assignment Type",
+              "default": "statistical",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sigma_mm",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "title": "Sigma Mm",
+              "default": 0,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataFrameModel"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/atlas_download": {
+      "get": {
+        "tags": [
+          "download"
+        ],
+        "summary": "Get Download Bundle",
+        "description": "Prepare the bundle. Given a specification, prepare/bundle according to the specification.",
+        "operationId": "get_download_bundle_atlas_download_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Space Id"
+            },
+            "name": "space_id",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Parcellation Id"
+            },
+            "name": "parcellation_id",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "title": "Bbox"
+            },
+            "name": "bbox",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Region Id"
+            },
+            "name": "region_id",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Feature Id"
+            },
+            "name": "feature_id",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/atlas_download/{task_id}": {
+      "get": {
+        "tags": [
+          "download"
+        ],
+        "summary": "Get Download Progress",
+        "description": "Get download task progress with task_id",
+        "operationId": "get_download_progress_atlas_download__task_id__get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Task Id"
+            },
+            "name": "task_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/atlas_download/{task_id}/download": {
+      "get": {
+        "tags": [
+          "download"
+        ],
+        "summary": "Get Download Result",
+        "description": "Download the bundle",
+        "operationId": "get_download_result_atlas_download__task_id__download_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Task Id"
+            },
+            "name": "task_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/feature/_types": {
+      "get": {
+        "tags": [
+          "feature"
+        ],
+        "summary": "Get All Feature Types",
+        "description": "Get meta info of all feature types",
+        "operationId": "get_all_feature_types_feature__types_get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Page",
+              "default": 1
+            },
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Size",
+              "default": 50
+            },
+            "name": "size",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_FeatureMetaModel_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/feature/RegionalConnectivity": {
+      "get": {
+        "tags": [
+          "feature"
+        ],
+        "summary": "Get All Connectivity Features",
+        "description": "Get all connectivity features",
+        "operationId": "get_all_connectivity_features_feature_RegionalConnectivity_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Parcellation Id"
+            },
+            "name": "parcellation_id",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Type"
+            },
+            "name": "type",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Page",
+              "default": 1
+            },
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Size",
+              "default": 50
+            },
+            "name": "size",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_SiibraRegionalConnectivityModel_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/feature/RegionalConnectivity/{feature_id}": {
+      "get": {
+        "tags": [
+          "feature"
+        ],
+        "summary": "Get Single Connectivity Feature",
+        "description": "subject is an optional param.\nIf provided, the specific matrix will be return.\nIf not provided, the matrix averaged between subjects will be returned under the key _average.",
+        "operationId": "get_single_connectivity_feature_feature_RegionalConnectivity__feature_id__get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Feature Id"
+            },
+            "name": "feature_id",
+            "in": "path"
+          },
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Parcellation Id"
+            },
+            "name": "parcellation_id",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Subject"
+            },
+            "name": "subject",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Type"
+            },
+            "name": "type",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiibraRegionalConnectivityModel"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/feature/CorticalProfile": {
+      "get": {
+        "tags": [
+          "feature"
+        ],
+        "summary": "Get All Corticalprofile Features",
+        "description": "Get all CorticalProfile features",
+        "operationId": "get_all_corticalprofile_features_feature_CorticalProfile_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Parcellation Id"
+            },
+            "name": "parcellation_id",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Region Id"
+            },
+            "name": "region_id",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Type"
+            },
+            "name": "type",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Page",
+              "default": 1
+            },
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Size",
+              "default": 50
+            },
+            "name": "size",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_SiibraCorticalProfileModel_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/feature/CorticalProfile/{feature_id}": {
+      "get": {
+        "tags": [
+          "feature"
+        ],
+        "summary": "Get Single Corticalprofile Feature",
+        "description": "Get a single CorticalProfile feature",
+        "operationId": "get_single_corticalprofile_feature_feature_CorticalProfile__feature_id__get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Feature Id"
+            },
+            "name": "feature_id",
+            "in": "path"
+          },
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Parcellation Id"
+            },
+            "name": "parcellation_id",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Region Id"
+            },
+            "name": "region_id",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Type"
+            },
+            "name": "type",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiibraCorticalProfileModel"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/feature/Tabular": {
+      "get": {
+        "tags": [
+          "feature"
+        ],
+        "summary": "Get All Tabular",
+        "description": "Get all tabular features",
+        "operationId": "get_all_tabular_feature_Tabular_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Parcellation Id"
+            },
+            "name": "parcellation_id",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Region Id"
+            },
+            "name": "region_id",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Type"
+            },
+            "name": "type",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Page",
+              "default": 1
+            },
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Size",
+              "default": 50
+            },
+            "name": "size",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_Union_SiibraCorticalProfileModel__SiibraReceptorDensityFp__SiibraTabularModel__"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/feature/Tabular/{feature_id}": {
+      "get": {
+        "tags": [
+          "feature"
+        ],
+        "summary": "Get Single Tabular",
+        "description": "Get a single tabular feature",
+        "operationId": "get_single_tabular_feature_Tabular__feature_id__get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Feature Id"
+            },
+            "name": "feature_id",
+            "in": "path"
+          },
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Parcellation Id"
+            },
+            "name": "parcellation_id",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Region Id"
+            },
+            "name": "region_id",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Type"
+            },
+            "name": "type",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/SiibraCorticalProfileModel"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SiibraReceptorDensityFp"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SiibraTabularModel"
+                    }
+                  ],
+                  "title": "Response Get Single Tabular Feature Tabular  Feature Id  Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/feature/Image": {
+      "get": {
+        "tags": [
+          "feature"
+        ],
+        "summary": "Get All Voi",
+        "description": "Get all Image features",
+        "operationId": "get_all_voi_feature_Image_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Space Id"
+            },
+            "name": "space_id",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Bbox"
+            },
+            "name": "bbox",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Type"
+            },
+            "name": "type",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Page",
+              "default": 1
+            },
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Size",
+              "default": 50
+            },
+            "name": "size",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_SiibraVoiModel_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/feature/Image/{feature_id}": {
+      "get": {
+        "tags": [
+          "feature"
+        ],
+        "summary": "Get Single Voi",
+        "description": "Get a single Image feature",
+        "operationId": "get_single_voi_feature_Image__feature_id__get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Feature Id"
+            },
+            "name": "feature_id",
+            "in": "path"
+          },
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Space Id"
+            },
+            "name": "space_id",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Type"
+            },
+            "name": "type",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiibraVoiModel"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/feature/GeneExpressions": {
+      "get": {
+        "tags": [
+          "feature"
+        ],
+        "summary": "Get All Gene",
+        "description": "Get all GeneExpressions features",
+        "operationId": "get_all_gene_feature_GeneExpressions_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Parcellation Id"
+            },
+            "name": "parcellation_id",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Region Id"
+            },
+            "name": "region_id",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Gene"
+            },
+            "name": "gene",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Page",
+              "default": 1
+            },
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Size",
+              "default": 50
+            },
+            "name": "size",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_SiibraTabularModel_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/feature/GeneExpressions/{feature_id}": {
+      "get": {
+        "tags": [
+          "feature"
+        ],
+        "summary": "Get Single Gene",
+        "description": "Get a single GeneExpressions feature",
+        "operationId": "get_single_gene_feature_GeneExpressions__feature_id__get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Feature Id"
+            },
+            "name": "feature_id",
+            "in": "path"
+          },
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Parcellation Id"
+            },
+            "name": "parcellation_id",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Region Id"
+            },
+            "name": "region_id",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Gene"
+            },
+            "name": "gene",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Page",
+              "default": 1
+            },
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Size",
+              "default": 50
+            },
+            "name": "size",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_SiibraTabularModel_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/feature/EbrainsDataFeature": {
+      "get": {
+        "tags": [
+          "feature"
+        ],
+        "summary": "Get All Ebrains Df",
+        "description": "Get all EbrainsDataFeatures",
+        "operationId": "get_all_ebrains_df_feature_EbrainsDataFeature_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Parcellation Id"
+            },
+            "name": "parcellation_id",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Region Id"
+            },
+            "name": "region_id",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Page",
+              "default": 1
+            },
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Size",
+              "default": 50
+            },
+            "name": "size",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_SiibraEbrainsDataFeatureModel_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/feature/EbrainsDataFeature/{feature_id}": {
+      "get": {
+        "tags": [
+          "feature"
+        ],
+        "summary": "Get Single Ebrains Df",
+        "description": "Get a single EbrainsDataFeature",
+        "operationId": "get_single_ebrains_df_feature_EbrainsDataFeature__feature_id__get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Feature Id"
+            },
+            "name": "feature_id",
+            "in": "path"
+          },
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Parcellation Id"
+            },
+            "name": "parcellation_id",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Region Id"
+            },
+            "name": "region_id",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Page",
+              "default": 1
+            },
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Size",
+              "default": 50
+            },
+            "name": "size",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_SiibraEbrainsDataFeatureModel_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/feature/{feature_id}": {
+      "get": {
+        "tags": [
+          "feature",
+          "feature"
+        ],
+        "summary": "Get Single Feature",
+        "description": "This endpoint allows detail of a single feature to be fetched, without the necessary context. However, the tradeoff for this endpoint is:\n\n- the endpoint typing is the union of all possible return types\n- the client needs to supply any necessary query param (e.g. subject for regional connectivity, gene for gene expression etc)",
+        "operationId": "get_single_feature_feature__feature_id__get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Feature Id"
+            },
+            "name": "feature_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/SiibraVoiModel"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SiibraCorticalProfileModel"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SiibraRegionalConnectivityModel"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SiibraReceptorDensityFp"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SiibraTabularModel"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SiibraEbrainsDataFeatureModel"
+                    }
+                  ],
+                  "title": "Response Get Single Feature Feature  Feature Id  Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AxesOrigin": {
+        "properties": {
+          "@context": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VocabModel"
+              }
+            ],
+            "title": "@Context",
+            "default": {
+              "@vocab": "https://openminds.ebrains.eu/vocab/"
+            }
+          },
+          "typeOfUncertainty": {
+            "title": "typeOfUncertainty",
+            "description": "Distinct technique used to quantify the uncertainty of a measurement."
+          },
+          "uncertainty": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 2,
+            "minItems": 2,
+            "title": "uncertainty",
+            "description": "Quantitative value range defining the uncertainty of a measurement."
+          },
+          "unit": {
+            "title": "unit",
+            "description": "Determinate quantity adopted as a standard of measurement."
+          },
+          "value": {
+            "type": "number",
+            "title": "value",
+            "description": "Entry for a property."
+          }
+        },
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "title": "AxesOrigin"
+      },
+      "BestViewPoint": {
+        "properties": {
+          "@context": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VocabModel"
+              }
+            ],
+            "title": "@Context",
+            "default": {
+              "@vocab": "https://openminds.ebrains.eu/vocab/"
+            }
+          },
+          "coordinateSpace": {
+            "title": "coordinateSpace",
+            "description": "Two or three dimensional geometric setting."
+          },
+          "coordinates": {
+            "items": {
+              "$ref": "#/components/schemas/api__models__openminds__SANDS__v3__atlas__parcellationEntityVersion__Coordinates"
+            },
+            "type": "array",
+            "title": "Coordinates",
+            "description": "Structured information on a quantitative value."
+          }
+        },
+        "type": "object",
+        "required": [
+          "coordinateSpace",
+          "coordinates"
+        ],
+        "title": "BestViewPoint"
+      },
+      "BoundingBoxModel": {
+        "properties": {
+          "@type": {
+            "type": "string",
+            "title": "@Type"
+          },
+          "space": {
+            "$ref": "#/components/schemas/SiibraAtIdModel"
+          },
+          "center": {
+            "$ref": "#/components/schemas/CoordinatePointModel"
+          },
+          "minpoint": {
+            "$ref": "#/components/schemas/CoordinatePointModel"
+          },
+          "maxpoint": {
+            "$ref": "#/components/schemas/CoordinatePointModel"
+          },
+          "shape": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Shape"
+          },
+          "isPlanar": {
+            "type": "boolean",
+            "title": "Isplanar"
+          }
+        },
+        "type": "object",
+        "required": [
+          "@type",
+          "space",
+          "center",
+          "minpoint",
+          "maxpoint",
+          "shape",
+          "isPlanar"
+        ],
+        "title": "BoundingBoxModel",
+        "description": "BoundingBoxModel"
+      },
+      "BrainAtlasVersionModel": {
+        "properties": {
+          "@type": {
+            "type": "string",
+            "title": "@Type"
+          },
+          "@context": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VocabModel"
+              }
+            ],
+            "title": "@Context",
+            "default": {
+              "@vocab": "https://openminds.ebrains.eu/vocab/"
+            }
+          },
+          "@id": {
+            "type": "string",
+            "title": "@Id",
+            "description": "Metadata node identifier."
+          },
+          "abbreviation": {
+            "type": "string",
+            "title": "abbreviation"
+          },
+          "accessibility": {
+            "type": "object",
+            "title": "accessibility",
+            "description": "Level to which something is accessible to someone or something."
+          },
+          "atlasType": {
+            "type": "object",
+            "title": "atlasType"
+          },
+          "author": {
+            "items": {},
+            "type": "array",
+            "minItems": 1,
+            "title": "author",
+            "description": "Creator of a literary or creative work, as well as a dataset publication."
+          },
+          "coordinateSpace": {
+            "type": "object",
+            "title": "coordinateSpace",
+            "description": "Two or three dimensional geometric setting."
+          },
+          "copyright": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Copyright"
+              }
+            ],
+            "title": "Copyright",
+            "description": "Structured information on the copyright."
+          },
+          "custodian": {
+            "items": {},
+            "type": "array",
+            "minItems": 1,
+            "title": "custodian",
+            "description": "The 'custodian' is a legal person who is responsible for the content and quality of the data, metadata, and/or code of a research product."
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 2000,
+            "title": "description",
+            "description": "Longer statement or account giving the characteristics of someone or something."
+          },
+          "digitalIdentifier": {
+            "type": "object",
+            "title": "digitalIdentifier",
+            "description": "Digital handle to identify objects or legal persons."
+          },
+          "fullDocumentation": {
+            "type": "object",
+            "title": "fullDocumentation",
+            "description": "Non-abridged instructions, comments, and information for using a particular product."
+          },
+          "fullName": {
+            "type": "string",
+            "title": "fullName",
+            "description": "Whole, non-abbreviated name of something or somebody."
+          },
+          "funding": {
+            "items": {},
+            "type": "array",
+            "minItems": 1,
+            "title": "funding",
+            "description": "Money provided by a legal person for a particular purpose."
+          },
+          "hasTerminologyVersion": {
+            "$ref": "#/components/schemas/HasTerminologyVersion"
+          },
+          "homepage": {
+            "type": "object",
+            "title": "homepage",
+            "description": "Main website of something or someone."
+          },
+          "howToCite": {
+            "type": "string",
+            "title": "howToCite",
+            "description": "Preferred format for citing a particular object or legal person."
+          },
+          "isAlternativeVersionOf": {
+            "items": {},
+            "type": "array",
+            "minItems": 1,
+            "title": "isAlternativeVersionOf",
+            "description": "Reference to an original form where the essence was preserved, but presented in an alternative form."
+          },
+          "isNewVersionOf": {
+            "type": "object",
+            "title": "isNewVersionOf",
+            "description": "Reference to a previous (potentially outdated) particular form of something."
+          },
+          "keyword": {
+            "items": {},
+            "type": "array",
+            "maxItems": 5,
+            "minItems": 1,
+            "title": "keyword",
+            "description": "Significant word or concept that are representative of something or someone."
+          },
+          "license": {
+            "type": "object",
+            "title": "license",
+            "description": "Grant by a party to another party as an element of an agreement between those parties that permits to do, use, or own something."
+          },
+          "ontologyIdentifier": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "ontologyIdentifier",
+            "description": "Term or code used to identify something or someone registered within a particular ontology."
+          },
+          "otherContribution": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OtherContribution"
+              }
+            ],
+            "title": "Othercontribution",
+            "description": "Structured information on the contribution made to a research product."
+          },
+          "relatedPublication": {
+            "items": {},
+            "type": "array",
+            "minItems": 1,
+            "title": "relatedPublication",
+            "description": "Reference to something that was made available for the general public to see or buy."
+          },
+          "releaseDate": {
+            "type": "string",
+            "title": "releaseDate",
+            "description": "Fixed date on which a product is due to become or was made available for the general public to see or buy"
+          },
+          "repository": {
+            "type": "object",
+            "title": "repository",
+            "description": "Place, room, or container where something is deposited or stored."
+          },
+          "shortName": {
+            "type": "string",
+            "maxLength": 30,
+            "title": "shortName",
+            "description": "Shortened or fully abbreviated name of something or somebody."
+          },
+          "supportChannel": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "supportChannel",
+            "description": "Way of communication used to interact with users or customers."
+          },
+          "versionIdentifier": {
+            "type": "string",
+            "title": "versionIdentifier",
+            "description": "Term or code used to identify the version of something."
+          },
+          "versionInnovation": {
+            "type": "string",
+            "title": "versionInnovation",
+            "description": "Documentation on what changed in comparison to a previously published form of something."
+          }
+        },
+        "type": "object",
+        "required": [
+          "@type",
+          "@id",
+          "accessibility",
+          "coordinateSpace",
+          "fullDocumentation",
+          "hasTerminologyVersion",
+          "license",
+          "releaseDate",
+          "shortName",
+          "versionIdentifier",
+          "versionInnovation"
+        ],
+        "title": "BrainAtlasVersionModel",
+        "description": "ConfigBaseModel"
+      },
+      "CommonCoordinateSpaceModel": {
+        "properties": {
+          "@type": {
+            "type": "string",
+            "title": "@Type"
+          },
+          "@context": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VocabModel"
+              }
+            ],
+            "title": "@Context",
+            "default": {
+              "@vocab": "https://openminds.ebrains.eu/vocab/"
+            }
+          },
+          "@id": {
+            "type": "string",
+            "title": "@Id",
+            "description": "Metadata node identifier."
+          },
+          "anatomicalAxesOrientation": {
+            "type": "object",
+            "title": "anatomicalAxesOrientation",
+            "description": "Relation between reference planes used in anatomy and mathematics."
+          },
+          "axesOrigin": {
+            "items": {
+              "$ref": "#/components/schemas/AxesOrigin"
+            },
+            "type": "array",
+            "title": "Axesorigin",
+            "description": "Structured information on a quantitative value."
+          },
+          "defaultImage": {
+            "items": {
+              "$ref": "#/components/schemas/VolumeModel"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "defaultImage",
+            "description": "Two or three dimensional image that particluarly represents a specific coordinate space. Overriden by Siibra API to use as VolumeModel"
+          },
+          "digitalIdentifier": {
+            "type": "object",
+            "title": "digitalIdentifier",
+            "description": "Digital handle to identify objects or legal persons."
+          },
+          "fullName": {
+            "type": "string",
+            "title": "fullName",
+            "description": "Whole, non-abbreviated name of something or somebody."
+          },
+          "homepage": {
+            "type": "object",
+            "title": "homepage",
+            "description": "Main website of something or someone."
+          },
+          "howToCite": {
+            "type": "string",
+            "title": "howToCite",
+            "description": "Preferred format for citing a particular object or legal person."
+          },
+          "nativeUnit": {
+            "type": "object",
+            "title": "nativeUnit",
+            "description": "Determinate quantity used in the original measurement."
+          },
+          "ontologyIdentifier": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "ontologyIdentifier",
+            "description": "Term or code used to identify something or someone registered within a particular ontology."
+          },
+          "releaseDate": {
+            "type": "string",
+            "title": "releaseDate",
+            "description": "Fixed date on which a product is due to become or was made available for the general public to see or buy"
+          },
+          "shortName": {
+            "type": "string",
+            "title": "shortName",
+            "description": "Shortened or fully abbreviated name of something or somebody."
+          },
+          "versionIdentifier": {
+            "type": "string",
+            "title": "versionIdentifier",
+            "description": "Term or code used to identify the version of something."
+          },
+          "datasets": {
+            "items": {
+              "$ref": "#/components/schemas/EbrainsDatasetModel"
+            },
+            "type": "array",
+            "title": "Datasets"
+          }
+        },
+        "type": "object",
+        "required": [
+          "@type",
+          "@id",
+          "anatomicalAxesOrientation",
+          "axesOrigin",
+          "fullName",
+          "nativeUnit",
+          "releaseDate",
+          "shortName",
+          "versionIdentifier"
+        ],
+        "title": "CommonCoordinateSpaceModel",
+        "description": "CommonCoordinateSpaceModel"
+      },
+      "CoordinatePointModel": {
+        "properties": {
+          "@type": {
+            "type": "string",
+            "title": "@Type"
+          },
+          "@context": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VocabModel"
+              }
+            ],
+            "title": "@Context",
+            "default": {
+              "@vocab": "https://openminds.ebrains.eu/vocab/"
+            }
+          },
+          "@id": {
+            "type": "string",
+            "title": "@Id",
+            "description": "Metadata node identifier."
+          },
+          "coordinateSpace": {
+            "type": "object",
+            "title": "coordinateSpace",
+            "description": "Two or three dimensional geometric setting."
+          },
+          "coordinates": {
+            "items": {
+              "$ref": "#/components/schemas/api__models__openminds__SANDS__v3__miscellaneous__coordinatePoint__Coordinates"
+            },
+            "type": "array",
+            "title": "Coordinates",
+            "description": "Structured information on a quantitative value."
+          }
+        },
+        "type": "object",
+        "required": [
+          "@type",
+          "@id",
+          "coordinateSpace",
+          "coordinates"
+        ],
+        "title": "CoordinatePointModel",
+        "description": "CoordinatePointModel"
+      },
+      "Copyright": {
+        "properties": {
+          "@context": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VocabModel"
+              }
+            ],
+            "title": "@Context",
+            "default": {
+              "@vocab": "https://openminds.ebrains.eu/vocab/"
+            }
+          },
+          "holder": {
+            "items": {},
+            "type": "array",
+            "minItems": 1,
+            "title": "holder",
+            "description": "Legal person in possession of something."
+          },
+          "year": {
+            "type": "string",
+            "pattern": "([0-9]{4})",
+            "title": "year",
+            "description": "Cycle in the Gregorian calendar specified by a number and comprised of 365 or 366 days divided into 12 months beginning with January and ending with December."
+          }
+        },
+        "type": "object",
+        "required": [
+          "holder",
+          "year"
+        ],
+        "title": "Copyright"
+      },
+      "DataFrameModel": {
+        "properties": {
+          "@type": {
+            "type": "string",
+            "title": "@Type"
+          },
+          "index": {
+            "items": {},
+            "type": "array",
+            "title": "Index"
+          },
+          "columns": {
+            "items": {},
+            "type": "array",
+            "title": "Columns"
+          },
+          "ndim": {
+            "type": "integer",
+            "title": "Ndim"
+          },
+          "data": {
+            "items": {
+              "items": {},
+              "type": "array"
+            },
+            "type": "array",
+            "title": "Data"
+          }
+        },
+        "type": "object",
+        "required": [
+          "@type",
+          "index",
+          "columns",
+          "ndim"
+        ],
+        "title": "DataFrameModel",
+        "description": "DataFrameModel"
+      },
+      "EbrainsDatasetModel": {
+        "properties": {
+          "@type": {
+            "type": "string",
+            "title": "@Type"
+          },
+          "@id": {
+            "type": "string",
+            "title": "@Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "urls": {
+            "items": {
+              "$ref": "#/components/schemas/EbrainsDsUrl"
+            },
+            "type": "array",
+            "title": "Urls"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "contributors": {
+            "items": {
+              "$ref": "#/components/schemas/EbrainsDsPerson"
+            },
+            "type": "array",
+            "title": "Contributors"
+          },
+          "ebrains_page": {
+            "type": "string",
+            "title": "Ebrains Page"
+          },
+          "custodians": {
+            "items": {
+              "$ref": "#/components/schemas/EbrainsDsPerson"
+            },
+            "type": "array",
+            "title": "Custodians"
+          }
+        },
+        "type": "object",
+        "required": [
+          "@type",
+          "@id",
+          "name",
+          "urls",
+          "contributors",
+          "custodians"
+        ],
+        "title": "EbrainsDatasetModel",
+        "description": "EbrainsDatasetModel"
+      },
+      "EbrainsDsPerson": {
+        "properties": {
+          "@type": {
+            "type": "string",
+            "title": "@Type"
+          },
+          "@id": {
+            "type": "string",
+            "title": "@Id"
+          },
+          "schema.org/shortName": {
+            "type": "string",
+            "title": "Schema.Org/Shortname"
+          },
+          "identifier": {
+            "type": "string",
+            "title": "Identifier"
+          },
+          "shortName": {
+            "type": "string",
+            "title": "Shortname"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "@type",
+          "@id",
+          "schema.org/shortName",
+          "identifier",
+          "shortName",
+          "name"
+        ],
+        "title": "EbrainsDsPerson",
+        "description": "EbrainsDsPerson"
+      },
+      "EbrainsDsUrl": {
+        "properties": {
+          "@type": {
+            "type": "string",
+            "title": "@Type"
+          },
+          "url": {
+            "type": "string",
+            "title": "Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "@type",
+          "url"
+        ],
+        "title": "EbrainsDsUrl",
+        "description": "EbrainsDsUrl"
+      },
+      "FeatureMetaModel": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "display_name": {
+            "type": "string",
+            "title": "Display Name"
+          },
+          "path": {
+            "type": "string",
+            "title": "Path"
+          },
+          "query_params": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Query Params"
+          },
+          "required_query_params": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Required Query Params"
+          },
+          "optional_query_params": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Optional Query Params"
+          },
+          "path_params": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Path Params"
+          },
+          "category": {
+            "type": "string",
+            "title": "Category"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "display_name"
+        ],
+        "title": "FeatureMetaModel",
+        "description": "Meta feature type"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "HasAnnotation": {
+        "properties": {
+          "@context": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VocabModel"
+              }
+            ],
+            "title": "@Context",
+            "default": {
+              "@vocab": "https://openminds.ebrains.eu/vocab/"
+            }
+          },
+          "bestViewPoint": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BestViewPoint"
+              }
+            ],
+            "title": "Bestviewpoint",
+            "description": "Structured information on a coordinate point."
+          },
+          "criteria": {
+            "title": "criteria",
+            "description": "Aspects or standards on which a judgement or decision is based."
+          },
+          "criteriaQualityType": {
+            "title": "criteriaQualityType",
+            "description": "Distinct class that defines how the judgement or decision was made for a particular criteria."
+          },
+          "displayColor": {
+            "type": "string",
+            "pattern": "^#[0-9A-Fa-f]{6}$",
+            "title": "displayColor",
+            "description": "Preferred coloring."
+          },
+          "inspiredBy": {
+            "items": {},
+            "type": "array",
+            "minItems": 1,
+            "title": "inspiredBy",
+            "description": "Reference to an inspiring element."
+          },
+          "internalIdentifier": {
+            "type": "string",
+            "title": "internalIdentifier",
+            "description": "Term or code that identifies someone or something within a particular product."
+          },
+          "laterality": {
+            "items": {},
+            "type": "array",
+            "maxItems": 2,
+            "minItems": 1,
+            "title": "laterality",
+            "description": "Differentiation between a pair of lateral homologous parts of the body."
+          },
+          "visualizedIn": {
+            "title": "visualizedIn",
+            "description": "Reference to an image in which something is visible."
+          }
+        },
+        "type": "object",
+        "required": [
+          "criteriaQualityType",
+          "internalIdentifier"
+        ],
+        "title": "HasAnnotation"
+      },
+      "HasTerminologyVersion": {
+        "properties": {
+          "@context": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VocabModel"
+              }
+            ],
+            "title": "@Context",
+            "default": {
+              "@vocab": "https://openminds.ebrains.eu/vocab/"
+            }
+          },
+          "definedIn": {
+            "items": {},
+            "type": "array",
+            "minItems": 1,
+            "title": "definedIn",
+            "description": "Reference to a file instance in which something is stored."
+          },
+          "hasEntityVersion": {
+            "items": {},
+            "type": "array",
+            "minItems": 1,
+            "title": "hasEntityVersion"
+          },
+          "ontologyIdentifier": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "ontologyIdentifier",
+            "description": "Term or code used to identify something or someone registered within a particular ontology."
+          }
+        },
+        "type": "object",
+        "required": [
+          "hasEntityVersion"
+        ],
+        "title": "HasTerminologyVersion"
+      },
+      "LocationModel": {
+        "properties": {
+          "@type": {
+            "type": "string",
+            "title": "@Type"
+          },
+          "space": {
+            "$ref": "#/components/schemas/SiibraAtIdModel"
+          }
+        },
+        "type": "object",
+        "required": [
+          "@type",
+          "space"
+        ],
+        "title": "LocationModel",
+        "description": "LocationModel"
+      },
+      "MapIndexModel": {
+        "properties": {
+          "@type": {
+            "type": "string",
+            "title": "@Type"
+          },
+          "volume": {
+            "type": "integer",
+            "title": "Volume"
+          },
+          "label": {
+            "type": "integer",
+            "title": "Label"
+          },
+          "fragment": {
+            "type": "string",
+            "title": "Fragment"
+          }
+        },
+        "type": "object",
+        "required": [
+          "@type",
+          "volume"
+        ],
+        "title": "MapIndexModel",
+        "description": "MapIndexModel"
+      },
+      "MapModel": {
+        "properties": {
+          "@type": {
+            "type": "string",
+            "title": "@Type"
+          },
+          "@id": {
+            "type": "string",
+            "title": "@Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "shortname": {
+            "type": "string",
+            "title": "Shortname"
+          },
+          "modality": {
+            "type": "string",
+            "title": "Modality"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "publications": {
+            "items": {
+              "$ref": "#/components/schemas/SiibraPublication"
+            },
+            "type": "array",
+            "title": "Publications"
+          },
+          "datasets": {
+            "items": {
+              "$ref": "#/components/schemas/EbrainsDatasetModel"
+            },
+            "type": "array",
+            "title": "Datasets"
+          },
+          "species": {
+            "type": "string",
+            "title": "Species"
+          },
+          "indices": {
+            "additionalProperties": {
+              "items": {
+                "$ref": "#/components/schemas/MapIndexModel"
+              },
+              "type": "array"
+            },
+            "type": "object",
+            "title": "Indices"
+          },
+          "volumes": {
+            "items": {
+              "$ref": "#/components/schemas/VolumeModel"
+            },
+            "type": "array",
+            "title": "Volumes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "@type",
+          "@id",
+          "name",
+          "publications",
+          "datasets",
+          "species",
+          "indices",
+          "volumes"
+        ],
+        "title": "MapModel",
+        "description": "MapModel"
+      },
+      "MapType": {
+        "type": "string",
+        "enum": [
+          "LABELLED",
+          "STATISTICAL"
+        ],
+        "title": "MapType",
+        "description": "MapType\n\nExact match to MapType in siibra, to avoid dependency on siibra"
+      },
+      "OtherContribution": {
+        "properties": {
+          "@context": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VocabModel"
+              }
+            ],
+            "title": "@Context",
+            "default": {
+              "@vocab": "https://openminds.ebrains.eu/vocab/"
+            }
+          },
+          "contributionType": {
+            "items": {},
+            "type": "array",
+            "minItems": 1,
+            "title": "contributionType",
+            "description": "Distinct class of what was given or supplied as a part or share."
+          },
+          "contributor": {
+            "title": "contributor",
+            "description": "Legal person that gave or supplied something as a part or share."
+          }
+        },
+        "type": "object",
+        "required": [
+          "contributionType",
+          "contributor"
+        ],
+        "title": "OtherContribution"
+      },
+      "Page_CommonCoordinateSpaceModel_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/CommonCoordinateSpaceModel"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "title": "Page"
+          },
+          "size": {
+            "type": "integer",
+            "minimum": 1,
+            "title": "Size"
+          },
+          "pages": {
+            "type": "integer",
+            "minimum": 0,
+            "title": "Pages"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "title": "Page[CommonCoordinateSpaceModel]"
+      },
+      "Page_FeatureMetaModel_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/FeatureMetaModel"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "title": "Page"
+          },
+          "size": {
+            "type": "integer",
+            "minimum": 1,
+            "title": "Size"
+          },
+          "pages": {
+            "type": "integer",
+            "minimum": 0,
+            "title": "Pages"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "title": "Page[FeatureMetaModel]"
+      },
+      "Page_ParcellationEntityVersionModel_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ParcellationEntityVersionModel"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "title": "Page"
+          },
+          "size": {
+            "type": "integer",
+            "minimum": 1,
+            "title": "Size"
+          },
+          "pages": {
+            "type": "integer",
+            "minimum": 0,
+            "title": "Pages"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "title": "Page[ParcellationEntityVersionModel]"
+      },
+      "Page_RegionRelationAsmtModel_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/RegionRelationAsmtModel"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "title": "Page"
+          },
+          "size": {
+            "type": "integer",
+            "minimum": 1,
+            "title": "Size"
+          },
+          "pages": {
+            "type": "integer",
+            "minimum": 0,
+            "title": "Pages"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "title": "Page[RegionRelationAsmtModel]"
+      },
+      "Page_SiibraAtlasModel_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SiibraAtlasModel"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "title": "Page"
+          },
+          "size": {
+            "type": "integer",
+            "minimum": 1,
+            "title": "Size"
+          },
+          "pages": {
+            "type": "integer",
+            "minimum": 0,
+            "title": "Pages"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "title": "Page[SiibraAtlasModel]"
+      },
+      "Page_SiibraCorticalProfileModel_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SiibraCorticalProfileModel"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "title": "Page"
+          },
+          "size": {
+            "type": "integer",
+            "minimum": 1,
+            "title": "Size"
+          },
+          "pages": {
+            "type": "integer",
+            "minimum": 0,
+            "title": "Pages"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "title": "Page[SiibraCorticalProfileModel]"
+      },
+      "Page_SiibraEbrainsDataFeatureModel_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SiibraEbrainsDataFeatureModel"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "title": "Page"
+          },
+          "size": {
+            "type": "integer",
+            "minimum": 1,
+            "title": "Size"
+          },
+          "pages": {
+            "type": "integer",
+            "minimum": 0,
+            "title": "Pages"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "title": "Page[SiibraEbrainsDataFeatureModel]"
+      },
+      "Page_SiibraParcellationModel_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SiibraParcellationModel"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "title": "Page"
+          },
+          "size": {
+            "type": "integer",
+            "minimum": 1,
+            "title": "Size"
+          },
+          "pages": {
+            "type": "integer",
+            "minimum": 0,
+            "title": "Pages"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "title": "Page[SiibraParcellationModel]"
+      },
+      "Page_SiibraRegionalConnectivityModel_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SiibraRegionalConnectivityModel"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "title": "Page"
+          },
+          "size": {
+            "type": "integer",
+            "minimum": 1,
+            "title": "Size"
+          },
+          "pages": {
+            "type": "integer",
+            "minimum": 0,
+            "title": "Pages"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "title": "Page[SiibraRegionalConnectivityModel]"
+      },
+      "Page_SiibraTabularModel_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SiibraTabularModel"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "title": "Page"
+          },
+          "size": {
+            "type": "integer",
+            "minimum": 1,
+            "title": "Size"
+          },
+          "pages": {
+            "type": "integer",
+            "minimum": 0,
+            "title": "Pages"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "title": "Page[SiibraTabularModel]"
+      },
+      "Page_SiibraVoiModel_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SiibraVoiModel"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "title": "Page"
+          },
+          "size": {
+            "type": "integer",
+            "minimum": 1,
+            "title": "Size"
+          },
+          "pages": {
+            "type": "integer",
+            "minimum": 0,
+            "title": "Pages"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "title": "Page[SiibraVoiModel]"
+      },
+      "Page_Union_SiibraCorticalProfileModel__SiibraReceptorDensityFp__SiibraTabularModel__": {
+        "properties": {
+          "items": {
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/SiibraCorticalProfileModel"
+                },
+                {
+                  "$ref": "#/components/schemas/SiibraReceptorDensityFp"
+                },
+                {
+                  "$ref": "#/components/schemas/SiibraTabularModel"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "title": "Page"
+          },
+          "size": {
+            "type": "integer",
+            "minimum": 1,
+            "title": "Size"
+          },
+          "pages": {
+            "type": "integer",
+            "minimum": 0,
+            "title": "Pages"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "title": "Page[Union[SiibraCorticalProfileModel, SiibraReceptorDensityFp, SiibraTabularModel]]"
+      },
+      "Page_Union_SiibraVoiModel__SiibraCorticalProfileModel__SiibraRegionalConnectivityModel__SiibraReceptorDensityFp__SiibraTabularModel__SiibraEbrainsDataFeatureModel__": {
+        "properties": {
+          "items": {
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/SiibraVoiModel"
+                },
+                {
+                  "$ref": "#/components/schemas/SiibraCorticalProfileModel"
+                },
+                {
+                  "$ref": "#/components/schemas/SiibraRegionalConnectivityModel"
+                },
+                {
+                  "$ref": "#/components/schemas/SiibraReceptorDensityFp"
+                },
+                {
+                  "$ref": "#/components/schemas/SiibraTabularModel"
+                },
+                {
+                  "$ref": "#/components/schemas/SiibraEbrainsDataFeatureModel"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "title": "Page"
+          },
+          "size": {
+            "type": "integer",
+            "minimum": 1,
+            "title": "Size"
+          },
+          "pages": {
+            "type": "integer",
+            "minimum": 0,
+            "title": "Pages"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "title": "Page[Union[SiibraVoiModel, SiibraCorticalProfileModel, SiibraRegionalConnectivityModel, SiibraReceptorDensityFp, SiibraTabularModel, SiibraEbrainsDataFeatureModel]]"
+      },
+      "ParcellationEntityVersionModel": {
+        "properties": {
+          "@type": {
+            "type": "string",
+            "title": "@Type"
+          },
+          "@context": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VocabModel"
+              }
+            ],
+            "title": "@Context",
+            "default": {
+              "@vocab": "https://openminds.ebrains.eu/vocab/"
+            }
+          },
+          "@id": {
+            "type": "string",
+            "title": "@Id",
+            "description": "Metadata node identifier."
+          },
+          "hasAnnotation": {
+            "$ref": "#/components/schemas/HasAnnotation"
+          },
+          "hasParent": {
+            "items": {},
+            "type": "array",
+            "minItems": 1,
+            "title": "hasParent",
+            "description": "Reference to a parent object or legal person."
+          },
+          "lookupLabel": {
+            "type": "string",
+            "title": "lookupLabel"
+          },
+          "name": {
+            "type": "string",
+            "title": "name",
+            "description": "Word or phrase that constitutes the distinctive designation of a being or thing."
+          },
+          "ontologyIdentifier": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "ontologyIdentifier",
+            "description": "Term or code used to identify something or someone registered within a particular ontology."
+          },
+          "relationAssessment": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RelationAssessmentItem"
+              },
+              {
+                "$ref": "#/components/schemas/RelationAssessmentItem1"
+              }
+            ],
+            "title": "Relationassessment"
+          },
+          "versionIdentifier": {
+            "type": "string",
+            "title": "versionIdentifier",
+            "description": "Term or code used to identify the version of something."
+          },
+          "versionInnovation": {
+            "type": "string",
+            "title": "versionInnovation",
+            "description": "Documentation on what changed in comparison to a previously published form of something."
+          }
+        },
+        "type": "object",
+        "required": [
+          "@type",
+          "@id",
+          "versionIdentifier"
+        ],
+        "title": "ParcellationEntityVersionModel",
+        "description": "ParcellationEntityVersionModel"
+      },
+      "PlotlyTemplate": {
+        "enum": [
+          "plotly",
+          "plotly_white",
+          "plotly_dark",
+          "ggplot2",
+          "seaborn",
+          "simple_white",
+          "none"
+        ],
+        "title": "PlotlyTemplate",
+        "description": "An enumeration."
+      },
+      "Qualification": {
+        "type": "string",
+        "enum": [
+          "EXACT",
+          "OVERLAPS",
+          "CONTAINED",
+          "CONTAINS",
+          "APPROXIMATE",
+          "HOMOLOGOUS",
+          "OTHER_VERSION"
+        ],
+        "title": "Qualification",
+        "description": "Qualification\n\nExactly match to Qualification in siibra.core.relation_quantification.Quantification"
+      },
+      "QuantitativeOverlapItem": {
+        "properties": {
+          "@context": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VocabModel"
+              }
+            ],
+            "title": "@Context",
+            "default": {
+              "@vocab": "https://openminds.ebrains.eu/vocab/"
+            }
+          },
+          "typeOfUncertainty": {
+            "title": "typeOfUncertainty",
+            "description": "Distinct technique used to quantify the uncertainty of a measurement."
+          },
+          "uncertainty": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 2,
+            "minItems": 2,
+            "title": "uncertainty",
+            "description": "Quantitative value range defining the uncertainty of a measurement."
+          },
+          "unit": {
+            "title": "unit",
+            "description": "Determinate quantity adopted as a standard of measurement."
+          },
+          "value": {
+            "type": "number",
+            "title": "value",
+            "description": "Entry for a property."
+          }
+        },
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "title": "QuantitativeOverlapItem"
+      },
+      "QuantitativeOverlapItem1": {
+        "properties": {
+          "@context": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VocabModel"
+              }
+            ],
+            "title": "@Context",
+            "default": {
+              "@vocab": "https://openminds.ebrains.eu/vocab/"
+            }
+          },
+          "maxValue": {
+            "type": "number",
+            "title": "maxValue",
+            "description": "Greatest quantity attained or allowed."
+          },
+          "maxValueUnit": {
+            "title": "maxValueUnit"
+          },
+          "minValue": {
+            "type": "number",
+            "title": "minValue",
+            "description": "Smallest quantity attained or allowed."
+          },
+          "minValueUnit": {
+            "title": "minValueUnit"
+          }
+        },
+        "type": "object",
+        "required": [
+          "maxValue",
+          "minValue"
+        ],
+        "title": "QuantitativeOverlapItem1"
+      },
+      "RegionRelationAsmtModel": {
+        "properties": {
+          "@type": {
+            "type": "string",
+            "title": "@Type"
+          },
+          "qualification": {
+            "$ref": "#/components/schemas/Qualification"
+          },
+          "query_structure": {
+            "$ref": "#/components/schemas/ParcellationEntityVersionModel"
+          },
+          "assigned_structure": {
+            "$ref": "#/components/schemas/ParcellationEntityVersionModel"
+          },
+          "assigned_structure_parcellation": {
+            "$ref": "#/components/schemas/SiibraParcellationModel"
+          }
+        },
+        "type": "object",
+        "required": [
+          "@type",
+          "qualification",
+          "query_structure",
+          "assigned_structure",
+          "assigned_structure_parcellation"
+        ],
+        "title": "RegionRelationAsmtModel",
+        "description": "ConfigBaseModel"
+      },
+      "RelationAssessmentItem": {
+        "properties": {
+          "@context": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VocabModel"
+              }
+            ],
+            "title": "@Context",
+            "default": {
+              "@vocab": "https://openminds.ebrains.eu/vocab/"
+            }
+          },
+          "criteria": {
+            "title": "criteria",
+            "description": "Aspects or standards on which a judgement or decision is based."
+          },
+          "inRelationTo": {
+            "title": "inRelationTo",
+            "description": "Reference to a related element."
+          },
+          "qualitativeOverlap": {
+            "title": "qualitativeOverlap",
+            "description": "Semantic characterization of how much two things occupy the same space."
+          }
+        },
+        "type": "object",
+        "required": [
+          "inRelationTo",
+          "qualitativeOverlap"
+        ],
+        "title": "RelationAssessmentItem"
+      },
+      "RelationAssessmentItem1": {
+        "properties": {
+          "@context": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VocabModel"
+              }
+            ],
+            "title": "@Context",
+            "default": {
+              "@vocab": "https://openminds.ebrains.eu/vocab/"
+            }
+          },
+          "criteria": {
+            "title": "criteria",
+            "description": "Aspects or standards on which a judgement or decision is based."
+          },
+          "inRelationTo": {
+            "title": "inRelationTo",
+            "description": "Reference to a related element."
+          },
+          "quantitativeOverlap": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/QuantitativeOverlapItem"
+              },
+              {
+                "$ref": "#/components/schemas/QuantitativeOverlapItem1"
+              }
+            ],
+            "title": "Quantitativeoverlap"
+          }
+        },
+        "type": "object",
+        "required": [
+          "inRelationTo",
+          "quantitativeOverlap"
+        ],
+        "title": "RelationAssessmentItem1"
+      },
+      "SiibraAnatomicalAssignmentModel": {
+        "properties": {
+          "@type": {
+            "type": "string",
+            "title": "@Type"
+          },
+          "qualification": {
+            "type": "string",
+            "title": "Qualification"
+          },
+          "query_structure": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LocationModel"
+              },
+              {
+                "$ref": "#/components/schemas/ParcellationEntityVersionModel"
+              },
+              {
+                "$ref": "#/components/schemas/SiibraParcellationModel"
+              }
+            ],
+            "title": "Query Structure"
+          },
+          "assigned_structure": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LocationModel"
+              },
+              {
+                "$ref": "#/components/schemas/ParcellationEntityVersionModel"
+              },
+              {
+                "$ref": "#/components/schemas/SiibraParcellationModel"
+              }
+            ],
+            "title": "Assigned Structure"
+          },
+          "explanation": {
+            "type": "string",
+            "title": "Explanation"
+          }
+        },
+        "type": "object",
+        "required": [
+          "@type",
+          "qualification",
+          "query_structure",
+          "assigned_structure",
+          "explanation"
+        ],
+        "title": "SiibraAnatomicalAssignmentModel",
+        "description": "SiibraAnatomicalAssignmentModel"
+      },
+      "SiibraAnchorModel": {
+        "properties": {
+          "@type": {
+            "type": "string",
+            "title": "@Type"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LocationModel"
+              },
+              {
+                "$ref": "#/components/schemas/CoordinatePointModel"
+              }
+            ],
+            "title": "Location"
+          },
+          "regions": {
+            "items": {
+              "$ref": "#/components/schemas/SiibraRegionAssignmentQual"
+            },
+            "type": "array",
+            "title": "Regions"
+          },
+          "last_match_description": {
+            "type": "string",
+            "title": "Last Match Description",
+            "default": ""
+          },
+          "last_match_result": {
+            "items": {
+              "$ref": "#/components/schemas/SiibraAnatomicalAssignmentModel"
+            },
+            "type": "array",
+            "title": "Last Match Result"
+          }
+        },
+        "type": "object",
+        "required": [
+          "@type",
+          "regions"
+        ],
+        "title": "SiibraAnchorModel",
+        "description": "SiibraAnchorModel"
+      },
+      "SiibraAtIdModel": {
+        "properties": {
+          "@id": {
+            "type": "string",
+            "title": "@Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "@id"
+        ],
+        "title": "SiibraAtIdModel"
+      },
+      "SiibraAtlasModel": {
+        "properties": {
+          "@type": {
+            "type": "string",
+            "title": "@Type"
+          },
+          "@id": {
+            "type": "string",
+            "title": "@Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "spaces": {
+            "items": {
+              "$ref": "#/components/schemas/SiibraAtIdModel"
+            },
+            "type": "array",
+            "title": "Spaces"
+          },
+          "parcellations": {
+            "items": {
+              "$ref": "#/components/schemas/SiibraAtIdModel"
+            },
+            "type": "array",
+            "title": "Parcellations"
+          },
+          "species": {
+            "type": "string",
+            "title": "Species"
+          }
+        },
+        "type": "object",
+        "required": [
+          "@type",
+          "@id",
+          "name",
+          "spaces",
+          "parcellations",
+          "species"
+        ],
+        "title": "SiibraAtlasModel",
+        "description": "SiibraAtlasModel"
+      },
+      "SiibraCorticalProfileModel": {
+        "properties": {
+          "@type": {
+            "type": "string",
+            "title": "@Type"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "modality": {
+            "type": "string",
+            "title": "Modality"
+          },
+          "category": {
+            "type": "string",
+            "title": "Category"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "datasets": {
+            "items": {
+              "$ref": "#/components/schemas/EbrainsDatasetModel"
+            },
+            "type": "array",
+            "title": "Datasets"
+          },
+          "anchor": {
+            "$ref": "#/components/schemas/SiibraAnchorModel"
+          },
+          "data": {
+            "$ref": "#/components/schemas/DataFrameModel"
+          },
+          "unit": {
+            "type": "string",
+            "title": "Unit"
+          },
+          "boundary_positions": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Boundary Positions"
+          },
+          "boundaries_mapped": {
+            "type": "boolean",
+            "title": "Boundaries Mapped"
+          }
+        },
+        "type": "object",
+        "required": [
+          "@type",
+          "id",
+          "category",
+          "description",
+          "name",
+          "datasets",
+          "boundary_positions",
+          "boundaries_mapped"
+        ],
+        "title": "SiibraCorticalProfileModel",
+        "description": "SiibraCorticalProfileModel"
+      },
+      "SiibraEbrainsDataFeatureModel": {
+        "properties": {
+          "@type": {
+            "type": "string",
+            "title": "@Type"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "modality": {
+            "type": "string",
+            "title": "Modality"
+          },
+          "category": {
+            "type": "string",
+            "title": "Category"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "datasets": {
+            "items": {
+              "$ref": "#/components/schemas/EbrainsDatasetModel"
+            },
+            "type": "array",
+            "title": "Datasets"
+          },
+          "anchor": {
+            "$ref": "#/components/schemas/SiibraAnchorModel"
+          }
+        },
+        "type": "object",
+        "required": [
+          "@type",
+          "id",
+          "category",
+          "description",
+          "name",
+          "datasets"
+        ],
+        "title": "SiibraEbrainsDataFeatureModel",
+        "description": "SiibraEbrainsDataFeatureModel"
+      },
+      "SiibraParcellationModel": {
+        "properties": {
+          "@type": {
+            "type": "string",
+            "title": "@Type"
+          },
+          "@id": {
+            "type": "string",
+            "title": "@Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "modality": {
+            "type": "string",
+            "title": "Modality"
+          },
+          "datasets": {
+            "items": {
+              "$ref": "#/components/schemas/EbrainsDatasetModel"
+            },
+            "type": "array",
+            "title": "Datasets"
+          },
+          "brainAtlasVersions": {
+            "items": {
+              "$ref": "#/components/schemas/BrainAtlasVersionModel"
+            },
+            "type": "array",
+            "title": "Brainatlasversions"
+          },
+          "version": {
+            "$ref": "#/components/schemas/SiibraParcellationVersionModel"
+          },
+          "shortname": {
+            "type": "string",
+            "title": "Shortname"
+          }
+        },
+        "type": "object",
+        "required": [
+          "@type",
+          "@id",
+          "name",
+          "datasets",
+          "brainAtlasVersions"
+        ],
+        "title": "SiibraParcellationModel",
+        "description": "SiibraParcellationModel"
+      },
+      "SiibraParcellationVersionModel": {
+        "properties": {
+          "@type": {
+            "type": "string",
+            "title": "@Type"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "deprecated": {
+            "type": "boolean",
+            "title": "Deprecated"
+          },
+          "prev": {
+            "$ref": "#/components/schemas/SiibraAtIdModel"
+          },
+          "next": {
+            "$ref": "#/components/schemas/SiibraAtIdModel"
+          }
+        },
+        "type": "object",
+        "required": [
+          "@type",
+          "name"
+        ],
+        "title": "SiibraParcellationVersionModel",
+        "description": "SiibraParcellationVersionModel"
+      },
+      "SiibraPublication": {
+        "properties": {
+          "@type": {
+            "type": "string",
+            "title": "@Type"
+          },
+          "citation": {
+            "type": "string",
+            "title": "Citation"
+          },
+          "url": {
+            "type": "string",
+            "title": "Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "@type",
+          "citation",
+          "url"
+        ],
+        "title": "SiibraPublication",
+        "description": "ConfigBaseModel"
+      },
+      "SiibraReceptorDensityFp": {
+        "properties": {
+          "@type": {
+            "type": "string",
+            "title": "@Type"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "modality": {
+            "type": "string",
+            "title": "Modality"
+          },
+          "category": {
+            "type": "string",
+            "title": "Category"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "datasets": {
+            "items": {
+              "$ref": "#/components/schemas/EbrainsDatasetModel"
+            },
+            "type": "array",
+            "title": "Datasets"
+          },
+          "anchor": {
+            "$ref": "#/components/schemas/SiibraAnchorModel"
+          },
+          "data": {
+            "$ref": "#/components/schemas/DataFrameModel"
+          },
+          "neurotransmitters": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Neurotransmitters"
+          },
+          "receptors": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Receptors"
+          }
+        },
+        "type": "object",
+        "required": [
+          "@type",
+          "id",
+          "category",
+          "description",
+          "name",
+          "datasets"
+        ],
+        "title": "SiibraReceptorDensityFp",
+        "description": "SiibraReceptorDensityFp"
+      },
+      "SiibraRegionAssignmentQual": {
+        "properties": {
+          "@type": {
+            "type": "string",
+            "title": "@Type"
+          },
+          "region": {
+            "$ref": "#/components/schemas/ParcellationEntityVersionModel"
+          },
+          "qualification": {
+            "type": "string",
+            "title": "Qualification"
+          }
+        },
+        "type": "object",
+        "required": [
+          "@type",
+          "region",
+          "qualification"
+        ],
+        "title": "SiibraRegionAssignmentQual",
+        "description": "SiibraRegionAssignmentModel"
+      },
+      "SiibraRegionalConnectivityModel": {
+        "properties": {
+          "@type": {
+            "type": "string",
+            "title": "@Type"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "modality": {
+            "type": "string",
+            "title": "Modality"
+          },
+          "category": {
+            "type": "string",
+            "title": "Category"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "datasets": {
+            "items": {
+              "$ref": "#/components/schemas/EbrainsDatasetModel"
+            },
+            "type": "array",
+            "title": "Datasets"
+          },
+          "anchor": {
+            "$ref": "#/components/schemas/SiibraAnchorModel"
+          },
+          "cohort": {
+            "type": "string",
+            "title": "Cohort"
+          },
+          "subjects": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Subjects"
+          },
+          "matrices": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/DataFrameModel"
+            },
+            "type": "object",
+            "title": "Matrices"
+          }
+        },
+        "type": "object",
+        "required": [
+          "@type",
+          "id",
+          "category",
+          "description",
+          "name",
+          "datasets",
+          "cohort",
+          "subjects"
+        ],
+        "title": "SiibraRegionalConnectivityModel",
+        "description": "SiibraRegionalConnectivityModel"
+      },
+      "SiibraTabularModel": {
+        "properties": {
+          "@type": {
+            "type": "string",
+            "title": "@Type"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "modality": {
+            "type": "string",
+            "title": "Modality"
+          },
+          "category": {
+            "type": "string",
+            "title": "Category"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "datasets": {
+            "items": {
+              "$ref": "#/components/schemas/EbrainsDatasetModel"
+            },
+            "type": "array",
+            "title": "Datasets"
+          },
+          "anchor": {
+            "$ref": "#/components/schemas/SiibraAnchorModel"
+          },
+          "data": {
+            "$ref": "#/components/schemas/DataFrameModel"
+          }
+        },
+        "type": "object",
+        "required": [
+          "@type",
+          "id",
+          "category",
+          "description",
+          "name",
+          "datasets"
+        ],
+        "title": "SiibraTabularModel",
+        "description": "SiibraTabularModel"
+      },
+      "SiibraVoiModel": {
+        "properties": {
+          "@type": {
+            "type": "string",
+            "title": "@Type"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "modality": {
+            "type": "string",
+            "title": "Modality"
+          },
+          "category": {
+            "type": "string",
+            "title": "Category"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "datasets": {
+            "items": {
+              "$ref": "#/components/schemas/EbrainsDatasetModel"
+            },
+            "type": "array",
+            "title": "Datasets"
+          },
+          "anchor": {
+            "$ref": "#/components/schemas/SiibraAnchorModel"
+          },
+          "volume": {
+            "$ref": "#/components/schemas/VolumeModel"
+          },
+          "boundingbox": {
+            "$ref": "#/components/schemas/BoundingBoxModel"
+          }
+        },
+        "type": "object",
+        "required": [
+          "@type",
+          "id",
+          "category",
+          "description",
+          "name",
+          "datasets",
+          "volume",
+          "boundingbox"
+        ],
+        "title": "SiibraVoiModel",
+        "description": "SiibraVoiModel"
+      },
+      "StatisticModelInfo": {
+        "properties": {
+          "min": {
+            "type": "number",
+            "title": "Min"
+          },
+          "max": {
+            "type": "number",
+            "title": "Max"
+          }
+        },
+        "type": "object",
+        "required": [
+          "min",
+          "max"
+        ],
+        "title": "StatisticModelInfo"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "VocabModel": {
+        "properties": {
+          "@vocab": {
+            "type": "string",
+            "title": "@Vocab"
+          }
+        },
+        "type": "object",
+        "required": [
+          "@vocab"
+        ],
+        "title": "VocabModel"
+      },
+      "VolumeModel": {
+        "properties": {
+          "@type": {
+            "type": "string",
+            "title": "@Type"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "formats": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Formats"
+          },
+          "providesMesh": {
+            "type": "boolean",
+            "title": "Providesmesh"
+          },
+          "providesImage": {
+            "type": "boolean",
+            "title": "Providesimage"
+          },
+          "fragments": {
+            "additionalProperties": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "type": "object",
+            "title": "Fragments"
+          },
+          "variant": {
+            "type": "string",
+            "title": "Variant"
+          },
+          "providedVolumes": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object"
+                }
+              ]
+            },
+            "type": "object",
+            "title": "Providedvolumes"
+          },
+          "space": {
+            "$ref": "#/components/schemas/SiibraAtIdModel"
+          },
+          "datasets": {
+            "items": {
+              "$ref": "#/components/schemas/EbrainsDatasetModel"
+            },
+            "type": "array",
+            "title": "Datasets"
+          }
+        },
+        "type": "object",
+        "required": [
+          "@type",
+          "name",
+          "formats",
+          "providesMesh",
+          "providesImage",
+          "fragments",
+          "providedVolumes",
+          "space",
+          "datasets"
+        ],
+        "title": "VolumeModel",
+        "description": "VolumeModel"
+      },
+      "api__models__openminds__SANDS__v3__atlas__parcellationEntityVersion__Coordinates": {
+        "properties": {
+          "@context": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VocabModel"
+              }
+            ],
+            "title": "@Context",
+            "default": {
+              "@vocab": "https://openminds.ebrains.eu/vocab/"
+            }
+          },
+          "typeOfUncertainty": {
+            "title": "typeOfUncertainty",
+            "description": "Distinct technique used to quantify the uncertainty of a measurement."
+          },
+          "uncertainty": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 2,
+            "minItems": 2,
+            "title": "uncertainty",
+            "description": "Quantitative value range defining the uncertainty of a measurement."
+          },
+          "unit": {
+            "title": "unit",
+            "description": "Determinate quantity adopted as a standard of measurement."
+          },
+          "value": {
+            "type": "number",
+            "title": "value",
+            "description": "Entry for a property."
+          }
+        },
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "title": "Coordinates"
+      },
+      "api__models__openminds__SANDS__v3__miscellaneous__coordinatePoint__Coordinates": {
+        "properties": {
+          "@context": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VocabModel"
+              }
+            ],
+            "title": "@Context",
+            "default": {
+              "@vocab": "https://openminds.ebrains.eu/vocab/"
+            }
+          },
+          "typeOfUncertainty": {
+            "title": "typeOfUncertainty",
+            "description": "Distinct technique used to quantify the uncertainty of a measurement."
+          },
+          "uncertainty": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 2,
+            "minItems": 2,
+            "title": "uncertainty",
+            "description": "Quantitative value range defining the uncertainty of a measurement."
+          },
+          "unit": {
+            "title": "unit",
+            "description": "Determinate quantity adopted as a standard of measurement."
+          },
+          "value": {
+            "type": "number",
+            "title": "value",
+            "description": "Entry for a property."
+          }
+        },
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "title": "Coordinates"
+      }
+    }
+  }
+}

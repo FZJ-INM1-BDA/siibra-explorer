@@ -7,6 +7,8 @@ import { maxGpuLimit, CSP } from "./const"
 export const defaultGpuLimit = maxGpuLimit
 
 export type UserPreference = {
+  overrideZTraversalMultiplier: number
+
   useMobileUi: boolean
   gpuLimit: number
   useAnimation: boolean
@@ -19,6 +21,8 @@ export type UserPreference = {
 }
 
 export const defaultState: UserPreference = {
+  overrideZTraversalMultiplier: null,
+  
   useMobileUi: JSON.parse(localStorage.getItem(LOCAL_STORAGE_CONST.MOBILE_UI)),
   gpuLimit: Number(localStorage.getItem(LOCAL_STORAGE_CONST.GPU_LIMIT)) || defaultGpuLimit,
   useAnimation: !localStorage.getItem(LOCAL_STORAGE_CONST.ANIMATION),
@@ -99,6 +103,13 @@ export const reducer = createReducer(
     (state, { flag }) => ({
       ...state,
       showExperimental: flag
+    })
+  ),
+  on(
+    actions.setZMultiplier,
+    (state, { value }) => ({
+      ...state,
+      overrideZTraversalMultiplier: value
     })
   )
 )

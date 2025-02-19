@@ -1,5 +1,5 @@
 import { DragDropModule } from '@angular/cdk/drag-drop'
-import { CommonModule } from "@angular/common";
+import { CommonModule, DOCUMENT } from "@angular/common";
 import { APP_INITIALIZER, NgModule } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { Store, select } from "@ngrx/store";
@@ -24,14 +24,12 @@ import { PluginModule } from './plugin/plugin.module';
 import { LoggingModule } from './logging/logging.module';
 import { AuthService } from './auth'
 
-import 'src/theme.scss'
 import { ClickInterceptorService } from './glue';
 import { TOS_OBS_INJECTION_TOKEN } from './ui/kgtos';
 import { MesssagingModule } from './messaging/module';
 import { ViewerModule } from './viewerModule';
 import { CookieModule } from './ui/cookieAgreement/module';
 import { KgTosModule } from './ui/kgtos/module';
-import { AtlasViewerRouterModule } from './routerModule';
 import { MessagingGlue } from './messagingGlue';
 import { QuickTourModule } from './ui/quickTour';
 import { of } from 'rxjs';
@@ -51,6 +49,11 @@ import { LayerCtrlEffects } from './viewerModule/nehuba/layerCtrl.service/layerC
 import { NehubaNavigationEffects } from './viewerModule/nehuba/navigation.service/navigation.effects';
 import { CONST } from "common/constants"
 import { ViewerCommonEffects } from './viewerModule';
+import { environment } from './environments/environment';
+import { SAPI } from './atlasComponents/sapi';
+import { GET_ATTR_TOKEN, GetAttr } from './util/constants';
+import { KCodeModule } from "./experimental/experimental.module"
+import { FreeModeModule } from './freeModeModule';
 
 @NgModule({
   imports: [
@@ -71,8 +74,8 @@ import { ViewerCommonEffects } from './viewerModule';
     SpotLightModule,
     CookieModule,
     KgTosModule,
-    AtlasViewerRouterModule,
     QuickTourModule,
+    FreeModeModule,
     
     EffectsModule.forRoot([
       ...getStoreEffects(),
@@ -82,6 +85,7 @@ import { ViewerCommonEffects } from './viewerModule';
     ]),
     RootStoreModule,
     HttpClientModule,
+    KCodeModule,
   ],
   declarations: [
     AtlasViewer,
@@ -179,6 +183,36 @@ import { ViewerCommonEffects } from './viewerModule';
       },
       multi: true,
       deps: [ AuthService ]
+    },
+    {
+      provide: GET_ATTR_TOKEN,
+      useFactory: (document: Document) => {
+        return (attr: string) => {
+          const rootEl = document.querySelector("atlas-viewer")
+          return rootEl?.getAttribute(attr)
+        }
+      },
+      deps: [ DOCUMENT ]
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: (sapi: SAPI, getAttr: GetAttr) => {
+        const overwriteSapiUrl = getAttr(CONST.OVERWRITE_SAPI_ENDPOINT_ATTR)
+        
+        const { SIIBRA_API_ENDPOINTS } = environment
+        const endpoints = (overwriteSapiUrl && [ overwriteSapiUrl ]) || SIIBRA_API_ENDPOINTS.split(',')
+        return async () => {
+          try {
+            const url = await SAPI.VerifyEndpoints(endpoints)
+            sapi.verifiedSapiEndpoint$.next(url)
+            sapi.verifiedSapiEndpoint$.complete()
+          } catch (e) {
+            SAPI.ErrorMessage = e.toString()
+          }
+        }
+      },
+      multi: true,
+      deps: [ SAPI, GET_ATTR_TOKEN ]
     }
   ],
   bootstrap: [

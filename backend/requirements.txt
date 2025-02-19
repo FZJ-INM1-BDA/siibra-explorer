@@ -1,0 +1,8 @@
+fastapi
+markdown
+authlib
+uvicorn[standard] # required as a asgi
+itsdangerous # required for starlette session middleware
+httpx # required for async uvicorn
+redis
+ebrains-drive>=0.6.0

@@ -139,7 +139,7 @@ export class NehubaMeshService implements OnDestroy {
        * TODO monkey patching jba29 in colin to show all meshes
        * 
        */
-      if (selectedParcellation.id === IDS.PARCELLATION.JBA29 && selectedTemplate.id === IDS.TEMPLATES.COLIN27) {
+      if ((selectedParcellation.id === IDS.PARCELLATION.JBA29 || IDS.PARCELLATION.JBA30 === selectedParcellation.id) && selectedTemplate.id === IDS.TEMPLATES.COLIN27) {
         return of(...allSegMesh)
       }
       const hasSegSelected = selectedSegMesh.some(v => v.labelIndicies.length !== 0)

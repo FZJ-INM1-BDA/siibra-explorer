@@ -1,10 +1,9 @@
 import { CommonModule } from "@angular/common";
 import { Component, Pipe, PipeTransform } from "@angular/core";
-import { MatDividerModule } from "@angular/material/divider";
-import { MatExpansionModule } from "@angular/material/expansion";
 import { Meta, moduleMetadata, Story } from "@storybook/angular";
 import { provideDarkTheme } from "src/atlasComponents/sapi/stories.base";
 import { SmartChipModule } from "./module";
+import { AngularMaterialModule } from "src/sharedModules";
 
 
 const complex1 = `
@@ -123,8 +122,7 @@ export default {
       imports: [
         CommonModule,
         SmartChipModule,
-        MatExpansionModule,
-        MatDividerModule,
+        AngularMaterialModule,
       ],
       declarations: [
         ShowHtmlCode,

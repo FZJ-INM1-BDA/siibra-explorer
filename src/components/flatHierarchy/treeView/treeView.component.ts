@@ -1,5 +1,5 @@
 import { FlatTreeControl } from "@angular/cdk/tree";
-import { MatTreeFlatDataSource, MatTreeFlattener } from "@angular/material/tree"
+import { MatTreeFlatDataSource, MatTreeFlattener } from 'src/sharedModules/angularMaterial.exports'
 import { ChangeDetectionStrategy, Component, EventEmitter, HostBinding, Input, OnChanges, Output, SimpleChanges, TemplateRef } from "@angular/core";
 import { TreeNode } from "../const"
 import { Tree } from "./treeControl"
@@ -44,7 +44,7 @@ export class SxplrFlatHierarchyTreeView<T extends Record<string, unknown>> exten
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.sxplrNodes || changes.sxplrIsParent) {
-      this.nodes = this.sxplrNodes
+      this.nodes = this.sxplrNodes || []
       this.isParent = this.sxplrIsParent
       this.dataSource.data = this.rootNodes
       if (this.expandOnInit) {

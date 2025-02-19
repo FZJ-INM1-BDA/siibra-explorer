@@ -16,7 +16,7 @@ export type TranslatedFeature = Awaited< ReturnType<(typeof translateV3Entities)
   selector: '[sxplr-feature-list-directive]',
   exportAs: 'featureListDirective'
 })
-export class ListDirective extends FeatureBase  implements OnDestroy{
+export class ListDirective extends FeatureBase implements OnDestroy{
 
   @Input()
   name: string
@@ -80,26 +80,36 @@ export class ListDirective extends FeatureBase  implements OnDestroy{
               return []
             }
 
-            const results = await this.sapi.v3Get(`/feature/${route}`, {
-              query: {
-                ...this.queryParams,
-                ...query,
-                page
-              }
-            }).pipe(
-              switchMap(resp => {
-                totalPages = resp.pages || 0
-                this.#total.next(resp.total || 0)
-                if (resp.items.length === 0) {
-                  return of([] as TranslatedFeature[])
+            try {
+
+              const results = await this.sapi.v3Get(`/feature/${route}`, {
+                query: {
+                  ...this.queryParams,
+                  ...query,
+                  page
                 }
-                return forkJoin(
-                  resp.items.map(feature => translateV3Entities.translateFeature(feature))
-                )
-              })
-            ).toPromise()
-            page += 1
-            return results
+              }).pipe(
+                switchMap(resp => {
+                  totalPages = resp.pages || 0
+                  this.#total.next(resp.total || 0)
+                  if (resp.items.length === 0) {
+                    return of([] as TranslatedFeature[])
+                  }
+                  return forkJoin(
+                    resp.items.map(feature => translateV3Entities.translateFeature(feature))
+                  )
+                })
+              ).toPromise()
+              page += 1
+              return results
+            } catch (e) {
+              console.error(`Datasource Error:`)
+              console.error(e)
+              
+              totalPages = 0
+              this.#total.next(0)
+              return []
+            }
           },
           annotations: {
             ...this.queryParams,

@@ -3,6 +3,8 @@ site_name: Siibra Explorer User Documentation
 theme:
   name: 'material'
 
+repo_url: https://github.com/fzj-inm1-bda/siibra-explorer
+
 extra_css:
   - extra.css
 
@@ -13,26 +15,66 @@ markdown_extensions:
   - codehilite
   - footnotes
   - mdx_truly_sane_lists
+  - attr_list
+  - toc
+  - attr_list
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
 
 plugins:
   - search
 
 nav:
   - Home: 'index.md'
-  - System requirements: 'requirements.md'
-  - User documentation:
-    - Selecting: 'usage/selecting.md'
-    - Navigating: 'usage/navigating.md'
-    - Searching: 'usage/search.md'
-    - Exploring connectivity: 'usage/connectivity.md'
-    - Miscellaneous: 'usage/misc.md'
-    - Sharing: 'usage/sharing.md'
-  - Advanced usage:
-    - Keyboard shortcuts: 'advanced/keyboard.md'
-    - URL parsing: 'advanced/url.md'
-    - Fetching datasets: 'advanced/datasets.md'
-    - Display non-atlas volumes: 'advanced/otherVolumes.md'
+  - Getting Started: 
+    - Launch & quick tour: 'getstarted/launch.md'
+    - Elements of an atlas: 'getstarted/atlas_elements.md'
+    - User interface structure: 'getstarted/ui.md'
+    - Keyboard shortcuts: 'basics/helperOnePager.md'
+  - Basic Functionalities:
+    - Exploring parcellation maps: 'basics/exploring_3d_parcellation_maps.md'
+    - Storing & sharing 3D views: 'basics/storing_and_sharing_3d_views.md'
+    - Finding & selecting regions: 'basics/selecting_brain_regions.md'
+    - Coordinate lookups: 'basics/looking_up_coordinates.md'
+    - Multimodal data features: 'basics/finding_multimodal_data.md'
+  - Advanced functionalities:
+    - State encoding in URL: "advanced/url_encoding.md"
+    - Superimposing local files: "advanced/superimposing_local_files.md"
+    - Annotating structures in the brain: "advanced/annotating_structures.md"
+    - Differential gene expression analysis: "advanced/differential_gene_expression_analysis.md"
+
   - Release notes:
+    - v2.14.15: 'releases/v2.14.15.md'
+    - v2.14.14: 'releases/v2.14.14.md'
+    - v2.14.13: 'releases/v2.14.13.md'
+    - v2.14.12: 'releases/v2.14.12.md'
+    - v2.14.11: 'releases/v2.14.11.md'
+    - v2.14.10: 'releases/v2.14.10.md'
+    - v2.14.9: 'releases/v2.14.9.md'
+    - v2.14.8: 'releases/v2.14.8.md'
+    - v2.14.7: 'releases/v2.14.7.md'
+    - v2.14.6: 'releases/v2.14.6.md'
+    - v2.14.5: 'releases/v2.14.5.md'
+    - v2.14.4: 'releases/v2.14.4.md'
+    - v2.14.3: 'releases/v2.14.3.md'
+    - v2.14.2: 'releases/v2.14.2.md'
+    - v2.14.1: 'releases/v2.14.1.md'
+    - v2.14.0: 'releases/v2.14.0.md'
+    - v2.13.5: 'releases/v2.13.5.md'
+    - v2.13.4: 'releases/v2.13.4.md'
+    - v2.13.3: 'releases/v2.13.3.md'
+    - v2.13.2: 'releases/v2.13.2.md'
+    - v2.13.1: 'releases/v2.13.1.md'
+    - v2.13.0: 'releases/v2.13.0.md'
+    - v2.12.5: 'releases/v2.12.5.md'
+    - v2.12.4: 'releases/v2.12.4.md'
+    - v2.12.3: 'releases/v2.12.3.md'
+    - v2.12.2: 'releases/v2.12.2.md'
+    - v2.12.1: 'releases/v2.12.1.md'
+    - v2.12.0: 'releases/v2.12.0.md'
+    - v2.11.4: 'releases/v2.11.4.md'
+    - v2.11.3: 'releases/v2.11.3.md'
     - v2.11.2: 'releases/v2.11.2.md'
     - v2.11.1: 'releases/v2.11.1.md'
     - v2.11.0: 'releases/v2.11.0.md'

@@ -1,0 +1,20 @@
+.textarea
+{
+    width: 75vw;
+
+}
+
+textarea-copy-export
+{
+    display: block;
+    width: 75vw;
+
+    ::ng-deep mat-form-field {
+        width: 100%;
+
+        textarea
+        {
+            resize: none;
+        }
+    }
+}

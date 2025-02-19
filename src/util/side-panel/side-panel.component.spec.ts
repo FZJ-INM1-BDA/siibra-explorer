@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SidePanelComponent } from './side-panel.component';
+import { AngularMaterialModule } from 'src/sharedModules/angularMaterial.module'
 
 describe('SidePanelComponent', () => {
   let component: SidePanelComponent;
@@ -8,7 +9,12 @@ describe('SidePanelComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ SidePanelComponent ]
+      imports: [
+        AngularMaterialModule,
+      ],
+      declarations: [ 
+        SidePanelComponent,
+      ]
     })
     .compileComponents();
 

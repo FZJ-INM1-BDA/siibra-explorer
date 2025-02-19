@@ -1,23 +1,32 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { throwError } from "rxjs";
-import { catchError, mapTo } from "rxjs/operators";
-import { BACKENDURL } from 'src/util/constants'
+import { catchError, mapTo, switchMap, take } from "rxjs/operators";
 import { IKeyValStore, NotFoundError } from '../type'
+import { environment } from "src/environments/environment";
+import { AuthService } from "src/auth";
 
 @Injectable({
   providedIn: 'root'
 })
 
-export class SaneUrlSvc implements IKeyValStore{
-  public saneUrlRoot = `${BACKENDURL}go/`
-  constructor(
-    private http: HttpClient
-  ){
-    if (!BACKENDURL) {
-      const loc = window.location
-      this.saneUrlRoot = `${loc.protocol}//${loc.hostname}${!!loc.port ? (':' + loc.port) : ''}${loc.pathname}go/`
+export class SaneUrlSvc implements IKeyValStore {
+
+  #backendUrl = (() => {
+    if (environment.BACKEND_URL) {
+      return environment.BACKEND_URL.replace(/\/$/, '')
     }
+    const url = new URL(window.location.href)
+    const { protocol, hostname, pathname } = url
+    return `${protocol}//${hostname}${pathname.replace(/\/$/, '')}`
+  })()
+
+  public saneUrlRoot = `${this.#backendUrl}/go/`
+
+  constructor(
+    private http: HttpClient,
+    private auth: AuthService,
+  ){
   }
 
   getKeyVal(key: string) {
@@ -36,11 +45,19 @@ export class SaneUrlSvc implements IKeyValStore{
   }
 
   setKeyVal(key: string, value: any) {
-    return this.http.post(
-      `${this.saneUrlRoot}${key}`,
-      value,
-    ).pipe(
-      mapTo(`${this.saneUrlRoot}${key}`)
+    return this.auth.user$.pipe(
+      take(1),
+      switchMap(user => this.http.post(
+        `${this.saneUrlRoot}${key}`,
+        value,
+        {
+          headers: {
+            "x-sxplr-auth-state": user ? 'true': 'false'
+          }
+        }
+      ).pipe(
+        mapTo(`${this.saneUrlRoot}${key}`)
+      ))
     )
   }
 }

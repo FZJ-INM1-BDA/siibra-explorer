@@ -1,33 +1,60 @@
-export const VALID_LINEAR_XFORM_SRC = {
-  CCF: "Allen Common Coordination Framework"
-}
+const VALID_XFORM_SRC = ["CCF_V2_5", "QUICKNII_ABA", "MNI152", "CYRIL_PTCLD"] as const
+const VALID_XFORM_DST = ["NEHUBA"] as const
 
-export const VALID_LINEAR_XFORM_DST = {
-  NEHUBA: "nehuba"
-}
-
-export type TVALID_LINEAR_XFORM_SRC = keyof typeof VALID_LINEAR_XFORM_SRC
-export type TVALID_LINEAR_XFORM_DST = keyof typeof VALID_LINEAR_XFORM_DST
+export type TVALID_LINEAR_XFORM_SRC = typeof VALID_XFORM_SRC[number]
+export type TVALID_LINEAR_XFORM_DST = typeof VALID_XFORM_DST[number]
 
 type TLinearXform = number[][]
 
 const _linearXformDict: Record<
-  keyof typeof VALID_LINEAR_XFORM_SRC,
+  TVALID_LINEAR_XFORM_SRC,
   Record<
-    keyof typeof VALID_LINEAR_XFORM_DST,
+  TVALID_LINEAR_XFORM_DST,
     TLinearXform
   >> = {
-    CCF: {
+    CYRIL_PTCLD: {
+      NEHUBA: 
+      // [
+      //   [-0.2, 0.0, 0.0, 96400000.0],
+      //   [0.0, -0.2, 0.0, 96400000.0],
+      //   [0.0, 0.0, -0.2, 114400000.0],
+      //   [0.0, 0.0, 0.0, 1.0]
+      // ]
+      [
+        [-1,0,0,96_500_000],
+        [0,-1,0,229_000_000 - 132_500_000],
+        [0,0,-1,193_000_000 - 78_500_000],
+        [0,0,0,1]
+      ]
+    },
+    MNI152: {
+      NEHUBA: [
+        [1,0,0,-96_500_000],
+        [0,1,0,-132_500_000],
+        [0,0,1,-78_500_000],
+        [0,0,0,1]
+      ]
+    },
+    CCF_V2_5: {
       NEHUBA: [
         [-1e3, 0, 0, 11400000 - 5737500], //
         [0, 0, -1e3, 13200000 - 6637500], //
         [0, -1e3, 0, 8000000 - 4037500], //
         [0, 0, 0, 1],
       ]
+    },
+    // see https://www.nitrc.org/plugins/mwiki/index.php?title=quicknii:Coordinate_systems
+    QUICKNII_ABA: {
+      NEHUBA: [
+        [2.5e4, 0, 0, -5737500], //
+        [0, 2.5e4, 0,  -6637500], //
+        [0, 0, 2.5e4, -4037500], //
+        [0, 0, 0, 1],
+      ]
     }
   }
 
-const defaultXform = [
+export const defaultXform = [
   [1e3, 0, 0, 0],
   [0, 1e3, 0, 0],
   [0, 0, 1e3, 0],
@@ -48,13 +75,13 @@ export const linearXformDict = getProxyXform(_linearXformDict, (value: Record<st
     return defaultXform
   })
 }) as Record<
-  keyof typeof VALID_LINEAR_XFORM_SRC,
+TVALID_LINEAR_XFORM_SRC,
   Record<
-    keyof typeof VALID_LINEAR_XFORM_DST,
+    TVALID_LINEAR_XFORM_DST,
     TLinearXform
   >>
 
 
-export const linearTransform = async (srcTmplName: keyof typeof VALID_LINEAR_XFORM_SRC, targetTmplName: keyof typeof VALID_LINEAR_XFORM_DST) => {
+export const linearTransform = async (srcTmplName: TVALID_LINEAR_XFORM_SRC, targetTmplName: TVALID_LINEAR_XFORM_DST) => {
   return linearXformDict[srcTmplName][targetTmplName]
 }

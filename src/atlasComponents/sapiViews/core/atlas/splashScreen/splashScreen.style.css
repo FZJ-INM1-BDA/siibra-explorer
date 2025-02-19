@@ -6,7 +6,12 @@
   width: 100%;
 }
 
-.font-stretch
+:host > h4
 {
-  font-stretch: extra-condensed;
+  margin: 2rem;
+}
+
+mat-card
+{
+  margin: 0.5rem;
 }

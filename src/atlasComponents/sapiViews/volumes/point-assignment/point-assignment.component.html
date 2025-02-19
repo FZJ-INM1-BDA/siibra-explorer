@@ -1,3 +1,50 @@
+<mat-action-list class="overview-container">
+    <ng-template [ngIf]="point$ | async" let-point>
+        <ng-template [ngIf]="point | sandsToNum" let-coordinates>
+            <button mat-list-item
+                (click)="navigateToPoint(coordinates.coords)">
+                <mat-icon matListItemIcon
+                    fontSet="fas"
+                    fontIcon="fa-map-marker">
+                </mat-icon>
+                <div matListItemTitle>
+                    {{ coordinates.coords | numbers : 2 | addUnitAndJoin : 'mm' }}
+                </div>
+            </button>
+    
+            <button mat-list-item
+                (click)="copyCoord(coordinates.coords)">
+                <mat-icon matListItemIcon fontSet="fas" fontIcon="fa-copy">
+                </mat-icon>
+                <div matListItemTitle>
+                    Copy to clipboard
+                </div>
+            </button>
+        </ng-template>
+    </ng-template>
+
+    <ng-template [ngIf]="df$ | async" let-df>
+        <button mat-list-item
+            (click)="openDialog(datatableTmpl)">
+            <mat-icon matListItemIcon
+                fontSet="fas"
+                fontIcon="fa-table">
+            </mat-icon>
+            <div matListItemTitle>
+                Show Full Assignment ({{ df.data.length }})
+            </div>
+        </button>
+    </ng-template>
+
+    <ng-template>
+
+    </ng-template>
+</mat-action-list>
+
+<div class="sxplr-m-2" *ngIf="warningMessage$ | async; let warningMessage">
+    <markdown-dom [markdown]="warningMessage"></markdown-dom>
+</div>
+
 <div class="sxplr-m-2" *ngIf="busy$ | async as busyMessage">
     <spinner-cmp class="sxplr-d-inline-block"></spinner-cmp>
     <span>
@@ -12,36 +59,34 @@
 </div>
 
 <ng-template [ngIf]="df$ | async" let-df>
-    <button mat-raised-button
-        class="sxplr-m-2"
-        (click)="openDialog(datatableTmpl)">
-        Show Full Assignment ({{ df.data.length }})
-    </button>
 
     <!-- simple table -->
     <table mat-table [dataSource]="df | dfToDs : simpleTblSort"
         matSort
         class="sxplr-w-100"
         #simpleTblSort="matSort"
-        matSortActive="map value"
+        matSortActive="map_value"
         matSortDirection="desc">
         <ng-container matColumnDef="region">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>
-                region
+                <span class="sxplr-m-1">
+                    region
+                </span>
             </th>
             <td mat-cell *matCellDef="let element">
                 <!-- {{ element | json }} -->
-                <button mat-button (click)="selectRegion(element['region'], $event)">
-                    {{ element['region'].name }}
+                <button mat-button (click)="selectRegion(element['region'], $event)"
+                    class="ws-no-wrap">
+                    {{ element['region'] }}
                 </button>
             </td>
         </ng-container>
-        <ng-container matColumnDef="map value">
+        <ng-container matColumnDef="map_value">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>
                 map value
             </th>
             <td mat-cell *matCellDef="let element">
-                {{ element['map value'] | prettyPresent }}
+                {{ element['map_value'] | prettyPresent }}
             </td>
         </ng-container>
         
@@ -56,17 +101,34 @@
         <table mat-table [dataSource]="df$ | async | dfToDs : comphTableSort"
             matSort
             #comphTableSort="matSort"
-            matSortActive="map value"
+            matSortActive="map_value"
             matSortDirection="desc">
-            <ng-container *ngFor="let column of columns$ | async"
-                [matColumnDef]="column">
+            
+            <ng-container matColumnDef="region">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>
-                    {{ column }}
+                    region
                 </th>
                 <td mat-cell *matCellDef="let element">
-                    {{ element[column] | prettyPresent }}
+                    <button mat-button (click)="selectRegion(element['region'], $event)"
+                        class="ws-no-wrap">
+                        {{ element['region'] }}
+                    </button>
                 </td>
             </ng-container>
+
+            <ng-template ngFor [ngForOf]="columns$ | async" let-column>
+                <ng-template [ngIf]="column !== 'region'">
+                    <ng-container [matColumnDef]="column">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                            {{ column }}
+                        </th>
+                        <td mat-cell *matCellDef="let element">
+                            {{ element[column] | prettyPresent }}
+                        </td>
+                    </ng-container>
+                </ng-template>
+            </ng-template>
+            
         
             <tr mat-header-row *matHeaderRowDef="columns$ | async"></tr>
             <tr mat-row *matRowDef="let row; columns: columns$ | async;"></tr>

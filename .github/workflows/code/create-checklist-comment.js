@@ -1,5 +1,5 @@
 module.exports = async ({github, context}) => {
-  const pathToChecklist = './e2e/checklist.md'
+  const pathToChecklist = './checklist.md'
   const fs = require('fs')
   const { promisify } = require('util')
   const asyncReadFile = promisify(fs.readFile)

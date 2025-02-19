@@ -14,8 +14,8 @@ jobs:
   #   runs-on: ubuntu-latest
 
   #   steps:
-  #   - uses: actions/checkout@v3
-  #   - uses: actions/setup-node@v1
+  #   - uses: actions/checkout@v4
+  #   - uses: actions/setup-node@v4
   #     with:
   #       node-version: '16.x'
   #   - run: npx prettier -c ./src
@@ -25,9 +25,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Use Node.js 16.x for lint
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v4
       with:
         node-version: '16.x'
     - run: npm i
@@ -41,16 +41,16 @@ jobs:
       NODE_ENV: test
       
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Use Node.js 16.x
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v4
       with:
         node-version: 16.x
     - run: npm i
     - run: |
         if [[ "$GITHUB_REF" = *hotfix* ]] || [[ "$GITHUB_REF" = refs/heads/staging ]]
         then
-          export SIIBRA_API_ENDPOINTS=https://siibra-api-rc.apps.hbp.eu/v2_0,https://siibra-api-rc.apps.jsc.hbp.eu/v2_0
+          export SIIBRA_API_ENDPOINTS=https://siibra-api-rc.apps.hbp.eu/v3_0
           node src/environments/parseEnv.js ./environment.ts
         fi
         npm run test-ci
@@ -58,18 +58,15 @@ jobs:
   backend:
     if: always()
     runs-on: ubuntu-latest
-
-    env:
-      NODE_ENV: test
-
     steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js 16.x
-      uses: actions/setup-node@v1
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v4
       with:
-        node-version: 16.x
+        python-version: '3.10'
     - run: |
-        cd deploy
-        npm i
-        npm run test
-  
+        cd backend
+        echo "hello world" >> index.html
+        export PATH_TO_PUBLIC=$(pwd)
+        pip install -r requirements.txt
+        pip install pytest
+        pytest

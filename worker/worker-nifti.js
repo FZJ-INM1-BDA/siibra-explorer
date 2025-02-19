@@ -1,4 +1,130 @@
+/**
+ * 
+ * 
+ * @typedef {object} ReadDataSpec
+ * @property {number} offset
+ * @property {number} type
+ * 
+ */
+
 (function(exports){
+
+  /**
+   * Partial port of glMatrix https://github.com/toji/gl-matrix
+   * MIT Licensed
+   */
+  const mat4 = {
+    transpose(out, a) {
+      // If we are transposing ourselves we can skip a few steps but have to cache some values
+      if (out === a) {
+        let a01 = a[1],
+          a02 = a[2],
+          a03 = a[3];
+        let a12 = a[6],
+          a13 = a[7];
+        let a23 = a[11];
+        out[1] = a[4];
+        out[2] = a[8];
+        out[3] = a[12];
+        out[4] = a01;
+        out[6] = a[9];
+        out[7] = a[13];
+        out[8] = a02;
+        out[9] = a12;
+        out[11] = a[14];
+        out[12] = a03;
+        out[13] = a13;
+        out[14] = a23;
+      } else {
+        out[0] = a[0];
+        out[1] = a[4];
+        out[2] = a[8];
+        out[3] = a[12];
+        out[4] = a[1];
+        out[5] = a[5];
+        out[6] = a[9];
+        out[7] = a[13];
+        out[8] = a[2];
+        out[9] = a[6];
+        out[10] = a[10];
+        out[11] = a[14];
+        out[12] = a[3];
+        out[13] = a[7];
+        out[14] = a[11];
+        out[15] = a[15];
+      }
+      return out;
+    },
+    getTranslation(out, mat){
+      out[0] = mat[12];
+      out[1] = mat[13];
+      out[2] = mat[14];
+      return out;
+    },
+    getScaling(out, mat){
+      let m11 = mat[0];
+      let m12 = mat[1];
+      let m13 = mat[2];
+      let m21 = mat[4];
+      let m22 = mat[5];
+      let m23 = mat[6];
+      let m31 = mat[8];
+      let m32 = mat[9];
+      let m33 = mat[10];
+      out[0] = Math.hypot(m11, m12, m13);
+      out[1] = Math.hypot(m21, m22, m23);
+      out[2] = Math.hypot(m31, m32, m33);
+      return out;
+    },
+    getRotation(out, mat){
+      let scaling = [1, 1, 1]
+      this.getScaling(scaling, mat);
+      let is1 = 1 / scaling[0];
+      let is2 = 1 / scaling[1];
+      let is3 = 1 / scaling[2];
+      let sm11 = mat[0] * is1;
+      let sm12 = mat[1] * is2;
+      let sm13 = mat[2] * is3;
+      let sm21 = mat[4] * is1;
+      let sm22 = mat[5] * is2;
+      let sm23 = mat[6] * is3;
+      let sm31 = mat[8] * is1;
+      let sm32 = mat[9] * is2;
+      let sm33 = mat[10] * is3;
+      let trace = sm11 + sm22 + sm33;
+      let S = 0;
+      if (trace > 0) {
+        S = Math.sqrt(trace + 1.0) * 2;
+        out[3] = 0.25 * S;
+        out[0] = (sm23 - sm32) / S;
+        out[1] = (sm31 - sm13) / S;
+        out[2] = (sm12 - sm21) / S;
+      } else if (sm11 > sm22 && sm11 > sm33) {
+        S = Math.sqrt(1.0 + sm11 - sm22 - sm33) * 2;
+        out[3] = (sm23 - sm32) / S;
+        out[0] = 0.25 * S;
+        out[1] = (sm12 + sm21) / S;
+        out[2] = (sm31 + sm13) / S;
+      } else if (sm22 > sm33) {
+        S = Math.sqrt(1.0 + sm22 - sm11 - sm33) * 2;
+        out[3] = (sm31 - sm13) / S;
+        out[0] = (sm12 + sm21) / S;
+        out[1] = 0.25 * S;
+        out[2] = (sm23 + sm32) / S;
+      } else {
+        S = Math.sqrt(1.0 + sm33 - sm11 - sm22) * 2;
+        out[3] = (sm12 - sm21) / S;
+        out[0] = (sm31 + sm13) / S;
+        out[1] = (sm23 + sm32) / S;
+        out[2] = 0.25 * S;
+      }
+      return out;
+    }
+  }
+  /**
+   * END partial port of glMatrix https://github.com/toji/gl-matrix
+   */
+
   const DTYPE = {
     SHORT: 0,
     BYTE: 1,
@@ -6,6 +132,15 @@
     DOUBLE: 3,
     INT: 4,
     LONG: 5,
+  }
+
+  const BYTE_LENGTH = {
+    [DTYPE.SHORT]: 2,
+    [DTYPE.BYTE]: 1,
+    [DTYPE.FLOAT]: 4,
+    [DTYPE.DOUBLE]: 8,
+    [DTYPE.INT]: 4,
+    [DTYPE.LONG]: 8,
   }
 
   const NIFTI_CONST = {
@@ -56,7 +191,46 @@
     numBitsPerVoxel: {
       offset: 72,
       type: DTYPE.SHORT
+    },
+    qformCode: {
+      offset: 252,
+      type: DTYPE.SHORT
+    },
+    sformCode: {
+      offset: 254,
+      type: DTYPE.SHORT
+    },
+
+    quaternB: {
+      offset: 256,
+      type: DTYPE.FLOAT
+    },
+    quaternC: {
+      offset: 260,
+      type: DTYPE.FLOAT
+    },
+    quaternD: {
+      offset: 264,
+      type: DTYPE.FLOAT
+    },
+    qoffsetX: {
+      offset: 268,
+      type: DTYPE.FLOAT
+    },
+    qoffsetY: {
+      offset: 272,
+      type: DTYPE.FLOAT
+    },
+    qoffsetZ: {
+      offset: 276,
+      type: DTYPE.FLOAT
+    },
+
+    srow: {
+      offset: 280,
+      type: DTYPE.FLOAT
     }
+
   }
   
   const nifti2 = {
@@ -99,7 +273,46 @@
     numBitsPerVoxel: {
       offset: 14,
       type: DTYPE.SHORT
+    },
+    qformCode: {
+      offset: 344,
+      type: DTYPE.SHORT
+    },
+    sformCode: {
+      offset: 348,
+      type: DTYPE.SHORT
+    },
+    
+    
+    quaternB: {
+      offset: 352,
+      type: DTYPE.DOUBLE
+    },
+    quaternC: {
+      offset: 360,
+      type: DTYPE.DOUBLE
+    },
+    quaternD: {
+      offset: 368,
+      type: DTYPE.DOUBLE
+    },
+    qoffsetX: {
+      offset: 376,
+      type: DTYPE.DOUBLE
+    },
+    qoffsetY: {
+      offset: 384,
+      type: DTYPE.DOUBLE
+    },
+    qoffsetZ: {
+      offset: 392,
+      type: DTYPE.DOUBLE
+    },
+    srow: {
+      offset: 400,
+      type: DTYPE.DOUBLE
     }
+
   }
 
   const isNifti1 = data => {
@@ -118,6 +331,13 @@
     && buf.getUint8(6) === 0x31
   }
 
+  /**
+   * 
+   * @param {DataView} buf 
+   * @param {ReadDataSpec} spec 
+   * @param {boolean} le 
+   * @returns {number}
+   */
   const readData = (buf, spec, le = false) => {
     const { offset, type } = spec
     if (type === DTYPE.SHORT) return buf.getInt16(offset, le)
@@ -145,6 +365,14 @@
     throw new Error(`Unknown type ${type}`)
   }
 
+  /**
+   * 
+   * @param {DataView} buf dataview
+   * @param {ReadDataSpec} spec Offset & datatype
+   * @param {number} value Value to set
+   * @param {boolean} le Endianness
+   * @returns {void}
+   */
   const setData = (buf, spec, value, le = false) => {
     const { offset, type } = spec
     if (type === DTYPE.SHORT) return buf.setInt16(offset, value, le)
@@ -197,6 +425,48 @@
       const dim3 = readData(dataView, dict.dim3, le)
       const dim4 = readData(dataView, dict.dim4, le)
       const dim5 = readData(dataView, dict.dim5, le)
+      
+      const qformCode = readData(dataView, dict.qformCode, le)
+      const sformCode = readData(dataView, dict.sformCode, le)
+
+      if (qformCode === 0) {
+        const step = BYTE_LENGTH[dict.srow.type]
+        const affine = []
+        for (let ctrOut = 0; ctrOut < 3; ctrOut += 1) {
+          for (let ctrIn = 0; ctrIn < 4; ctrIn += 1) {
+            index = dict.srow.offset + (ctrOut * step + ctrIn) * step;
+            affine.push(
+              readData(dataView, {
+                offset: index,
+                type: dict.srow.type,
+              }, le)
+            )
+          }
+        }
+        affine.push(0, 0, 0, 1)
+        mat4.transpose(affine, affine)
+        const quat = [0, 0, 0, 1]
+        mat4.getRotation(quat, affine)
+        const translation = [0, 0, 0]
+        mat4.getTranslation(translation, affine)
+
+        setData(dataView, dict.quaternB, quat[0], le)
+        setData(dataView, dict.quaternC, quat[1], le)
+        setData(dataView, dict.quaternD, quat[2], le)
+        
+        setData(dataView, dict.qoffsetX, translation[0], le)
+        setData(dataView, dict.qoffsetY, translation[1], le)
+        setData(dataView, dict.qoffsetZ, translation[2], le)
+
+        setData(dataView, dict.qformCode, 2, le)
+
+        warning.push(`qform not set. populated with sform affine.`)
+      }
+      
+      if (dim0 > 3) {
+        warning.push(`dim[0] was ${dim0}, set to 3 instead`)
+        setData(dataView, dict.dim0, 3, le)
+      }
       if (dim4 === 0) {
         warning.push(`dim[4] was 0, set to 1 instead`)
         setData(dataView, dict.dim4, 1, le)

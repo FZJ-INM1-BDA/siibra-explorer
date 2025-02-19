@@ -1,0 +1,65 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: redirect-1-certificate
+spec:
+  secretName: siibra-explorer-redirect-1-secret
+  renewBefore: 120h 
+  commonName: interactive-viewer.apps.hbp.eu
+  isCA: false
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS1
+    size: 2048
+  usages:
+  - server auth
+  dnsNames:
+  # (CHANGE ME! same as `commonName`)
+  - interactive-viewer.apps.hbp.eu
+  issuerRef:
+    name: letsencrypt-production-issuer-1
+    kind: ClusterIssuer 
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: redirect-2-certificate
+spec:
+  secretName: siibra-explorer-redirect-2-secret
+  renewBefore: 120h 
+  commonName: interactive-viewer-ms-5-3-2.apps.hbp.eu
+  isCA: false
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS1
+    size: 2048
+  usages:
+  - server auth
+  dnsNames:
+  # (CHANGE ME! same as `commonName`)
+  - interactive-viewer-ms-5-3-2.apps.hbp.eu
+  issuerRef:
+    name: letsencrypt-production-issuer-1
+    kind: ClusterIssuer 
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: redirect-3-certificate
+spec:
+  secretName: siibra-explorer-redirect-3-secret
+  renewBefore: 120h 
+  commonName: interactive-viewer-expmt.apps.hbp.eu
+  isCA: false
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS1
+    size: 2048
+  usages:
+  - server auth
+  dnsNames:
+  # (CHANGE ME! same as `commonName`)
+  - interactive-viewer-expmt.apps.hbp.eu
+  issuerRef:
+    name: letsencrypt-production-issuer-1
+    kind: ClusterIssuer 

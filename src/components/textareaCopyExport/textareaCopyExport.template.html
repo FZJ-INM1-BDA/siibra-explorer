@@ -1,0 +1,33 @@
+<mat-form-field>
+  <mat-label *ngIf="label">
+    {{ label }}
+  </mat-label>
+  <textarea
+    [rows]="rows"
+    [cols]="cols"
+    [disabled]="disableFlag"
+    matInput
+    #exportTarget>{{ input }}</textarea>
+
+  <button mat-icon-button
+    *ngIf="showSuffix"
+    matSuffix
+    iav-stop="click"
+    aria-label="Copy to clipboard"
+    matTooltip="Copy to clipboard."
+    (click)="copyToClipboard(exportTarget.value)">
+    <i class="fas fa-copy"></i>
+  </button>
+  <button mat-icon-button
+    *ngIf="showSuffix"
+    matSuffix
+    iav-stop="click"
+    [matTooltip]="ARIA_LABELS.USER_ANNOTATION_EXPORT_SINGLE"
+    [attr.aria-label]="ARIA_LABELS.USER_ANNOTATION_EXPORT_SINGLE"
+    [single-file-output]="{
+      filename: filename,
+      filecontent: exportTarget.value
+    }">
+    <i class="fas fa-download"></i>
+  </button>
+</mat-form-field>

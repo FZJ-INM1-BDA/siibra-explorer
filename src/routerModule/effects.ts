@@ -11,9 +11,14 @@ import { RouterService } from "./router.service";
 import { encodeCustomState } from "./util"
 import { STATE_DEBOUNCE_MS } from "./const"
 import { APP_BASE_HREF } from "@angular/common";
+import { GET_ATTR_TOKEN } from "src/util/constants";
+import { CONST } from 'common/constants'
 
 @Injectable()
 export class RouterEffects {
+
+  isFreeMode = !!this.getattr(CONST.FREE_MODE)
+
   #navEnd$ = this.router.events.pipe(
     filter<NavigationEnd>(ev => ev instanceof NavigationEnd),
     shareReplay(1)
@@ -36,6 +41,11 @@ export class RouterEffects {
   onViewerLoad$ = createEffect(() => this.#navEnd$.pipe(
     take(1),
     switchMap(ev => {
+      if (this.isFreeMode) {
+        return of(
+          generalActions.noop()
+        )
+      }
       return combineLatest([
         from(
           this.routeToStateTransformSvc.cvtRouteToState(
@@ -43,31 +53,38 @@ export class RouterEffects {
           )
         ),
         this.sapi.atlases$
-      ])
-    }),
-    map(([state, atlases]) => {
-      const { "[state.atlasSelection]": atlasSelectionState } = state
+      ]).pipe(
+        map(([state, atlases]) => {
+          const { "[state.atlasSelection]": atlasSelectionState } = state
 
-      /**
-       * condition by which a default atlas is selected
-       * if no atlas is selected by default
-       */
-      if (!atlasSelectionState.selectedAtlas) {
-        const humanAtlas = atlases.find(atlas => atlas.id === IDS.ATLAES.HUMAN)
-        if (humanAtlas) {
-          return atlasSelection.actions.selectAtlas({
-            atlas: humanAtlas
+          /**
+           * condition by which a default atlas is selected
+           * if no atlas is selected by default
+           */
+          if (!atlasSelectionState.selectedAtlas) {
+            const humanAtlas = atlases.find(atlas => atlas.id === IDS.ATLAES.HUMAN)
+            if (humanAtlas) {
+              return atlasSelection.actions.selectATPById({
+                atlasId: IDS.ATLAES.HUMAN,
+                parcellationId: IDS.PARCELLATION.JBA31,
+                templateId: IDS.TEMPLATES.MNI152,
+              })
+            }
+          }
+
+          /**
+           * otherwise, apply returned state
+           */
+          return generalActions.generalApplyState({
+            state
           })
-        }
-      }
-
-      /**
-       * otherwise, apply returned state
-       */
-      return generalActions.generalApplyState({
-        state
-      })
-    })
+        }),
+        switchMap(ac => from([
+          ac,
+          generalActions.routeParseComplete()
+        ]))
+      )
+    }),
   ))
 
   onRouteUpdate$ = createEffect(() => this.#atlasesLoaded$.pipe(
@@ -162,7 +179,9 @@ export class RouterEffects {
     private routeToStateTransformSvc: RouteStateTransformSvc,
     private store: Store<MainState>,
     private zone: NgZone,
-    @Inject(APP_BASE_HREF) private baseHref: string
+    @Inject(APP_BASE_HREF) private baseHref: string,
+    @Inject(GET_ATTR_TOKEN) private getattr: (attrName: string) => undefined|null|string
   ){
+    
   }
 }

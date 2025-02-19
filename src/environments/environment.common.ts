@@ -4,7 +4,14 @@ export const environment = {
   VERSION: 'unknown version',
   PRODUCTION: false,
   BACKEND_URL: null,
-  SIIBRA_API_ENDPOINTS: 'https://siibra-api-latest.apps-dev.hbp.eu/v3_0', //'https://siibra-api-stable.apps.hbp.eu/v2_0,https://siibra-api-stable.apps.jsc.hbp.eu/v2_0,https://siibra-api-stable-ns.apps.hbp.eu/v2_0',
+  // N.B. do not update the SIIBRA_API_ENDPOINTS directly
+  // some libraries rely on the exact string formatting to work properly
+  SIIBRA_API_ENDPOINTS: 
+    // 'http://localhost:5000/v3_0', // endpoint-local-10081
+    // 'https://siibra-api-latest.apps-dev.hbp.eu/v3_0', //endpoint-latest
+    // 'https://siibra-api-rc.apps.hbp.eu/v3_0', // endpoint-rc
+    // 'https://siibra-api-stable.apps.hbp.eu/v3_0', // endpoint-stable
+    'https://siibra-api-rc.apps.tc.humanbrainproject.eu/v3_0', // endpoint-rc-tc
   SPATIAL_TRANSFORM_BACKEND: 'https://hbp-spatial-backend.apps.hbp.eu',
   MATOMO_URL: null,
   MATOMO_ID: null,

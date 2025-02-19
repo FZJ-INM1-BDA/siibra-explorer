@@ -32,7 +32,7 @@
                         </mat-form-field>
 
                         
-                        <ng-template [ngIf]="formValue$ | async | getProperty : 'selectedCohort'">
+                        <ng-template [ngIf]="view$ | async | getProperty : 'showAverageToggle'">
                             <mat-radio-group formControlName="selectedView">
                                 <mat-radio-button value="average" class="m-2" color="primary">
                                     Average
@@ -54,14 +54,15 @@
                 <div class="flex-grow-0 flex-shrink-0 d-flex flex-nowrap align-items-center">
                     <div class="flex-grow-1 flex-shrink-1 w-100">
                         <mat-label>
-                            Dataset
+                            Dataset: {{ view$ | async | getProperty : 'selectedDataset' }}
                         </mat-label>
                         <mat-slider [min]="0"
                             [max]="cohortDatasets.length - 1"
                             step="1"
-                            formControlName="selectedDatasetIndex"
                             thumbLabel
+                            [discrete]="true"
                             class="w-100">
+                            <input matSliderThumb formControlName="selectedDatasetIndex">
                         </mat-slider>
                     </div>
                 </div>
@@ -72,15 +73,14 @@
             class="flex-grow-0 flex-shrink-0 d-flex flex-nowrap align-items-center">
             <div class="flex-grow-1 flex-shrink-1 w-100">
                 <mat-label>
-                    Subject
+                    Subject: {{ view$ | async | getProperty : 'selectedSubject' }}
                 </mat-label>
                 <mat-slider [min]="0"
                     [max]="(view$ | async | getProperty : 'numSubjects') - 1"
-                    thumbLabel
-                    [displayWith]="displaySubject$ | async"
                     step="1"
-                    formControlName="selectedSubjectIndex"
+                    [discrete]="true"
                     class="w-100">
+                    <input matSliderThumb formControlName="selectedSubjectIndex">
                 </mat-slider>
             </div>
         </div>
@@ -90,15 +90,11 @@
     <ng-template [ngIf]="view$ | async | getProperty : 'region'" let-region>
 
         <!-- loading spinner -->
-        <ng-template [ngIf]="view$ | async | getProperty : 'fetchingMatrix'"
+        <ng-template [ngIf]="view$ | async | getProperty : 'busy'"
             [ngIfElse]="profileTmpl">
-            <div class="d-flex justify-content-center">
-                <mat-spinner></mat-spinner>
-            </div>
         </ng-template>
 
         <!-- profile -->
-        <!-- <pre>{{ view$ | async | json }}</pre> -->
         <ng-template #profileTmpl>
             
             <ng-template #noConnTmpl>
@@ -127,7 +123,7 @@
                             [sxplr-dialog-data]="{
                                 title: info?.name,
                                 descMd: info?.description,
-                                actions: [info.ebrains_page]
+                                actions: info?.urls | mapToProperty : 'url'
                             }">
                             <i class="fas fa-info"></i>
                         </button>
@@ -154,3 +150,13 @@
     </button>
     <button mat-menu-item (click)="exportFullConnectivity()">Dataset</button>
 </mat-menu>
+
+<ng-template [ngIf]="view$ | async | getProperty : 'busy'">
+    <div class="d-flex justify-content-center">
+        <ng-template [ngTemplateOutlet]="loadingTmpl"></ng-template>
+    </div>
+</ng-template>
+
+<ng-template #loadingTmpl>
+    <mat-spinner></mat-spinner>
+</ng-template>

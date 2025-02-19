@@ -1,0 +1,13 @@
+apiVersion: v1
+data:
+  SIIBRA_CACHEDIR: /siibra-api-volume
+  HBP_DISCOVERY_URL: "https://iam.ebrains.eu/auth/realms/hbp"
+  REDIS_ADDR: "cache-redis-service"
+  V2_7_PLUGIN_URLS: "https://siibra-jugex.apps.tc.humanbrainproject.eu/viewer_plugin/manifest.json;https://ngpy.apps.hbp.eu/viewer_plugin/manifest.json"
+  LOGGER_DIR: "/sxplr-log"
+  OVERWRITE_API_ENDPOINT: https://siibra-api-prod.apps.tc.humanbrainproject.eu/v3_0
+  OVERWRITE_SPATIAL_ENDPOINT: 'https://siibra-spatial-backend.apps.tc.humanbrainproject.eu'
+
+kind: ConfigMap
+metadata:
+  name: siibra-sxplr-common

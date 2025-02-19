@@ -2,9 +2,9 @@ import { Component, Inject, OnDestroy, Optional } from "@angular/core";
 import { ModularUserAnnotationToolService } from "../tools/service";
 import { ARIA_LABELS } from 'common/constants'
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR, CONTEXT_MENU_ITEM_INJECTOR, TContextMenu } from "src/util";
-import { TContextArg } from "src/viewerModule/viewer.interface";
+import { TViewerEvtCtxData } from "src/viewerModule/viewer.interface";
 import { TContextMenuReg } from "src/contextMenuModule";
-import { MatSnackBar } from "@angular/material/snack-bar";
+import { MatSnackBar } from 'src/sharedModules/angularMaterial.exports'
 
 @Component({
   selector: 'annotating-tools-panel',
@@ -26,8 +26,14 @@ export class AnnotationMode implements OnDestroy{
     private modularToolSvc: ModularUserAnnotationToolService,
     snackbar: MatSnackBar,
     @Optional() @Inject(CLICK_INTERCEPTOR_INJECTOR) clickInterceptor: ClickInterceptor,
-    @Optional() @Inject(CONTEXT_MENU_ITEM_INJECTOR) ctxMenuInterceptor: TContextMenu<TContextMenuReg<TContextArg<'nehuba' | 'threeSurfer'>>>
+    @Optional() @Inject(CONTEXT_MENU_ITEM_INJECTOR) ctxMenuInterceptor: TContextMenu<TContextMenuReg<TViewerEvtCtxData<'nehuba' | 'threeSurfer'>>>
   ) {
+
+    /**
+     * reverse the order, since we are column reverse to achieve the tab effect
+     */
+    this.moduleAnnotationTypes.reverse()
+
     const stopClickProp = () => false
     if (clickInterceptor) {
       const { register, deregister } = clickInterceptor

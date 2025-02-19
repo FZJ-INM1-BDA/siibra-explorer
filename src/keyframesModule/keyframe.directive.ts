@@ -1,42 +1,61 @@
-import { Directive, HostListener, Input } from "@angular/core";
-import { KeyFrameService } from "./service";
+import { Directive, HostListener, Input, inject } from "@angular/core";
+import { Store, select } from "@ngrx/store";
+import { DestroyDirective } from "src/util/directives/destroy.directive";
+import { atlasSelection } from "src/state";
+import { takeUntil } from "rxjs/operators";
+import { ViewerMode } from "src/state/atlasSelection/const";
 
 @Directive({
-  selector: '[key-frame-play-now]'
+  selector: '[key-frame-play-now]',
+  hostDirectives: [DestroyDirective]
 })
 
 export class KeyFrameDirective{
+
+  #viewerMode: ViewerMode
+  #onDestroy$ = inject(DestroyDirective).destroyed$
+
   @HostListener('click')
   onClick(){
-    if (this._mode === 'on') {
-      this.svc.startKeyFrameSession()
+    if (this.mode === 'on') {
+      if (this.#viewerMode !== "key frame") {
+        this.store.dispatch(
+          atlasSelection.actions.setViewerMode({
+            viewerMode: "key frame"
+          })
+        )
+      }
       return
     }
-    if (this._mode === 'off') {
-      this.svc.endKeyFrameSession()
+    if (this.mode === 'off') {
+      if (this.#viewerMode === "key frame") {
+        this.store.dispatch(
+          atlasSelection.actions.setViewerMode({
+            viewerMode: null
+          })
+        )
+      }
       return
     }
-    if (this.svc.inSession) {
-      this.svc.endKeyFrameSession()
-    } else {
-      this.svc.startKeyFrameSession()
-    }
+
+    this.store.dispatch(
+      atlasSelection.actions.setViewerMode({
+        viewerMode: this.#viewerMode === "key frame"
+        ? null
+        : "key frame"
+      })
+    )
   }
 
-  private _mode: 'toggle' | 'off' | 'on' = 'on'
   @Input('key-frame-play-now')
-  set mode(val: string){
-    if (val === 'off') {
-      this._mode = val
-      return
-    }
-    if (val === 'toggle') {
-      this._mode = val
-      return
-    }
-    this._mode = 'on'
-  }
+  mode: 'toggle' | 'off' | 'on' | '' = 'on'
 
-  constructor(private svc: KeyFrameService){
+  constructor(private store: Store){
+    this.store.pipe(
+      select(atlasSelection.selectors.viewerMode),
+      takeUntil(this.#onDestroy$),
+    ).subscribe(viewerMode => {
+      this.#viewerMode = viewerMode
+    })
   }
 }

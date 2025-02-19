@@ -1,6 +1,5 @@
 import { Inject, Injectable, Optional } from "@angular/core";
 import { Observable } from "rxjs";
-import { MatDialog } from "@angular/material/dialog";
 import { getUuid, noop } from "src/util/fn";
 import { ConfirmDialogComponent } from "src/components/confirmDialog/confirmDialog.component";
 
@@ -10,6 +9,7 @@ import { TYPE as NATIVE_TYPE, processJsonLd as nativeProcess } from './native'
 import { BoothVisitor, JRPCRequest, ListenerChannel } from "src/api/jsonrpc"
 import { ApiService } from "src/api";
 import { ApiBoothEvents, namespace as apiNameSpace } from "src/api/service";
+import { MatDialog } from 'src/sharedModules/angularMaterial.exports'
 
 export const IAV_POSTMESSAGE_NAMESPACE = `ebrains:iav:`
 
@@ -73,6 +73,14 @@ export class MessagingService {
     }
 
     window.addEventListener('message', async ({ data, origin, source }) => {
+      
+      /**
+       * only deal with opener
+       */
+      if (!window.opener || source !== window.opener) {
+        return
+      }
+
       if (/^webpack/.test(data.type)) return
       if (!data) return
       const { method } = data

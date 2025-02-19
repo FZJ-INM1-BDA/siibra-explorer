@@ -1,8 +1,11 @@
 import { createAction, props } from "@ngrx/store";
-import { SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
+import { BoundingBox, SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { BreadCrumb, nameSpace, ViewerMode, AtlasSelectionState } from "./const"
 import { TFace, TSandsPoint } from "src/util/types";
 
+/**
+ * @deprecated Please use selectATPById
+ */
 export const selectAtlas = createAction(
   `${nameSpace} selectAtlas`,
   props<{
@@ -10,28 +13,6 @@ export const selectAtlas = createAction(
     requested?: {
       template?: SxplrTemplate
       parcellation?: SxplrParcellation
-    }
-  }>()
-)
-
-export const selectTemplate = createAction(
-  `${nameSpace} selectTemplate`,
-  props<{
-    template: SxplrTemplate
-    requested?: {
-      template?: SxplrTemplate
-      parcellation?: SxplrParcellation
-    }
-  }>()
-)
-
-export const selectParcellation = createAction(
-  `${nameSpace} selectParcellation`,
-  props<{
-    parcellation: SxplrParcellation
-    requested?: {
-      parcellation?: SxplrParcellation
-      template?: SxplrTemplate
     }
   }>()
 )
@@ -133,6 +114,15 @@ export const selectATPById = createAction(
     atlasId?: string
     templateId?: string
     parcellationId?: string
+    regionId?: string
+
+    config?: {
+      autoSelect?: boolean
+      messages?: {
+        template?: string
+        parcellation?: string
+      }
+    }
   }>()
 )
 
@@ -166,7 +156,7 @@ export const navigateTo = createAction(
 export const navigateToRegion = createAction(
   `${nameSpace} navigateToRegion`,
   props<{
-    region: SxplrRegion
+    region: Pick<SxplrRegion, 'name'>
   }>()
 )
 
@@ -198,4 +188,11 @@ export const selectPoint = createAction(
 
 export const clearSelectedPoint = createAction(
   `${nameSpace} clearPoint`
+)
+
+export const setViewport = createAction(
+  `${nameSpace} setViewport`,
+  props<{
+    viewport: BoundingBox
+  }>()
 )

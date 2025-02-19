@@ -1,0 +1,11 @@
+.container
+{
+    display: inline-flex;
+    width: 100%;
+    align-items: center;
+}
+
+.container .mat-body
+{
+    text-wrap: nowrap;
+}
