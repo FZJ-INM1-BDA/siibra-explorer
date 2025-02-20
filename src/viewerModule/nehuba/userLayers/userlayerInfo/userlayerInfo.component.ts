@@ -11,6 +11,7 @@ export type UserLayerInfoData = {
   filename: string
   warning: string[]
   actions?: Action[]
+  meta?: any
 }
 
 @Component({

@@ -535,7 +535,7 @@ export const getShader = ({
     contrast,
     hideZero: false,
     opacity: 1.0,
-    removeBg: false
+    removeBg
   })
 
   if (override) {

@@ -29,6 +29,8 @@ type LayerOption = Omit<atlasAppearance.const.OldNgLayerCustomLayer, "clType" | 
 type Meta = {
   messages?: string[]
   filename: string
+  min?: number
+  max?: number
 }
 
 const OVERLAY_LAYER_KEY = "x-overlay-layer"
@@ -144,11 +146,13 @@ export class UserLayerService implements OnDestroy {
           colormap: EnumColorMapName.MAGMA,
           lowThreshold: meta.min || 0,
           highThreshold: meta.max || 1,
+          removeBg: true
         })
       },
       meta: {
         filename: file.name,
-        messages: meta.warning
+        messages: meta.warning,
+        ...meta
       },
       cleanup: () => URL.revokeObjectURL(url)
     }
@@ -584,7 +588,8 @@ export class UserLayerService implements OnDestroy {
           ...(meta.messages || []),
           ...(messages || []).map(v => v.message),
         ],
-        actions
+        actions,
+        meta
       },
       hasBackdrop: false,
       disableClose: true,

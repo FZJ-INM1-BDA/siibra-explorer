@@ -80,6 +80,8 @@
   <ng-layer-tune
     [hideCtrl]="onlyOpacity ? HIDE_NG_TUNE_CTRL.ONLY_SHOW_OPACITY : ''"
     advanced-control="true"
-    [ngLayerName]="data.layerName">
+    [ngLayerName]="data.layerName"
+    [thresholdMax]="data.meta.max || 1"
+    [thresholdMin]="data.meta.min || 0">
   </ng-layer-tune>
 </ng-template>
