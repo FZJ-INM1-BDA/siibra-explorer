@@ -698,7 +698,7 @@
           "maps"
         ],
         "summary": "Get Siibra Map",
-        "description": "Get map according to specification",
+        "description": "Get map according to specification.\n\nDeprecated. use /maps/{map_id} instead.",
         "operationId": "get_siibra_map_map_get",
         "parameters": [
           {
@@ -749,7 +749,8 @@
               }
             }
           }
-        }
+        },
+        "deprecated": true
       }
     },
     "/map/resampled_template": {
@@ -778,6 +779,16 @@
               "title": "Space Id"
             },
             "name": "space_id",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Name",
+              "default": ""
+            },
+            "name": "name",
             "in": "query"
           }
         ],
@@ -876,18 +887,28 @@
             "required": true,
             "schema": {
               "type": "string",
-              "title": "Space Id"
+              "title": "Region Id"
             },
-            "name": "space_id",
+            "name": "region_id",
             "in": "query"
           },
           {
             "required": true,
             "schema": {
               "type": "string",
-              "title": "Region Id"
+              "title": "Space Id"
             },
-            "name": "region_id",
+            "name": "space_id",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Name",
+              "default": ""
+            },
+            "name": "name",
             "in": "query"
           }
         ],
@@ -931,18 +952,28 @@
             "required": true,
             "schema": {
               "type": "string",
-              "title": "Space Id"
+              "title": "Region Id"
             },
-            "name": "space_id",
+            "name": "region_id",
             "in": "query"
           },
           {
             "required": true,
             "schema": {
               "type": "string",
-              "title": "Region Id"
+              "title": "Space Id"
             },
-            "name": "region_id",
+            "name": "space_id",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Name",
+              "default": ""
+            },
+            "name": "name",
             "in": "query"
           }
         ],
@@ -974,60 +1005,58 @@
       "get": {
         "tags": [
           "maps",
-          [
-            "maps"
-          ]
+          "maps"
         ],
         "summary": "Get Assign Point",
         "description": "Perform assignment according to specification",
         "operationId": "get_assign_point_map_assign_get",
         "parameters": [
           {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Parcellation Id"
+            },
             "name": "parcellation_id",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "title": "Parcellation Id",
-              "type": "string"
-            }
+            "in": "query"
           },
           {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Space Id"
+            },
             "name": "space_id",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "title": "Space Id",
-              "type": "string"
-            }
+            "in": "query"
           },
           {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Point"
+            },
             "name": "point",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "title": "Point",
-              "type": "string"
-            }
+            "in": "query"
           },
           {
-            "name": "assignment_type",
-            "in": "query",
             "required": false,
             "schema": {
+              "type": "string",
               "title": "Assignment Type",
-              "default": "statistical",
-              "type": "string"
-            }
+              "default": "statistical"
+            },
+            "name": "assignment_type",
+            "in": "query"
           },
           {
-            "name": "sigma_mm",
-            "in": "query",
             "required": false,
             "schema": {
+              "type": "number",
               "title": "Sigma Mm",
-              "default": 0,
-              "type": "number"
-            }
+              "default": 0
+            },
+            "name": "sigma_mm",
+            "in": "query"
           }
         ],
         "responses": {
@@ -1037,6 +1066,132 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/DataFrameModel"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/maps": {
+      "get": {
+        "tags": [
+          "maps"
+        ],
+        "summary": "Filter Map",
+        "description": "Get a list of maps according to specification",
+        "operationId": "filter_map_maps_get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Parcellation Id"
+            },
+            "name": "parcellation_id",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Space Id"
+            },
+            "name": "space_id",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/MapType"
+            },
+            "name": "map_type",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Page",
+              "default": 1
+            },
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Size",
+              "default": 50
+            },
+            "name": "size",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_MapModel_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/maps/{map_id}": {
+      "get": {
+        "tags": [
+          "maps"
+        ],
+        "summary": "Single Map",
+        "description": "Get a list of maps according to specification",
+        "operationId": "single_map_maps__map_id__get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Map Id"
+            },
+            "name": "map_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MapModel"
                 }
               }
             }
@@ -2277,6 +2432,72 @@
           }
         }
       }
+    },
+    "/vocabularies/genes": {
+      "get": {
+        "tags": [
+          "vocabularies"
+        ],
+        "summary": "Genes",
+        "description": "HTTP get (filtered) genes",
+        "operationId": "genes_vocabularies_genes_get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Find"
+            },
+            "name": "find",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Page",
+              "default": 1
+            },
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Size",
+              "default": 50
+            },
+            "name": "size",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_GeneModel_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -2364,16 +2585,40 @@
             "title": "@Type"
           },
           "space": {
-            "$ref": "#/components/schemas/SiibraAtIdModel"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SiibraAtIdModel"
+              }
+            ],
+            "title": "Space",
+            "description": "Space (id) by which the location is found. More detail of the space can be found by querying /v3_0/spaces/{space_id}"
           },
           "center": {
-            "$ref": "#/components/schemas/CoordinatePointModel"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CoordinatePointModel"
+              }
+            ],
+            "title": "Center",
+            "description": "Center point of the bounding box"
           },
           "minpoint": {
-            "$ref": "#/components/schemas/CoordinatePointModel"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CoordinatePointModel"
+              }
+            ],
+            "title": "Minpoint",
+            "description": "Most left-posterior-inferior point of the bounding box"
           },
           "maxpoint": {
-            "$ref": "#/components/schemas/CoordinatePointModel"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CoordinatePointModel"
+              }
+            ],
+            "title": "Maxpoint",
+            "description": "Most right-anterior-superior point of the bounding box"
           },
           "shape": {
             "items": {
@@ -2398,7 +2643,7 @@
           "isPlanar"
         ],
         "title": "BoundingBoxModel",
-        "description": "BoundingBoxModel"
+        "description": "BoundingBoxModel. Describes an axis aligned boundingbox. As a result, only the most left-posterior-inferior and most right-anterior-superior points are needed to define all eight vertices of the bounding box."
       },
       "BrainAtlasVersionModel": {
         "properties": {
@@ -2721,7 +2966,7 @@
           "versionIdentifier"
         ],
         "title": "CommonCoordinateSpaceModel",
-        "description": "CommonCoordinateSpaceModel"
+        "description": "CommonCoordinateSpaceModel. Whilst the concept of a coordinate space does not necessitate the existence of an image, in practice, every coordinate space is associated with an image (either volumetric or , in the case of fsaverage, surface-based).\nThe origin of the coordinate space is determined by the original data (e.g. affine header in NifTI). All spaces are in RAS neuroanatomical convention."
       },
       "CoordinatePointModel": {
         "properties": {
@@ -3011,6 +3256,30 @@
         "title": "FeatureMetaModel",
         "description": "Meta feature type"
       },
+      "GeneModel": {
+        "properties": {
+          "@type": {
+            "type": "string",
+            "title": "@Type"
+          },
+          "symbol": {
+            "type": "string",
+            "title": "Symbol"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          }
+        },
+        "type": "object",
+        "required": [
+          "@type",
+          "symbol",
+          "description"
+        ],
+        "title": "GeneModel",
+        "description": "ConfigBaseModel"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -3141,7 +3410,13 @@
             "title": "@Type"
           },
           "space": {
-            "$ref": "#/components/schemas/SiibraAtIdModel"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SiibraAtIdModel"
+              }
+            ],
+            "title": "Space",
+            "description": "Space (id) by which the location is found. More detail of the space can be found by querying /v3_0/spaces/{space_id}"
           }
         },
         "type": "object",
@@ -3239,6 +3514,16 @@
             },
             "type": "array",
             "title": "Volumes"
+          },
+          "parcellation": {
+            "$ref": "#/components/schemas/SiibraAtIdModel"
+          },
+          "space": {
+            "$ref": "#/components/schemas/SiibraAtIdModel"
+          },
+          "maptype": {
+            "type": "string",
+            "title": "Maptype"
           }
         },
         "type": "object",
@@ -3250,7 +3535,10 @@
           "datasets",
           "species",
           "indices",
-          "volumes"
+          "volumes",
+          "parcellation",
+          "space",
+          "maptype"
         ],
         "title": "MapModel",
         "description": "MapModel"
@@ -3367,6 +3655,78 @@
           "items"
         ],
         "title": "Page[FeatureMetaModel]"
+      },
+      "Page_GeneModel_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/GeneModel"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "title": "Page"
+          },
+          "size": {
+            "type": "integer",
+            "minimum": 1,
+            "title": "Size"
+          },
+          "pages": {
+            "type": "integer",
+            "minimum": 0,
+            "title": "Pages"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "title": "Page[GeneModel]"
+      },
+      "Page_MapModel_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/MapModel"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "title": "Page"
+          },
+          "size": {
+            "type": "integer",
+            "minimum": 1,
+            "title": "Size"
+          },
+          "pages": {
+            "type": "integer",
+            "minimum": 0,
+            "title": "Pages"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "title": "Page[MapModel]"
       },
       "Page_ParcellationEntityVersionModel_": {
         "properties": {

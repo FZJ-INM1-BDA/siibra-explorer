@@ -356,7 +356,7 @@ class TranslateV3 {
         format: key,
         url: input[key],
         transform: transform,
-        info: info,
+        info,
         meta,
       }
     }
@@ -373,6 +373,7 @@ class TranslateV3 {
     for (const defaultImage of validImages) {
       
       const { providedVolumes } = defaultImage
+      // TODO fix zarr/other format space volume image
       const { "neuroglancer/precomputed": precomputedVol } = await this.#extractNgPrecompUnfrag(providedVolumes)
       
       if (!precomputedVol) {

@@ -25,10 +25,6 @@ export class SAPIParcellation extends SAPIBase<PF>{
     })
   }
 
-  getLabelledMap(spaceId: string) {
-    return this.sapi.getMap(this.id, spaceId, "LABELLED")
-  }
-
   static Features$ = of(Object.keys(ParcellationFeatures) as PF[])
   public features$ = SAPIParcellation.Features$
 }

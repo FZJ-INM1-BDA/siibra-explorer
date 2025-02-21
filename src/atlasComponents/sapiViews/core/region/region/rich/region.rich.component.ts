@@ -1,4 +1,4 @@
-import { concat, Observable, of, Subject } from "rxjs";
+import { concat, forkJoin, Observable, of, Subject } from "rxjs";
 import { Component, EventEmitter, Inject, Output } from "@angular/core";
 import { DARKTHEME } from "src/util/injectionTokens";
 import { SapiViewsCoreRegionRegionBase } from "../region.base.directive";
@@ -6,7 +6,7 @@ import { ARIA_LABELS, CONST } from 'common/constants'
 import { Feature, SxplrParcellation, SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes";
 import { SAPI } from "src/atlasComponents/sapi/sapi.service";
 import { environment } from "src/environments/environment";
-import { catchError, map, scan, shareReplay, switchMap } from "rxjs/operators";
+import { map, scan, shareReplay, switchMap } from "rxjs/operators";
 import { PathReturn } from "src/atlasComponents/sapi/typeV3";
 import { DecisionCollapse } from "src/atlasComponents/sapi/decisionCollapse.service";
 
@@ -58,25 +58,22 @@ export class SapiViewsCoreRegionRegionRich extends SapiViewsCoreRegionRegionBase
   private regionalMaps$ = this.ATPR$.pipe(
     switchMap(({ parcellation, template, region }) =>
       concat(
-        of([] as PathReturn<"/map">["volumes"]),
-        this.sapi.getMap(parcellation.id, template.id, "STATISTICAL").pipe(
-          map(v => {
-            const mapIndices = v.indices[region.name]
-            return mapIndices.map(mapIdx => v.volumes[mapIdx.volume])
-          }),
-          catchError((_err, _obs) => {
-            /**
-             * if statistical map somehow fails to fetch (e.g. does not exist for this combination 
-             * of parc tmpl), fallback to labelled map
-             */
-            return this.sapi.getMap(parcellation.id, template.id, "LABELLED").pipe(
-              map(v => {
-                const mapIndices = v.indices[region.name]
-                return (mapIndices || []).map(mapIdx => v.volumes[mapIdx.volume])
-              })
+        of([] as PathReturn<"/maps/{map_id}">["volumes"]),
+        this.sapi.getMaps(parcellation.id, template.id).pipe(
+          switchMap(maps => 
+            forkJoin(
+              maps.map(m => this.sapi.getMap(m["@id"]))
             )
+          ),
+          map(maps => {
+            return maps.map(m => {
+              const indices = m.indices[region.name] || []
+              return indices
+                .map(index => m.volumes[index.volume || 0])
+                .filter(v => !!v)
+            }).flat()
           })
-        ),
+        )
       )
     ),
     shareReplay(1)

@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from '@angular/common/http';
-import { catchError, map, shareReplay, switchMap, tap } from "rxjs/operators";
+import { map, shareReplay, switchMap, tap } from "rxjs/operators";
 import { CachedFunction, getExportNehuba, noop } from "src/util/fn";
 import { MatSnackBar } from 'src/sharedModules/angularMaterial.exports'
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
@@ -20,7 +20,7 @@ export const useViewer = {
 } as const
 
 export const SIIBRA_API_VERSION_HEADER_KEY='x-siibra-api-version'
-export const EXPECTED_SIIBRA_API_VERSION = '0.3.22'
+export const EXPECTED_SIIBRA_API_VERSION = '0.3.23'
 
 type PaginatedResponse<T> = {
   items: T[]
@@ -162,12 +162,24 @@ export class SAPI{
     )
   }
 
-  getMap(parcId: string, spaceId: string, mapType: "LABELLED" | "STATISTICAL") {
-    return this.v3Get("/map", {
+  getMaps(parcId?: string, spaceId?: string, mapType?: "LABELLED" | "STATISTICAL") {
+    const getPage = (page: number) => this.v3Get("/maps", {
       query: {
         map_type: mapType,
         parcellation_id: parcId,
-        space_id: spaceId
+        space_id: spaceId,
+        page,
+      }
+    })
+    return getPage(1).pipe(
+      switchMap(resp => this.iteratePages(resp, getPage)),
+    )
+  }
+
+  getMap(id: string){
+    return this.v3Get("/maps/{map_id}", {
+      path: {
+        map_id: id
       }
     })
   }
@@ -238,11 +250,17 @@ export class SAPI{
       switchMap(endpoint => {
         const headers: Record<string, string> = {}
         const { path, params } = this.v3GetRoute(route, sapiParam)
+        const cleanedParams = {}
+        for (const key in params){
+          if (!!params[key]) {
+            cleanedParams[key] = params[key]
+          }
+        }
         return this.http.get<PathReturn<T>>(
           `${endpoint}${path}`,
           {
             headers,
-            params
+            params: cleanedParams
           }
         )
       })
@@ -333,25 +351,18 @@ export class SAPI{
     if (this.#tmplToParcMap.has(template.id)) {
       return of(this.#tmplToParcMap.get(template.id))
     }
+
     return this.getAllParcellations(atlas).pipe(
-      switchMap(parcs => forkJoin(
-        parcs.map(
-          parc => this.getMap(
-            parc.id,
-            template.id,
-            "LABELLED"
-          ).pipe(
-            catchError(() => of(null as SxplrParcellation)),
-            map(_map => _map && parc)
-          )
+      switchMap(parcs => 
+        this.getMaps(null, template.id, "LABELLED").pipe(
+          map(maps => {
+            const supportedParcIds = new Set(maps.map(m => m.parcellation["@id"]))
+            const supportedParcs = parcs.filter(p => supportedParcIds.has(p.id))
+            this.#tmplToParcMap.set(template.id, supportedParcs)
+            return supportedParcs
+          })
         )
-      ).pipe(
-        map(arr => {
-          const val = arr.filter(v => !!v)
-          this.#tmplToParcMap.set(template.id, val)
-          return val
-        })
-      ))
+      )
     )
   }
 
@@ -412,24 +423,16 @@ export class SAPI{
       return of(this.#parcIdToTmplMap.get(parc.id))
     }
     return this.getAllSpaces(atlas).pipe(
-      switchMap(spaces => forkJoin(
-        spaces.map(
-          space => this.getMap(
-            parc.id,
-            space.id,
-            "LABELLED"
-          ).pipe(
-            catchError(() => of(null as SxplrTemplate)),
-            map(_map => _map && space)
-          )
+      switchMap(spaces => 
+        this.getMaps(parc.id, null, "LABELLED").pipe(
+          map(maps => {
+            const supportedSpaceIds = new Set(maps.map(m => m.space["@id"]))
+            const supportedSpaces = spaces.filter(s => supportedSpaceIds.has(s.id))
+            this.#parcIdToTmplMap.set(parc.id, supportedSpaces)
+            return supportedSpaces
+          })
         )
-      ).pipe(
-        map(arr => {
-          const val = arr.filter(v => !!v)
-          this.#parcIdToTmplMap.set(parc.id, val)
-          return val
-        })
-      ))
+      )
     )
   }
 
