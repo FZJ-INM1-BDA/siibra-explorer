@@ -6,10 +6,10 @@ const selectStore = state => state[nameSpace] as UiStore
 
 export const panelMode = createSelector(
   selectStore,
-  state => state.panelMode
+  state => state.panelMode || "FOUR_PANEL"
 )
 
 export const panelOrder = createSelector(
   selectStore,
-  state => state.panelOrder
+  state => state.panelOrder || "0123"
 )

@@ -84,7 +84,6 @@ export class ConfigComponent implements OnInit, OnDestroy {
 
   #panelOrder$ = this.store.pipe(
     select(userInterface.selectors.panelOrder),
-    map(val => val || "0123"),
     shareReplay(1),
   )
 

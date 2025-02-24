@@ -143,19 +143,16 @@ export class NehubaLayoutOverlay implements OnDestroy{
 
   public panelMode$ = this.store$.pipe(
     select(userInterface.selectors.panelMode),
-    map(v => v || "FOUR_PANEL")
   )
 
   public panelOrder$ = this.store$.pipe(
     select(userInterface.selectors.panelOrder),
-    map(v => v || "0123")
   )
 
   public volumeChunkLoading$: Subject<boolean> = new Subject()
 
   public showPipPerspectiveView$ = this.store$.pipe(
     select(panelOrder),
-    map(v => v || "0123"),
     distinctUntilChanged(),
     map(po => po[0] !== '3')
   )
