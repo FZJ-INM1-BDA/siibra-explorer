@@ -88,28 +88,6 @@
     
     <sxplr-vertical-bread-crumb class="sxplr-d-block sxplr-overflow-y-auto">
     </sxplr-vertical-bread-crumb>
-
-    <ng-template sxplrExperimentalFlag [deprecated]="true">
-    <mat-card sxplr-slide-in [state]="!!view.selectedFeature">
-      <sxplr-feature-view
-        *ngIf="view.selectedFeature"
-        [feature]="view.selectedFeature"
-        [extraParams]="{
-          regions: view.selectedRegions,
-          space: view.selectedTemplate
-        }">
-      </sxplr-feature-view>
-    </mat-card>
-    
-    <mat-card sxplr-slide-in [state]="!!view.selectedPoint"
-      class="pe-all">
-      <ng-template [ngIf]="!!view.selectedPoint">
-        <ng-template [ngTemplateOutlet]="selectedPointTmpl"
-          [ngTemplateOutletContext]="{view: view}">
-        </ng-template>
-      </ng-template>
-    </mat-card>
-    </ng-template>
   </div>
   
   <sxplr-tab *ngIf="!!view.selectedTemplate"

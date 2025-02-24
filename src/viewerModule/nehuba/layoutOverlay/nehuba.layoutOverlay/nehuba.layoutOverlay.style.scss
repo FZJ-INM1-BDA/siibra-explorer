@@ -122,9 +122,43 @@ current-layout
 {
   :has(> .reset-rotation)
   {
-    &:not(:last-child)
-    {
-      display: none;
-    }
-  }  
+    display: none;
+  }
+}
+
+.reset-rotation-container
+{
+  width: 0px;
+  height: 0px;
+  overflow: visible;
+  position: fixed;
+  top: 4rem;
+  left: 50%;
+  z-index: 99;
+  
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  
+  
+  
+  
+  .reset-rotation-btn
+  {
+    animation: reset-rotation-slide-in 100ms ease-in-out 1;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+
+@keyframes reset-rotation-slide-in {
+  0% {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(-0%);
+  }
 }

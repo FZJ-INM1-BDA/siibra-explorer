@@ -173,19 +173,18 @@
     </div>
 
     <div class="d-flex flex-row flex-nowrap sxplr-p-2">
-      BLA?
+
       <!-- main template -->
       <ng-template #panelModeBtnTmpl
         let-panelMode="panelMode"
         let-previewTmpl="previewTmpl">
         <button
-          class="sxplr-m-2 sxplr-p-2"
-          mat-flat-button
+          class="sxplr-m-2 sxplr-p-2 uncollapsable"
           (click)="usePanelMode(panelMode)"
-          [color]="(panelMode$ | async) === panelMode ? 'primary' : null">
+          mat-flat-button
+          [color]="(panelMode$ | async) === panelMode ? 'primary' : 'default'">
 
           <div class="uncollapsable">
-
             <ng-template [ngTemplateOutlet]="previewTmpl">
             </ng-template>
           </div>
@@ -195,10 +194,10 @@
       <!-- Four Panel Card -->
       <ng-template #layoutFourPanelTmpl>
         <layout-four-panel class="d-block chunky">
-          <div class="sxplr-border chunky" cell-i></div>
-          <div class="sxplr-border chunky" cell-ii></div>
-          <div class="sxplr-border chunky" cell-iii></div>
-          <div class="sxplr-border chunky" cell-iv></div>
+          <div class="border chunky" cell-i></div>
+          <div class="border chunky" cell-ii></div>
+          <div class="border chunky" cell-iii></div>
+          <div class="border chunky" cell-iv></div>
         </layout-four-panel>
       </ng-template>
       <ng-template [ngTemplateOutlet]="panelModeBtnTmpl"
@@ -211,32 +210,36 @@
       <!-- temporarily disabling 1-3 layout -->
 
       <!-- horizontal 1 3 card -->
-      <button
-        class="sxplr-m-2 sxplr-p-2"
-        mat-flat-button
-        (click)="usePanelMode(panelModes.H_ONE_THREE)"
-        [color]="(panelMode$ | async) === panelModes.H_ONE_THREE ? 'primary' : null">
-        <layout-horizontal-one-three class="d-block w-10em h-7em">
+      <ng-template #layoutH13Tmpl>
+        <layout-horizontal-one-three class="d-block chunky">
           <div class="border chunky" cell-i></div>
           <div class="border chunky" cell-ii></div>
           <div class="border chunky" cell-iii></div>
           <div class="border chunky" cell-iv></div>
         </layout-horizontal-one-three>
-      </button>
+      </ng-template>
+      <ng-template [ngTemplateOutlet]="panelModeBtnTmpl"
+        [ngTemplateOutletContext]="{
+          panelMode: panelModes.H_ONE_THREE,
+          previewTmpl: layoutH13Tmpl
+        }">
+      </ng-template>
 
       <!-- vertical 1 3 card -->
-      <button
-        class="sxplr-m-2 sxplr-p-2"
-        mat-flat-button
-        (click)="usePanelMode(panelModes.V_ONE_THREE)"
-        [color]="(panelMode$ | async) === panelModes.V_ONE_THREE ? 'primary' : null">
-        <layout-vertical-one-three class="d-block w-10em h-7em">
+      <ng-template #layoutV13Tmpl>
+        <layout-vertical-one-three class="d-block chunky">
           <div class="border chunky" cell-i></div>
           <div class="border chunky" cell-ii></div>
           <div class="border chunky" cell-iii></div>
           <div class="border chunky" cell-iv></div>
         </layout-vertical-one-three>
-      </button>
+      </ng-template>
+      <ng-template [ngTemplateOutlet]="panelModeBtnTmpl"
+        [ngTemplateOutletContext]="{
+          panelMode: panelModes.V_ONE_THREE,
+          previewTmpl: layoutV13Tmpl
+        }">
+      </ng-template>
 
       <!-- single -->
       <ng-template #singlePanelTmpl>
@@ -256,12 +259,16 @@
 
       <!-- picture-in-picture -->
       <ng-template #pipPanelTmpl>
-        <picture-in-picture-panel class="d-block w-10em h-7em">
-          <div class="border chunky" cell-i></div>
-          <div class="border chunky" cell-ii></div>
-          <div class="border chunky" cell-iii></div>
-          <div class="border chunky" cell-iv></div>
-        </picture-in-picture-panel>
+        <div class="sxplr-position-relative w-10em h-7em">
+
+          <picture-in-picture-panel class="d-block w-10em h-7em">
+            <div class="border chunky" cell-i></div>
+            <div class="border chunky" cell-ii></div>
+            <div class="border chunky" cell-iii></div>
+            <div class="border chunky" cell-iv></div>
+          </picture-in-picture-panel>
+          <div class="pip border"></div>
+        </div>
       </ng-template>
       <ng-template [ngTemplateOutlet]="panelModeBtnTmpl"
         [ngTemplateOutletContext]="{

@@ -59,6 +59,8 @@ export class VerticalBreadCrumbComponent {
   private ptAsgmtExpPanel: MatExpansionPanel
   @ViewChild('selFtExpPanel')
   private featExpPanel: MatExpansionPanel
+  @ViewChild('selRegExpPanel')
+  private regExpPanel: MatExpansionPanel
 
   DoiTemplate = DoiTemplate
 
@@ -403,8 +405,8 @@ export class VerticalBreadCrumbComponent {
       distinctUntilChanged(arrayEqual((o, n) => o.name === n.name)),
       filter(regions => regions.length > 0)
     ).subscribe(() => {
-      if (this.parcExpPanel) {
-        this.parcExpPanel.open()
+      if (this.regExpPanel) {
+        this.regExpPanel.open()
       }
     })
 
@@ -600,6 +602,10 @@ export class VerticalBreadCrumbComponent {
         }
       })
     )
+
+    if (this.ptAsgmtExpPanel) {
+      this.ptAsgmtExpPanel.open()
+    }
   }
 
   public isActive<T extends SxplrAtlas|SxplrTemplate|SxplrParcellation>(current: T) {

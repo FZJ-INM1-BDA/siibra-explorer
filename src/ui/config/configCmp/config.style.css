@@ -21,6 +21,17 @@
 
 .uncollapsable
 {
-  width: 10em;
-  height: 7em;
+  width: 10em!important;
+  height: 7em!important;
+}
+
+.pip
+{
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  margin-right: 1em;
+  margin-bottom: 1em;
+  width: 4em;
+  height: 2em;
 }

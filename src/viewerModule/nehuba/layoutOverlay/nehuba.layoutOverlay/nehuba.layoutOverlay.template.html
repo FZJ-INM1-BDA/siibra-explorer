@@ -31,6 +31,19 @@
   </div>
 </current-layout>
 
+<ng-template sxplrExperimentalFlag [experimental]="true">
+<div *ngIf="obliqueRotated$ | async"
+  class="reset-rotation-container">
+  
+  <button mat-mini-fab class="reset-rotation-btn sxplr-pe-all"
+    [matTooltip]="(labels$ | async).RESET_ROTATION"
+    color="warn"
+    (click)="resetOrientation()">
+    <i class="iavic iavic-rotation"></i>
+  </button>
+</div>
+</ng-template>
+
 <!-- slice view overlay tmpl -->
 <ng-template #ngPanelOverlayTmpl let-panelIndex="panelIndex">
 
@@ -65,17 +78,9 @@
         <ng-template [ngIf]="axesLabels[panelIndex]" let-myAxesLabels>
           <ng-template ngFor [ngForOf]="myAxesLabels" let-index="index" let-axisLabel>
             <div [class]="'axis-' + index">
-              <ng-template sxplrExperimentalFlag [deprecated]="true">
-              <div class="axis-label sxplr-custom-cmp bg text" *ngFor="let keyvalue of axisLabel | keyvalue">
-                {{ keyvalue.key }}
-              </div>
-              </ng-template>
-              
-              <ng-template sxplrExperimentalFlag [experimental]="true">
               <div class="axis-label sxplr-custom-cmp text accent" *ngFor="let keyvalue of axisLabel | keyvalue">
                 {{ keyvalue.key }}
               </div>
-              </ng-template>
               
               <ng-template [ngIf]="(axisLabel | keyvalue).length === 0">
                 <button mat-icon-button

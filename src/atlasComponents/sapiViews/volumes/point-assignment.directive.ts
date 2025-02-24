@@ -57,17 +57,25 @@ export class PointAssignmentDirective {
   @Output()
   clickOnRegionName = new EventEmitter<{ target: string, event: MouseEvent }>()
 
+  coordTxt$ = this.point$.pipe(
+    map(val => {
+      if (!val) {
+        return null
+      }
+      const xformedCoord = pipe.transform(val)
+      return `(${xformedCoord.coords.map(v => v.toFixed(2)).join(", ")}) mm`
+    }),
+  )
 
   infoMsg$: Observable<string> = combineLatest([
-    this.point$,
+    this.coordTxt$,
     this.parcellation$,
     this.template$,
     this.busy$.pipe(
       filter(busyWith => busyWith === DOING_LABEL_ASGMT || busyWith === DOING_PROB_ASGMT)
     ),
   ]).pipe(
-    map(([ point, parcellation, template, busyWith ]) => {
-      const coords = pipe.transform(point)
+    map(([ coordText, parcellation, template, busyWith ]) => {
       let maptype = "map"
       let warningMsg = ""
       if (busyWith === DOING_LABEL_ASGMT) {
@@ -77,7 +85,7 @@ export class PointAssignmentDirective {
       if (busyWith === DOING_PROB_ASGMT) {
         maptype = "statistical map"
       }
-      return `Assignment of \`(${coords.coords.map(v => v.toFixed(2)).join(", ")}) mm\` to the ${maptype} of \`${parcellation.name}\` in \`${template.name}\`.
+      return `Assignment of \`${coordText}\` to the ${maptype} of \`${parcellation.name}\` in \`${template.name}\`.
 
 For more detail, see [siibra-python documentation](https://siibra-python.readthedocs.io/en/v0.4eol/examples/05_anatomical_assignment/001_coordinates.html).
 

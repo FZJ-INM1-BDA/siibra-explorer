@@ -6,7 +6,7 @@
 $themes: "default", "ebrains";
 $themes-map: (
   "default": (
-    "primary": mat.define-palette(mat.$indigo-palette, 400),
+    "primary": mat.define-palette(mat.$light-green-palette, 400),
     "accent": mat.define-palette(mat.$amber-palette, A200, A100, A400),
     "warn": mat.define-palette(mat.$red-palette),
   ),
@@ -16,10 +16,6 @@ $themes-map: (
     "warn": mat.define-palette(mat.$red-palette),
   )
 );
-
-$sxplr-primary: mat.define-palette(mat.$indigo-palette, 400);
-$sxplr-accent: mat.define-palette(mat.$amber-palette, A200, A100, A400);
-$sxplr-warn: mat.define-palette(mat.$red-palette);
 
 $typographic-config: mat.define-typography-config();
 
@@ -41,11 +37,10 @@ $typographic-config: mat.define-typography-config();
     
     &.hoverable
     {
-      padding: 1rem 1.3rem;
+      padding: 0.5rem 1rem;
       &:hover
       {
         cursor: pointer;
-        background-color: mat.get-color-from-palette($background, 100);
       }
     }
 

@@ -212,6 +212,16 @@ export class NehubaLayoutOverlay implements OnDestroy{
     shareReplay(1),
   )
 
+  obliqueRotated$ = this.axesLabels$.pipe(
+    map(axisLabels =>
+      axisLabels.some(
+        axisLabel => axisLabel.some(
+          label => Object.keys(label).length === 0
+        )
+      )
+    )
+  )
+
   constructor(
     private store$: Store,
     private cdr: ChangeDetectorRef,

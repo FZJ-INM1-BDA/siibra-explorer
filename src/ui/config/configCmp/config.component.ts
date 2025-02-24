@@ -1,7 +1,7 @@
 import { Component, Inject, OnDestroy, OnInit, Optional } from '@angular/core'
 import { select, Store } from '@ngrx/store';
 import { combineLatest, Observable, of, Subscription } from 'rxjs';
-import { debounceTime, distinctUntilChanged, map, startWith } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, map, shareReplay, startWith, take } from 'rxjs/operators';
 import { isIdentityQuat } from 'src/viewerModule/nehuba/util';
 import { MatSlideToggleChange } from 'src/sharedModules/angularMaterial.exports'
 import { atlasSelection, userPreference, userInterface } from 'src/state';
@@ -61,70 +61,59 @@ export class ConfigComponent implements OnInit, OnDestroy {
   /**
    * in MB
    */
-  public gpuLimit$: Observable<number>
+  public gpuLimit$ = this.store.pipe(
+    select(userPreference.selectors.gpuLimit),
+    map(v => v / 1e6),
+  )
 
   public useMobileUI$: Observable<boolean> = this.store.pipe(
-    select(userPreference.selectors.useMobileUi)
+    select(userPreference.selectors.useMobileUi),
   )
-  public animationFlag$: Observable<boolean>
+  public animationFlag$ = this.store.pipe(
+    select(userPreference.selectors.useAnimation),
+  )
   private subscriptions: Subscription[] = []
 
   public gpuMin: number = 100
   public gpuMax: number = 1000
 
-  public panelMode$: Observable<string>
+  public panelMode$ = this.store.pipe(
+    select(userInterface.selectors.panelMode),
+    map(panelMode => panelMode || "FOUR_PANEL")
+  )
 
-  private panelOrder: string
-  private panelOrder$: Observable<string>
-  public panelTexts$: Observable<[string, string, string, string]>
+  #panelOrder$ = this.store.pipe(
+    select(userInterface.selectors.panelOrder),
+    map(val => val || "0123"),
+    shareReplay(1),
+  )
 
-  private viewerObliqueRotated$: Observable<boolean>
+  private viewerObliqueRotated$ = this.store.pipe(
+    select(atlasSelection.selectors.navigation),
+    map(navigation => navigation?.orientation || [0, 0, 0, 1]),
+    debounceTime(100),
+    map(isIdentityQuat),
+    map(flag => !flag),
+    distinctUntilChanged(),
+  )
+  public panelTexts$ = combineLatest([
+    this.#panelOrder$.pipe(
+      map(panelOrder => panelOrder.split('').map(s => Number(s))),
+    ),
+    this.viewerObliqueRotated$,
+  ]).pipe(
+    map(([arr, isObliqueRotated]) => arr.map(idx => (isObliqueRotated ? OBLIQUE_ROOT_TEXT_ORDER : ROOT_TEXT_ORDER)[idx]) as [string, string, string, string]),
+    startWith(ROOT_TEXT_ORDER),
+  )
 
   constructor(
     private store: Store<any>,
     @Optional() @Inject(Z_TRAVERSAL_MULTIPLIER) private zTraversalMult$: Observable<number> = of(1)
   ) {
-
-    this.gpuLimit$ = this.store.pipe(
-      select(userPreference.selectors.gpuLimit),
-      map(v => v / 1e6),
-    )
-
-    this.animationFlag$ = this.store.pipe(
-      select(userPreference.selectors.useAnimation)
-    )
-
-    this.panelMode$ = this.store.pipe(
-      select(userInterface.selectors.panelMode)
-    )
-
-    this.panelOrder$ = this.store.pipe(
-      select(userInterface.selectors.panelOrder),
-    )
-
-    this.viewerObliqueRotated$ = this.store.pipe(
-      select(atlasSelection.selectors.navigation),
-      map(navigation => (navigation && navigation.orientation) || [0, 0, 0, 1]),
-      debounceTime(100),
-      map(isIdentityQuat),
-      map(flag => !flag),
-      distinctUntilChanged(),
-    )
-
-    this.panelTexts$ = combineLatest([
-      this.panelOrder$.pipe(
-        map(string => string.split('').map(s => Number(s))),
-      ),
-      this.viewerObliqueRotated$,
-    ]).pipe(
-      map(([arr, isObliqueRotated]) => arr.map(idx => (isObliqueRotated ? OBLIQUE_ROOT_TEXT_ORDER : ROOT_TEXT_ORDER)[idx]) as [string, string, string, string]),
-      startWith(ROOT_TEXT_ORDER),
-    )
   }
 
   public ngOnInit() {
     this.subscriptions.push(
-      this.panelOrder$.subscribe(panelOrder => this.panelOrder = panelOrder),
       combineLatest([
         this.zTraversalMult$,
         this.store.pipe(
@@ -212,14 +201,17 @@ export class ConfigComponent implements OnInit, OnDestroy {
     )
   }
 
-  public handleDrop(event: DragEvent) {
+  public async handleDrop(event: DragEvent) {
     event.preventDefault()
     const droppedAttri = (event.target as HTMLElement).getAttribute('panel-order')
     const draggedAttri = event.dataTransfer.getData('text/plain')
     if (droppedAttri === draggedAttri) { return }
     const idx1 = Number(droppedAttri)
     const idx2 = Number(draggedAttri)
-    const arr = this.panelOrder.split('');
+    const panelOrder = await this.#panelOrder$.pipe(
+      take(1)
+    ).toPromise()
+    const arr = panelOrder.split('');
 
     [arr[idx1], arr[idx2]] = [arr[idx2], arr[idx1]]
     this.store.dispatch(

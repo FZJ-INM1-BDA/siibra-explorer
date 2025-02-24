@@ -31,6 +31,8 @@ export const enLabels = {
   NEWEST_VERSION: "newest version",
   GOTO_NEWEST_VERSION: "go to newest version",
 
+  TOGGLE_SPATIAL_BOXES: "toggle spatial data feature locations",
+
   TOGGLE_SIDE_PANELS: "toggle side panels",
   NAVIGATION_CONTROL: "navigation control",
   MAXIMIZE_PANEL: 'maximize this panel',
