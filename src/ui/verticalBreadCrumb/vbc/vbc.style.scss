@@ -268,3 +268,35 @@ mat-accordion
         margin-right: 24px;
     }
 }
+
+.progressbar-container
+{
+    overflow: visible;
+    display: block;
+    height: 0px;
+    width: 100%;
+    position: relative;
+
+    *
+    {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+    }
+}
+
+mat-dialog-content
+{
+    display: flex;
+    flex-direction: column;
+    height: 65vh;
+    & > *
+    {
+        flex: 0 0 0;
+    }
+    & > sxplr-dumb-feature-list
+    {
+        flex: 1 1 0;
+    }
+}

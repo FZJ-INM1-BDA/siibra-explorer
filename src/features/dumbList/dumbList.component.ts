@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { Component, EventEmitter, Input, Output } from "@angular/core";
+import { Component, EventEmitter, HostBinding, Input, Output } from "@angular/core";
 import { BehaviorSubject, combineLatest } from "rxjs";
 import { Feature, VoiFeature } from "src/atlasComponents/sapi/sxplrTypes";
 import { FeatureFilterDirective } from "../feature.filter.directive";
@@ -28,6 +28,10 @@ type TFeature = Feature | VoiFeature
 })
 
 export class SxplrDumbFeatureList {
+
+  @Input()
+  @HostBinding('class.dumblist-small')
+  compact = false
 
   features$ = new BehaviorSubject<TFeature[]>([])
 

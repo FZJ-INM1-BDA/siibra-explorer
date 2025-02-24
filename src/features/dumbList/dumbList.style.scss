@@ -1,6 +1,6 @@
 .feature-list-container
 {
-    height: 40dvh;
+    height: 100%;
 
     > cdk-virtual-scroll-viewport
     {
@@ -15,8 +15,81 @@
 
 .filter-section
 {
-    max-height: 10dvh;
     overflow: auto;
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
+
+    & > *
+    {
+        display: block;
+    }
+}
+
+// data directives
+[feature-filter-directive]
+{
+    display: inline-block;
+    width: 0px;
+    height: 0px;
+}
+
+mat-checkbox
+{
+    span
+    {
+        white-space: nowrap;
+    }
+}
+
+:host
+{
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    height: 50vh;
+
+    & > .filter-section,
+    & > .feature-list-container
+    {
+        height: 100%;
+    }
+    
+    & > .filter-section
+    {
+        flex: 0 0 20em;
+    }
+    & > .feature-list-container
+    {
+        flex: 1 1 20em;
+    }
+
+    mat-divider
+    {
+        margin: 0.25em;
+    }
+
+    &.dumblist-small
+    {
+        flex-direction: column;
+        height: unset;
+        
+        & > .filter-section,
+        & > .feature-list-container
+        {
+            height: unset;
+            width: 100%;
+        }
+        
+        & > .filter-section
+        {
+            flex: 0 0 20dvh;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+        & > .feature-list-container
+        {
+            flex: 1 1 0;
+        }
+
+    }
 }

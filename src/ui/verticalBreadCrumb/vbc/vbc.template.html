@@ -552,9 +552,11 @@
                         autoFocus: true
                     }"
                     [sxplr-dialog-data]="{
-                        features: voiFeatureEntryCmp.features$ | async,
+                        busy$: voiFeatureEntryCmp.busy$,
+                        features$: voiFeatureEntryCmp.features$,
                         anchorTmpl: anchorTmpl
-                    }">
+                    }"
+                    sxplr-dialog-size="xl">
                     <mat-icon [matBadge]="totals" aria-hidden="false">dataset_linked</mat-icon>
                 </button>
             </ng-template>
@@ -699,9 +701,11 @@
                     autoFocus: true
                 }"
                 [sxplr-dialog-data]="{
-                    features: parcFeature.features$ | async,
+                    busy$: parcFeature.busy$,
+                    features$: parcFeature.features$,
                     anchorTmpl: anchorTmpl
-                }">
+                }"
+                sxplr-dialog-size="xl">
                 <mat-icon [matBadge]="parcFeature.totals$ | async" aria-hidden="false">dataset_linked</mat-icon>
             </button>
         </ng-template>
@@ -825,7 +829,7 @@
 
         <!-- features -->
         <ng-template #anchorTmpl>
-            <tpbr-viewer [tpbr-concept]="parcFeature.TPRBbox$ | async">
+            <tpbr-viewer [tpbr-concept]="regFeatures.TPRBbox$ | async">
             </tpbr-viewer>
         </ng-template>
 
@@ -833,11 +837,11 @@
             class="sxplr-d-none"
             [parcellation]="view.selectedATP.parcellation"
             [region]="view.selectedRegions[0]"
-            [attr.data-feature-length]="((parcFeature.features$ | async) || []).length"
-            #parcFeature="featureEntryCmp">
+            [attr.data-feature-length]="((regFeatures.features$ | async) || []).length"
+            #regFeatures="featureEntryCmp">
         </sxplr-feature-entry>
 
-        <ng-template [ngIf]="(parcFeature.totals$ | async) > 0">
+        <ng-template [ngIf]="(regFeatures.totals$ | async) > 0">
             <button mat-icon-button
                 [matTooltip]="view.labels.RELATED_DATASETS"
                 [sxplr-dialog]="dumbFeatureDialogTmpl"
@@ -845,18 +849,20 @@
                     autoFocus: true
                 }"
                 [sxplr-dialog-data]="{
-                    features: parcFeature.features$ | async,
+                    busy$: regFeatures.busy$,
+                    features$: regFeatures.features$,
                     anchorTmpl: anchorTmpl
-                }">
+                }"
+                sxplr-dialog-size="xl">
                 <mat-icon
-                    [matBadge]="parcFeature.totals$ | async"
+                    [matBadge]="regFeatures.totals$ | async"
                     aria-hidden="false">dataset_linked</mat-icon>
             </button>
         </ng-template>
 
         <!-- busy spinner -->
         
-        <ng-template [ngIf]="(regionDirective.fetchInProgress$ | async) || (parcFeature.busy$ | async)">
+        <ng-template [ngIf]="(regionDirective.fetchInProgress$ | async) || (regFeatures.busy$ | async)">
             <mat-spinner class="sxplr-d-inline-block" diameter="24"></mat-spinner>
         </ng-template>
         
@@ -980,11 +986,20 @@
         <span>Anchored at:</span>
         <ng-template [ngTemplateOutlet]="context.anchorTmpl"></ng-template>
 
+        <div class="progressbar-container">
+            <ng-template [ngIf]="context.busy$ && (context.busy$ | async)">
+                <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+            </ng-template>
+        </div>
+        
         <mat-divider></mat-divider>
 
         <sxplr-dumb-feature-list
-            [features]="context.features"
-            (feature-clicked)="selectFeature($event); closeBtn.dialogRef.close()">
+            iav-media-query
+            [compact]="(media.mediaBreakPoint$ | async) > 3"
+            [features]="context.features$ | async"
+            (feature-clicked)="selectFeature($event); closeBtn.dialogRef.close()"
+            #media="iavMediaQuery">
         </sxplr-dumb-feature-list>
     </mat-dialog-content>
     <div mat-dialog-actions>

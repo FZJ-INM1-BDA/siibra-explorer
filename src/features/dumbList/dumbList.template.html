@@ -1,5 +1,4 @@
 <ng-template [ngIf]="view$ | async" let-view>
-
     <div feature-filter-directive
         [items]="view.categories"
         [initValue]="true"
@@ -16,9 +15,48 @@
 
     <!-- filter -->
     <section class="filter-section">
+        
+        <ng-template #allTmpl>
+            <span class="text-muted">
+                <i>(all)</i>
+            </span>
+        </ng-template>
 
-        <button (click)="modFilter.setAll(true)" mat-button color="primary">select all</button>
-        <button (click)="modFilter.setAll(false)" mat-button color="warn">deselect all</button>
+        <ng-template #allCheckedTmpl>
+            <mat-checkbox [checked]="true"
+                (change)="modFilter.setAll(false)"
+                class="all-toggle">
+                <ng-template [ngTemplateOutlet]="allTmpl"></ng-template>
+            </mat-checkbox>
+        </ng-template>
+        <ng-template #indeterminateTmpl>
+            <mat-checkbox [indeterminate]="true"
+                (change)="modFilter.setAll(false)"
+                class="all-toggle">
+                <ng-template [ngTemplateOutlet]="allTmpl"></ng-template>
+            </mat-checkbox>
+        </ng-template>
+        <ng-template #nonCheckedTmpl>
+            <mat-checkbox [checked]="false"
+                (change)="modFilter.setAll(true)"
+                class="all-toggle">
+                <ng-template [ngTemplateOutlet]="allTmpl"></ng-template>
+            </mat-checkbox>
+        </ng-template>
+
+        <ng-template #notAllCheckedTmpl>
+            <ng-template [ngIf]="(modFilter.checked$ | async).length === 0"
+                [ngIfThen]="nonCheckedTmpl"
+                [ngIfElse]="indeterminateTmpl">
+            </ng-template>
+        </ng-template>
+
+        <ng-template [ngIf]="(modFilter.unchecked$ | async).length === 0"
+            [ngIfThen]="allCheckedTmpl"
+            [ngIfElse]="notAllCheckedTmpl">
+        </ng-template>
+
+        <mat-divider></mat-divider>
 
         <!-- categories -->
         <ng-template ngFor [ngForOf]="view.categories" let-cat>

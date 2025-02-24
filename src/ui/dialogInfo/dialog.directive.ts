@@ -20,7 +20,7 @@ const sizeDict: Record<DialogSize, Partial<MatDialogConfig>> = {
   },
   'xl': {
     width: '90vw',
-    height: '90vh'
+    height: '80vh'
   },
   'auto': {}
 }

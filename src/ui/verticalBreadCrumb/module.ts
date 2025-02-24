@@ -27,6 +27,7 @@ import { ZipFilesOutputModule } from "src/zipFilesOutput/module";
 import { MarkdownModule } from "src/components/markdown";
 import { NgLayerCtrlCmp } from "src/viewerModule/nehuba/nehubaViewerInterface/ngLayerCtl/ngLayerCtrl.component";
 import { PlotComponent } from "src/features/plotly/plot/plot.component";
+import { MediaQueryDirective } from "src/util/directives/mediaQuery.directive";
 
 @NgModule({
   imports: [
@@ -56,6 +57,7 @@ import { PlotComponent } from "src/features/plotly/plot/plot.component";
     MarkdownModule,
     NgLayerCtrlCmp,
     PlotComponent,
+    MediaQueryDirective,
   ],
   declarations: [
     VerticalBreadCrumbComponent,
