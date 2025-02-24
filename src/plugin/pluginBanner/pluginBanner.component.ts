@@ -61,6 +61,7 @@ export class PluginBannerUI {
       UserLayerService.VerifyUrl(iframeUrl)
       this.userLayerSvc.handleUserInput(iframeUrl)
       return
+      /* eslint-disable-next-line no-empty */
     } catch (e) {
 
     }
