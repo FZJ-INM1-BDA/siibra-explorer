@@ -137,6 +137,8 @@ export class SapiViewsCoreRichRegionListSearch {
   }
 
   optionSelected(opt: MatAutocompleteSelectedEvent) {
+    this.searchFormControl.setValue('')
+
     const selectedRegion = opt.option.value as (SxplrRegion | RegionExtra)
     if (isExtra(selectedRegion)) {
       if (selectedRegion.extra.noneFound) {
