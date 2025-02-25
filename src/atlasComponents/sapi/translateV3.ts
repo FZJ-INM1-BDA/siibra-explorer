@@ -30,8 +30,8 @@ function metaFactory(url: string): MetaV1Schema{
       data: {
         type: "image/1d",
         range: [{
-          min: 0.215,
-          max: 0.2250
+          min: 0.218,
+          max: 0.220
         }]
       }
     }
