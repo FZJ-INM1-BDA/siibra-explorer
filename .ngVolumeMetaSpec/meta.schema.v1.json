@@ -372,7 +372,7 @@
                             "type": "object",
                             "properties": {
                                 "imageBackground": {
-                                    "$ref": "#/definitions/vec3"
+                                    "$ref": "#/definitions/vec4"
                                 },
                                 "initialNgState": {
                                     "type": "object"
@@ -416,13 +416,13 @@
                                             "type": "boolean"
                                         },
                                         "perspectiveSlicesBackground": {
-                                            "$ref": "#/definitions/vec3"
+                                            "$ref": "#/definitions/vec4"
                                         },
                                         "removePerspectiveSlicesBackground": {
                                             "type": "object",
                                             "properties": {
                                                 "color": {
-                                                    "$ref": "#/definitions/vec3"
+                                                    "$ref": "#/definitions/vec4"
                                                 },
                                                 "mode": {
                                                     "oneOf": [
@@ -483,7 +483,7 @@
                                                     "$ref": "#/definitions/vec4"
                                                 },
                                                 "backFaceColor": {
-                                                    "$ref": "#/definitions/vec3"
+                                                    "$ref": "#/definitions/vec4"
                                                 },
                                                 "removeBasedOnNavigation": {
                                                     "type": "boolean"
@@ -505,7 +505,7 @@
                                                 "color": {
                                                     "$ref": "#/definitions/vec4"
                                                 },
-                                                "normalizedTranslate": {
+                                                "translate": {
                                                     "$ref": "#/definitions/vec3"
                                                 }
                                             }
@@ -580,7 +580,7 @@
                             "enableMeshLoadingControl": true,
                             "zoomAtViewCentre": true,
                             "dataset": {
-                                "imageBackground": [1, 1, 1],
+                                "imageBackground": [1, 1, 1, 1],
                                 "initialNgState": {
                                     "showDefaultAnnotations": false,
                                     "layers": {},
@@ -603,9 +603,9 @@
                             },
                             "layout": {
                                 "useNehubaPerspective": {
-                                    "perspectiveSlicesBackground": [1, 1, 1],
+                                    "perspectiveSlicesBackground": [1, 1, 1, 1],
                                     "removePerspectiveSlicesBackground": {
-                                        "color": [1, 1, 1],
+                                        "color": [1, 1, 1, 1],
                                         "mode": "=="
                                     },
                                     "perspectiveBackground": [1,1,1,1],
@@ -616,7 +616,7 @@
                                         "sliceViewportSizeMultiplier": 2
                                     },
                                     "mesh": {
-                                        "backFaceColor": [1,1,1],
+                                        "backFaceColor": [1,1,1,1],
                                         "removeBasedOnNavigation": true,
                                         "flipRemovedOctant": true,
                                         "surfaceParcellation": false
@@ -624,7 +624,7 @@
                                     "centerToOrigin": true,
                                     "drawSubstrates": {
                                         "color": [0,0,0.5,0.15],
-                                        "normalizedTranslate": [0,0,0]
+                                        "translate": [0,0,0]
                                     },
                                     "drawZoomLevels": {
                                         "cutOff": 200000,
@@ -730,7 +730,7 @@
                                             1,
                                             0.2
                                         ],
-                                        "normalizedTranslate": null
+                                        "translate": [0, 0, 0]
                                     },
                                     "drawZoomLevels": {
                                         "cutOff": 150000
