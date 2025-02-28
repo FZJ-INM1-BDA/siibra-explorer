@@ -300,8 +300,8 @@ export const spaceMiscInfoMap = new Map([
 
 export function getNehubaConfig(space: SxplrTemplate): NehubaConfig {
 
-  const darkTheme = space.id !== "minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588"
-  const { scale } = spaceMiscInfoMap.get(space.id) || { scale: 1 }
+  const darkTheme = space?.id !== "minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588"
+  const { scale } = spaceMiscInfoMap.get(space?.id) || { scale: 1 }
   const backgrd = darkTheme
     ? [0,0,0,1]
     : [1,1,1,1]
@@ -318,7 +318,7 @@ export function getNehubaConfig(space: SxplrTemplate): NehubaConfig {
 
   // enable surface parcellation
   // otherwise, on segmentation selection, the unselected meshes will also be invisible
-  const surfaceParcellation = space.id === 'minds/core/referencespace/v1.0.0/7f39f7be-445b-47c0-9791-e971c0b6d992'
+  const surfaceParcellation = space?.id === 'minds/core/referencespace/v1.0.0/7f39f7be-445b-47c0-9791-e971c0b6d992'
   return {
     "configName": "",
     "globals": {

@@ -2,7 +2,6 @@ import { DragDropModule } from '@angular/cdk/drag-drop'
 import { CommonModule, DOCUMENT } from "@angular/common";
 import { APP_INITIALIZER, NgModule } from "@angular/core";
 import { FormsModule } from "@angular/forms";
-import { Store, select } from "@ngrx/store";
 import { AngularMaterialModule } from 'src/sharedModules'
 import { AtlasViewer } from "./atlasViewer/atlasViewer.component";
 import { ComponentsModule } from "./components/components.module";
@@ -36,12 +35,10 @@ import { Observable, of } from 'rxjs';
 import { CANCELLABLE_DIALOG, CANCELLABLE_DIALOG_OPTS } from './util/interfaces';
 import { NotSupportedCmp } from './notSupportedCmp/notSupported.component';
 import {
-  atlasSelection,
   RootStoreModule,
   getStoreEffects,
 } from "./state"
 import { DARKTHEME } from './util/injectionTokens';
-import { map } from 'rxjs/operators';
 import { EffectsModule } from '@ngrx/effects';
 
 // TODO check if there is a more logical place import put layerctrl effects ts
@@ -169,7 +166,7 @@ import { FreeModeModule } from './freeModeModule';
     },
     {
       provide: APP_INITIALIZER,
-      useFactory: (authSvc: AuthService, darktheme$: Observable<boolean>) => {
+      useFactory: (authSvc: AuthService, _darktheme$: Observable<boolean>) => {
         authSvc.authReloadState()
         return () => Promise.resolve()
       },

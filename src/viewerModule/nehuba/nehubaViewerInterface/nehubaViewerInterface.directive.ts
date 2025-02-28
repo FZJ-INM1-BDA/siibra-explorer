@@ -9,7 +9,6 @@ import { arrayOfPrimitiveEqual } from 'src/util/fn'
 import { INavObj } from "../constants"
 import { NehubaConfig, defaultNehubaConfig, getNehubaConfig } from "../config.service";
 import { atlasAppearance, atlasSelection, userPreference } from "src/state";
-import { SxplrAtlas, SxplrParcellation, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { arrayEqual } from "src/util/array";
 import { cvtNavigationObjToNehubaConfig } from "../config.service/util";
 import { LayerCtrlEffects } from "../layerCtrl.service/layerCtrl.effects";
@@ -179,7 +178,7 @@ export class NehubaViewerContainerDirective implements OnDestroy{
             this.store$.pipe(
               select(atlasAppearance.selectors.customLayers),
               map(cl => cl.filter(l => l.clType === "baselayer/nglayer") as atlasAppearance.const.NgLayerCustomLayer[]),
-              distinctUntilChanged(arrayEqual((oi, ni) => oi.id === ni.id)),
+              distinctUntilChanged(arrayEqual((oi, ni) => oi?.id === ni?.id)),
             ),
             translateV3Entities.translateSpaceToVolumeImageMeta(template)
           ]).pipe(
@@ -219,6 +218,10 @@ export class NehubaViewerContainerDirective implements OnDestroy{
           take(1)
         ).toPromise()
 
+        if (this.gpuLimit) {
+          config.dataset.initialNgState['gpuMemoryLimit'] = this.gpuLimit  
+        }
+
         await this.createNehubaInstance(config)
 
         const ngIdSegmentsMap: Record<string, number[]> = {} 
@@ -251,7 +254,6 @@ export class NehubaViewerContainerDirective implements OnDestroy{
       }),
 
       this.gpuLimit$.pipe(
-        debounceTime(160),
       ).subscribe(limit => {
         this.gpuLimit = limit
         if (this.nehubaViewerInstance && this.nehubaViewerInstance.nehubaViewer) {
