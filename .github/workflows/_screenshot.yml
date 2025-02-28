@@ -9,7 +9,7 @@ on:
       browser:
         required: false
         type: string
-        default: firefox
+        default: chrome
       url:
         required: true
         type: string
@@ -52,14 +52,13 @@ jobs:
         echo "SCREENSHOT_NAME=$SCREENSHOT_NAME" >> $GITHUB_ENV
 
     - name: Install dependency
-      run: npm install cypress
+      run: npm install cypress@13.17.0
 
     - name: Run Cypress
       uses: cypress-io/github-action@v6
       with:
         spec: cypress/e2e/screenshot.cy.js
         browser: ${{ inputs.browser }}
-        config: experimentalMemoryManagement=true
         
     - uses: actions/upload-artifact@v4
       with:
