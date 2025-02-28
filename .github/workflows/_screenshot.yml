@@ -9,7 +9,7 @@ on:
       browser:
         required: false
         type: string
-        default: chrome
+        default: firefox
       url:
         required: true
         type: string
