@@ -89,6 +89,11 @@ div.neuroglancer-rendered-data-panel
   visibility: hidden;
 }
 
+.neuroglancer-layer-side-panel
+{
+  display: none;
+}
+
 ul#statusContainer
 {
   display:none;
