@@ -71,6 +71,7 @@ interface NeuroglancerSpecificConfigurations {
    * Hints that client should use this shader for the volume in neuroglancer
    */
   shader?: string
+  opacity?: number
   [k: string]: unknown
 }
 /**
@@ -101,7 +102,7 @@ interface Configuration {
   crossSectionBackground?: X1Vector
   perspectiveViewBackground?: X1Vector
   dataset?: {
-    imageBackground?: X1Vector
+    imageBackground?: X1Vector1
     initialNgState?: {
       [k: string]: unknown
     }
@@ -120,9 +121,9 @@ interface Configuration {
     useNehubaPerspective?: {
       enablePerspectiveDrag?: boolean
       doNotRestrictUserNavigation?: boolean
-      perspectiveSlicesBackground?: X1Vector
+      perspectiveSlicesBackground?: X1Vector1
       removePerspectiveSlicesBackground?: {
-        color?: X1Vector
+        color?: X1Vector1
         mode?: "none" | ">" | ">=" | "==" | "<=" | "<"
         [k: string]: unknown
       }
@@ -135,7 +136,7 @@ interface Configuration {
       }
       mesh?: {
         removeOctant?: X1Vector1
-        backFaceColor?: X1Vector
+        backFaceColor?: X1Vector1
         removeBasedOnNavigation?: boolean
         flipRemovedOctant?: boolean
         surfaceParcellation?: boolean
@@ -144,7 +145,7 @@ interface Configuration {
       centerToOrigin?: boolean
       drawSubstrates?: {
         color?: X1Vector1
-        normalizedTranslate?: X1Vector
+        translate?: X1Vector
         [k: string]: unknown
       }
       drawZoomLevels?: {

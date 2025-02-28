@@ -363,7 +363,7 @@ export class StatusCardComponent {
 
     const {
       zoomFactor: zoom
-    } = config.dataset.initialNgState.navigation
+    } = config.dataset.initialNgState.navigation as { zoomFactor: number }
 
     this.store$.dispatch(
       actions.navigateTo({

@@ -14,6 +14,8 @@ import { arrayEqual } from "src/util/array";
 import { cvtNavigationObjToNehubaConfig } from "../config.service/util";
 import { LayerCtrlEffects } from "../layerCtrl.service/layerCtrl.effects";
 import { NavigationBaseSvc } from "../navigation.service/navigation.base.service";
+import { translateV3Entities } from "src/atlasComponents/sapi/translateV3";
+import { MetaV1Schema } from "src/atlasComponents/sapi/volumeMeta";
 
 
 const determineProtocol = (url: string) => {
@@ -170,26 +172,38 @@ export class NehubaViewerContainerDirective implements OnDestroy{
       }),
       this.store$.pipe(
         atlasSelection.fromRootStore.distinctATP(),
-        debounceTime(16),
-        switchMap((ATP: { atlas: SxplrAtlas, parcellation: SxplrParcellation, template: SxplrTemplate }) => this.store$.pipe(
-          select(atlasAppearance.selectors.customLayers),
-          debounceTime(16),
-          map(cl => cl.filter(l => l.clType === "baselayer/nglayer") as atlasAppearance.const.NgLayerCustomLayer[]),
-          distinctUntilChanged(arrayEqual((oi, ni) => oi.id === ni.id)),
-          filter(layers => layers.length > 0),
-          map(ngBaseLayers => {
-            return {
-              ATP,
-              ngBaseLayers
-            }
-          })
-        ))
-      ).subscribe(async ({ ATP, ngBaseLayers }) => {
-        const config = getNehubaConfig(ATP.template)
-        for (const baseLayer of ngBaseLayers) {
-          config.dataset.initialNgState.layers[baseLayer.id] = baseLayer
-        }
-    
+        map(({ template }) => template),
+        distinctUntilChanged((o, n) => o?.id === n?.id),
+        switchMap(template => 
+          combineLatest([
+            this.store$.pipe(
+              select(atlasAppearance.selectors.customLayers),
+              map(cl => cl.filter(l => l.clType === "baselayer/nglayer") as atlasAppearance.const.NgLayerCustomLayer[]),
+              distinctUntilChanged(arrayEqual((oi, ni) => oi.id === ni.id)),
+            ),
+            translateV3Entities.translateSpaceToVolumeImageMeta(template)
+          ]).pipe(
+            map(([ ngBaseLayers, metas ]) => {
+  
+              let config: MetaV1Schema["https://schema.brainatlas.eu/github/humanbrainproject/nehuba"]['config']
+  
+              for (const meta of metas){
+                const cfg = meta?.meta?.["https://schema.brainatlas.eu/github/humanbrainproject/nehuba"]?.config
+                if (cfg) {
+                  config = cfg
+                  break
+                }
+              }
+              config ||= getNehubaConfig(template)
+              for (const baseLayer of ngBaseLayers) {
+                config.dataset.initialNgState.layers[baseLayer.id] = baseLayer
+              }
+              return config
+            })
+          )
+        ),
+        debounceTime(160),
+      ).subscribe(async config => {
         const overwritingInitState = this.navigation
           ? cvtNavigationObjToNehubaConfig(this.navigation, config.dataset.initialNgState)
           : {}

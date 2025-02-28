@@ -47,7 +47,7 @@ export class SapiViewsCoreRichRegionListSearch {
 
   ARIA_LABELS = ARIA_LABELS
 
-  showNOptions = Number.POSITIVE_INFINITY
+  showNOptions = 50
 
   #regions = new BehaviorSubject<SxplrRegion[]>([])
   @Input('sxplr-sapiviews-core-rich-regionlistsearch-regions')
@@ -130,6 +130,8 @@ export class SapiViewsCoreRichRegionListSearch {
   )
 
   public autocompleteList$ = this.searchedList$.pipe(
+    debounceTime(160),
+    map(v => v.slice(0, this.showNOptions))
   )
 
   displayFn(region: SxplrRegion){

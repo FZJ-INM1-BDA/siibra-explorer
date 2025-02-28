@@ -560,6 +560,10 @@ void main() {
 `
 }
 
+export function getOpacityFromMeta(meta: MetaV1Schema) {
+  return meta?.['https://schema.brainatlas.eu/github/humanbrainproject/neuroglancer']?.opacity || 1
+}
+
 export function getShaderFromMeta(meta: MetaV1Schema){
   let colormap = EnumColorMapName.GREYSCALE
 

@@ -202,9 +202,7 @@ export const defaultNehubaConfig: NehubaConfig = {
   "configName": "",
   "globals": {
     "hideNullImageValues": true,
-    "useNehubaLayout": {
-      "keepDefaultLayouts": false
-    },
+    "useNehubaLayout": true,
     "useNehubaMeshLayer": true,
     "rightClickWithCtrlGlobal": false,
     "zoomWithoutCtrlGlobal": false,
@@ -325,9 +323,7 @@ export function getNehubaConfig(space: SxplrTemplate): NehubaConfig {
     "configName": "",
     "globals": {
       "hideNullImageValues": true,
-      "useNehubaLayout": {
-        "keepDefaultLayouts": false
-      },
+      "useNehubaLayout": true,
       "useNehubaMeshLayer": true,
       "rightClickWithCtrlGlobal": false,
       "zoomWithoutCtrlGlobal": false,
@@ -388,7 +384,7 @@ export function getNehubaConfig(space: SxplrTemplate): NehubaConfig {
         }
       }
     }
-  }
+  } as any
 }
 
 
@@ -424,5 +420,5 @@ export function cvtNavigationObjToNehubaConfig(navigationObj: atlasSelection.Atl
       },
       zoomFactor: zoom
     }
-  }
+  } as NgConfig
 }

@@ -363,17 +363,54 @@ class TranslateV3 {
     return returnObj
   }
 
+  async translateSpaceToVolumeImageMeta(template: SxplrTemplate): Promise<{
+    type: string
+    url: string
+    meta: MetaV1Schema
+  }[]>{
+    const returnVal: {
+      type: string
+      url: string
+      meta: MetaV1Schema
+    }[] = []
+    if (!template) return returnVal
+    const space = this.retrieveTemplate(template)
+    if (!space) return returnVal
+
+    // TODO make work with other formats, e.g. fsaverage
+    const validImages = space.defaultImage.filter(di => di.formats.includes("neuroglancer/precomputed"))
+    for (const defaultImage of validImages) {
+      
+      const { providedVolumes } = defaultImage
+      // TODO fix zarr/other format space volume image
+      const { "neuroglancer/precomputed": precomputedVol } = await this.#extractNgPrecompUnfrag(providedVolumes)
+      
+      if (!precomputedVol) {
+        console.error(`neuroglancer/precomputed data source has not been found!`)
+        continue
+      }
+      const { url, meta } = precomputedVol
+      returnVal.push({
+        type: "neuroglancer/precomputed",
+        url,
+        meta,
+      })
+    }
+    return returnVal
+  }
+
   async translateSpaceToVolumeImage(template: SxplrTemplate): Promise<NgLayerSpec[]> {
     if (!template) return []
     const space = this.retrieveTemplate(template)
     if (!space) return []
     const returnObj: NgLayerSpec[] = []
+    
+    // TODO fix zarr/other format space volume image
     const validImages = space.defaultImage.filter(di => di.formats.includes("neuroglancer/precomputed"))
 
     for (const defaultImage of validImages) {
       
       const { providedVolumes } = defaultImage
-      // TODO fix zarr/other format space volume image
       const { "neuroglancer/precomputed": precomputedVol } = await this.#extractNgPrecompUnfrag(providedVolumes)
       
       if (!precomputedVol) {

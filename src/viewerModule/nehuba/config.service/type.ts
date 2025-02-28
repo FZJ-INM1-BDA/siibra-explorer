@@ -1,10 +1,11 @@
+import { MetaV1Schema } from "src/atlasComponents/sapi/volumeMeta"
 
 export type RecursivePartial<T> = {
   [K in keyof T]?: RecursivePartial<T[K]>
 }
 
-type Vec4 = number[]
-type Vec3 = number[]
+type Vec4 = [number, number, number, number]
+type Vec3 = [number, number, number]
 
 export type NgConfigViewerState = {
   perspectiveOrientation: Vec4
@@ -27,74 +28,8 @@ export type NgConfig = {
   gpuMemoryLimit: number
 } & NgConfigViewerState
 
-interface _NehubaConfig {
-  configName: string
-  globals: {
-    hideNullImageValues: boolean
-    useNehubaLayout: {
-      keepDefaultLayouts: boolean
-    }
-    useNehubaMeshLayer: boolean
-    rightClickWithCtrlGlobal: boolean
-    zoomWithoutCtrlGlobal: boolean
-    useCustomSegmentColors: boolean
-  }
-  zoomWithoutCtrl: boolean
-  hideNeuroglancerUI: boolean
-  rightClickWithCtrl: boolean
-  rotateAtViewCentre: boolean
-  enableMeshLoadingControl: boolean
-  zoomAtViewCentre: boolean
-  restrictUserNavigation: boolean
-  disableSegmentSelection: boolean
-  dataset: {
-    imageBackground: Vec4
-    initialNgState: NgConfig
-  }
-  layout: {
-    views: string
-    planarSlicesBackground: Vec4
-    useNehubaPerspective: {
-      enableShiftDrag: boolean
-      doNotRestrictUserNavigation: boolean
-      removePerspectiveSlicesBackground: {
-        mode: string
-        color: Vec4
-      }
-      perspectiveSlicesBackground: Vec4
-      perspectiveBackground: Vec4
-      fixedZoomPerspectiveSlices: {
-        sliceViewportWidth: number
-        sliceViewportHeight: number
-        sliceZoom: number
-        sliceViewportSizeMultiplier: number
-      }
-      mesh: {
-        removeOctant: Vec4
-        backFaceColor: Vec3
-        removeBasedOnNavigation: boolean
-        flipRemovedOctant: boolean
-        surfaceParcellation: boolean
-      }
-      centerToOrigin: boolean
-      drawSubstrates: {
-        color: Vec4
-      }
-      drawZoomLevels: {
-        cutOff: number
-        color: Vec4
-      }
-      restrictZoomLevel: {
-        minZoom: number
-        maxZoom: number
-      }
-      hideImages: boolean
-      waitForMesh: boolean
-    }
-  }
-}
 
-export type NehubaConfig = RecursivePartial<_NehubaConfig>
+export type NehubaConfig = MetaV1Schema["https://schema.brainatlas.eu/github/humanbrainproject/nehuba"]["config"]
 
 type OldNgLayerSpec = {
   legacySpecFlag: 'old'

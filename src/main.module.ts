@@ -32,7 +32,7 @@ import { CookieModule } from './ui/cookieAgreement/module';
 import { KgTosModule } from './ui/kgtos/module';
 import { MessagingGlue } from './messagingGlue';
 import { QuickTourModule } from './ui/quickTour';
-import { of } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { CANCELLABLE_DIALOG, CANCELLABLE_DIALOG_OPTS } from './util/interfaces';
 import { NotSupportedCmp } from './notSupportedCmp/notSupported.component';
 import {
@@ -168,21 +168,13 @@ import { FreeModeModule } from './freeModeModule';
       useClass: MessagingGlue
     },
     {
-      provide: DARKTHEME,
-      useFactory: (store: Store) => store.pipe(
-        select(atlasSelection.selectors.selectedTemplate),
-        map(tmpl => !!(tmpl && tmpl.id !== 'minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588')),
-      ),
-      deps: [ Store ]
-    },
-    {
       provide: APP_INITIALIZER,
-      useFactory: (authSvc: AuthService) => {
+      useFactory: (authSvc: AuthService, darktheme$: Observable<boolean>) => {
         authSvc.authReloadState()
         return () => Promise.resolve()
       },
       multi: true,
-      deps: [ AuthService ]
+      deps: [ AuthService, DARKTHEME ]
     },
     {
       provide: GET_ATTR_TOKEN,

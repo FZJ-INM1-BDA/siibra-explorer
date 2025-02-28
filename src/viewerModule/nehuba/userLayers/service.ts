@@ -11,7 +11,7 @@ import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.se
 import { RouterService } from "src/routerModule/router.service"
 import * as atlasAppearance from "src/state/atlasAppearance"
 import { EnumColorMapName } from "src/util/colorMaps"
-import { getShader, getShaderFromMeta, noop, QuickHash } from "src/util/fn"
+import { getOpacityFromMeta, getShader, getShaderFromMeta, noop, QuickHash } from "src/util/fn"
 import { getExportNehuba, getUuid } from "src/util/fn"
 import { UserLayerInfoCmp } from "./userlayerInfo/userlayerInfo.component"
 import { translateV3Entities } from "src/atlasComponents/sapi/translateV3"
@@ -233,6 +233,7 @@ export class UserLayerService implements OnDestroy {
         legacySpecFlag: "old",
         transform: meta?.transform || transform,
         shader: getShaderFromMeta(meta),
+        opacity: getOpacityFromMeta(meta),
       },
       protocol,
       url

@@ -5,7 +5,7 @@ import { CONST } from "common/constants"
 import { Observable } from "rxjs";
 import { atlasAppearance, atlasSelection } from "src/state";
 import { NehubaViewerUnit, NEHUBA_INSTANCE_INJTKN } from "src/viewerModule/nehuba";
-import { getExportNehuba, getShaderFromMeta } from "src/util/fn";
+import { getExportNehuba, getOpacityFromMeta, getShaderFromMeta } from "src/util/fn";
 import { MetaV1Schema, isEnclosed } from "src/atlasComponents/sapi/typeV3";
 import { getPositionOrientation } from "../../util";
 
@@ -128,6 +128,7 @@ export class NgLayerCtrlCmp implements OnChanges, OnDestroy{
         this.removeLayer = null
       }
       this.shader = getShaderFromMeta(this.meta)
+      this.opacity = getOpacityFromMeta(this.meta)
 
       let format = "precomputed://"
       if (this.format === "neuroglancer-precomputed") {
