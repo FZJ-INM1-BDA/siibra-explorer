@@ -52,7 +52,7 @@ jobs:
         echo "SCREENSHOT_NAME=$SCREENSHOT_NAME" >> $GITHUB_ENV
 
     - name: Install dependency
-      run: npm install cypress
+      run: npm install cypress@14.0.3
 
     - name: Run Cypress
       uses: cypress-io/github-action@v6

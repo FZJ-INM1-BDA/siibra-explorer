@@ -194,6 +194,7 @@ export class NehubaViewerContainerDirective implements OnDestroy{
                 }
               }
               config ||= getNehubaConfig(template)
+              config.dataset.initialNgState.layers = {}
               for (const baseLayer of ngBaseLayers) {
                 config.dataset.initialNgState.layers[baseLayer.id] = baseLayer
               }
