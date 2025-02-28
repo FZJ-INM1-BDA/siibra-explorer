@@ -434,7 +434,7 @@ export class NehubaViewerUnit implements OnDestroy {
 
     this.nehubaViewer = createNehubaViewer(this.config, (err: string) => {
       /* print in debug mode */
-      this.log.error(err)
+      this.log.warn(err)
     });
 
     const viewer = this.nehubaViewer.ngviewer

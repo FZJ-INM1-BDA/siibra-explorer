@@ -21,3 +21,8 @@ export const IDS = {
     MEBRAINS: "minds/core/parcellationatlas/v1.0.0/e3235c039c6f54c3ba151568c829f117",
   }
 }
+
+export const MAPTYPE = {
+  STATISTICAL: "STATISTICAL",
+  LABELLED: "LABELLED"
+} as const

@@ -89,7 +89,7 @@
         </ng-template>
 
         <!-- all dois -->
-        <ng-template ngFor [ngForOf]="dois$ | async" let-doi>
+        <ng-template ngFor [ngForOf]="dois$ | async | getUniquePipe" let-doi>
           <a mat-list-item [href]="doi" target="_blank" class="no-hover">
             <mat-icon matListItemIcon fontSet="ai" fontIcon="ai-doi"></mat-icon>
             <div matListItemTitle>{{ doi }}</div>
