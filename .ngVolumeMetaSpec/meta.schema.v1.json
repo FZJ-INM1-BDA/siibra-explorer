@@ -298,6 +298,8 @@
                 "const": "inferno"
             }, {
                 "const": "jet"
+            }, {
+                "const": "orange"
             }]
         },
         "hbp-ng": {
@@ -311,6 +313,12 @@
                     "examples": [
                         "void main() { emitGrayscale(toNormalized(getDataValue())); }"
                     ]
+                },
+                "opacity": {
+                    "type": "number",
+                    "description": "Hints the opacity that should be set for this layer",
+                    "maximum": 1,
+                    "minimum": 0
                 }
             }
         },
