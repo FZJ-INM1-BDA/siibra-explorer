@@ -8,7 +8,12 @@
             hideToggle>
             <mat-expansion-panel-header>
                 <mat-panel-title>
-                    Atlas
+                    <ng-template [ngIf]="atlasExpPanel.expanded">
+                        Species
+                    </ng-template>
+                    <ng-template [ngIf]="!atlasExpPanel.expanded">
+                        <i class="pseudo-mat-icon fas fa-dna"></i>
+                    </ng-template>
                 </mat-panel-title>
                 <mat-panel-description *ngIf="!atlasExpPanel.expanded">
                     {{ atlas.name }}
@@ -46,7 +51,12 @@
             hideToggle>
             <mat-expansion-panel-header>
                 <mat-panel-title>
-                    Space
+                    <ng-template [ngIf]="spaceExpPanel.expanded">
+                        Space
+                    </ng-template>
+                    <ng-template [ngIf]="!spaceExpPanel.expanded">
+                        <mat-icon>view_in_ar</mat-icon>
+                    </ng-template>
                 </mat-panel-title>
                 <mat-panel-description *ngIf="!spaceExpPanel.expanded">
                     {{ template.name }}
@@ -88,7 +98,13 @@
             hideToggle>
             <mat-expansion-panel-header>
                 <mat-panel-title>
-                    Reference Parcellation
+                    <ng-template [ngIf]="parcExpPanel.expanded">
+                        Reference Atlas
+                    </ng-template>
+                    <ng-template [ngIf]="!parcExpPanel.expanded">
+                        <mat-icon>account_tree</mat-icon>
+                    </ng-template>
+                    
                 </mat-panel-title>
                 <mat-panel-description *ngIf="!parcExpPanel.expanded">
                     {{ parcellation.name }}
@@ -158,7 +174,13 @@
             
             <mat-expansion-panel-header>
                 <mat-panel-title>
-                    Brain Area
+                    <ng-template [ngIf]="selRegExpPanel.expanded">
+                        Brain Area
+                    </ng-template>
+                    <ng-template [ngIf]="!selRegExpPanel.expanded">
+                        <i class="pseudo-mat-icon fas fa-brain"></i>
+                    </ng-template>
+                    
                 </mat-panel-title>
                 
                 <mat-panel-description *ngIf="!selRegExpPanel.expanded">
@@ -212,8 +234,18 @@
                 
                 <mat-expansion-panel-header>
                     <mat-panel-title>
-                        Point Assignment
+                        <ng-template [ngIf]="selPtExpPanel.expanded">
+                            Point Assignment
+                        </ng-template>
+                        <ng-template [ngIf]="!selPtExpPanel.expanded">
+                            <mat-icon>query_stats</mat-icon>
+                        </ng-template>
+                        
                     </mat-panel-title>
+                    
+                    <mat-panel-description *ngIf="!selPtExpPanel.expanded">
+                        {{ ptAsgmt.coordTxt$ | async }}
+                    </mat-panel-description>
 
                     <button mat-icon-button
                         [matTooltip]="view.labels.CLEAR_SELECTED_POINT"
@@ -317,13 +349,18 @@
                 
                 <mat-expansion-panel-header>
                     <mat-panel-title>
-                        <ng-template [ngIf]="featureView.view$ | async" let-fView [ngIfElse]="fallbackTmpl">
-                            <ng-template [ngIf]="fView.category" let-category [ngIfElse]="fallbackTmpl">
-                                {{ category }}
+                        <ng-template [ngIf]="selFtExpPanel.expanded">
+                            <ng-template [ngIf]="featureView.view$ | async" let-fView [ngIfElse]="fallbackTmpl">
+                                <ng-template [ngIf]="fView.category" let-category [ngIfElse]="fallbackTmpl">
+                                    {{ category }}
+                                </ng-template>
+                            </ng-template>
+                            <ng-template #fallbackTmpl>
+                                feature
                             </ng-template>
                         </ng-template>
-                        <ng-template #fallbackTmpl>
-                            feature
+                        <ng-template [ngIf]="!selFtExpPanel.expanded">
+                            <mat-icon>dataset_linked</mat-icon>
                         </ng-template>
                     </mat-panel-title>
 
@@ -843,6 +880,7 @@
 
         <ng-template [ngIf]="(regFeatures.totals$ | async) > 0">
             <button mat-icon-button
+                (click)="regFeatures.pullAll()"
                 [matTooltip]="view.labels.RELATED_DATASETS"
                 [sxplr-dialog]="dumbFeatureDialogTmpl"
                 [sxplr-dialog-config]="{

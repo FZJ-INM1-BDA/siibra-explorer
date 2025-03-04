@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { createEffect } from "@ngrx/effects";
 import { select, Store } from "@ngrx/store";
-import { forkJoin, from, of } from "rxjs";
+import { concat, forkJoin, from, of } from "rxjs";
 import { switchMap, withLatestFrom, catchError, map, debounceTime, shareReplay, distinctUntilChanged, tap } from "rxjs/operators";
 import { NgLayerSpec, NgPrecompMeshSpec, NgSegLayerSpec, SxplrAtlas, SxplrParcellation, SxplrTemplate, VoiFeature } from "src/atlasComponents/sapi/sxplrTypes";
 import { SAPI } from "src/atlasComponents/sapi"
@@ -61,11 +61,10 @@ export class LayerCtrlEffects {
           if (regions.length !== 1) {
             return of(rmPmapAction)
           }
-          return this.sapi.getStatisticalMap(parcellation, template, regions[0]).pipe(
+          const addNewStateMap = this.sapi.getStatisticalMap(parcellation, template, regions[0]).pipe(
             switchMap(({ buffer, meta }) => {
               this.#pmapUrl = URL.createObjectURL(new Blob([buffer], {type: "application/octet-stream"}))
               return of(
-                rmPmapAction,
                 atlasAppearance.actions.addCustomLayer({
                   customLayer: {
                     legacySpecFlag: "old",
@@ -85,6 +84,10 @@ export class LayerCtrlEffects {
               )
             }),
             catchError(() => of(rmPmapAction)),
+          )
+          return concat(
+            of(rmPmapAction),
+            addNewStateMap,
           )
         })
       )
