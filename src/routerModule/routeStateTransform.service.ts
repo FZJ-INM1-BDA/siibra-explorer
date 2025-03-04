@@ -8,8 +8,10 @@ import { atlasAppearance, atlasSelection, defaultState, MainState, plugins, user
 import { decodeToNumber, encodeNumber, encodeURIFull, separator } from "./cipher";
 import { TUrlAtlas, TUrlPathObj, TUrlStandaloneVolume } from "./type";
 import { decodePath, encodeId, decodeId, encodePath } from "./util";
-import { QuickHash, decodeBool, encodeBool, isNullish } from "src/util/fn";
+import { QuickHash, decodeBool, encodeBool, isNullish, mutateDeepMerge } from "src/util/fn";
 import { NEHUBA_CONFIG_SERVICE_TOKEN, NehubaConfigSvc } from "src/viewerModule/nehuba/config.service";
+import { INIT_ROUTE_TO_STATE } from "src/util/injectionTokens";
+import { RecursivePartial } from "src/util/recursivePartial";
 
 type ViewerConfigState = {
   panelMode: userInterface.PanelMode
@@ -31,7 +33,10 @@ export class RouteStateTransformSvc {
     private sapi: SAPI,
     @Inject(NEHUBA_CONFIG_SERVICE_TOKEN)
     private nehubaCfgSvc: NehubaConfigSvc,
-  ){}
+    @Inject(INIT_ROUTE_TO_STATE)
+    private otherRouteToState: ((fullpath: string) => Promise<RecursivePartial<MainState>>)[]
+  ){
+  }
   
   private async getATPR(obj: TUrlPathObj<string[], TUrlAtlas<string[]>>){
     const selectedAtlasId = decodeId( RouteStateTransformSvc.GetOneAndOnlyOne(obj.a) )
@@ -264,6 +269,12 @@ export class RouteStateTransformSvc {
       // if error, show error on UI?
       console.error(`parse template, parc, region error`, e)
     }
+
+    for (const fn of this.otherRouteToState){
+      const partial = await fn(fullPath.toString())
+      mutateDeepMerge(returnState, partial)
+    }
+
     return returnState
   }
 

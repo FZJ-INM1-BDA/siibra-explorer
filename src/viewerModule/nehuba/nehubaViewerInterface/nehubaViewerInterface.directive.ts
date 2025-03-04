@@ -178,6 +178,7 @@ export class NehubaViewerContainerDirective implements OnDestroy{
             this.store$.pipe(
               select(atlasAppearance.selectors.customLayers),
               map(cl => cl.filter(l => l.clType === "baselayer/nglayer") as atlasAppearance.const.NgLayerCustomLayer[]),
+              filter(layers => layers.length > 0),
               distinctUntilChanged(arrayEqual((oi, ni) => oi?.id === ni?.id)),
             ),
             translateV3Entities.translateSpaceToVolumeImageMeta(template)

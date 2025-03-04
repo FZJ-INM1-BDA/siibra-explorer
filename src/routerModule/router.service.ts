@@ -1,10 +1,10 @@
 import { Inject, Injectable } from "@angular/core";
 import { NavigationEnd, Router } from '@angular/router'
 import { distinctUntilChanged, filter, map, shareReplay, switchMap, take } from "rxjs/operators";
-import { DECODE_ENCODE, DecodeEncode } from "./util";
 import { BehaviorSubject, merge } from 'rxjs'
 import { scan } from 'rxjs/operators'
 import { SAPI } from "src/atlasComponents/sapi";
+import { DECODE_ENCODE, DecodeEncode } from "./util";
 
 
 @Injectable({

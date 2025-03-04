@@ -40,3 +40,7 @@ export type TContextMenu<T> = {
 }
 
 export const DARKTHEME = new InjectionToken<Observable<boolean>>('DARKTHEME')
+
+export const INIT_ROUTE_TO_STATE = new InjectionToken("INIT_ROUTE_TO_STATE", {
+  factory: () => [],
+})

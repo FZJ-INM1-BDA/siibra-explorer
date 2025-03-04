@@ -15,8 +15,13 @@ import { ZipFilesOutputModule } from "src/zipFilesOutput/module";
 import { FilterAnnotationsBySpace } from "./filterAnnotationBySpace.pipe";
 import { AnnotationEventDirective } from "./directives/annotationEv.directive";
 import { ShareModule } from "src/share";
-import { StateModule } from "src/state";
+import { MainState, StateModule } from "src/state";
 import { RoutedAnnotationService } from "./routedAnnotation.service";
+import { INIT_ROUTE_TO_STATE } from "src/util/injectionTokens";
+import { Router } from "@angular/router";
+import { DECODE_ENCODE, DecodeEncode } from "src/routerModule/util";
+import { userAnnotationRouteKey } from "./constants";
+import { RecursivePartial } from "src/util/recursivePartial";
 
 @NgModule({
   imports: [
@@ -58,6 +63,27 @@ import { RoutedAnnotationService } from "./routedAnnotation.service";
         return () => Promise.resolve()
       },
       deps: [ RoutedAnnotationService ],
+      multi: true
+    },
+    {
+      provide: INIT_ROUTE_TO_STATE,
+      useFactory: (router: Router, decodeCustomState: DecodeEncode) => {
+        return async (fullPath: string) => {
+          const customState = decodeCustomState.decodeCustomState(
+            router.parseUrl(fullPath)
+          ) || {}
+          if (userAnnotationRouteKey in customState) {
+            const partial: RecursivePartial<MainState> = {
+              "[state.atlasSelection]": {
+                viewerMode: "annotating"
+              }
+            }
+            return Promise.resolve(partial)
+          }
+          return Promise.resolve({})
+        }
+      },
+      deps: [Router, DECODE_ENCODE],
       multi: true
     }
   ]
