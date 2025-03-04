@@ -107,7 +107,7 @@ export class AnnotationLayer {
         transform: affine,
       }
     )
-    const layer = viewer.layerManager.addManagedLayer(layerSpec)
+    const _layer = viewer.layerManager.addManagedLayer(layerSpec)
     const mouseState = viewer.mouseState
     const res: () => void = mouseState.changed.add(() => {
       const payload = mouseState.active
@@ -124,9 +124,10 @@ export class AnnotationLayer {
 
     // TODO registerdisposer seems to fire without the layer been removed
     // Thus it cannot be relied upon for cleanup
-    layer.layer.registerDisposer(() => {
+    // 
+    // _layer.layer.registerDisposer(() => {
 
-    })
+    // })
     NehubaLayerControlService.RegisterLayerName(this.name)
   }
   async setVisible(flag: boolean){
