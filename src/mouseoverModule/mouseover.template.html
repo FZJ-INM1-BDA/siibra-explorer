@@ -1,14 +1,21 @@
 <mat-list>
     <ng-template ngFor [ngForOf]="messages$ | async" let-message>
 
-        <ng-template [ngIf]="message.fontIcon && message.fontSet" [ngIfElse]="noIconTmpl">
+        <ng-template [ngIf]="message.materialIcon">
+            <mat-list-item class="h-auto">
+                <mat-icon class="centered" matListItemIcon>{{ message.materialIcon }}</mat-icon>
+                <span matListItemTitle>{{ message.message }}</span>
+            </mat-list-item>
+        </ng-template>
+
+        <ng-template [ngIf]="message.fontIcon && message.fontSet">
             <mat-list-item class="h-auto">
                 <span [class]="message.fontSet + ' centered ' + message.fontIcon" matListItemIcon></span>
                 <span matListItemTitle>{{ message.message }}</span>
             </mat-list-item>
         </ng-template>
 
-        <ng-template #noIconTmpl>
+        <ng-template [ngIf]="!message.materialIcon && !(message.fontIcon && message.fontSet)">
             <mat-list-item class="h-auto">
                 <span matListItemTitle>{{ message.message }}</span>
             </mat-list-item>

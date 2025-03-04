@@ -1,7 +1,7 @@
-import { Directive, EventEmitter, Input, Output } from "@angular/core";
+import { Directive, EventEmitter, Inject, Input, OnDestroy, OnInit, Optional, Output } from "@angular/core";
 import { catchError, filter, map, shareReplay, switchMap, tap } from "rxjs/operators";
 import { SandsToNumPipe } from "./sandsToNum.pipe"
-import { BehaviorSubject, combineLatest, concat, EMPTY, Observable, of } from "rxjs";
+import { BehaviorSubject, combineLatest, concat, EMPTY, Observable, of, Subscription } from "rxjs";
 import { TFace, TSandsPoint } from "src/util/types";
 import { SxplrParcellation, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { PathReturn } from "src/atlasComponents/sapi/typeV3";
@@ -9,6 +9,8 @@ import { EXPECTED_SIIBRA_API_VERSION, SAPI } from "src/atlasComponents/sapi/sapi
 import { TZipFileConfig } from "src/zipFilesOutput/type";
 import { environment } from "src/environments/environment"
 import { translateRegionName } from "src/atlasComponents/sapi/translateV3";
+import { AnnotationLayer } from "src/atlasComponents/annotations";
+import { CLICK_INTERCEPTOR_INJECTOR, ClickInterceptor, HOVER_INTERCEPTOR_INJECTOR, HoverInterceptor } from "src/util/injectionTokens";
 
 const pipe = new SandsToNumPipe()
 
@@ -24,7 +26,79 @@ const LABELLED_MAP_ASSIGNMENT_REGRESSION = `Labelled point assignment is current
   exportAs: 'ptAsgmt'
 })
 
-export class PointAssignmentDirective {
+export class PointAssignmentDirective implements OnDestroy, OnInit{
+  #sub: Subscription[] = []
+  #destroyCb: (() => void)[] = []
+  #annotLayerName = "ptAsmtLayerName"
+  #pointId = `${this.#annotLayerName}-pt`
+  #layer: AnnotationLayer
+  #onHoverSub: Subscription
+  #hovered = false
+
+  @Output()
+  onAnnotationClick = new EventEmitter()
+
+  ngOnDestroy(): void {
+    this.#layer.dispose()
+    this.#layer = null
+    while (this.#sub.length > 0) {
+      this.#sub.pop().unsubscribe()
+    }
+    if (this.#onHoverSub) {
+      this.#onHoverSub.unsubscribe()
+    }
+  }
+
+  ngOnInit(): void {
+    this.#sub.push(
+      this.point$.subscribe(pt => {
+        if (!pt) {
+          return
+        }
+        if (!this.#layer) {
+          this.#layer = new AnnotationLayer(this.#annotLayerName, "#ff0000")
+        }
+        
+        this.#layer.updateAnnotation({
+          point: pt.coordinates.map(v => v.value) as [number, number, number],
+          type: "point",
+          id: this.#pointId
+        })
+
+        const message = {
+          message: "",
+          materialIcon: "place"
+        }
+
+        if (!this.#onHoverSub) {
+          this.#onHoverSub = this.#layer.onHover.subscribe(hovered => {
+            this.#hovered = !!hovered
+
+            if (this.hoverInterceptor) {
+              if (this.#hovered) {
+                message.message = `Selected point (${pt.coordinates.map(v => (v.value / 1e6).toFixed(2)).join(", ")}) mm`
+                this.hoverInterceptor.append(message)
+              } else {
+                this.hoverInterceptor.remove(message)
+              }
+            }
+
+            if (this.clickInterceptor) {
+              const fn = (arg: unknown) => {
+                if (this.#hovered){
+                  this.onAnnotationClick.emit(arg)
+                  return false
+                }
+                return true
+              }
+              this.#destroyCb.push(() => this.clickInterceptor.deregister(fn))
+              this.clickInterceptor.register(fn)
+            }
+          })
+        }
+      })
+    )
+  }
   
   #busy$ = new BehaviorSubject<typeof DOING_PROB_ASGMT | typeof DOING_LABEL_ASGMT>(null)
   busy$ = this.#busy$.asObservable()
@@ -171,7 +245,13 @@ ${warningMsg}`
   )
 
 
-  constructor(protected sapi: SAPI){
+  constructor(
+    protected sapi: SAPI,
+    @Optional() @Inject(HOVER_INTERCEPTOR_INJECTOR) 
+    protected hoverInterceptor: HoverInterceptor,
+    @Optional() @Inject(CLICK_INTERCEPTOR_INJECTOR)
+    protected clickInterceptor: ClickInterceptor,
+  ){
 
   }
 

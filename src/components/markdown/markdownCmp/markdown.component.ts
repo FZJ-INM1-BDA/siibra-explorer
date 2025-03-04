@@ -6,7 +6,7 @@ import * as showdown from 'showdown'
   selector : 'markdown-dom',
   templateUrl : `./markdown.template.html`,
   styleUrls : [
-    `./markdown.style.css`,
+    `./markdown.style.scss`,
   ],
   changeDetection : ChangeDetectionStrategy.OnPush,
 })
@@ -16,7 +16,8 @@ export class MarkdownDom implements OnChanges {
   @Input() public markdown: string = ``
   public innerHtml: string = ``
   private converter = new showdown.Converter({
-    tables: true
+    tables: true,
+    openLinksInNewWindow: true
   })
 
   constructor(
@@ -37,9 +38,12 @@ export class MarkdownDom implements OnChanges {
     const innerHtml = this.converter.makeHtml(
       this.getMarkdown()
     )
+
+    // TODO move this to an actual pipeline
+    const iconHtml = innerHtml.replace(/<\/a>/g, `<span class="material-icons sxplr-fs-100">open_in_new</span></a>`)
     this.innerHtml = this.ds.sanitize(
       SecurityContext.HTML,
-      innerHtml
+      iconHtml
     )
     this.cdr.detectChanges()
   }

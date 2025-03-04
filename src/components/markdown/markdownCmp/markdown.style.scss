@@ -1,0 +1,22 @@
+:host
+{
+  display: block;
+}
+
+::ng-deep img
+{
+  max-width: 100%;
+}
+
+// color: hsl(332, 79%, 58%)!important;
+
+:host-context([darktheme="true"])
+{
+  :host
+  {
+    ::ng-deep code
+    {
+      color: hsl(332, 79%, 68%)!important;
+    }
+  }
+}

@@ -1,9 +1,0 @@
-:host
-{
-  display: block;
-}
-
-::ng-deep img
-{
-  max-width: 100%;
-}

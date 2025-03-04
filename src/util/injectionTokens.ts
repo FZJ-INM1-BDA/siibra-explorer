@@ -24,6 +24,7 @@ export const HOVER_INTERCEPTOR_INJECTOR = new InjectionToken<HoverInterceptor>("
 export type THoverConfig = {
   fontSet?: string
   fontIcon?: string
+  materialIcon?: string
   message: string
 }
 

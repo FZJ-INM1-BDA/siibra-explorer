@@ -1,9 +1,10 @@
-import { Component, TemplateRef } from '@angular/core';
+import { Component, Inject, Optional, TemplateRef } from '@angular/core';
 import { Clipboard, MatDialog, MatDialogRef, MatSnackBar } from 'src/sharedModules/angularMaterial.exports';
 import { SAPI } from 'src/atlasComponents/sapi/sapi.service';
 import { Store } from '@ngrx/store';
 import { atlasSelection } from 'src/state';
 import { PointAssignmentDirective } from '../point-assignment.directive';
+import { CLICK_INTERCEPTOR_INJECTOR, ClickInterceptor, HOVER_INTERCEPTOR_INJECTOR, HoverInterceptor } from 'src/util/injectionTokens';
 
 
 @Component({
@@ -17,8 +18,12 @@ export class PointAssignmentComponent extends PointAssignmentDirective {
     private store: Store,
     private clipboard: Clipboard,
     private snackbar: MatSnackBar,
+    @Optional() @Inject(HOVER_INTERCEPTOR_INJECTOR) 
+    hoverInterceptor: HoverInterceptor,
+    @Optional() @Inject(CLICK_INTERCEPTOR_INJECTOR)
+    clickInterceptor: ClickInterceptor,
   ) {
-    super(sapi)  
+    super(sapi, hoverInterceptor, clickInterceptor)
   }
 
   #dialogRef: MatDialogRef<unknown>

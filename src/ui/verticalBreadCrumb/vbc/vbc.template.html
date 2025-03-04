@@ -271,6 +271,7 @@
                 <sxplr-assignment-view-simple
                     (clickOnRegionName)="handleClickRegionName($event.target, $event.event.ctrlKey)"
                     point-assignment
+                    (onAnnotationClick)="selPtExpPanel.open(); show.emit($event)"
                     #ptAsgmt="ptAsgmt"
                     [point]="view.selectedPoint"
                     [template]="view.selectedATP.template"

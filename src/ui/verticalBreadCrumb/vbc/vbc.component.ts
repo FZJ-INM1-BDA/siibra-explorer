@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, Inject, Optional, ViewChild } from "@angular/core";
+import { ChangeDetectionStrategy, Component, EventEmitter, inject, Inject, Optional, Output, ViewChild } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { BehaviorSubject, combineLatest, merge, Observable, of, Subject } from "rxjs";
 import { debounceTime, distinctUntilChanged, filter, map, switchMap, take, takeUntil, withLatestFrom } from "rxjs/operators";
@@ -52,6 +52,9 @@ function validateNumbers(input: (number|null|undefined)[]): input is number[]{
 })
 
 export class VerticalBreadCrumbComponent {
+
+  @Output()
+  show = new EventEmitter()
 
   @ViewChild('parcExpPanel')
   private parcExpPanel: MatExpansionPanel
@@ -405,6 +408,7 @@ export class VerticalBreadCrumbComponent {
       distinctUntilChanged(arrayEqual((o, n) => o.name === n.name)),
       filter(regions => regions.length > 0)
     ).subscribe(() => {
+      this.show.emit({})
       if (this.regExpPanel) {
         this.regExpPanel.open()
       }
