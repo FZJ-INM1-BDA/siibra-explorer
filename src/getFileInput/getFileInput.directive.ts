@@ -14,30 +14,39 @@ export class FileInputDirective implements IFileInputConfig{
   title = 'Import'
 
   @Input('file-input-directive-text')
-  allowText = false
+  allowText: boolean|string = false
 
   @Input('file-input-directive-file')
-  allowFile = true
+  allowFile: boolean|string = true
+  
+  @Input('file-input-directive-file-ext')
+  allowFileExt: string = "*"
+
+  @Input('file-input-directive-url')
+  allowUrl: boolean|string = false
 
   @Input('file-input-directive-message')
   messageTmpl: TemplateRef<any>
 
   @Output('file-input-directive')
-  evtEmitter = new EventEmitter<TFileInputEvent<'text' | 'file'>>()
+  evtEmitter = new EventEmitter<TFileInputEvent<'text' | 'file' | 'url'>>()
 
   private dialogRef: MatDialogRef<FileInputModal>
 
   @HostListener('click')
   handleClick(){
-    const { title, allowText, allowFile, messageTmpl } = this
+    const { title, allowText, allowFile, messageTmpl, allowUrl, allowFileExt } = this
     this.dialogRef = this.dialog.open(FileInputModal, {
       width: '65vw',
       data: {
+        allowUrl,
         allowText,
         allowFile,
         title,
         messageTmpl,
-      }
+        allowFileExt,
+      },
+      autoFocus: true
     })
     const evSub = this.dialogRef.componentInstance.evtEmitter.subscribe(
       (ev: TFileInputEvent<"text" | "file">) => this.evtEmitter.emit(ev)

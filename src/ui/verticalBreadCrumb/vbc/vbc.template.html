@@ -364,6 +364,10 @@
                             <mat-icon>dataset_linked</mat-icon>
                         </ng-template>
                     </mat-panel-title>
+                    
+                    <mat-panel-description *ngIf="!selFtExpPanel.expanded">
+                        {{ selectedFeature.name }}
+                    </mat-panel-description>
 
                     <button mat-icon-button
                         [matTooltip]="view.labels.CLEAR_SELECTED_FEATURE"
@@ -440,6 +444,73 @@
 
                 </ng-template>
                 
+            </mat-expansion-panel>
+        </ng-template>
+
+        <!-- custom layers -->
+        <ng-template ngFor [ngForOf]="view.customLayers" let-customLayer>
+            <mat-expansion-panel hideToggle
+                [expanded]="true"
+                #customLExpPanel="matExpansionPanel">
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        <ng-template [ngIf]="!customLExpPanel.expanded">
+                            <ng-template [ngIf]="customLayer.source | isLocalBlob">
+                                <mat-icon>cloud_off</mat-icon>
+                            </ng-template>
+                            <ng-template [ngIf]="!(customLayer.source | isLocalBlob)">
+                                <mat-icon>cloud</mat-icon>
+                            </ng-template>
+                        </ng-template>
+                        <ng-template [ngIf]="customLExpPanel.expanded">
+                            {{ customLayer?.meta?.filename || 'Custom Layer' }}
+                        </ng-template>
+                    </mat-panel-title>
+                    <mat-panel-description *ngIf="!customLExpPanel.expanded">
+                        {{ customLayer.source }}
+                    </mat-panel-description>
+                    <button mat-icon-button
+                        [matTooltip]="view.labels.CLEAR_OVERLAY"
+                        color="warn"
+                        (click)="removeCustomLayer(customLayer.id)"
+                        >
+                        <mat-icon>clear</mat-icon>
+                    </button>
+                </mat-expansion-panel-header>
+                <ng-layer-ctl [ng-layer-ctl-name]="customLayer.id">
+                </ng-layer-ctl>
+
+                <mat-divider></mat-divider>
+                <div class="sxplr-d-flex">
+
+                    <ng-template [ngIf]="customLayer.source | isLocalBlob"
+                        [ngIfElse]="isCloudTmpl">
+                        <button mat-icon-button
+                            [matTooltip]="view.labels.LOCAL_FILE_EXPLAINER">
+                            <mat-icon>cloud_off</mat-icon>
+                        </button>
+                    </ng-template>
+
+                    <ng-template #isCloudTmpl>
+                        <button mat-icon-button
+                            [matTooltip]="view.labels.CLOUD_FILE_EXPLAINER">
+                            <mat-icon>cloud</mat-icon>
+                        </button>
+                    </ng-template>
+
+                    <ng-template [ngIf]="customLayer?.meta?.messages || []" let-messages>
+                        <button mat-icon-button
+                            color="warn"
+                            [matTooltip]="view.labels.WARN"
+                            sxplr-dialog
+                            [sxplr-dialog-data]="{
+                                title: view.labels.WARN,
+                                descMd: messages | concat
+                            }">
+                            <mat-icon>warning</mat-icon>
+                        </button>
+                    </ng-template>
+                </div>
             </mat-expansion-panel>
         </ng-template>
         

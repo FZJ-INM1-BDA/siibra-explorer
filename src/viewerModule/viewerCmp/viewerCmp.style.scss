@@ -143,3 +143,29 @@ sxplr-vertical-bread-crumb
   overflow: auto;
   pointer-events: all;
 }
+
+.add-layer-container
+{
+  display: flex;
+  justify-content: center;
+  margin-top: 0.25rem;
+
+  &> button
+  {
+    pointer-events: all;
+  }
+}
+
+.add-layer-card
+{
+  & .add-layer-radio-group
+  {
+    display: flex;
+    flex-direction: column;
+
+    & > :not(mat-radio-button)
+    {
+      margin-left: 3rem;
+    }
+  }
+}

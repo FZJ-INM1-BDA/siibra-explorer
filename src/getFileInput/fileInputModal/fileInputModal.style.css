@@ -13,10 +13,19 @@
   border: 2px dashed rgba(128,128,128,0.4);
   opacity: 0.7;
   transition: opacity 200ms ease-in-out;
+
+  padding: 0.5rem 1rem;
 }
 
 .file-input-label:hover
 {
   cursor: pointer;
   opacity: 1.0;
+}
+
+.file-input-label .label
+{
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0.5rem;
 }

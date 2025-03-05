@@ -89,6 +89,26 @@
     <sxplr-vertical-bread-crumb class="sxplr-d-block sxplr-overflow-y-auto mat-elevation-z1"
       (show)="controlHalfNav(true)">
     </sxplr-vertical-bread-crumb>
+
+    <ng-template sxplrExperimentalFlag [experimental]="true">
+    <div class="add-layer-container">
+      <ng-template #inputUserLayerTmpl>
+        <markdown-dom [markdown]="view.labels.ADD_LAYER_DESC"></markdown-dom>
+      </ng-template>
+      <button mat-mini-fab color="primary"
+        [matTooltip]="view.labels.ADD_LAYER"
+        (file-input-directive)="loadUserLayer($event); fileinput.dismiss()"
+        [file-input-directive-file]="view.labels.ADD_LOCAL_FILE_DESC"
+        file-input-directive-file-ext=".nii,.nii.gz"
+        [file-input-directive-text]="false"
+        [file-input-directive-url]="view.labels.ADD_REMOTE_URL_PLACEHOLDER"
+        [file-input-directive-message]="inputUserLayerTmpl"
+        [file-input-directive-title]="view.labels.ADD_LAYER_TITLE"
+        #fileinput="fileInputDirective">
+        <mat-icon>add</mat-icon>
+      </button>
+    </div>
+    </ng-template>
   </div>
   
   <sxplr-tab *ngIf="!!view.selectedTemplate"

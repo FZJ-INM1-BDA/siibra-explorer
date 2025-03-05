@@ -24,6 +24,8 @@ import { CommonModule } from "@angular/common";
 import { DfToDsPipe } from './df-to-ds.pipe';
 import { PrettyPresentPipe } from './pretty-present.pipe';
 import { DedupPipe } from "./pipes/dedup.pipe";
+import { IsLocalBlob as IsLocalBlobPipe } from "./pipes/isLocalBlob.pipe";
+import { ConcatPipe } from "./pipes/concat.pipe";
 
 @NgModule({
   imports:[
@@ -54,6 +56,8 @@ import { DedupPipe } from "./pipes/dedup.pipe";
     DfToDsPipe,
     PrettyPresentPipe,
     DedupPipe,
+    IsLocalBlobPipe,
+    ConcatPipe,
   ],
   exports: [
     StopPropagationDirective,
@@ -78,6 +82,8 @@ import { DedupPipe } from "./pipes/dedup.pipe";
     DfToDsPipe,
     PrettyPresentPipe,
     DedupPipe,
+    IsLocalBlobPipe,
+    ConcatPipe,
   ]
 })
 

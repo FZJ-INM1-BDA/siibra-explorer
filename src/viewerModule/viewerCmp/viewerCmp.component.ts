@@ -17,6 +17,9 @@ import { wait } from "src/util/fn";
 import { DestroyDirective } from "src/util/directives/destroy.directive";
 import { generalActionError } from "src/state/actions";
 import { enLabels } from "src/uiLabels";
+import { UserLayerService } from "../nehuba/userLayers/service";
+import { TFileInputEvent } from "src/getFileInput/type";
+import { MatSnackBar } from "src/sharedModules";
 
 interface HasName {
   name: string
@@ -216,6 +219,8 @@ export class ViewerCmp {
     private dialogSvc: DialogService,
     private cdr: ChangeDetectorRef,
     private sapi: SAPI,
+    private snackbar: MatSnackBar,
+    private userLayerSvc: UserLayerService,
   ){
 
     this.view$.pipe(
@@ -557,5 +562,26 @@ export class ViewerCmp {
     if (event.type === EnumViewerEvt.VIEWER_CTX) {
       this.ctxMenuSvc.deepMerge(event.data)
     }
+  }
+
+  loadUserLayer(input: TFileInputEvent<'text' | 'file' | 'url'>){
+    if (input.type === "file") {
+      const files = (input as TFileInputEvent<"file">).payload.files
+      if (files.length !== 1) {
+        this.snackbar.open(`Can only handle one and only one file. You supplied ${files.length} files.`, "Dismiss")
+        return
+      }
+      this.userLayerSvc.handleUserInput(files[0])
+      return
+    }
+    if (input.type === "url") {
+      let url = (input as TFileInputEvent<"url">).payload.url
+      if (!url.startsWith("x-overlay-layer")) {
+        url = `x-overlay-layer://${url}`
+      }
+      this.userLayerSvc.handleUserInput(url)
+      return
+    }
+    this.snackbar.open(`Cannot handle input`, "Dismiss")
   }
 }

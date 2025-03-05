@@ -1,6 +1,7 @@
 <h2 mat-dialog-title>
   {{ title }}
 </h2>
+<form>
 <mat-dialog-content>
   <ng-template [ngIf]="messageTmpl" [ngIfElse]="defaultMessageTmpl" [ngTemplateOutlet]="messageTmpl">
   </ng-template>
@@ -11,6 +12,18 @@
 
   <div class="w-100 d-flex">
 
+    <!-- url input -->
+     <mat-form-field *ngIf="allowUrl" class="flex-grow-1 flex-shrink-1 w-0">
+      <mat-label>
+        URL
+      </mat-label>
+      <input type="text"
+        matInput
+        [(ngModel)]="urlInput"
+        [placeholder]="urlPlaceholder"
+        [ngModelOptions]="{standalone: true}">
+     </mat-form-field>
+
     <!-- text input -->
     <mat-form-field *ngIf="allowText"
       class="flex-grow-1 flex-shrink-1 w-0">
@@ -20,7 +33,8 @@
       <textarea matInput
         [(ngModel)]="textInput"
         rows="5"
-        placeholder="Text Input"></textarea>
+        placeholder="Text Input"
+        [ngModelOptions]="{standalone: true}"></textarea>
     </mat-form-field>
 
     <!-- file-input -->
@@ -28,7 +42,7 @@
       (drag-drop-file)="handleFileDrop($event)">
       <label for="file-input" class="file-input-label w-100 h-100">
         <i [ngClass]="hasFileInput ? 'fa-file' : 'fa-folder-open'" class="fas"></i>
-        <span class="ml-2">
+        <span class="label">
           {{ fileInputLabel }}
         </span>
       </label>
@@ -37,6 +51,7 @@
         class="position-absolute left-0 tosxplr-p-0 w-0 h-0 invisible"
         name="file-input"
         id="file-input"
+        [accept]="allowFileExt"
         #fileInput>
     </div>
   </div>
@@ -44,12 +59,15 @@
 
 <mat-dialog-actions align="end">
   <button mat-raised-button
+    action="submit"
     (click)="runImport()"
     [disabled]="!importable"
-    color="primary">
+    color="primary"
+    #confirm="matButton">
     Import
   </button>
   <button mat-button mat-dialog-close>
     Close
   </button>
 </mat-dialog-actions>
+</form>

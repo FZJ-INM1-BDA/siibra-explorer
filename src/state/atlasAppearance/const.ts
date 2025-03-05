@@ -3,10 +3,18 @@ export const nameSpace = `[state.atlasAppearance]`
 
 type CustomLayerBase = {
   id: string
+  meta?: {
+    filename?: string
+    messages?: string[]
+  }
 }
 
 type NgLayerBase = {
   clType: 'customlayer/nglayer' | 'baselayer/nglayer'
+} & CustomLayerBase
+
+export type GenericCustomLayer = {
+  clType: 'customlayer/generic'
 } & CustomLayerBase
 
 export type ColorMapCustomLayer = {
@@ -74,7 +82,7 @@ export type NgLayerCustomLayer = NewNgLayerOption | OldNgLayerCustomLayer
  * - clType facilitates viewer on how to interprete the custom layer
  * - id allows custom layer to be removed, if necessary
  */
-export type CustomLayer = ColorMapCustomLayer | NgLayerCustomLayer | ThreeSurferCustomLayer | ThreeSurferCustomLabelLayer
+export type CustomLayer = ColorMapCustomLayer | NgLayerCustomLayer | ThreeSurferCustomLayer | ThreeSurferCustomLabelLayer | GenericCustomLayer
 
 export const useViewer = {
   THREESURFER: "THREESURFER",

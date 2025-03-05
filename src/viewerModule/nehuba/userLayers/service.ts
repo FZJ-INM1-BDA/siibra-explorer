@@ -1,7 +1,7 @@
 import { Injectable, OnDestroy } from "@angular/core"
 import { select, Store } from "@ngrx/store"
 import { forkJoin, from, Subscription } from "rxjs"
-import { distinctUntilChanged, filter } from "rxjs/operators"
+import { distinctUntilChanged, filter, map, pairwise } from "rxjs/operators"
 import {
   linearTransform,
   TVALID_LINEAR_XFORM_DST,
@@ -13,12 +13,12 @@ import * as atlasAppearance from "src/state/atlasAppearance"
 import { EnumColorMapName } from "src/util/colorMaps"
 import { getShader, getShaderFromMeta, noop } from "src/util/fn"
 import { getExportNehuba, getUuid } from "src/util/fn"
-import { UserLayerInfoCmp } from "./userlayerInfo/userlayerInfo.component"
 import { translateV3Entities } from "src/atlasComponents/sapi/translateV3"
 import { MetaV1Schema } from "src/atlasComponents/sapi/typeV3"
 import { AnnotationLayer } from "src/atlasComponents/annotations"
 import { rgbToHex } from 'common/util'
-import { MatDialogRef, MatDialog, MatSnackBar } from "src/sharedModules/angularMaterial.exports"
+import { MatDialogRef, MatSnackBar } from "src/sharedModules/angularMaterial.exports"
+import { arrayEqual } from "src/util/array"
 
 type LayerOption = Omit<atlasAppearance.const.OldNgLayerCustomLayer, "clType" | "id" | "source"> | Omit<atlasAppearance.const.NewNgLayerOption, "id" | "clType">
 
@@ -164,6 +164,7 @@ export class UserLayerService implements OnDestroy {
   )
   async processOverlayPath(source: string) {
     const strippedSrc = source.replace(OVERLAY_LAYER_PROTOCOL, "")
+    this.routerSvc.setCustomRoute(OVERLAY_LAYER_KEY, strippedSrc)
     const { cleanup, ...rest } = await this.#processInput(strippedSrc)
     return {
       ...rest,
@@ -171,6 +172,32 @@ export class UserLayerService implements OnDestroy {
         this.routerSvc.setCustomRoute(OVERLAY_LAYER_KEY, null)
         cleanup()
       }
+    }
+  }
+  @RegisterSource(
+    async input => typeof input === "string" && input.startsWith("nifti://")
+  )
+  async processRemoteNii(source: string): Promise<ProcessorOutput>{
+    const url = source.replace(/^nifti:\/\//, "")
+    return {
+      cleanup: noop,
+      meta: {
+        filename: source,
+        messages: [
+          `The image may be displayed incorrectly if xyzt_unit header is not set`,
+          `The image will not be displayed if the image is in float64`,
+        ]
+      },
+      option: {
+        legacySpecFlag: "old",
+        shader: getShader({
+          colormap: EnumColorMapName.MAGMA,
+          removeBg: true
+        }),
+        opacity: 0.5,
+      },
+      protocol: "nifti://",
+      url
     }
   }
 
@@ -331,6 +358,8 @@ export class UserLayerService implements OnDestroy {
         point: triplet.map(v => v) as [number, number, number]
       })))
     }
+    // TODO also return a custom layer
+    // so it can be shown in the overlay
     return {
       cleanup: () => {
         for (const layer of layers){
@@ -362,6 +391,9 @@ export class UserLayerService implements OnDestroy {
       type: "point",
       point: line.split(" ").map(v => parseFloat(v)*1e6) as [number, number, number],
     })))
+    
+    // TODO also return a custom layer
+    // so it can be shown in the overlay
     return {
       cleanup: () => {
         layer.dispose()
@@ -386,10 +418,10 @@ export class UserLayerService implements OnDestroy {
 
   async handleUserInput(input: ValidInputTypes){
     try {
-      const id = getUuid()
       const { option, protocol, url, meta, cleanup } = await this.#processInput(input)
+      const id = url
       if (this.#idToCleanup.has(id)) {
-        throw new Error(`${url} was already registered`)
+        return
       }
       this.#idToCleanup.set(id, cleanup)
       this.addUserLayer(
@@ -416,6 +448,7 @@ export class UserLayerService implements OnDestroy {
         id,
         clType: "customlayer/nglayer" as const,
         source,
+        meta,
         ...options,
       }
       this.store$.dispatch(
@@ -429,37 +462,11 @@ export class UserLayerService implements OnDestroy {
       this.#dialogRef.close()
       this.#dialogRef = null
     }
-    this.#dialogRef = this.dialog.open(UserLayerInfoCmp, {
-      data: {
-        layerName: id,
-        filename: meta.filename,
-        warning: meta.messages || [],
-      },
-      hasBackdrop: false,
-      disableClose: true,
-      position: {
-        top: "0em",
-      },
-      autoFocus: false,
-      panelClass: ["no-padding-dialog", "w-100"],
-    })
-  
-    this.#dialogRef.afterClosed().subscribe(() => {
-      const cleanup = this.#idToCleanup.get(id)
-      cleanup && cleanup()
-      if (source) {
-        this.store$.dispatch(
-          atlasAppearance.actions.removeCustomLayer({ id })
-        )
-      }
-      this.#idToCleanup.delete(id)
-    })
   }
 
   #subscription: Subscription[] = []
   constructor(
     private store$: Store,
-    private dialog: MatDialog,
     private worker: AtlasWorkerService,
     private routerSvc: RouterService,
     private snackbar: MatSnackBar,
@@ -470,7 +477,24 @@ export class UserLayerService implements OnDestroy {
       ).pipe(
         distinctUntilChanged(),
         filter(url => !!url)
-      ).subscribe(url => this.handleUserInput(url))
+      ).subscribe(url => this.handleUserInput(`${OVERLAY_LAYER_PROTOCOL}${url}`)),
+      this.store$.pipe(
+        select(atlasAppearance.selectors.customLayers),
+        map(layers => layers.filter(l => l.clType === "customlayer/nglayer")),
+        distinctUntilChanged(arrayEqual((o, n) => o.id === n.id)),
+        pairwise(),
+      ).subscribe(([ prev, curr ]) => {
+        const prevIds = prev.map(v => v.id)
+        const newIds = curr.map(v => v.id)
+        for (const id of prevIds) {
+          if (newIds.includes(id)) {
+            continue
+          }
+          if (this.#idToCleanup.has(id)) {
+            this.#idToCleanup.get(id)()
+          }
+        }
+      })
     )
   }
 

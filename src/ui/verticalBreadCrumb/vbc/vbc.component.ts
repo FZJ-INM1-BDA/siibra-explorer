@@ -173,10 +173,15 @@ export class VerticalBreadCrumbComponent {
     ),
     this.store$.pipe(
       select(atlasSelection.selectors.selectedPoint),
+    ),
+    this.store$.pipe(
+      select(atlasAppearance.selectors.customLayers),
+      map(layers => layers.filter(l => l.clType === "customlayer/nglayer") as atlasAppearance.const.NgLayerCustomLayer[]),
+      distinctUntilChanged(arrayEqual((o, n) => o.id === n.id)),
     )
   ]).pipe(
-    map(([ selectedFeature, selectedPoint ]) => {
-      return { selectedFeature, selectedPoint }
+    map(([ selectedFeature, selectedPoint, customLayers ]) => {
+      return { selectedFeature, selectedPoint, customLayers }
     })
   )
 
@@ -188,7 +193,7 @@ export class VerticalBreadCrumbComponent {
     this.#spaceStates$,
     this.#userSelected$,
   ]).pipe(
-    map(([selectedATP, selectedRegions, {noGroupParcs, groupParcs, templates, parcellations }, {allAvailableRegions, labelMappedRegionNames}, { currentViewport }, { selectedFeature, selectedPoint}]) => {
+    map(([selectedATP, selectedRegions, {noGroupParcs, groupParcs, templates, parcellations }, {allAvailableRegions, labelMappedRegionNames}, { currentViewport }, { selectedFeature, selectedPoint, customLayers}]) => {
       
       return {
         selectedATP,
@@ -202,6 +207,7 @@ export class VerticalBreadCrumbComponent {
         currentViewport,
         selectedFeature,
         selectedPoint,
+        customLayers,
       }
     })
   )
@@ -264,6 +270,7 @@ export class VerticalBreadCrumbComponent {
         currentViewport,
         selectedFeature,
         selectedPoint,
+        customLayers,
       },
       { useViewer },
       { labels, showExperimental, minimizedCards, parcellationVisible, maximizedCard, }]) => {
@@ -271,7 +278,7 @@ export class VerticalBreadCrumbComponent {
       const parentIds = new Set(allAvailableRegions.flatMap(v => v.parentIds))
 
       return {
-        selectedATP, selectedRegions, templates, parcellations, atlases, noGroupParcs, groupParcs, allAvailableRegions, labelMappedRegionNames, currentViewport, selectedFeature, selectedPoint, labels, minimizedCards, useViewer, parcellationVisible, showExperimental,
+        selectedATP, selectedRegions, templates, parcellations, atlases, noGroupParcs, groupParcs, allAvailableRegions, labelMappedRegionNames, currentViewport, selectedFeature, selectedPoint, labels, minimizedCards, useViewer, parcellationVisible, showExperimental, customLayers,
         useAccordion: true, maximizedCard,
         leafRegions: allAvailableRegions.filter(r => !parentIds.has(r.id)),
         branchRegions: allAvailableRegions.filter(r => parentIds.has(r.id)),
@@ -475,6 +482,11 @@ export class VerticalBreadCrumbComponent {
   public clearFeature(){
     this.store$.dispatch(
       userInteraction.actions.clearShownFeature()
+    )
+  }
+  public removeCustomLayer(id: string){
+    this.store$.dispatch(
+      atlasAppearance.actions.removeCustomLayer({ id })
     )
   }
 

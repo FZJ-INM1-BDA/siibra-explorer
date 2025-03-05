@@ -18,6 +18,7 @@ export const enLabels = {
   CLEAR_SELECTED_POINT: "clear selected point",
   CLEAR_SELECTED_REGION: "clear selected region",
   CLEAR_SELECTED_FEATURE: "clear selected feature",
+  CLEAR_OVERLAY: "clear overlay",
   
   COPY_REGION_NAMES: "copy selected region names",
   COPY_CURRENT_POSITION: "copy the current position",
@@ -44,5 +45,23 @@ export const enLabels = {
   RESTORE_PANELS: 'restore panels',
 
   RELATED_DATASETS: "related datasets",
-  DOWNLOAD: "download"
+  DOWNLOAD: "download",
+
+  INFO: "info",
+  WARN: "warning",
+
+  LOCAL_FILE_TOOLTIP: "this is a local file",
+  LOCAL_FILE_EXPLAINER: "This is a local file. Shared URL will not contain this layer.",
+  CLOUD_FILE_TOOLTIP: "this is a cloud file",
+  CLOUD_FILE_EXPLAINER: "This is a cloud file. Shared URL will contain this layer.",
+
+  ADD_LAYER: "add a layer",
+  ADD_LAYER_TITLE: "Add a layer",
+  ADD_LAYER_DESC: `Enter the URL of a cloud resource, or select a local file to be overlayed. 
+
+Loaded local files stays local within your browser.`,
+
+  ADD_LOCAL_FILE_DESC: `Load a local file. It will stay on your computer. Supported extensions: .nii.gz, .nii.`,
+
+  ADD_REMOTE_URL_PLACEHOLDER: `e.g. precomputed://https://neuroglancer.humanbrainproject.eu/precomputed/BigBrainRelease.2015/8bit`,
 }

@@ -46,6 +46,7 @@ import { AtlasViewerRouterModule } from "src/routerModule";
 import { VerticalBreadCrumbModule } from "src/ui/verticalBreadCrumb";
 import { SxplrAnimationModule } from "src/ux";
 import { NgLayerCtrlCmp } from "./nehuba/nehubaViewerInterface/ngLayerCtl/ngLayerCtrl.component";
+import { FileInputModule } from "src/getFileInput/module";
 
 @NgModule({
   imports: [
@@ -81,6 +82,7 @@ import { NgLayerCtrlCmp } from "./nehuba/nehubaViewerInterface/ngLayerCtl/ngLaye
     FloatingMouseContextualContainerDirective,
     ExperimentalFlagDirective,
     TPBRViewCmp,
+    FileInputModule,
     
     ...(environment.ENABLE_LEAP_MOTION ? [LeapModule] : [])
   ],

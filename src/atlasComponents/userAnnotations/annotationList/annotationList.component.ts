@@ -112,7 +112,7 @@ export class AnnotationList {
     if (annotation) this.annotSvc.importAnnotation(annotation)
   }
 
-  async handleImportEvent(ev: TFileInputEvent<'text' | 'file'>){
+  async handleImportEvent(ev: TFileInputEvent<'text' | 'file' | "url">){
 
     const { abort } = this.dialogSvc.blockUserInteraction({
       title: CONST.LOADING_TXT,
