@@ -37,11 +37,11 @@ export class NehubaNavigationEffects implements OnDestroy{
       ),
       tap(([{ navigation: _navigation, animation, physical }, globalAnimationFlag, currentNavigation]) => {
         const navigation: Partial<{
-          position: number[];
-          orientation: number[];
-          zoom: number;
-          perspectiveOrientation: number[];
-          perspectiveZoom: number;
+          position: number[]
+          orientation: number[]
+          zoom: number
+          perspectiveOrientation: number[]
+          perspectiveZoom: number
         }> = {}
         for (const key in _navigation){
           if (_navigation[key] === null || typeof _navigation[key] === "undefined") {

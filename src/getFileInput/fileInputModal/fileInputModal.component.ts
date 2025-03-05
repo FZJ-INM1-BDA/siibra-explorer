@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, Inject, Input, OnChanges, Optional, SimpleChanges, TemplateRef, ViewChild } from "@angular/core";
+import { Component, ElementRef, EventEmitter, Inject, Input, OnChanges, Optional, TemplateRef, ViewChild } from "@angular/core";
 import { MAT_DIALOG_DATA } from "src/sharedModules/angularMaterial.exports";
 import { IFileInputConfig, TFileInputEvent } from "../type";
 

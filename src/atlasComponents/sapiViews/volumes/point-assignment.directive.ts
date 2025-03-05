@@ -39,8 +39,10 @@ export class PointAssignmentDirective implements OnDestroy, OnInit{
   onAnnotationClick = new EventEmitter()
 
   ngOnDestroy(): void {
-    this.#layer.dispose()
-    this.#layer = null
+    if (this.#layer) {
+      this.#layer.dispose()
+      this.#layer = null
+    }
     while (this.#sub.length > 0) {
       this.#sub.pop().unsubscribe()
     }
