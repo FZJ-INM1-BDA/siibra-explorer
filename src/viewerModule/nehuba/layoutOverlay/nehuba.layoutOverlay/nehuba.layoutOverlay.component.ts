@@ -219,6 +219,52 @@ export class NehubaLayoutOverlay implements OnDestroy{
     )
   )
 
+  async turn90(axis: AxisLabel){
+    const { orientation } = await this.store$.pipe(
+      select(atlasSelection.selectors.navigation),
+      take(1)
+    ).toPromise()
+
+    const { quat } = await this.#exportNehuba
+    const newOrientation = quat.clone(orientation)
+
+    for (const key in axis){
+      if (key === "S") {
+        quat.rotateZ(newOrientation, orientation, Math.PI / 2)
+        continue
+      }
+      if (key === "I") {
+        quat.rotateZ(newOrientation, orientation, - Math.PI / 2)
+        continue
+      }
+      if (key === "A") {
+        quat.rotateY(newOrientation, orientation, Math.PI / 2)
+        continue
+      }
+      if (key === "P") {
+        quat.rotateY(newOrientation, orientation, -Math.PI / 2)
+        continue
+      }
+      if (key === "R") {
+        quat.rotateX(newOrientation, orientation, Math.PI / 2)
+        continue
+      }
+      if (key === "L") {
+        quat.rotateX(newOrientation, orientation, -Math.PI / 2)
+        continue
+      }
+    }
+    
+    this.store$.dispatch(
+      atlasSelection.actions.navigateTo({
+        navigation: {
+          orientation: Array.from(newOrientation)
+        },
+        animation: true
+      })
+    )
+  }
+
   constructor(
     private store$: Store,
     private cdr: ChangeDetectorRef,

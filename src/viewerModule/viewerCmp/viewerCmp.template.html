@@ -91,7 +91,7 @@
     </sxplr-vertical-bread-crumb>
 
     <ng-template sxplrExperimentalFlag [experimental]="true">
-    <div class="add-layer-container">
+    <div *ngIf="view.useViewer === 'NEHUBA'" class="add-layer-container">
       <ng-template #inputUserLayerTmpl>
         <markdown-dom [markdown]="view.labels.ADD_LAYER_DESC"></markdown-dom>
       </ng-template>

@@ -46,12 +46,6 @@ export class KeyFrameCtrlCmp {
     })
   })
 
-  frameFormGrp = new FormGroup({
-    loop: new FormControl<boolean>(false),
-    linearCamera: new FormGroup<boolean>(false),
-    steps: new FormGroup({})
-  })
-
   constructor(
     private snackbar: MatSnackBar,
     @Optional() private viewerInternalSvc: ViewerInternalStateSvc

@@ -111,22 +111,27 @@
                 </mat-panel-description>
             </mat-expansion-panel-header>
 
-            <div class="title-1-container sxplr-custom-cmp hoverable"
-                mat-ripple
-                role="select"
-                [matTooltip]="view.labels.SELECTED_DIFFERENT_PARCELLATION"
-                [matMenuTriggerFor]="selectATPMenu"
-                [matMenuTriggerData]="{
-                    current: view.selectedATP.parcellation, 
-                    type: 'parcellationId',
-                    options: view.noGroupParcs,
-                    groupedOptions: view.groupParcs,
-                    getSubMenu: getSubParcellation,
-                    optionTemplate: parcellationOptTmpl
-                }">
-                <h4>
-                    {{ parcellation.name }}
-                </h4>
+            <div class="title-1-container">
+
+                <div class="title-1-container sxplr-custom-cmp hoverable"
+                    mat-ripple
+                    role="select"
+                    [matTooltip]="view.labels.SELECTED_DIFFERENT_PARCELLATION"
+                    [matMenuTriggerFor]="selectATPMenu"
+                    [matMenuTriggerData]="{
+                        current: view.selectedATP.parcellation, 
+                        type: 'parcellationId',
+                        options: view.noGroupParcs,
+                        groupedOptions: view.groupParcs,
+                        getSubMenu: getSubParcellation,
+                        optionTemplate: parcellationOptTmpl
+                    }">
+                    <h4>
+                        {{ parcellation.name }}
+                    </h4>
+
+                    <mat-icon>expand_more</mat-icon>
+                </div>
 
                 <ng-template [ngIf]="parcellation | isVersioned : view.parcellations">
                     <ng-template [ngIf]="parcellation | isNewest : view.parcellations"
@@ -153,7 +158,6 @@
                     </ng-template>
                 </ng-template>
                 
-                <mat-icon>expand_more</mat-icon>
             </div>
 
             <ng-template [ngTemplateOutlet]="parcRegionQuickSearchTmpl"></ng-template>
@@ -256,16 +260,27 @@
                 </mat-expansion-panel-header>
 
                 <ng-template [ngIf]="ptAsgmt.coordTxt$ | async" let-coordText>
-                    <div class="title-1-container sxplr-custom-cmp hoverable">
-                        <h4>
-                            {{ coordText }}
-                        </h4>
-                    </div>
+                    <h4>
+                        {{ coordText }}
+                    </h4>
+                </ng-template>
+                
+                <ng-template sxplrExperimentalFlag [experimental]="true">
+                <h5 class="sxplr-very-muted">
+                    {{ view.selectedATP.template.name }}
+                </h5>
+                <h5>assigned to</h5>
+                <h5 class="sxplr-very-muted">
+                    {{ view.selectedATP.parcellation.name }}
+                </h5>
+                <mat-divider></mat-divider>
                 </ng-template>
 
                 <ng-template [ngIf]="ptAsgmt.infoMsg$ | async" let-infoMsg>
+                    <ng-template sxplrExperimentalFlag [deprecated]="true">
                     <markdown-dom [markdown]="infoMsg"></markdown-dom>
                     <mat-divider></mat-divider>
+                    </ng-template>
                 </ng-template>
 
                 <sxplr-assignment-view-simple
@@ -384,12 +399,22 @@
                             {{ name }}
                         </h4>
                         
+                        <doi-template
+                            [showFooter]="false"
+                            [doi-template-data]="{
+                                title: null,
+                                desc: null,
+                                actions: fView.links | mapToProperty : 'href' | dedup,
+                                contributors: fView.contributors | dedup
+                            }">
+                        </doi-template>
+
                         <!-- special views -->
 
                         <!-- voi special view -->
                         <ng-template [ngIf]="fView.voi" let-voi>
                             <ng-layer-ctl
-                                [ng-layer-ctl-name]="voi.ngVolume.url"
+                                [ng-layer-ctl-name]="SXPLR_PREFIX + voi.ngVolume.url"
                                 [ng-layer-ctl-src]="voi.ngVolume.url"
                                 [ng-layer-ctl-transform]="voi.ngVolume.transform"
                                 [ng-layer-ctl-info]="voi.ngVolume.info"
@@ -587,92 +612,101 @@
             <mat-icon>info</mat-icon>
         </button>
 
-        <ng-template [ngIf]="view.currentViewport?.center" let-center>
+        <!-- 
+        only show
+        1/ copy coordinate
+        2/ point assignement
+        3/ spatial features
+        if we are in nehuba viewer
+        -->
+        <ng-template [ngIf]="view.useViewer === 'nehuba'">
+            <ng-template [ngIf]="view.currentViewport?.center" let-center>
 
-            <button
-                [matTooltip]="view.labels.COPY_CURRENT_POSITION"
-                mat-icon-button
-                [iav-clipboard-copy]="
-                    center
-                    | numbers : 3
-                    | addUnitAndJoin : 'mm' : ', '
-                ">
-                <i class="fas fa-copy"></i>
-            </button>
-
-            <button mat-icon-button
-                [matTooltip]="view.labels.POSITION_ASSIGNMENT"
-                (click)="assignPoint(center, view.selectedATP.template)"
-                >
-                <mat-icon>query_stats</mat-icon>
-            </button>
-        </ng-template>
-
-        <mat-divider [vertical]="true"></mat-divider>
-        
-        <div iav-switch #switchdir="iavSwitch">
-
-        </div>
-        <div sxplr-sapiviews-core-space-boundingbox
-            (sxplr-sapiviews-core-space-boundingbox-changed)="voiFeatureEntryCmp?.pullAll()"
-            [sxplr-sapiviews-core-space-boundingbox-atlas]="view.selectedATP.atlas"
-            [sxplr-sapiviews-core-space-boundingbox-space]="view.selectedATP.template"
-            [sxplr-sapiviews-core-space-boundingbox-spec]="view.currentViewport && [view.currentViewport.minpoint, view.currentViewport.maxpoint]"
-            #bbox="sxplrSapiViewsCoreSpaceBoundingBox"
-            >
-        </div>
-
-        <sxplr-feature-entry
-            class="sxplr-d-none"
-            [template]="view.selectedATP.template"
-            [bbox]="bbox.bbox$ | async | getProperty : 'bbox'"
-            [attr.data-feature-length]="((voiFeatureEntryCmp.features$ | async) || []).length"
-            #voiFeatureEntryCmp="featureEntryCmp">
-        </sxplr-feature-entry>
-        
-        <ng-template [ngIf]="(voiFeatureEntryCmp.totals$ | async) > 0">
-            <div *ngIf="switchdir.switchState$ | async"
-                voiBbox
-                [features]="voiFeatureEntryCmp.features$ | async">
-            </div>
-        </ng-template>
-
-        <button mat-icon-button
-            [color]="(switchdir.switchState$ | async) ? 'accent' : 'default'"
-            (click)="switchdir.toggle()"
-            [matTooltip]="view.labels.TOGGLE_SPATIAL_BOXES">
-            <i [class]="(switchdir.switchState$ | async) ? 'fas fa-lightbulb' : 'far fa-lightbulb'"></i>
-        </button>
-
-
-        <ng-template [ngIf]="voiFeatureEntryCmp.totals$ | async" let-totals>
-            
-            <ng-template [ngIf]="totals > 0">
-                
-                <ng-template #anchorTmpl>
-                    <tpbr-viewer [tpbr-concept]="voiFeatureEntryCmp.TPRBbox$ | async">
-                    </tpbr-viewer>
-                </ng-template>
-
+                <button
+                    [matTooltip]="view.labels.COPY_CURRENT_POSITION"
+                    mat-icon-button
+                    [iav-clipboard-copy]="
+                        center
+                        | numbers : 3
+                        | addUnitAndJoin : 'mm' : ', '
+                    ">
+                    <i class="fas fa-copy"></i>
+                </button>
+    
                 <button mat-icon-button
-                    [matTooltip]="view.labels.RELATED_DATASETS"
-                    [sxplr-dialog]="dumbFeatureDialogTmpl"
-                    [sxplr-dialog-config]="{
-                        autoFocus: true
-                    }"
-                    [sxplr-dialog-data]="{
-                        busy$: voiFeatureEntryCmp.busy$,
-                        features$: voiFeatureEntryCmp.features$,
-                        anchorTmpl: anchorTmpl
-                    }"
-                    sxplr-dialog-size="xl">
-                    <mat-icon [matBadge]="totals" aria-hidden="false">dataset_linked</mat-icon>
+                    [matTooltip]="view.labels.POSITION_ASSIGNMENT"
+                    (click)="assignPoint(center, view.selectedATP.template)"
+                    >
+                    <mat-icon>query_stats</mat-icon>
                 </button>
             </ng-template>
-        </ng-template>
-
-        <ng-template [ngIf]="voiFeatureEntryCmp.busy$ | async">
-            <mat-spinner class="action-v-center" diameter="24"></mat-spinner>
+    
+            <mat-divider [vertical]="true"></mat-divider>
+            
+            <div iav-switch #switchdir="iavSwitch">
+    
+            </div>
+            <div sxplr-sapiviews-core-space-boundingbox
+                (sxplr-sapiviews-core-space-boundingbox-changed)="voiFeatureEntryCmp?.pullAll()"
+                [sxplr-sapiviews-core-space-boundingbox-atlas]="view.selectedATP.atlas"
+                [sxplr-sapiviews-core-space-boundingbox-space]="view.selectedATP.template"
+                [sxplr-sapiviews-core-space-boundingbox-spec]="view.currentViewport && [view.currentViewport.minpoint, view.currentViewport.maxpoint]"
+                #bbox="sxplrSapiViewsCoreSpaceBoundingBox"
+                >
+            </div>
+    
+            <sxplr-feature-entry
+                class="sxplr-d-none"
+                [template]="view.selectedATP.template"
+                [bbox]="bbox.bbox$ | async | getProperty : 'bbox'"
+                [attr.data-feature-length]="((voiFeatureEntryCmp.features$ | async) || []).length"
+                #voiFeatureEntryCmp="featureEntryCmp">
+            </sxplr-feature-entry>
+            
+            <ng-template [ngIf]="(voiFeatureEntryCmp.totals$ | async) > 0">
+                <div *ngIf="switchdir.switchState$ | async"
+                    voiBbox
+                    [features]="voiFeatureEntryCmp.features$ | async">
+                </div>
+            </ng-template>
+    
+            <button mat-icon-button
+                [color]="(switchdir.switchState$ | async) ? 'accent' : 'default'"
+                (click)="switchdir.toggle()"
+                [matTooltip]="view.labels.TOGGLE_SPATIAL_BOXES">
+                <i [class]="(switchdir.switchState$ | async) ? 'fas fa-lightbulb' : 'far fa-lightbulb'"></i>
+            </button>
+    
+    
+            <ng-template [ngIf]="voiFeatureEntryCmp.totals$ | async" let-totals>
+                
+                <ng-template [ngIf]="totals > 0">
+                    
+                    <ng-template #anchorTmpl>
+                        <tpbr-viewer [tpbr-concept]="voiFeatureEntryCmp.TPRBbox$ | async">
+                        </tpbr-viewer>
+                    </ng-template>
+    
+                    <button mat-icon-button
+                        [matTooltip]="view.labels.RELATED_DATASETS"
+                        [sxplr-dialog]="dumbFeatureDialogTmpl"
+                        [sxplr-dialog-config]="{
+                            autoFocus: true
+                        }"
+                        [sxplr-dialog-data]="{
+                            busy$: voiFeatureEntryCmp.busy$,
+                            features$: voiFeatureEntryCmp.features$,
+                            anchorTmpl: anchorTmpl
+                        }"
+                        sxplr-dialog-size="xl">
+                        <mat-icon [matBadge]="totals" aria-hidden="false">dataset_linked</mat-icon>
+                    </button>
+                </ng-template>
+            </ng-template>
+    
+            <ng-template [ngIf]="voiFeatureEntryCmp.busy$ | async">
+                <mat-spinner class="action-v-center" diameter="24"></mat-spinner>
+            </ng-template>
         </ng-template>
     </ng-template>
 

@@ -17,6 +17,7 @@ import { translateRegionName } from "src/atlasComponents/sapi/translateV3";
 import { generalActionError } from "src/state/actions";
 import { MatExpansionPanel } from "@angular/material/expansion";
 import { arrayEqual } from "src/util/array";
+import { SXPLR_PREFIX } from "src/util/constants";
 
 
 const pipe = new FilterGroupedParcellationPipe()
@@ -52,6 +53,8 @@ function validateNumbers(input: (number|null|undefined)[]): input is number[]{
 })
 
 export class VerticalBreadCrumbComponent {
+  
+  SXPLR_PREFIX = SXPLR_PREFIX
 
   @Output()
   show = new EventEmitter()
@@ -176,7 +179,7 @@ export class VerticalBreadCrumbComponent {
     ),
     this.store$.pipe(
       select(atlasAppearance.selectors.customLayers),
-      map(layers => layers.filter(l => l.clType === "customlayer/nglayer") as atlasAppearance.const.NgLayerCustomLayer[]),
+      map(layers => layers.filter(l => l.clType === "customlayer/nglayer" && !l.id.startsWith(SXPLR_PREFIX)) as atlasAppearance.const.NgLayerCustomLayer[]),
       distinctUntilChanged(arrayEqual((o, n) => o.id === n.id)),
     )
   ]).pipe(

@@ -24,13 +24,7 @@
 
   </form>
 
-  <form *ngIf="currViewerType === 'ThreeSurfer'" [formGroup]="frameFormGrp">
-
-    <mat-divider class="m-2"></mat-divider>
-
-    <mat-slide-toggle formControlName="loop">Loop</mat-slide-toggle>
-    <mat-slide-toggle formControlName="linearCamera">Linear Camera</mat-slide-toggle>
-  
+  <ng-template [ngIf]="currViewerType === 'ThreeSurfer'">
     <button mat-button
       (click)="togglePlay()">
       <ng-template [ngIf]="isPlaying" [ngIfElse]="isNotPlayingTmpl">
@@ -42,9 +36,9 @@
         Play
       </ng-template>
     </button>
-  
+
     <mat-divider class="m-2"></mat-divider>
-  
+
     <button
       (click)="addKeyFrame()"
       matTooltip="Add key frame. Shortcut: [a]"
@@ -84,6 +78,7 @@
         
       </mat-list-item>
     </mat-list>
-  </form>
+  </ng-template>
+
 
 </div>

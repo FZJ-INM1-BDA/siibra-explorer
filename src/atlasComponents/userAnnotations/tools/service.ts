@@ -14,7 +14,7 @@ import { Point } from "./point";
 import { FilterAnnotationsBySpace } from "../filterAnnotationBySpace.pipe";
 import { MatSnackBar } from 'src/sharedModules/angularMaterial.exports'
 import { actions } from "src/state/atlasSelection";
-import { atlasSelection } from "src/state";
+import { atlasAppearance, atlasSelection } from "src/state";
 import { SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { AnnotationLayer } from "src/atlasComponents/annotations";
 import { translateV3Entities } from "src/atlasComponents/sapi/translateV3";
@@ -505,8 +505,14 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     this.subscription.push(
       store.pipe(
         select(atlasSelection.selectors.viewerMode),
-        withLatestFrom(this.#voxelSize),
-        switchMap(([viewerMode, voxelSize]) => from(
+        withLatestFrom(
+          this.#voxelSize,
+          this.store.pipe(
+            select(atlasAppearance.selectors.useViewer)
+          )
+        ),
+        filter(([_viewerMode, _voxelSize, useViewer]) => useViewer === "NEHUBA"),
+        switchMap(([viewerMode, voxelSize, _useViewer]) => from(
           retry(() => {
             if (this.annotationLayer) {
               return this.annotationLayer

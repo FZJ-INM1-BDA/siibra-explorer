@@ -55,7 +55,7 @@
         
     </mat-dialog-content>
     
-    <mat-dialog-actions align="start">
+    <mat-dialog-actions *ngIf="showFooter" align="start">
         <button mat-dialog-close mat-button>
             Close
         </button>

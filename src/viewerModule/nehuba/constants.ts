@@ -1,5 +1,6 @@
 import { InjectionToken } from '@angular/core'
 import { Observable } from 'rxjs'
+import { SXPLR_PREFIX } from 'src/util/constants'
 
 export const NEHUBA_VIEWER_FEATURE_KEY = 'ngViewerFeature'
 
@@ -34,7 +35,7 @@ export type TNehubaViewerUnit = {
 
 export const SET_MESHES_TO_LOAD = new InjectionToken<Observable<IMeshesToLoad>>('SET_MESHES_TO_LOAD')
 
-export const PMAP_LAYER_NAME = 'regional-pmap'
+export const PMAP_LAYER_NAME = `${SXPLR_PREFIX}regional-pmap`
 
 /**
  * since export_nehuba@0.1.0 onwards (the big update that changed a lot of neuroglancer's internals)

@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { ChangeDetectionStrategy, Component, Inject, Input } from "@angular/core";
+import { ChangeDetectionStrategy, Component, Inject, Input, Optional } from "@angular/core";
 import { BehaviorSubject } from "rxjs";
 import { SapiViewsUtilModule } from "src/atlasComponents/sapiViews";
 import { MarkdownModule } from "src/components/markdown";
@@ -32,6 +32,9 @@ export interface DoiData {
 
 export class DoiTemplate {
 
+  @Input()
+  showFooter = true
+
   data$ = new BehaviorSubject<DoiData>(null)
 
   @Input('doi-template-data')
@@ -39,7 +42,7 @@ export class DoiTemplate {
     this.data$.next(data)
   }
 
-  constructor(@Inject(MAT_DIALOG_DATA) injectedData: DoiData){
+  constructor(@Optional() @Inject(MAT_DIALOG_DATA) injectedData: DoiData){
     if (injectedData) {
       this.data$.next(injectedData)
     }

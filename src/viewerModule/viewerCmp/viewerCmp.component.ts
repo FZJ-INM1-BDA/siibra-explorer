@@ -9,7 +9,7 @@ import { ContextMenuService, TContextMenuReg } from "src/contextMenuModule";
 import { DialogService } from "src/services/dialogService.service";
 import { SAPI } from "src/atlasComponents/sapi";
 import { Feature, SxplrAtlas, SxplrParcellation, SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes"
-import { atlasSelection, userInteraction } from "src/state";
+import { atlasAppearance, atlasSelection, userInteraction } from "src/state";
 import { SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { EntryComponent } from "src/features/entry/entry.component";
 import { TFace, TSandsPoint, getCoord } from "src/util/types";
@@ -65,6 +65,10 @@ export class ViewerCmp {
   private selectedATP = this.store$.pipe(
     atlasSelection.fromRootStore.distinctATP(),
     shareReplay(1)
+  )
+
+  #useViewer$ = this.store$.pipe(
+    select(atlasAppearance.selectors.useViewer)
   )
 
   public fetchedAtlases$: Observable<SxplrAtlas[]> = this.sapi.atlases$
@@ -137,9 +141,10 @@ export class ViewerCmp {
     this.allAvailableRegions$,
     this.#fullNavBarSwitch$,
     this.#halfNavBarSwitch$,
+    this.#useViewer$,
   ]).pipe(
-    map(( [ currentMap, allAvailableRegions, fullSidenavExpanded, halfSidenavExpanded ] ) => ({
-      currentMap, allAvailableRegions, fullSidenavExpanded, halfSidenavExpanded
+    map(( [ currentMap, allAvailableRegions, fullSidenavExpanded, halfSidenavExpanded, useViewer ] ) => ({
+      currentMap, allAvailableRegions, fullSidenavExpanded, halfSidenavExpanded, useViewer
     }))
   )
 
@@ -149,7 +154,7 @@ export class ViewerCmp {
     of(enLabels),
   ]).pipe(
     map(([v0, v1, labels]) => ({ ...v0, ...v1, labels })),
-    map(({ selectedRegions, viewerMode, selectedFeature, selectedPoint, selectedTemplate, selectedParcellation, currentMap, allAvailableRegions, fullSidenavExpanded, halfSidenavExpanded, labels }) => {
+    map(({ selectedRegions, viewerMode, selectedFeature, selectedPoint, selectedTemplate, selectedParcellation, currentMap, allAvailableRegions, fullSidenavExpanded, halfSidenavExpanded, labels, useViewer }) => {
       let spatialObjectTitle: string
       let spatialObjectSubtitle: string
       if (selectedPoint) {
@@ -197,6 +202,7 @@ export class ViewerCmp {
         halfSidenavExpanded,
 
         labels,
+        useViewer,
       }
     }),
     shareReplay(1),

@@ -3,7 +3,7 @@ import { createEffect } from "@ngrx/effects";
 import { select, Store } from "@ngrx/store";
 import { concat, forkJoin, from, of } from "rxjs";
 import { switchMap, withLatestFrom, catchError, map, debounceTime, shareReplay, distinctUntilChanged, tap } from "rxjs/operators";
-import { NgLayerSpec, NgPrecompMeshSpec, NgSegLayerSpec, SxplrAtlas, SxplrParcellation, SxplrTemplate, VoiFeature } from "src/atlasComponents/sapi/sxplrTypes";
+import { NgLayerSpec, NgPrecompMeshSpec, NgSegLayerSpec, SxplrAtlas, SxplrParcellation, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { SAPI } from "src/atlasComponents/sapi"
 import { atlasAppearance, atlasSelection } from "src/state";
 import { arrayEqual } from "src/util/array";
@@ -15,16 +15,6 @@ import { getParcNgId } from "../config.service";
 
 @Injectable()
 export class LayerCtrlEffects {
-  static TransformVolumeModel(volumeModel: VoiFeature['ngVolume']): atlasAppearance.const.NgLayerCustomLayer[] {    
-    return [{
-      clType: "customlayer/nglayer",
-      legacySpecFlag: "old",
-      id: volumeModel.url,
-      source: `precomputed://${volumeModel.url}`,
-      transform: volumeModel.transform,
-    }]
-  }
-
   #onATP$ = this.store.pipe(
     atlasSelection.fromRootStore.distinctATP(),
     map(val => val as { atlas: SxplrAtlas, parcellation: SxplrParcellation, template: SxplrTemplate }),

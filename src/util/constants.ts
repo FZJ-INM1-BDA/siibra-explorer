@@ -117,3 +117,8 @@ export const parcBanList: string[] = [
 export const GET_ATTR_TOKEN = new InjectionToken("GET_ATTR_TOKEN")
 
 export type GetAttr = (attr: string) => string|null
+
+/**
+ * prefix hinting that the object is controlled by siibra-explorer
+ */
+export const SXPLR_PREFIX = "sxplr-"
