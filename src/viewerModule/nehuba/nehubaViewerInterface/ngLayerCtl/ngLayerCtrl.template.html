@@ -14,7 +14,7 @@
     mat-icon-button
     [matTooltip]="CONST.ORIENT_TO_LAYER"
     (click)="setOrientation()">
-    <i class="iavic iavic-rotation"></i>
+    <mat-icon>3d_rotation</mat-icon>
   </button>
 
   <button
@@ -27,7 +27,7 @@
 </div>
 
 <ng-template [ngIf]="showOpacityCtrl">
-  <div class="sxplr-d-flex sxplr-justify-content-center sxplr-align-items-center">
+  <div class="nglayer-ctl-container">
     <ng-layer-tune
       [ngLayerName]="name"
       [hideCtrl]="hideNgTuneCtrl"

@@ -110,21 +110,6 @@ current-layout
     justify-self: left;
   }
 }
-:host-context([experimental="false"])
-{
-  .axis-label
-  {
-    opacity: 0.5;
-  }
-}
-
-:host-context([experimental="true"])
-{
-  :has(> .reset-rotation)
-  {
-    display: none;
-  }
-}
 
 .reset-rotation-container
 {

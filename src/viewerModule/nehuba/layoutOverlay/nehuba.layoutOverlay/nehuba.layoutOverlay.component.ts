@@ -401,7 +401,7 @@ export class NehubaLayoutOverlay implements OnDestroy{
         navigation: {
           orientation: [0, 0, 0, 1]
         },
-        animation: false
+        animation: true
       })
     )
   }

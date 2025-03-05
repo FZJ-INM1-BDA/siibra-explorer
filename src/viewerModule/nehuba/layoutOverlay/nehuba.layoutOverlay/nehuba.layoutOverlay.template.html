@@ -31,7 +31,6 @@
   </div>
 </current-layout>
 
-<ng-template sxplrExperimentalFlag [experimental]="true">
 <div *ngIf="obliqueRotated$ | async"
   class="reset-rotation-container">
   
@@ -39,10 +38,9 @@
     [matTooltip]="(labels$ | async).RESET_ROTATION"
     color="warn"
     (click)="resetOrientation()">
-    <i class="iavic iavic-rotation"></i>
+    <mat-icon>3d_rotation</mat-icon>
   </button>
 </div>
-</ng-template>
 
 <!-- slice view overlay tmpl -->
 <ng-template #ngPanelOverlayTmpl let-panelIndex="panelIndex">
@@ -81,16 +79,6 @@
               <div class="axis-label sxplr-custom-cmp text accent" *ngFor="let keyvalue of axisLabel | keyvalue">
                 {{ keyvalue.key }}
               </div>
-              
-              <ng-template [ngIf]="(axisLabel | keyvalue).length === 0">
-                <button mat-icon-button
-                  [matTooltip]="(labels$ | async).RESET_ROTATION"
-                  (click)="resetOrientation()"
-                  class="sxplr-pe-all reset-rotation"
-                  >
-                  <mat-icon fontSet="iavic" fontIcon="iavic-rotation"></mat-icon>
-                </button>
-              </ng-template>
             </div>
           </ng-template>
         </ng-template>
@@ -136,7 +124,7 @@
     </button>
 
     <button (click)="resetZoom(panelIndex)" mat-icon-button color="default">
-      <mat-icon fontSet="iavic" fontIcon="iavic-scaling"></mat-icon>
+      <mat-icon>crop_free</mat-icon>
     </button>
 
     <!-- factor > 1.0 === zoom out -->
