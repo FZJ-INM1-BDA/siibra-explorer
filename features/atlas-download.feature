@@ -19,6 +19,6 @@ Feature: Atlas Download
         When User click `[download]` button (top right of UI)
         Then After a few seconds of preparation, the download should start automatically. A snack bar message should appear when it does.
     
-    Scenario: The downloaded archive should contain the expected files (#2)
+    Scenario: The downloaded archive should contain the expected files - part 2
         Given User downloaded hOc1 left hemisphere in MNI152
         Then the downloaded archive should contain: README.md, LICENSE.md, template (nii.gz + md), regional map (nii.gz + md)
