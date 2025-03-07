@@ -7,6 +7,7 @@
 
 We are aware of the following initiatives, which to various degrees solves some of above:
 
+- [nifti-zarr](https://github.com/neuroscales/nifti-zarr/tree/draft/0.3)
 - [ome-ngff](https://ngff.openmicroscopy.org/latest/)
 - [zarr](https://github.com/zarr-developers/zarr-specs)
 
