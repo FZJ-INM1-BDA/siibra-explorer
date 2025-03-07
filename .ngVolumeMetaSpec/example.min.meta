@@ -1,0 +1,5 @@
+{
+    "$schema": "./meta.schema.json",
+    "version": 1,
+    "preferredColormap": ["magma", "plasma", "greyscale"]
+}
