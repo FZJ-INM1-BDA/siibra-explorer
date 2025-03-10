@@ -160,6 +160,41 @@ export class UserLayerService implements OnDestroy {
   }
 
   @RegisterSource(
+    async input => input instanceof File && input.name.endsWith(".csv")
+  )
+  async processCsv(file: File): Promise<ReturnType<ProcessResource['processor']>> {
+    
+    const id = getUuid()
+    const xform = await linearTransform("LENS_ABA", "NEHUBA")
+    const layer = new AnnotationLayer(id, "#ffcccc", xform)
+    const text = await file.text()
+    const lines = text.split("\n")
+    const triplets: number[][] = lines.map(l =>{
+      const xyz = l.split(',').map(n => Number(n))
+      if (xyz.some(v => isNaN(v))){
+        return null
+      }
+      return xyz
+    }).filter(v => !!v)
+    
+    layer.addAnnotation(triplets.map((triplet, idx) => ({
+      id: `${id}-${idx}`,
+      type: 'point',
+      point: triplet.map(v => v) as [number, number, number]
+    })))
+
+    return {
+      cleanup: () => {
+        layer.dispose()
+      },
+      meta: {
+        filename: file.name
+      },
+
+    }
+  }
+
+  @RegisterSource(
     async input => typeof input === "string" && input.startsWith(OVERLAY_LAYER_PROTOCOL)
   )
   async processOverlayPath(source: string) {
@@ -477,7 +512,9 @@ export class UserLayerService implements OnDestroy {
       ).pipe(
         distinctUntilChanged(),
         filter(url => !!url)
-      ).subscribe(url => this.handleUserInput(`${OVERLAY_LAYER_PROTOCOL}${url}`)),
+      ).subscribe(url => {
+        console.log("handling", url)
+        this.handleUserInput(`${OVERLAY_LAYER_PROTOCOL}${url}`)}),
       this.store$.pipe(
         select(atlasAppearance.selectors.customLayers),
         map(layers => layers.filter(l => l.clType === "customlayer/nglayer")),

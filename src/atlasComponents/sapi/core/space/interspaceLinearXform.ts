@@ -1,4 +1,4 @@
-const VALID_XFORM_SRC = ["CCF_V2_5", "QUICKNII_ABA", "MNI152", "CYRIL_PTCLD"] as const
+const VALID_XFORM_SRC = ["LENS_ABA", "CCF_V2_5", "QUICKNII_ABA", "MNI152", "CYRIL_PTCLD"] as const
 const VALID_XFORM_DST = ["NEHUBA"] as const
 
 export type TVALID_LINEAR_XFORM_SRC = typeof VALID_XFORM_SRC[number]
@@ -40,6 +40,14 @@ const _linearXformDict: Record<
         [-1e3, 0, 0, 11400000 - 5737500], //
         [0, 0, -1e3, 13200000 - 6637500], //
         [0, -1e3, 0, 8000000 - 4037500], //
+        [0, 0, 0, 1],
+      ]
+    },
+    LENS_ABA: {
+      NEHUBA: [
+        [-1e6, 0, 0, 11400000 - 5737500], //
+        [0, -1e6, 0, 13200000 - 6637500], //
+        [0, 0, -1e6, 8000000 - 4037500], //
         [0, 0, 0, 1],
       ]
     },

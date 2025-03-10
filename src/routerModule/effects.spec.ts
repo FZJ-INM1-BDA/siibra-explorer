@@ -11,6 +11,8 @@ import { STATE_DEBOUNCE_MS } from "./const"
 import { NgZone } from "@angular/core"
 import { take } from "rxjs/operators"
 import { GET_ATTR_TOKEN } from "src/util/constants"
+import { provideMockActions } from "@ngrx/effects/testing"
+import { generalActions } from "src/state"
 
 let mockRouter: any 
 
@@ -38,6 +40,7 @@ describe("> effects.ts", () => {
       TestBed.configureTestingModule({
         providers: [
           RouterEffects,
+          provideMockActions(() => of(generalActions.initRouteParseComplete())),
           {
             provide: Store,
             useValue: mockStore

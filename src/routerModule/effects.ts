@@ -1,7 +1,7 @@
 import { Inject, Injectable, NgZone } from "@angular/core";
 import { NavigationEnd, Router } from "@angular/router";
-import { catchError, debounceTime, filter, map, shareReplay, switchMap, take, tap, withLatestFrom } from "rxjs/operators";
-import { createEffect } from "@ngrx/effects"
+import { catchError, debounceTime, filter, map, shareReplay, skipUntil, switchMap, take, tap, withLatestFrom } from "rxjs/operators";
+import { Actions, createEffect, ofType } from "@ngrx/effects"
 import { RouteStateTransformSvc } from "./routeStateTransform.service";
 import { IDS, SAPI } from "src/atlasComponents/sapi";
 import { MainState, atlasSelection, generalActions } from "src/state"
@@ -36,6 +36,12 @@ export class RouterEffects {
     filter(atlases => (atlases || []).length > 0),
     map(() => true),
     shareReplay(1),
+  )
+
+  #initRouteParsed$ = this.action.pipe(
+    ofType(generalActions.initRouteParseComplete),
+    take(1),
+    shareReplay(1)
   )
 
   onViewerLoad$ = createEffect(() => this.#navEnd$.pipe(
@@ -81,14 +87,16 @@ export class RouterEffects {
         }),
         switchMap(ac => from([
           ac,
-          generalActions.routeParseComplete()
+          generalActions.initRouteParseComplete()
         ]))
       )
     }),
   ))
 
   onRouteUpdate$ = createEffect(() => this.#atlasesLoaded$.pipe(
-    switchMap(() => this.#navEnd$),
+    switchMap(() => this.#navEnd$.pipe(
+      skipUntil(this.#initRouteParsed$)
+    )),
     map(ev => ev.urlAfterRedirects),
     switchMap(urlAfterRedirect => 
       from(this.routeToStateTransformSvc.cvtRouteToState(
@@ -179,6 +187,7 @@ export class RouterEffects {
     private routeToStateTransformSvc: RouteStateTransformSvc,
     private store: Store<MainState>,
     private zone: NgZone,
+    private action: Actions,
     @Inject(APP_BASE_HREF) private baseHref: string,
     @Inject(GET_ATTR_TOKEN) private getattr: (attrName: string) => undefined|null|string
   ){

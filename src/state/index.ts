@@ -25,9 +25,13 @@ export * as generalActions from "./actions"
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function debug(reducer: ActionReducer<MainState>): ActionReducer<MainState> {
   return function(state, action) {
-    console.log('state', state);
     console.log('action', action);
-    return reducer(state, action);
+    const sbefore = structuredClone(state?.["[state.atlasAppearance]"].customLayers)
+    console.log("state before", sbefore)
+    const newState = reducer(state, action);
+    const safter = structuredClone(newState?.["[state.atlasAppearance]"].customLayers)
+    console.log("state after", safter)
+    return newState
   };
 }
 
@@ -41,7 +45,7 @@ function gateKeepUntilRouteParseComplete(reducer: ActionReducer<MainState>): Act
     }
 
     let _state = state
-    if (action.type === routeParseComplete.type) {
+    if (action.type === initRouteParseComplete.type) {
       while (actions.length > 0) {
         const _action = actions.shift() // FIFO
         _state = reducer(_state, _action)
@@ -107,7 +111,7 @@ export function getStoreEffects() {
 }
 
 import { MainState } from "./const"
-import { generalApplyState, routeParseComplete, noop } from "./actions"
+import { generalApplyState, initRouteParseComplete, noop } from "./actions"
 
 export { MainState }
 
