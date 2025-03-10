@@ -1,4 +1,4 @@
-name: "[e2e] screenshot"
+name: "[ci] screenshot"
 on:
   workflow_call:
     inputs:

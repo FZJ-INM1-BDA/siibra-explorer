@@ -1,4 +1,4 @@
-name: '[manual-e2e]'
+name: "[ci] create manual e2e checklist"
 
 on:
   pull_request:
