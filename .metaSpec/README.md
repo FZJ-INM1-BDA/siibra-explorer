@@ -13,12 +13,12 @@ We are aware of the following initiatives, which to various degrees solves some 
 
 ## Proposal
 
-We propose the introduction of `meta` extensionless json file, at the same hierarchy as `info` file. So the file structure looks like:
+We propose the introduction of `meta.json` json file, at the same hierarchy as `info` file. So the file structure looks like:
 
 ```
 - root
     - info
-    - meta
+    - meta.json
     - 1mm
         - 0-64_0-64_0-64
         ...
@@ -44,6 +44,7 @@ type: `object`
 | preferredColormap | ([Shader Enum](#definitions-shader-enum))[] |  |
 | https://schema.brainatlas.eu/github/humanbrainproject/neuroglancer | [neuroglancer specific configurations](#definitions-hbp-ng) |  |
 | https://schema.brainatlas.eu/github/humanbrainproject/nehuba | [nehuba speicfic configurations](#definitions-hbp-nehuba) |  |
+| https://schema.brainatlas.eu/github/fzj-inm1-bda/siibra-explorer | [siibra-explorer specific configuration options](#definitions-fzjinm1bda-sxplr) |  |
 | bestViewPoints | ([Point Geometry](#definitions-geometry-point) \|\| [Plane Geometry](#definitions-geometry-plane) \|\| [Enclosed Geometry](#definitions-geometry-enclosed))[] |  |
 
 <a name="definitions-data-image"></a>
@@ -164,7 +165,7 @@ type: `object`
 
 One of:
 
-`greyscale` , `viridis` , `plasma` , `magma` , `inferno` , `jet`
+`greyscale` , `viridis` , `plasma` , `magma` , `inferno` , `jet` , `orange`
 
 <a name="definitions-hbp-ng"></a>
 
@@ -178,6 +179,7 @@ type: `object`
 | property | type | required |
 | --- | --- | --- |
 | shader | string |  |
+| opacity | number |  |
 
 <a name="definitions-hbp-nehuba"></a>
 
@@ -192,6 +194,17 @@ type: `object`
 | --- | --- | --- |
 | config | [configuration](#definitions-config) |  |
 
+<a name="definitions-fzjinm1bda-sxplr"></a>
+
+# siibra-explorer specific configuration options
+
+type: `object`
+
+
+| property | type | required |
+| --- | --- | --- |
+| useTheme | `"light"` \|\| `"dark"` |  |
+
 <a name="definitions-config"></a>
 
 # configuration
@@ -203,7 +216,7 @@ type: `object`
 
 | property | type | required |
 | --- | --- | --- |
-| globals | [undefined](#definitions-globals) |  |
+| globals | [definitions-globals](#definitions-globals) |  |
 | zoomWithoutCtrl | boolean |  |
 | rightClickWithCtrl | boolean |  |
 | rotateAtViewCentre | boolean |  |
@@ -215,12 +228,12 @@ type: `object`
 | hideNeuroglancerUI | boolean |  |
 | crossSectionBackground | [3x1 Vector](#definitions-vec3) |  |
 | perspectiveViewBackground | [3x1 Vector](#definitions-vec3) |  |
-| dataset | [undefined](#definitions-dataset) |  |
+| dataset | [definitions-dataset](#definitions-dataset) |  |
 | layout | undefined |  |
 
 <a name="definitions-globals"></a>
 
-# untitled schema
+# globals
 
 type: `object`
 
@@ -232,18 +245,18 @@ type: `object`
 
 <a name="definitions-dataset"></a>
 
-# untitled schema
+# dataset
 
 type: `object`
 
 
 | property | type | required |
 | --- | --- | --- |
-| imageBackground | [3x1 Vector](#definitions-vec3) |  |
-| initialNgState | [undefined](#definitions-initialNgState) |  |
+| imageBackground | [4x1 Vector](#definitions-vec4) |  |
+| initialNgState | [definitions-initialNgState](#definitions-initialNgState) |  |
 
 <a name="definitions-initialNgState"></a>
 
-# untitled schema
+# initialNgState
 
 type: `object`

@@ -48,7 +48,7 @@ function parseRootObj(rootObj) {
     }
     if (type === "object") {
       const { key } = resolveRef(obj)
-      return `[${obj.title}](#${key})`
+      return `[${obj.title || key}](#${key})`
     }
     if (type) {
       return type
@@ -58,7 +58,7 @@ function parseRootObj(rootObj) {
     }
     if ($ref) {
       const { key, obj: _obj } = resolveRef(obj)
-      return `[${_obj.title}](#${key})`
+      return `[${_obj.title || key}](#${key})`
     }
   }
 
@@ -92,11 +92,11 @@ function parseRootObj(rootObj) {
    * 
    * @param {JsonSchemaObj} obj 
    */
-  function parseObj(obj){
+  function parseObj(obj, backup="root"){
     let _md = ``
 
     const {
-      title = "untitled schema",
+      title = backup,
       description,
       type,
       properties,
@@ -115,7 +115,7 @@ function parseRootObj(rootObj) {
 
     if ($ref) {
       const { obj, key } = resolveRef($ref)
-      _md += `see [${obj.title}](#${key})`
+      _md += `see [${title}](#${key})`
       return
     }
 
@@ -170,7 +170,7 @@ function parseRootObj(rootObj) {
     const { key:_key } = resolveRef(definitionsToBeAppended[key])
 
     md += `\n\n<a name="${_key}"></a>`
-    md += parseObj(obj)
+    md += parseObj(obj, key)
   }
 
   return md
