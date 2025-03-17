@@ -119,6 +119,7 @@ export type Feature = {
 export type VoiFeature = {
   bbox: BoundingBox
   ngVolume: {
+    format: string
     url: string
     transform: number[][]
     info: Record<string, any>

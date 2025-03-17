@@ -535,7 +535,7 @@ export const getShader = ({
     contrast,
     hideZero: false,
     opacity: 1.0,
-    removeBg: false
+    removeBg
   })
 
   if (override) {
@@ -558,6 +558,10 @@ void main() {
   ${ removeBg ? '}' : '' }
 }
 `
+}
+
+export function getOpacityFromMeta(meta: MetaV1Schema) {
+  return meta?.['https://schema.brainatlas.eu/github/humanbrainproject/neuroglancer']?.opacity || 1
 }
 
 export function getShaderFromMeta(meta: MetaV1Schema){
@@ -597,4 +601,19 @@ export function isNullish(v: unknown){
 export function isWheelEvent(e: unknown): e is WheelEvent{
   const { deltaX, deltaY } = (e || {}) as any
   return !isNullish(deltaX) && !isNullish(deltaY)
+}
+
+const conversion = {
+  "nano": 1e-9,
+  "micro": 1e-6,
+  "milli": 1e-3,
+}
+
+export function getFactor(unit: string){
+  for (const key in conversion) {
+    if (unit.startsWith(key)) {
+      return conversion[key]
+    }
+  }
+  throw new Error(`Cannot convert ${unit}`)
 }

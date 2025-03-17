@@ -1,4 +1,4 @@
-name: "[e2e] screenshot"
+name: "[ci] screenshot"
 on:
   workflow_call:
     inputs:
@@ -52,7 +52,7 @@ jobs:
         echo "SCREENSHOT_NAME=$SCREENSHOT_NAME" >> $GITHUB_ENV
 
     - name: Install dependency
-      run: npm install cypress
+      run: npm install cypress@13.17.0
 
     - name: Run Cypress
       uses: cypress-io/github-action@v6

@@ -1,5 +1,5 @@
 import { Component } from "@angular/core"
-import { TestBed, ComponentFixture, fakeAsync, tick } from "@angular/core/testing"
+import { TestBed, ComponentFixture, fakeAsync, tick, flush, discardPeriodicTasks } from "@angular/core/testing"
 import { By } from "@angular/platform-browser"
 import { MockStore, provideMockStore } from "@ngrx/store/testing"
 import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component"
@@ -8,6 +8,7 @@ import { NEVER, of, pipe, Subject } from "rxjs"
 import { userPreference, atlasSelection, atlasAppearance } from "src/state"
 import { LayerCtrlEffects } from "../layerCtrl.service/layerCtrl.effects"
 import { mapTo } from "rxjs/operators"
+import { translateV3Entities } from "src/atlasComponents/sapi/translateV3"
 
 describe('> nehubaViewerInterface.directive.ts', () => {
   let distinctATPSpy: jasmine.Spy
@@ -85,6 +86,7 @@ describe('> nehubaViewerInterface.directive.ts', () => {
       let nehubaViewerInstanceSpy: jasmine.Spy
       let elClearSpy: jasmine.Spy
       let elCreateComponentSpy: jasmine.Spy
+      let translateSpaceToVolumeImageMetaSpy: jasmine.Spy
       const spyNehubaViewerInstance = {
         config: null,
         lifecycle: null,
@@ -104,16 +106,16 @@ describe('> nehubaViewerInterface.directive.ts', () => {
       }
 
       const gpuLimit = 5e8
-      beforeEach(fakeAsync(() => {
+      beforeEach(() => {
         const mockStore = TestBed.inject(MockStore)
         mockStore.overrideSelector(userPreference.selectors.gpuLimit, gpuLimit)
+        translateSpaceToVolumeImageMetaSpy = spyOn(translateV3Entities, 'translateSpaceToVolumeImageMeta')
+        translateSpaceToVolumeImageMetaSpy.and.returnValue(Promise.resolve([]))
 
         fixture = TestBed.createComponent(DummyCmp)
         const directive = fixture.debugElement.query(
           By.directive(NehubaViewerContainerDirective)
         )
-
-        tick(300)
         
         directiveInstance = directive.injector.get(NehubaViewerContainerDirective)
         
@@ -122,7 +124,7 @@ describe('> nehubaViewerInterface.directive.ts', () => {
         // casting return value to any is not perfect, but since only 2 methods and 1 property is used, it's a quick way 
         // rather than allow component to be created
         elCreateComponentSpy = spyOn(directiveInstance['el'], 'createComponent').and.returnValue(spyComRef as any)
-      }))
+      })
 
       describe('> on createNehubaInstance called', () => {
         const nehubaConfig = {

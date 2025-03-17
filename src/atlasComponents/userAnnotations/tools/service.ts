@@ -2,12 +2,12 @@ import { Injectable, OnDestroy, Type } from "@angular/core";
 import { ARIA_LABELS } from 'common/constants'
 import { Inject, Optional } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { BehaviorSubject, combineLatest, from, fromEvent, merge, Observable, of, Subject, Subscription } from "rxjs";
-import {map, switchMap, filter, shareReplay, pairwise, withLatestFrom } from "rxjs/operators";
+import { BehaviorSubject, combineLatest, fromEvent, merge, Observable, of, Subject, Subscription } from "rxjs";
+import {map, switchMap, filter, shareReplay, pairwise, distinctUntilChanged, take } from "rxjs/operators";
 import { NehubaViewerUnit } from "src/viewerModule/nehuba";
 import { NEHUBA_INSTANCE_INJTKN } from "src/viewerModule/nehuba/util";
 import { AbsToolClass, ANNOTATION_EVENT_INJ_TOKEN, IAnnotationEvents, IAnnotationGeometry, INgAnnotationTypes, INJ_ANNOT_TARGET, TAnnotationEvent, ClassInterface, TCallbackFunction, TSands, TGeometryJson, TCallback, DESC_TYPE } from "./type";
-import { getExportNehuba, switchMapWaitFor, retry } from "src/util/fn";
+import { getExportNehuba, switchMapWaitFor } from "src/util/fn";
 import { Polygon } from "./poly";
 import { Line } from "./line";
 import { Point } from "./point";
@@ -274,7 +274,8 @@ export class ModularUserAnnotationToolService implements OnDestroy{
       }
       const { real, voxel } = volImage.info
       return [0, 1, 2].map(idx => real[idx]/voxel[idx]) as [number, number, number]
-    })
+    }),
+    shareReplay(1)
   )
 
   #hoverMsgs: THoverConfig[] = []
@@ -377,11 +378,6 @@ export class ModularUserAnnotationToolService implements OnDestroy{
      * on new nehubaViewer, unset annotationLayer
      */
     if (!!nehubaViewer$) {
-      this.subscription.push(
-        nehubaViewer$.subscribe(() => {
-          this.annotationLayer = null
-        })
-      )
   
       /**
        * get mouse real position
@@ -502,52 +498,54 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     /**
      * on viewer mode update, either create layer, or show/hide layer
      */
-    this.subscription.push(
-      store.pipe(
-        select(atlasSelection.selectors.viewerMode),
-        withLatestFrom(this.#voxelSize),
-        switchMap(([viewerMode, voxelSize]) => from(
-          retry(() => {
-            if (this.annotationLayer) {
-              return this.annotationLayer
-            }
-            if (!voxelSize) {
-              throw new Error(`voxelSize of ${this.selectedTmpl.id} cannot be found!`)
-            }
-            this.annotationLayer = new AnnotationLayer(
-              ANNOTATION_LAYER_NAME,
-              ModularUserAnnotationToolService.USER_ANNOTATION_LAYER_SPEC.annotationColor
-            )
-            this.annotationLayer.onHover.subscribe(val => {
-              this.annotnEvSubj.next({
-                type: 'hoverAnnotation',
-                detail: val
-                  ? {
-                    pickedAnnotationId: val.id,
-                    pickedOffset: val.offset
-                  }
-                  : null
-              })
-            })
-            
-            return this.annotationLayer
-          }, { retries: 60, timeout: 1000 })
-          ).pipe(
-            map(annotationLayer => ({viewerMode, annotationLayer}))
-          )
-        )
-      ).subscribe(({viewerMode, annotationLayer}) => {
-        this.currMode = viewerMode
-        
-        /**
-         * on template changes, the layer gets lost
-         * force redraw annotations if layer needs to be recreated
-         */
-        this.forcedAnnotationRefresh$.next(null)
-        annotationLayer.setVisible(viewerMode === ModularUserAnnotationToolService.VIEWER_MODE)
-      })
+    const templateIsVolumetric$ = this.store.pipe(
+      select(atlasSelection.selectors.selectedTemplate),
+      distinctUntilChanged((o, n) => o?.id === n?.id),
+      switchMap(tmpl => translateV3Entities.translateSpaceToVolumeImage(tmpl)),
+      map(volImages => volImages.length > 0),
     )
 
+    this.subscription.push(
+      templateIsVolumetric$.subscribe(flag => {
+        let sub: Subscription
+        if (this.annotationLayer) {
+          this.annotationLayer.dispose()
+          this.annotationLayer = null
+        }
+        if (sub) {
+          sub.unsubscribe()
+          sub = null
+        }
+  
+        if (!flag) {
+          return
+        }
+        
+        this.annotationLayer = new AnnotationLayer(
+          ANNOTATION_LAYER_NAME,
+          ModularUserAnnotationToolService.USER_ANNOTATION_LAYER_SPEC.annotationColor
+        )
+        sub = this.annotationLayer.onHover.subscribe(val => {
+          this.annotnEvSubj.next({
+            type: 'hoverAnnotation',
+            detail: val
+              ? {
+                pickedAnnotationId: val.id,
+                pickedOffset: val.offset
+              }
+              : null
+          })
+        })
+        this.forcedAnnotationRefresh$.next(null)
+      }),
+      store.pipe(
+        select(atlasSelection.selectors.viewerMode),
+      ).subscribe(mode => {
+        if (this.annotationLayer) {
+          this.annotationLayer.setVisible(mode === ModularUserAnnotationToolService.VIEWER_MODE)
+        }
+      })  
+    )
     /**
      * on template select, update selectedtmpl
      * required for metadata in annotation geometry and voxel size
@@ -735,17 +733,20 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     while(this.subscription.length > 0) this.subscription.pop().unsubscribe()
   }
 
-  private currMode: string
-  switchAnnotationMode(mode: 'on' | 'off' | 'toggle' = 'toggle') {
+  async switchAnnotationMode(mode: 'on' | 'off' | 'toggle' = 'toggle') {
+    const currMode = await this.store.pipe(
+      select(atlasSelection.selectors.viewerMode),
+      take(1)
+    ).toPromise()
 
     let payload: 'annotating' = null
     if (mode === 'on') payload = ARIA_LABELS.VIEWER_MODE_ANNOTATING
     if (mode === 'off') {
-      if (this.currMode === ARIA_LABELS.VIEWER_MODE_ANNOTATING) payload = null
+      if (currMode === ARIA_LABELS.VIEWER_MODE_ANNOTATING) payload = null
       else return
     }
     if (mode === 'toggle') {
-      payload = this.currMode === ARIA_LABELS.VIEWER_MODE_ANNOTATING
+      payload = currMode === ARIA_LABELS.VIEWER_MODE_ANNOTATING
         ? null
         : ARIA_LABELS.VIEWER_MODE_ANNOTATING
     }

@@ -4,7 +4,7 @@ import {
 import { PathReturn, MetaV1Schema, /* CompoundFeature */ } from "./typeV3"
 import { hexToRgb } from 'common/util'
 import { components } from "./schemaV3"
-import { defaultdict } from "src/util/fn"
+import { defaultdict, getFactor, getShaderFromMeta } from "src/util/fn"
 
 export function parseUrl(url: string): {protocol: string, host: string, path: string} {
   const urlProtocolPattern = /^(blob:)?([^:/]+):\/\/([^/]+)((?:\/.*)?)$/;
@@ -22,19 +22,51 @@ const BIGBRAIN_XZ = [
   [68.533, 62.222],
 ]
 
+function metaFactory(url: string): MetaV1Schema{
+  if (url.includes("ucl-hip")) {
+    return {
+      version: 1,
+      preferredColormap: ["greyscale"],
+      data: {
+        type: "image/1d",
+        range: [{
+          min: 0.218,
+          max: 0.220
+        }]
+      }
+    }
+  }
+  if (url.includes("tanner")) {
+    return {
+      version: 1,
+      preferredColormap: ["greyscale"],
+      data: {
+        type: "image/1d",
+        range: [{
+          min: 0.2,
+          max: 0.4
+        }]
+      },
+      transform: [[-1,0,0,5662500],[0,0,1,-6562500],[0,-1,0,3962500],[0,0,0,1]]
+    }
+  }
+  if (url.includes("gaba_bz")) {
+    return {
+      version: 1,
+      preferredColormap: ["magma"],
+      data: {
+        type: "image/1d",
+        range: [{
+          min: 0,
+          max: 10000
+        }]
+      }
+    }
+  }
+  return null
+}
+
 const TMP_META_REGISTRY: Record<string, MetaV1Schema> = {
-  "https://data-proxy.ebrains.eu/api/v1/public/buckets/tanner-test/fullSharded_v1": {
-    version: 1,
-    preferredColormap: ["greyscale"],
-    data: {
-      type: "image/1d",
-      range: [{
-        min: 0.2,
-        max: 0.4
-      }]
-    },
-    transform: [[-1,0,0,5662500],[0,0,1,-6562500],[0,-1,0,3962500],[0,0,0,1]]
-  },
   "https://1um.brainatlas.eu/pli-bigbrain/fom/precomputed": {
     version: 1,
     data: {
@@ -304,29 +336,67 @@ class TranslateV3 {
     }
     
     const returnObj: Record<string, {
+      format: string
       url: string
       transform: number[][]
       info: Record<string, any>
       meta?: MetaV1Schema
     }> = {}
     for (const key in input) {
-      if (key !== 'neuroglancer/precomputed') {
+      if (key !== 'neuroglancer/precomputed' && key !== 'zarr2') {
         continue
       }
-      const url = input[key]
+      const url = input[key].replace(/\/+$/, '')
       const [ transform, info, meta ] = await Promise.all([
         this.cFetch(`${url}/transform.json`).then(res => res.json()) as Promise<number[][]>,
-        this.cFetch(`${url}/info`).then(res => res.json()) as Promise<Record<string, any>>,
+        this.fetchInfo(url, key),
         this.fetchMeta(url),
       ])
       returnObj[key] = {
+        format: key,
         url: input[key],
         transform: transform,
-        info: info,
+        info,
         meta,
       }
     }
     return returnObj
+  }
+
+  async translateSpaceToVolumeImageMeta(template: SxplrTemplate): Promise<{
+    type: string
+    url: string
+    meta: MetaV1Schema
+  }[]>{
+    const returnVal: {
+      type: string
+      url: string
+      meta: MetaV1Schema
+    }[] = []
+    if (!template) return returnVal
+    const space = this.retrieveTemplate(template)
+    if (!space) return returnVal
+
+    // TODO make work with other formats, e.g. fsaverage
+    const validImages = space.defaultImage.filter(di => di.formats.includes("neuroglancer/precomputed"))
+    for (const defaultImage of validImages) {
+      
+      const { providedVolumes } = defaultImage
+      // TODO fix zarr/other format space volume image
+      const { "neuroglancer/precomputed": precomputedVol } = await this.#extractNgPrecompUnfrag(providedVolumes)
+      
+      if (!precomputedVol) {
+        console.error(`neuroglancer/precomputed data source has not been found!`)
+        continue
+      }
+      const { url, meta } = precomputedVol
+      returnVal.push({
+        type: "neuroglancer/precomputed",
+        url,
+        meta,
+      })
+    }
+    return returnVal
   }
 
   async translateSpaceToVolumeImage(template: SxplrTemplate): Promise<NgLayerSpec[]> {
@@ -334,6 +404,8 @@ class TranslateV3 {
     const space = this.retrieveTemplate(template)
     if (!space) return []
     const returnObj: NgLayerSpec[] = []
+    
+    // TODO fix zarr/other format space volume image
     const validImages = space.defaultImage.filter(di => di.formats.includes("neuroglancer/precomputed"))
 
     for (const defaultImage of validImages) {
@@ -345,19 +417,21 @@ class TranslateV3 {
         console.error(`neuroglancer/precomputed data source has not been found!`)
         continue
       }
-      const { transform, info: _info, url } = precomputedVol
+      const { transform, info: _info, url, meta } = precomputedVol
       const { resolution, size } = _info.scales[0]
       const info = {
         voxel: size as [number, number, number],
         real: [0, 1, 2].map(idx => resolution[idx] * size[idx]) as [number, number, number],
         resolution: resolution as [number, number, number]
       }
-      returnObj.push({
+      const obj: NgLayerSpec = {
         source: `precomputed://${url}`,
         legacySpecFlag: "old",
         transform,
+        shader: getShaderFromMeta(meta),
         info,
-      })
+      }
+      returnObj.push(obj)
     }
     return returnObj
   }
@@ -547,7 +621,7 @@ class TranslateV3 {
       const { host, path, protocol } = parseUrl(url)
       if (protocol === "gs") {
         const _path = encodeURIComponent(path.substring(1))
-        url = `https://www.googleapis.com/storage/v1/b/${host}/o/${_path}?alt=media`;
+        url = `https://www.googleapis.com/storage/v1/b/${host}/o/${_path}?alt=media`
       }
       const resp = await fetch(url)
       if (resp.status >= 400) {
@@ -567,6 +641,36 @@ class TranslateV3 {
     }
   }
 
+  async fetchInfo(url: string, format: string) {
+    if (format === "neuroglancer/precomputed") {
+      return this.cFetch(`${url}/info`).then(res => res.json())
+    }
+    if (format === "zarr2") {
+      const _url = url.replace(/\/+$/, '')
+      const zattrs = await this.cFetch(`${_url}/.zattrs`).then(res => res.json())
+      const multiscale = zattrs.multiscales[0]
+      
+      const factors = multiscale.axes.map(axis => getFactor(axis.unit) * 1e9)
+      const { path, coordinateTransformations } = multiscale.datasets[0]
+      const axesScaling = coordinateTransformations[0]
+      if (axesScaling.type !== "scale") {
+        throw new Error(`Expected the first coordinate transform to be scaling, but was ${axesScaling.type}`)
+      }
+      const resolution = [0, 1, 2].map(idx => factors[idx] * axesScaling.scale[idx])
+
+      const zarray = await this.cFetch(`${_url}/${path}/.zarray`).then(res => res.json())
+
+      return {
+        scales: [
+          {
+            size: zarray.shape,
+            resolution
+          }
+        ]
+      }
+    }
+  }
+
   async fetchMeta(url: string): Promise<MetaV1Schema|null> {
     // TODO move to neuroglancer-data-vm
     // difumo
@@ -574,6 +678,10 @@ class TranslateV3 {
       return {
         version: 1
       }
+    }
+    const meta = metaFactory(url)
+    if (meta) {
+      return meta
     }
     if (url in TMP_META_REGISTRY) {
       return TMP_META_REGISTRY[url]
@@ -735,7 +843,7 @@ class TranslateV3 {
   // }
 
   async translateVoiFeature(feat: PathReturn<"/feature/Image/{feature_id}">): Promise<VoiFeature> {
-    const [superObj, { loc: center }, { loc: maxpoint }, { loc: minpoint }, { "neuroglancer/precomputed": precomputedVol }] = await Promise.all([
+    const [superObj, { loc: center }, { loc: maxpoint }, { loc: minpoint }, { "neuroglancer/precomputed": precomputedVol, "zarr2": zarrVol }] = await Promise.all([
       this.translateBaseFeature(feat),
       this.#translatePoint(feat.boundingbox.center),
       this.#translatePoint(feat.boundingbox.maxpoint),
@@ -752,7 +860,7 @@ class TranslateV3 {
     return {
       ...superObj,
       bbox,
-      ngVolume: precomputedVol
+      ngVolume: precomputedVol || zarrVol
     }
   }
   

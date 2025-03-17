@@ -1,17 +1,33 @@
 <ng-template [ngIf]="view$ | async" [ngIfElse]="spinnerTmpl" let-view>
 
-  <div class="grid grid-col-5 sxplr-custom-cmp text">
+  <div class="sxplr-d-flex sxplr-custom-cmp">
 
-    <span class="ml-2 text-truncate v-center-text-span">
+    <div class="ml-2 text-truncate v-center-text-span text filename-container"
+      [matTooltip]="data.filename || 'unknown filename'">
       <i class="fas fa-file"></i>
-      {{ data.filename }} {{ data.filename }}
-    </span>
-  
-    <ng-template [ngIf]="!view.showMore && !view.compact">
-      <ng-template [ngTemplateOutlet]="ngLayerController" [ngTemplateOutletContext]="{ onlyOpacity: true }">
+      <span>
+        {{ data.filename }}
+      </span>
+    </div>
+
+    <div>
+      <ng-template [ngIf]="!view.showMore && !view.compact">
+        <ng-template [ngTemplateOutlet]="ngLayerController" [ngTemplateOutletContext]="{ onlyOpacity: true }">
+        </ng-template>
+      </ng-template>
+    </div>
+
+    <ng-template [ngIf]="data.actions" let-actions>
+      <ng-template ngFor [ngForOf]="actions" let-action>
+        <button mat-icon-button
+          (click)="action.action()">
+          <sxplr-icon
+            [icon]="action">
+          </sxplr-icon>
+        </button>
       </ng-template>
     </ng-template>
-    
+  
     <ng-template [ngIf]="data.warning.length > 0">
       <button mat-icon-button
         [matTooltip]="data.warning.length +  ' messages on user layer.'"
@@ -37,17 +53,20 @@
       <i class="fas fa-trash"></i>
     </button>
   
-    <div *ngIf="view.showMore || view.compact"
-      class="sxplr-custom-cmp darker-bg overflow-hidden grid-wide-4">
-      <ng-template [ngTemplateOutlet]="ngLayerController" [ngTemplateOutletContext]="{ onlyOpacity: !view.showMore }">
-      </ng-template>
-    </div>
-    
-    <ul class="grid-wide-4 sxplr-custom-cmp darker-bg" *ngIf="view.showMore">
+  </div>
+
+  <div *ngIf="view.compact || view.showMore"
+    class="sxplr-d-block sxplr-custom-cmp darker-bg overflow-hidden">
+    <ng-template [ngTemplateOutlet]="ngLayerController" [ngTemplateOutletContext]="{ onlyOpacity: !view.showMore }">
+    </ng-template>
+  </div>
+
+
+  <ng-template [ngIf]="view.showMore">
+    <ul class="sxplr-custom-cmp text sxplr-custom-cmp darker-bg">
       <li *ngFor="let warn of data.warning">{{ warn }}</li>
     </ul>
-  
-  </div>
+  </ng-template>
 </ng-template>
 
 <ng-template #spinnerTmpl>
@@ -61,6 +80,8 @@
   <ng-layer-tune
     [hideCtrl]="onlyOpacity ? HIDE_NG_TUNE_CTRL.ONLY_SHOW_OPACITY : ''"
     advanced-control="true"
-    [ngLayerName]="data.layerName">
+    [ngLayerName]="data.layerName"
+    [thresholdMax]="data.meta.max || 1"
+    [thresholdMin]="data.meta.min || 0">
   </ng-layer-tune>
 </ng-template>

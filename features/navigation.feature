@@ -8,7 +8,7 @@ Feature: Navigating the viewer
 
     Scenario: On hover shows region name(s)
         Given User launched atlas viewer
-        Given User navigated to Human Multilevel Atals, in MNI152 space, with Julich brain 3.0 loaded
+        Given User navigated to Human Multilevel Atlas, in MNI152 space, with Julich brain 3.0 loaded
         Given User has not enabled mobile view
         Given The browser's width is at least 900px wide
 

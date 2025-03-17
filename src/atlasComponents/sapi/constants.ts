@@ -9,7 +9,8 @@ export const IDS = {
     COLIN27: "minds/core/referencespace/v1.0.0/7f39f7be-445b-47c0-9791-e971c0b6d992",
     WAXHOLM: "minds/core/referencespace/v1.0.0/d5717c4a-0fa1-46e6-918c-b8003069ade8",
     MEBRAINS: "minds/core/referencespace/v1.0.0/MEBRAINS",
-    FSAVERAGE: 'minds/core/referencespace/v1.0.0/tmp-fsaverage'
+    FSAVERAGE: 'minds/core/referencespace/v1.0.0/tmp-fsaverage',
+    AMBA_CCF_V3: "minds/core/referencespace/v1.0.0/265d32a0-3d84-40a5-926f-bf89f68212b9",
   },
   PARCELLATION: {
     JBA29: "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-290",
@@ -20,3 +21,8 @@ export const IDS = {
     MEBRAINS: "minds/core/parcellationatlas/v1.0.0/e3235c039c6f54c3ba151568c829f117",
   }
 }
+
+export const MAPTYPE = {
+  STATISTICAL: "STATISTICAL",
+  LABELLED: "LABELLED"
+} as const

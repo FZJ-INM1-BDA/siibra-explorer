@@ -41,3 +41,19 @@ export function getCoord(value: number): TSandsQValue {
     }
   }
 }
+
+
+export type MaterialIcon = {
+  materialIcon: string
+}
+
+export type FallbackIcon = {
+  set: string
+  icon: string
+}
+
+export type Icon = MaterialIcon|FallbackIcon
+
+export type Action = {
+  action: () => void|Promise<void> 
+} & Icon

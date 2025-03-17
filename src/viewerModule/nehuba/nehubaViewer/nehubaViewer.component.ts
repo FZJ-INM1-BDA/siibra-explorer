@@ -207,9 +207,32 @@ export class NehubaViewerUnit implements OnDestroy {
 
         const viewer = this.nehubaViewer.ngviewer
 
+        const layers: Record<string, any> = this.config?.dataset?.initialNgState?.layers || {}
+        let layerReadyCallbacks = Object.keys(this.config?.dataset?.initialNgState?.layers || {})
+          .map(name => {
+            const layer = layers[name]
+            const shader = layer.shader
+            if (!shader) {
+              return null
+            }
+            return (readiedLayerNames: string[]) => {
+              if (readiedLayerNames.includes(name)) {
+                const layer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(name)
+                if (!layer) {
+                  throw new Error(`layer ${name} not found`)
+                }
+                layer.layer.fragmentMain.restoreState(shader)
+                return true
+              }
+              return false
+            }
+          })
+          .filter(cb => !!cb)
+
         this.layersChangedHandler = viewer.layerManager.readyStateChanged.add(() => {
           this.layersChanged.emit(null)
           const readiedLayerNames: string[] = viewer.layerManager.managedLayers.filter(l => l.isReady()).map(l => l.name)
+          layerReadyCallbacks = layerReadyCallbacks.filter(cb => !cb(readiedLayerNames))
           for (const layerName in this.ngIdSegmentsMap) {
             if (!readiedLayerNames.includes(layerName)) {
               return
@@ -411,7 +434,7 @@ export class NehubaViewerUnit implements OnDestroy {
 
     this.nehubaViewer = createNehubaViewer(this.config, (err: string) => {
       /* print in debug mode */
-      this.log.error(err)
+      this.log.warn(err)
     });
 
     const viewer = this.nehubaViewer.ngviewer
@@ -917,12 +940,39 @@ export class NehubaViewerUnit implements OnDestroy {
     const position = this.nehubaViewer.ngviewer.state.children.get("position")
     const prevPos = position.toJSON()
     const layerJson = layersManager.toJSON()
+    const viewer = this.nehubaViewer.ngviewer
+
     for (const layer of layerJson) {
       if (layer.name in mainDict) {
-        layer['segmentColors'] = mainDict[layer.name]
+
+        // removes the segmentation layer, and adds one with the correct color map
+        // (this is actually how NG does it internally, clears all layers, and add them one by one)
+        const l = layersManager.layerManager.getLayerByName(layer.name)
+        layersManager.layerManager.removeManagedLayer(l)
+        layersManager.layerManager.addManagedLayer(
+          viewer.layerSpecification.getLayer(layer.name, {
+            ...layer,
+            segmentColors: mainDict[layer.name]
+          })
+        )
+        
       }
     }
-    layersManager.restoreState(layerJson)
+
+    // n.b. must not use 
+    //
+    // layersManager.restoreState(layersToApply)
+    //
+    // this somehow changes the global (?) space
+    // must also not restore state layer by layer
+    // since this applies **multiple sources**, which really tanks performance
+    //
+    // for (const layer of layerJson){
+    //   console.log(layer.name, layerJson)
+    //   const l = layersManager.layerManager.getLayerByName(layer.name)
+    //   l.layer.restoreState(layer)
+    // }
+    
     position.restoreState(prevPos)
     this.#triggerMeshLoad$.next(null)
   }

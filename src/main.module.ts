@@ -2,7 +2,6 @@ import { DragDropModule } from '@angular/cdk/drag-drop'
 import { CommonModule, DOCUMENT } from "@angular/common";
 import { APP_INITIALIZER, NgModule } from "@angular/core";
 import { FormsModule } from "@angular/forms";
-import { Store, select } from "@ngrx/store";
 import { AngularMaterialModule } from 'src/sharedModules'
 import { AtlasViewer } from "./atlasViewer/atlasViewer.component";
 import { ComponentsModule } from "./components/components.module";
@@ -32,16 +31,14 @@ import { CookieModule } from './ui/cookieAgreement/module';
 import { KgTosModule } from './ui/kgtos/module';
 import { MessagingGlue } from './messagingGlue';
 import { QuickTourModule } from './ui/quickTour';
-import { of } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { CANCELLABLE_DIALOG, CANCELLABLE_DIALOG_OPTS } from './util/interfaces';
 import { NotSupportedCmp } from './notSupportedCmp/notSupported.component';
 import {
-  atlasSelection,
   RootStoreModule,
   getStoreEffects,
 } from "./state"
 import { DARKTHEME } from './util/injectionTokens';
-import { map } from 'rxjs/operators';
 import { EffectsModule } from '@ngrx/effects';
 
 // TODO check if there is a more logical place import put layerctrl effects ts
@@ -168,21 +165,13 @@ import { FreeModeModule } from './freeModeModule';
       useClass: MessagingGlue
     },
     {
-      provide: DARKTHEME,
-      useFactory: (store: Store) => store.pipe(
-        select(atlasSelection.selectors.selectedTemplate),
-        map(tmpl => !!(tmpl && tmpl.id !== 'minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588')),
-      ),
-      deps: [ Store ]
-    },
-    {
       provide: APP_INITIALIZER,
-      useFactory: (authSvc: AuthService) => {
+      useFactory: (authSvc: AuthService, _darktheme$: Observable<boolean>) => {
         authSvc.authReloadState()
         return () => Promise.resolve()
       },
       multi: true,
-      deps: [ AuthService ]
+      deps: [ AuthService, DARKTHEME ]
     },
     {
       provide: GET_ATTR_TOKEN,

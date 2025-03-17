@@ -202,9 +202,7 @@ export const defaultNehubaConfig: NehubaConfig = {
   "configName": "",
   "globals": {
     "hideNullImageValues": true,
-    "useNehubaLayout": {
-      "keepDefaultLayouts": false
-    },
+    "useNehubaLayout": true,
     "useNehubaMeshLayer": true,
     "rightClickWithCtrlGlobal": false,
     "zoomWithoutCtrlGlobal": false,
@@ -302,8 +300,8 @@ export const spaceMiscInfoMap = new Map([
 
 export function getNehubaConfig(space: SxplrTemplate): NehubaConfig {
 
-  const darkTheme = space.id !== "minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588"
-  const { scale } = spaceMiscInfoMap.get(space.id) || { scale: 1 }
+  const darkTheme = space?.id !== "minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588"
+  const { scale } = spaceMiscInfoMap.get(space?.id) || { scale: 1 }
   const backgrd = darkTheme
     ? [0,0,0,1]
     : [1,1,1,1]
@@ -312,22 +310,20 @@ export function getNehubaConfig(space: SxplrTemplate): NehubaConfig {
     ? {"mode":"<","color":[0.1,0.1,0.1,1]}
     :{"color":[1,1,1,1],"mode":"=="}
   const drawSubstrates = darkTheme
-    ? {"color":[0.5,0.5,1,0.2]}
-    : {"color":[0,0,0.5,0.15]}
+    ? {"color":[0.5,0.5,1,0.2], "normalizedTranslate": null}
+    : {"color":[0,0,0.5,0.15], "normalizedTranslate": null}
   const drawZoomLevels = darkTheme
     ? {"cutOff":150000 * scale }
     : {"cutOff":200000 * scale,"color":[0.5,0,0,0.15] }
 
   // enable surface parcellation
   // otherwise, on segmentation selection, the unselected meshes will also be invisible
-  const surfaceParcellation = space.id === 'minds/core/referencespace/v1.0.0/7f39f7be-445b-47c0-9791-e971c0b6d992'
+  const surfaceParcellation = space?.id === 'minds/core/referencespace/v1.0.0/7f39f7be-445b-47c0-9791-e971c0b6d992'
   return {
     "configName": "",
     "globals": {
       "hideNullImageValues": true,
-      "useNehubaLayout": {
-        "keepDefaultLayouts": false
-      },
+      "useNehubaLayout": true,
       "useNehubaMeshLayer": true,
       "rightClickWithCtrlGlobal": false,
       "zoomWithoutCtrlGlobal": false,
@@ -388,7 +384,7 @@ export function getNehubaConfig(space: SxplrTemplate): NehubaConfig {
         }
       }
     }
-  }
+  } as any
 }
 
 
@@ -424,5 +420,5 @@ export function cvtNavigationObjToNehubaConfig(navigationObj: atlasSelection.Atl
       },
       zoomFactor: zoom
     }
-  }
+  } as NgConfig
 }

@@ -6,6 +6,7 @@ import { UserLayerInfoCmp } from "./userlayerInfo/userlayerInfo.component"
 import { UtilModule } from "src/util"
 import { SpinnerModule } from "src/components/spinner"
 import { AngularMaterialModule } from "src/sharedModules"
+import { IconComponent } from "src/sharedModules/icon"
 
 @NgModule({
   imports: [
@@ -14,6 +15,7 @@ import { AngularMaterialModule } from "src/sharedModules"
     AngularMaterialModule,
     UtilModule,
     SpinnerModule,
+    IconComponent,
   ],
   declarations: [UserLayerDragDropDirective, UserLayerInfoCmp],
   exports: [UserLayerDragDropDirective],

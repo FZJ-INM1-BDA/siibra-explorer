@@ -47,7 +47,9 @@ export class SapiViewsCoreRichRegionListSearch {
 
   ARIA_LABELS = ARIA_LABELS
 
-  showNOptions = Number.POSITIVE_INFINITY
+  // n.b. showing all regions drastically degrade oblique slicing 
+  // of parcellations with high number (>1k) nodes, e.g. AMBA ccfv3 2017
+  showNOptions = 50
 
   #regions = new BehaviorSubject<SxplrRegion[]>([])
   @Input('sxplr-sapiviews-core-rich-regionlistsearch-regions')
@@ -130,6 +132,8 @@ export class SapiViewsCoreRichRegionListSearch {
   )
 
   public autocompleteList$ = this.searchedList$.pipe(
+    debounceTime(160),
+    map(v => v.slice(0, this.showNOptions))
   )
 
   displayFn(region: SxplrRegion){

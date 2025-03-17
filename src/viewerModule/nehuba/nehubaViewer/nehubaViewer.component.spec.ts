@@ -305,12 +305,19 @@ describe('> nehubaViewer.component.ts', () => {
       let ngViewerStatechildrenGetSpy = jasmine.createSpy('get')
       let layersMngerToJsonSpy = jasmine.createSpy('layersMngerToJsonSpy')
       let posToJsonSpy = jasmine.createSpy('posToJsonSpy')
-      let layerMgerRestoreStateSpy = jasmine.createSpy('layerMgerRestoreStateSpy')
+      
+      let getLayerByNameSpy = jasmine.createSpy('getLayerByNameSpy')
+      let removeManagedLayerSpy = jasmine.createSpy('removeManagedLayerSpy')
+      let addManagedLayerSpy = jasmine.createSpy('addManagedLayerSpy')
+      let getLayerSpy = jasmine.createSpy('getLayerSpy')
+      let fakeLayer = {}
+      let fakeNewLayer = {}
       let posRestoreStateSpy = jasmine.createSpy("posRestoreStateSpy")
 
       const ngId1 = 'foo-bar'
       const ngId2 = 'hello-world'
       beforeEach(() => {
+        getLayerSpy.and.returnValue(fakeNewLayer)
         nehubaViewerSpy = {
           dispose(){
 
@@ -320,6 +327,13 @@ describe('> nehubaViewer.component.ts', () => {
               children: {
                 get: ngViewerStatechildrenGetSpy
               }
+            },
+            layerManager: {
+              removeManagedLayer: removeManagedLayerSpy,
+              addManagedLayer: addManagedLayerSpy,
+            },
+            layerSpecification: {
+              getLayer: getLayerSpy
             }
           }
         }
@@ -332,9 +346,14 @@ describe('> nehubaViewer.component.ts', () => {
             }
           }
           if (prop === "layers") {
+            getLayerByNameSpy.and.returnValue(fakeLayer)
             return {
               toJSON: layersMngerToJsonSpy,
-              restoreState: layerMgerRestoreStateSpy,
+              layerManager: {
+                getLayerByName: getLayerByNameSpy,
+                removeManagedLayer: removeManagedLayerSpy,
+                addManagedLayer: addManagedLayerSpy,
+              },
             }
           }
           throw new Error(`prop ${prop} is not anticipated`)
@@ -349,7 +368,10 @@ describe('> nehubaViewer.component.ts', () => {
       afterEach(() => {
         ngViewerStatechildrenGetSpy.calls.reset()
         layersMngerToJsonSpy.calls.reset()
-        layerMgerRestoreStateSpy.calls.reset()
+        removeManagedLayerSpy.calls.reset()
+        addManagedLayerSpy.calls.reset()
+        getLayerByNameSpy.calls.reset()
+        getLayerSpy.calls.reset()
       })
       it('> calls nehubaViewer.restoreState', () => {
         const fixture = TestBed.createComponent(NehubaViewerUnit)
@@ -369,19 +391,27 @@ describe('> nehubaViewer.component.ts', () => {
 
         fixture.componentInstance['setColorMap'](mainMap)
 
-        expect(layerMgerRestoreStateSpy).toHaveBeenCalledOnceWith([{
+        expect(getLayerByNameSpy).toHaveBeenCalledWith(ngId1)
+        expect(removeManagedLayerSpy).toHaveBeenCalledWith(fakeLayer)
+        expect(getLayerSpy).toHaveBeenCalledWith(ngId1, {
           name: ngId1,
           segmentColors: {
             1: rgbToHex([100, 100, 100]),
             2: rgbToHex([200, 200, 200]),
           }
-        }, {
+        })
+        expect(addManagedLayerSpy).toHaveBeenCalledWith(fakeNewLayer)
+
+        expect(getLayerByNameSpy).toHaveBeenCalledWith(ngId2)
+        expect(removeManagedLayerSpy).toHaveBeenCalledWith(fakeLayer)
+        expect(getLayerSpy).toHaveBeenCalledWith(ngId2, {
           name: ngId2,
           segmentColors: {
             1: rgbToHex([10, 10, 10]),
             2: rgbToHex([20, 20, 20]),
           }
-        }])
+        })
+        expect(addManagedLayerSpy).toHaveBeenCalledWith(fakeNewLayer)
 
         expect(posRestoreStateSpy).toHaveBeenCalledOnceWith(
           [ 1.1, 2.2, 3.3 ]

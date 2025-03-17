@@ -11,7 +11,7 @@ import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.se
 import { RouterService } from "src/routerModule/router.service"
 import * as atlasAppearance from "src/state/atlasAppearance"
 import { EnumColorMapName } from "src/util/colorMaps"
-import { getShader, getShaderFromMeta, noop } from "src/util/fn"
+import { getOpacityFromMeta, getShader, getShaderFromMeta, noop, QuickHash } from "src/util/fn"
 import { getExportNehuba, getUuid } from "src/util/fn"
 import { UserLayerInfoCmp } from "./userlayerInfo/userlayerInfo.component"
 import { translateV3Entities } from "src/atlasComponents/sapi/translateV3"
@@ -19,12 +19,18 @@ import { MetaV1Schema } from "src/atlasComponents/sapi/typeV3"
 import { AnnotationLayer } from "src/atlasComponents/annotations"
 import { rgbToHex } from 'common/util'
 import { MatDialogRef, MatDialog, MatSnackBar } from "src/sharedModules/angularMaterial.exports"
+import { atlasSelection } from "src/state"
+import { Action } from "src/util/types"
+import { getPositionOrientation } from "../util"
+import { VOXEL_SIZE_MAP } from "../constants"
 
 type LayerOption = Omit<atlasAppearance.const.OldNgLayerCustomLayer, "clType" | "id" | "source"> | Omit<atlasAppearance.const.NewNgLayerOption, "id" | "clType">
 
 type Meta = {
   messages?: string[]
   filename: string
+  min?: number
+  max?: number
 }
 
 const OVERLAY_LAYER_KEY = "x-overlay-layer"
@@ -34,7 +40,21 @@ const SUPPORTED_PREFIX = ["nifti://", "precomputed://", "zarr://", "n5://", "swc
 type ValidProtocol = typeof SUPPORTED_PREFIX[number]
 type ValidInputTypes = File|string
 
-type ProcessorOutput = {option?: LayerOption, url?: string, protocol?: ValidProtocol, meta: Meta, cleanup: () => void}
+type Message = {
+  severity: 'info' | 'warning' | 'error'
+  message: string
+}
+
+
+type ProcessorOutput = {
+  option?: LayerOption
+  url?: string
+  protocol?: ValidProtocol
+  meta: Meta
+  messages?: Message[]
+  actions?: Action[]
+  cleanup: () => void
+}
 type ProcessResource = {
   matcher: (input: ValidInputTypes) => Promise<boolean>
   processor: (input: ValidInputTypes) => Promise<ProcessorOutput>
@@ -126,11 +146,13 @@ export class UserLayerService implements OnDestroy {
           colormap: EnumColorMapName.MAGMA,
           lowThreshold: meta.min || 0,
           highThreshold: meta.max || 1,
+          removeBg: true
         })
       },
       meta: {
         filename: file.name,
-        messages: meta.warning
+        messages: meta.warning,
+        ...meta
       },
       cleanup: () => URL.revokeObjectURL(url)
     }
@@ -211,6 +233,7 @@ export class UserLayerService implements OnDestroy {
         legacySpecFlag: "old",
         transform: meta?.transform || transform,
         shader: getShaderFromMeta(meta),
+        opacity: getOpacityFromMeta(meta),
       },
       protocol,
       url
@@ -222,11 +245,153 @@ export class UserLayerService implements OnDestroy {
   )
   async processDzi(source: string): Promise<ProcessorOutput> {
     const url = source.replace("deepzoom://", "")
-    /**
-     * still a big hacky, but works
-     * TODO figure out how to get the actual transform in
-     */
-    const scaleFactor = 230
+
+    let matrix = [
+      [1, 0, 0, 0, 0],
+      [0, 1, 0, 0, 0],
+      [0, 0, 1, 0, 0],
+      [0, 0, 0, 1, 0],
+    ]
+
+    const messages: Message[] = []
+    const actions: Action[] = []
+
+    try {
+
+      const [_imgname, dziname] = url.split("/").slice(-2)
+      const root = url.split("/").slice(0, -2).join("/")
+      const rootname = dziname.replace(/\.dzi$/, '')
+      const jsonname = dziname.replace(/_s\d{3}\.dzi$/, '') + ".json"
+      const jsonpath = `${root}/${jsonname}`
+  
+      const [ dzimetadata, jsonResp ] = await Promise.all([
+        (async () => {
+          const dziresp = await fetch(url)
+          const dzimetadata = await dziresp.text()
+          return dzimetadata
+        })(),
+        (async () => {
+          const resp = await fetch(jsonpath)
+          return await resp.json()
+        })()
+      ])
+  
+      const foundSlice = ((jsonResp.slices || []) as Record<string, unknown>[]).find(
+        slice => (slice.filename as string).includes(rootname)
+      )
+      const anchoring = foundSlice?.anchoring as number[]
+  
+      const parser = new DOMParser()
+      const xml = parser.parseFromString(dzimetadata, "application/xml")
+      const size = xml.querySelector("Size")
+      const width = Number(size.getAttribute("Width"))
+      const height = Number(size.getAttribute("Height"))
+      if (width === 0 || isNaN(width)) {
+        throw new Error(`dzi xml file error: Width attribute is not a number!`)
+      }
+      if (height === 0 || isNaN(height)) {
+        throw new Error(`dzi xml file error: Height attribute is not a number!`)
+      }
+      
+      // TODO fetch voxel transform based on .target attribute
+      if (!(jsonResp.target in VOXEL_SIZE_MAP)) {
+        throw new Error(`${jsonResp.target} cannot be rendered`)
+      }
+      const { voxelSizes, voxelTransform } = VOXEL_SIZE_MAP[jsonResp.target]
+
+      const thickness = 10
+  
+      const [
+        m03,
+        m13,
+        m23,
+  
+        m00,
+        m10,
+        m20,
+  
+        m01,
+        m11,
+        m21,
+      ] = anchoring
+  
+      const { mat4, vec3, quat } = await getExportNehuba()
+  
+      const o = vec3.fromValues(m03, m13, m23)
+      const u = vec3.fromValues(m00, m10, m20)
+      const v = vec3.fromValues(m01, m11, m21)
+      const uxv = vec3.normalize(
+        vec3.create(),
+        vec3.cross(vec3.create(), u, v)
+      )
+  
+      const m0 = vec3.scale(vec3.create(), u, 1 / width)
+      const m1 = vec3.scale(vec3.create(), v, 1 / height)
+      const m2 = vec3.scale(vec3.create(), uxv, thickness)
+      const m3 = vec3.sub(vec3.create(), o, voxelTransform)
+  
+      vec3.multiply(m3, m3, voxelSizes)
+  
+      const _m = [
+        [...Array.from(m0), 0],
+        [...Array.from(m1), 0],
+        [...Array.from(m2), 0],
+        [...Array.from(m3), 0],
+      ] as number[][]
+      const m = mat4.fromValues(..._m.flatMap(v => v))
+      const voxelDimension = Array.from(vec3.multiply(vec3.create(), [width, height, 1], voxelSizes)) as number[]
+      const { orientation, position } = getPositionOrientation(mat4, vec3, quat, _m, voxelDimension)
+      const otherOrientation = quat.rotateZ(quat.create(), orientation, Math.PI)
+      
+      actions.push({
+        set: "iavic",
+        icon: "iavic-rotation",
+        action: () => {
+          this.store$.dispatch(
+            atlasSelection.actions.navigateTo({
+              navigation: {
+                orientation: Array.from(orientation),
+                position: Array.from(position),
+              },
+              animation: true
+            })
+          )
+        }
+      }, {
+        set: "iavic",
+        icon: "iavic-rotation",
+        action: () => {
+          this.store$.dispatch(
+            atlasSelection.actions.navigateTo({
+              navigation: {
+                orientation: Array.from(otherOrientation),
+                position: Array.from(position),
+              },
+              animation: true
+            })
+          )
+        }
+      })
+      
+      mat4.scale(m, m, voxelSizes)
+      mat4.transpose(m, m)
+      const _matrix: number[] = Array.from(m)
+      matrix = [
+        _matrix.slice(0, 4),
+        _matrix.slice(4, 8),
+        _matrix.slice(8, 12),
+      ]
+      matrix[0].splice(2, 0, 0)
+      matrix[1].splice(2, 0, 0)
+      matrix[2].splice(2, 0, 0)
+      matrix.splice(2, 0, [0, 0, 1, 0, 0])
+    } catch (e) {
+      messages.push({
+        severity: 'error',
+        message: e.toString()
+      })
+    }
+    
     return {
       cleanup: noop,
       meta: {
@@ -242,19 +407,14 @@ export class UserLayerService implements OnDestroy {
               "x": [1e-9, "m"],
               "y": [1e-9, "m"],
               "c^": [1, ""],
-              "": [0.0000390625, "m"],
+              "": [1e-9, "m"],
             },
-            matrix: [
-              [scaleFactor, 0, 0, 0, -150],
-              [0, 0, 0, 5, 0],
-              [0, 0, 1, 0, 0],
-              [0, -scaleFactor, 0, 0, 100]
-            ],
+            matrix,
             outputDimensions: {
-              "x": [0.0000390625, "m"],
-              "y": [0.0000390625, "m"],
+              "x": [1e-9, "m"],
+              "y": [1e-9, "m"],
               "c^": [1, ""],
-              "z": [0.0000390625, "m"],
+              "z": [1e-9, "m"],
             },
             sourceRank: 3
           }
@@ -262,10 +422,11 @@ export class UserLayerService implements OnDestroy {
         type: "image",
         visible: true,
         shader: getShader({ colormap: EnumColorMapName.RGB }),
-        
       },
       protocol: "deepzoom://",
-      url
+      url,
+      messages,
+      actions,
     }
   }
 
@@ -386,37 +547,28 @@ export class UserLayerService implements OnDestroy {
 
   async handleUserInput(input: ValidInputTypes){
     try {
-      const id = getUuid()
-      const { option, protocol, url, meta, cleanup } = await this.#processInput(input)
-      if (this.#idToCleanup.has(id)) {
-        throw new Error(`${url} was already registered`)
-      }
-      this.#idToCleanup.set(id, cleanup)
-      this.addUserLayer(
-        id,
-        protocol && url &&`${protocol}${url}`,
-        meta,
-        option,
-      )
+      const processedOutput = await this.#processInput(input)
+      this.#addLayer(processedOutput)
       return
     } catch (e) {
       this.snackbar.open(`Error opening file: ${e.toString()}`, "Dismiss")
     }
   }
 
-  addUserLayer(
-    id: string,
-    source: string|null|undefined,
-    meta: Meta,
-    options: LayerOption
-  ) {
+  #addLayer(processedOutput: ProcessorOutput){
+    const { option, protocol, url, meta, cleanup, actions, messages } = processedOutput
+    
+    const source = protocol && url && `${protocol}${url}`
+    const id = url ? QuickHash.GetHash(url) : getUuid()
+    this.#idToCleanup.set(id, cleanup)
+
     if (source) {
       UserLayerService.VerifyUrl(source)
       const layer = {
         id,
         clType: "customlayer/nglayer" as const,
         source,
-        ...options,
+        ...option,
       }
       this.store$.dispatch(
         atlasAppearance.actions.addCustomLayer({
@@ -433,7 +585,12 @@ export class UserLayerService implements OnDestroy {
       data: {
         layerName: id,
         filename: meta.filename,
-        warning: meta.messages || [],
+        warning: [
+          ...(meta.messages || []),
+          ...(messages || []).map(v => v.message),
+        ],
+        actions,
+        meta
       },
       hasBackdrop: false,
       disableClose: true,

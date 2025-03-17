@@ -33,7 +33,7 @@ const defaultNehubaConfigObject = {
     },
     zoomFactor: defaultZoom
   }
-}
+} as any
 
 const bigbrainNehubaConfig = {
   "showDefaultAnnotations": false,
@@ -63,7 +63,7 @@ const bigbrainNehubaConfig = {
     -0.3195493221282959
   ],
   "perspectiveZoom": 1922235.5293810747
-}
+} as any
 
 describe('> util.ts', () => {
   
@@ -126,13 +126,13 @@ describe('> util.ts', () => {
           pose: {
             position: {
               voxelSize: bigbrainNehubaConfig.navigation.pose.position.voxelSize,
-              voxelCoordinates: [0, 1, 2].map(idx => position[idx] / bigbrainNehubaConfig.navigation.pose.position.voxelSize[idx])
+              voxelCoordinates: [0, 1, 2].map(idx => position[idx] / bigbrainNehubaConfig.navigation.pose.position.voxelSize[idx]) as [number, number, number]
             },
-            orientation
+            orientation: orientation as [number, number, number, number]
           },
           zoomFactor: zoom
         },
-        perspectiveOrientation: perspectiveOrientation,
+        perspectiveOrientation: perspectiveOrientation as [number, number, number, number],
         perspectiveZoom: perspectiveZoom
       })
     })

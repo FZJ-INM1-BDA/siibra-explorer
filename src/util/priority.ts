@@ -22,6 +22,12 @@ type Queue = {
   next: HttpHandler
 }
 
+class SxplrHttpError extends Error {
+  constructor(message: string, public status: number){
+    super(message)
+  }
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -109,8 +115,8 @@ export class PriorityHttpInterceptor implements HttpInterceptor{
           })
         }
         if (val instanceof HttpErrorResponse) {
-          const error = new Error(
-            PriorityHttpInterceptor.ErrorToString(val)
+          const error = new SxplrHttpError(
+            PriorityHttpInterceptor.ErrorToString(val), val.status
           )
           this.archive.set(urlWithParams, error)
           this.error$.next({
@@ -151,6 +157,13 @@ export class PriorityHttpInterceptor implements HttpInterceptor{
     const { urlWithParams } = req
     const archive = this.archive.get(urlWithParams)
     if (archive) {
+      if (archive instanceof SxplrHttpError) {
+        return throwError({
+          urlWithParams,
+          error: archive,
+          status: archive.status
+        })
+      }
       if (archive instanceof Error) {
         return throwError({
           urlWithParams,

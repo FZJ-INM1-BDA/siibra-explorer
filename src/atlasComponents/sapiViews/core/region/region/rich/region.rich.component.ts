@@ -1,4 +1,4 @@
-import { concat, Observable, of, Subject } from "rxjs";
+import { concat, merge, Observable, of, Subject } from "rxjs";
 import { Component, EventEmitter, Inject, Output } from "@angular/core";
 import { DARKTHEME } from "src/util/injectionTokens";
 import { SapiViewsCoreRegionRegionBase } from "../region.base.directive";
@@ -6,7 +6,7 @@ import { ARIA_LABELS, CONST } from 'common/constants'
 import { Feature, SxplrParcellation, SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes";
 import { SAPI } from "src/atlasComponents/sapi/sapi.service";
 import { environment } from "src/environments/environment";
-import { catchError, map, scan, shareReplay, switchMap } from "rxjs/operators";
+import { map, scan, shareReplay, switchMap, tap } from "rxjs/operators";
 import { PathReturn } from "src/atlasComponents/sapi/typeV3";
 import { DecisionCollapse } from "src/atlasComponents/sapi/decisionCollapse.service";
 
@@ -56,30 +56,39 @@ export class SapiViewsCoreRegionRegionRich extends SapiViewsCoreRegionRegionBase
   )
 
   private regionalMaps$ = this.ATPR$.pipe(
+    tap(() => this.#fetching$.next({ regionalMaps: true })),
     switchMap(({ parcellation, template, region }) =>
       concat(
-        of([] as PathReturn<"/map">["volumes"]),
-        this.sapi.getMap(parcellation.id, template.id, "STATISTICAL").pipe(
-          map(v => {
-            const mapIndices = v.indices[region.name]
-            return mapIndices.map(mapIdx => v.volumes[mapIdx.volume])
-          }),
-          catchError((_err, _obs) => {
-            /**
-             * if statistical map somehow fails to fetch (e.g. does not exist for this combination 
-             * of parc tmpl), fallback to labelled map
-             */
-            return this.sapi.getMap(parcellation.id, template.id, "LABELLED").pipe(
-              map(v => {
-                const mapIndices = v.indices[region.name]
-                return (mapIndices || []).map(mapIdx => v.volumes[mapIdx.volume])
-              })
+        of([] as PathReturn<"/maps/{map_id}">[]),
+        this.sapi.getMaps(parcellation.id, template.id).pipe(
+          switchMap(maps =>
+            merge(
+              ...maps.map(m => this.sapi.getMap(m["@id"]))
             )
-          })
+          ),
+          scan((acc, curr) => ([...acc, curr]), [] as PathReturn<"/maps/{map_id}">[]),
+          map(maps => {
+            // while it is possible to distinguish statistical vs labelled maps
+            // it is not advised to do so for presenting dois for the following reasons:
+            //
+            // 1. we fetch statistical/labelled map info in parallel, labelled map info returns first
+            // --> we have to try to fetch both, since we do not know if the current selection has statistical map or not
+            // 2a. we show labelled map doi. When/if statistical map doi shows up, we hot swap it
+            // --> sudden change of UI, highly discouraged (almost bait and switch)
+            // 2b. we wait until **both** calls return
+            // --> user could be waiting for a long time, staring at a spinner
+            return maps.map(m => {
+              const indices = m.indices[region.name] || []
+              return indices
+                .map(index => m.volumes[index.volume || 0])
+                .filter(v => !!v)
+            }).flat()
+          }),
         ),
-      )
+      ),
     ),
-    shareReplay(1)
+    tap(() => this.#fetching$.next({ regionalMaps: false })), 
+    shareReplay(1),
   )
 
   public dois$ = this.regionalMaps$.pipe(

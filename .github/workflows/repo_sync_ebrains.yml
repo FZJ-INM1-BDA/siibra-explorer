@@ -1,4 +1,4 @@
-name: "[repo-sync] repo-sync gitlab.ebrains.eu"
+name: "[maint] repo-sync gitlab.ebrains.eu"
 
 on:
   push:
