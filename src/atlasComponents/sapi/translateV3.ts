@@ -31,9 +31,25 @@ function metaFactory(url: string): MetaV1Schema{
         type: "image/1d",
         range: [{
           min: 0.218,
-          max: 0.220
+          max: 0.221
         }]
-      }
+      },
+      bestViewPoints: [{
+        type: "enclosed",
+        points: [{
+          type: "point",
+          value: [-70.677, 0, 62.222]
+        },{
+          type: "point",
+          value: [-70.677, 0, -58.788]
+        },{
+          type: "point",
+          value: [68.533, 0, -58.788]
+        },{
+          type: "point",
+          value: [68.533, 0, 62.222]
+        }]
+      }],
     }
   }
   if (url.includes("tanner")) {
