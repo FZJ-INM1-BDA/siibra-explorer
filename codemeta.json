@@ -66,7 +66,7 @@
         "python 3",
         "typescript"
     ],
-    "schema:releaseNotes": "# v2.14.17\n\n## Documentation\n\n- added video tutorial on drag and drop nifti\n",
+    "schema:releaseNotes": "# v2.14.17\n\n## Documentation\n\n- added video tutorial on drag and drop nifti\n- fixed latest release script",
     "runtimePlatform": "docker",
     "version": "2.14.17",
     "contIntegration": "https://github.com/FZJ-INM1-BDA/siibra-explorer/actions",
