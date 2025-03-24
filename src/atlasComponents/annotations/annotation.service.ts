@@ -1,6 +1,6 @@
-import { BehaviorSubject, Observable } from "rxjs";
-import { distinctUntilChanged } from "rxjs/operators";
-import { getUuid, waitFor } from "src/util/fn";
+import { BehaviorSubject, from, Observable, of } from "rxjs";
+import { distinctUntilChanged, map, switchMap, take } from "rxjs/operators";
+import { getUuid, retry, switchMapWaitFor } from "src/util/fn";
 import { PeriodicSvc } from "src/util/periodic.service";
 import { NehubaLayerControlService } from "src/viewerModule/nehuba/layerCtrl.service";
 
@@ -39,7 +39,7 @@ export type AnnotationSpec = TNgAnnotationLine | TNgAnnotationPoint | TNgAnnotat
 type _AnnotationSpec = Omit<AnnotationSpec, 'type'> & { type: number }
 type AnnotationRef = Record<string, unknown>
 
-interface NgAnnotationLayer {
+interface _NgAnnotationLayer {
   isReady: () => boolean
   layer: {
     localAnnotations: {
@@ -83,16 +83,21 @@ export class AnnotationLayer {
   )
   private onDestroyCb: (() => void)[] = []
   
-  get nglayer(): NgAnnotationLayer{
-    return this.viewer.layerManager.getLayerByName(this.name)
-  }
   private idset = new Set<string>()
   constructor(
     private name: string = getUuid(),
     private color="#ffffff",
     affine=ID_AFFINE,
   ){
-    const layerSpec = this.viewer.layerSpecification.getLayer(
+    this.#getViewerObs().pipe(
+      take(1)
+    ).subscribe(viewer => {
+      this.#coupleToViewer(viewer, affine)
+    })
+  }
+ 
+  #coupleToViewer(viewer: any, affine: number[][]){
+    const layerSpec = viewer.layerSpecification.getLayer(
       this.name,
       {
         type: "annotation",
@@ -102,8 +107,8 @@ export class AnnotationLayer {
         transform: affine,
       }
     )
-    this.viewer.layerManager.addManagedLayer(layerSpec)
-    const mouseState = this.viewer.mouseState
+    const _layer = viewer.layerManager.addManagedLayer(layerSpec)
+    const mouseState = viewer.mouseState
     const res: () => void = mouseState.changed.add(() => {
       const payload = mouseState.active
       && !!mouseState.pickedAnnotationId
@@ -117,23 +122,30 @@ export class AnnotationLayer {
     })
     this.onDestroyCb.push(res)
 
-    this.nglayer.layer.registerDisposer(() => {
-      // TODO registerdisposer seems to fire without the layer been removed
-      // Thus it cannot be relied upon for cleanup
-    })
+    // TODO registerdisposer seems to fire without the layer been removed
+    // Thus it cannot be relied upon for cleanup
+    // 
+    // _layer.layer.registerDisposer(() => {
+
+    // })
     NehubaLayerControlService.RegisterLayerName(this.name)
   }
-  setVisible(flag: boolean){
-    this.nglayer && this.nglayer.setVisible(flag)
+  async setVisible(flag: boolean){
+    const nglayer = await this.#getLayer()
+    nglayer && nglayer.setVisible(flag)
   }
   dispose() {
     NehubaLayerControlService.DeregisterLayerName(this.name)
     AnnotationLayer.Map.delete(this.name)
     this._onHover.complete()
-    while(this.onDestroyCb.length > 0) this.onDestroyCb.pop()()
+    while(this.onDestroyCb.length > 0) {
+      this.onDestroyCb.pop()()
+    }
+
     try {
-      const l = this.viewer.layerManager.getLayerByName(this.name)
-      this.viewer.layerManager.removeManagedLayer(l)
+      const viewer = this.#getViewer()
+      const l = viewer.layerManager.getLayerByName(this.name)
+      viewer.layerManager.removeManagedLayer(l)
     // eslint-disable-next-line no-empty
     } catch (e) {
       console.error("removing layer failed", e)
@@ -145,8 +157,9 @@ export class AnnotationLayer {
    * 
    * @param spec 
    */
-  #addSingleAnn(spec: AnnotationSpec) {
-    const localAnnotations = this.nglayer.layer.localAnnotations
+  async #addSingleAnn(spec: AnnotationSpec) {
+    const nglayer = await this.#getLayer()
+    const localAnnotations = nglayer.layer.localAnnotations
     this.idset.add(spec.id)
     const annSpec = this.parseNgSpecType(spec)
     localAnnotations.add(
@@ -155,12 +168,13 @@ export class AnnotationLayer {
   }
 
   async addAnnotation(spec: AnnotationSpec|AnnotationSpec[]){
-    if (!this.nglayer) {
+    const nglayer = await this.#getLayer()
+    if (!nglayer) {
       throw new Error(`layer has already been disposed`)
     }
 
     PeriodicSvc.AddToQueue(() => {
-      if (this.nglayer.isReady()) {
+      if (nglayer.isReady()) {
         if (Array.isArray(spec)) {
           for (const item of spec) {
             this.#addSingleAnn(item)
@@ -175,8 +189,15 @@ export class AnnotationLayer {
     })
   }
   async removeAnnotation(spec: { id: string }) {
-    await waitFor(() => !!this.nglayer?.layer?.localAnnotations)
-    const { localAnnotations } = this.nglayer.layer
+    const nglayer = await this.#getLayerObs().pipe(
+      switchMap(switchMapWaitFor({
+        condition: nglayer => !!nglayer?.layer?.localAnnotations,
+        leading: true
+      })),
+      take(1)
+    ).toPromise()
+    // await waitFor(() => !!nglayer?.layer?.localAnnotations)
+    const { localAnnotations } = nglayer.layer
     this.idset.delete(spec.id)
     const ref = localAnnotations.references.get(spec.id)
     if (ref) {
@@ -190,23 +211,40 @@ export class AnnotationLayer {
    * 
    * @param spec 
    */
-  #updateSingleAnn(spec: AnnotationSpec) {
-    const { localAnnotations } = this.nglayer.layer
-    const ref = localAnnotations.references.get(spec.id)
-    const _spec = this.parseNgSpecType(spec)
-    if (ref) {
-      localAnnotations.update(
-        ref,
-        _spec
-      )
-    } else {
-      this.idset.add(_spec.id)
-      localAnnotations.add(_spec)
+  async #updateSingleAnn(spec: AnnotationSpec) {
+    try {
+
+      const nglayer = this.#unsafeGetLayer()
+      
+      const { localAnnotations } = nglayer.layer
+      const ref = localAnnotations.references.get(spec.id)
+      const _spec = this.parseNgSpecType(spec)
+      if (ref) {
+        localAnnotations.update(
+          ref,
+          _spec
+        )
+      } else {
+        this.idset.add(_spec.id)
+        localAnnotations.add(_spec)
+      }
+    } catch (e) {
+      console.error(`update single annotation error:`, e)
+      return
     }
+    
   }
 
   async updateAnnotation(spec: AnnotationSpec|AnnotationSpec[]) {
-    await waitFor(() => !!this.nglayer?.layer?.localAnnotations)
+    
+    const _nglayer = await this.#getLayerObs().pipe(
+      switchMap(switchMapWaitFor({
+        condition: nglayer => !!nglayer?.layer?.localAnnotations,
+        leading: true
+      })),
+      take(1)
+    ).toPromise()
+    // await waitFor(() => !!this.nglayer?.layer?.localAnnotations)
     if (Array.isArray(spec)) {
       for (const item of spec){
         this.#updateSingleAnn(item)
@@ -216,9 +254,39 @@ export class AnnotationLayer {
     this.#updateSingleAnn(spec)
   }
 
-  private get viewer() {
+  #getViewer(){
+    
     if ((window as any).viewer) return (window as any).viewer
     throw new Error(`window.viewer not defined`)
+  }
+
+  #getViewerObs(): Observable<any>{
+
+    const tryAgain = () => retry(() => this.#getViewer(), { timeout: 160, retries: 100 })
+    
+    try {
+      const viewer = this.#getViewer()
+      return of(viewer)
+    } catch {
+      return from(tryAgain()) 
+    }
+  }
+
+  #getLayerObs(): Observable<any> {
+    return this.#getViewerObs().pipe(
+      map(viewer => viewer.layerManager.getLayerByName(this.name))
+    )
+  }
+
+  #getLayer(): Promise<any> {
+    return this.#getLayerObs().pipe(
+      take(1)
+    ).toPromise()
+  }
+
+  #unsafeGetLayer() {
+    const viewer = this.#getViewer()
+    return viewer.layerManager.getLayerByName(this.name)
   }
 
   private parseNgSpecType(spec: AnnotationSpec): _AnnotationSpec{

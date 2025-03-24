@@ -7,7 +7,6 @@ import { NgLayerSpec, NgPrecompMeshSpec, NgSegLayerSpec, SxplrAtlas, SxplrParcel
 import { SAPI } from "src/atlasComponents/sapi"
 import { atlasAppearance, atlasSelection } from "src/state";
 import { arrayEqual } from "src/util/array";
-import { EnumColorMapName } from "src/util/colorMaps";
 import { getShader } from "src/util/fn";
 import { PMAP_LAYER_NAME } from "../constants";
 import { QuickHash } from "src/util/fn";
@@ -62,7 +61,7 @@ export class LayerCtrlEffects {
                     id: PMAP_LAYER_NAME,
                     source: `nifti://${this.#pmapUrl}`,
                     shader: getShader({
-                      colormap: EnumColorMapName.VIRIDIS,
+                      colormap: "viridis",
                       highThreshold: meta.max,
                       lowThreshold: meta.min,
                       removeBg: true,

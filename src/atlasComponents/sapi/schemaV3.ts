@@ -94,7 +94,10 @@ export interface paths {
   "/map": {
     /**
      * Get Siibra Map 
-     * @description Get map according to specification
+     * @deprecated 
+     * @description Get map according to specification.
+     * 
+     * Deprecated. use /maps/{map_id} instead.
      */
     get: operations["get_siibra_map_map_get"]
   }
@@ -138,6 +141,20 @@ export interface paths {
      * @description Perform assignment according to specification
      */
     get: operations["get_assign_point_map_assign_get"]
+  }
+  "/maps": {
+    /**
+     * Filter Map 
+     * @description Get a list of maps according to specification
+     */
+    get: operations["filter_map_maps_get"]
+  }
+  "/maps/{map_id}": {
+    /**
+     * Single Map 
+     * @description Get a list of maps according to specification
+     */
+    get: operations["single_map_maps__map_id__get"]
   }
   "/atlas_download": {
     /**
@@ -263,6 +280,13 @@ export interface paths {
      */
     get: operations["get_single_feature_feature__feature_id__get"]
   }
+  "/vocabularies/genes": {
+    /**
+     * Genes 
+     * @description HTTP get (filtered) genes
+     */
+    get: operations["genes_vocabularies_genes_get"]
+  }
 }
 
 export type webhooks = Record<string, never>;
@@ -321,14 +345,30 @@ export interface components {
     }
     /**
      * BoundingBoxModel 
-     * @description BoundingBoxModel
+     * @description BoundingBoxModel. Describes an axis aligned boundingbox. As a result, only the most left-posterior-inferior and most right-anterior-superior points are needed to define all eight vertices of the bounding box.
      */
     BoundingBoxModel: {
       /** @Type */
       "@type": string
+      /**
+       * Space 
+       * @description Space (id) by which the location is found. More detail of the space can be found by querying /v3_0/spaces/{space_id}
+       */
       space: components["schemas"]["SiibraAtIdModel"]
+      /**
+       * Center 
+       * @description Center point of the bounding box
+       */
       center: components["schemas"]["CoordinatePointModel"]
+      /**
+       * Minpoint 
+       * @description Most left-posterior-inferior point of the bounding box
+       */
       minpoint: components["schemas"]["CoordinatePointModel"]
+      /**
+       * Maxpoint 
+       * @description Most right-anterior-superior point of the bounding box
+       */
       maxpoint: components["schemas"]["CoordinatePointModel"]
       /** Shape */
       shape: (number)[]
@@ -487,7 +527,8 @@ export interface components {
     }
     /**
      * CommonCoordinateSpaceModel 
-     * @description CommonCoordinateSpaceModel
+     * @description CommonCoordinateSpaceModel. Whilst the concept of a coordinate space does not necessitate the existence of an image, in practice, every coordinate space is associated with an image (either volumetric or , in the case of fsaverage, surface-based).
+     * The origin of the coordinate space is determined by the original data (e.g. affine header in NifTI). All spaces are in RAS neuroanatomical convention.
      */
     CommonCoordinateSpaceModel: {
       /** @Type */
@@ -705,6 +746,18 @@ export interface components {
       /** Category */
       category?: string
     }
+    /**
+     * GeneModel 
+     * @description ConfigBaseModel
+     */
+    GeneModel: {
+      /** @Type */
+      "@type": string
+      /** Symbol */
+      symbol: string
+      /** Description */
+      description: string
+    }
     /** HTTPValidationError */
     HTTPValidationError: {
       /** Detail */
@@ -789,6 +842,10 @@ export interface components {
     LocationModel: {
       /** @Type */
       "@type": string
+      /**
+       * Space 
+       * @description Space (id) by which the location is found. More detail of the space can be found by querying /v3_0/spaces/{space_id}
+       */
       space: components["schemas"]["SiibraAtIdModel"]
     }
     /**
@@ -834,6 +891,10 @@ export interface components {
       }
       /** Volumes */
       volumes: (components["schemas"]["VolumeModel"])[]
+      parcellation: components["schemas"]["SiibraAtIdModel"]
+      space: components["schemas"]["SiibraAtIdModel"]
+      /** Maptype */
+      maptype: string
     }
     /**
      * MapType 
@@ -880,6 +941,32 @@ export interface components {
     Page_FeatureMetaModel_: {
       /** Items */
       items: (components["schemas"]["FeatureMetaModel"])[]
+      /** Total */
+      total?: number
+      /** Page */
+      page?: number
+      /** Size */
+      size?: number
+      /** Pages */
+      pages?: number
+    }
+    /** Page[GeneModel] */
+    Page_GeneModel_: {
+      /** Items */
+      items: (components["schemas"]["GeneModel"])[]
+      /** Total */
+      total?: number
+      /** Page */
+      page?: number
+      /** Size */
+      size?: number
+      /** Pages */
+      pages?: number
+    }
+    /** Page[MapModel] */
+    Page_MapModel_: {
+      /** Items */
+      items: (components["schemas"]["MapModel"])[]
       /** Total */
       total?: number
       /** Page */
@@ -1928,7 +2015,10 @@ export interface operations {
   get_siibra_map_map_get: {
     /**
      * Get Siibra Map 
-     * @description Get map according to specification
+     * @deprecated 
+     * @description Get map according to specification.
+     * 
+     * Deprecated. use /maps/{map_id} instead.
      */
     parameters: {
       query: {
@@ -1961,6 +2051,7 @@ export interface operations {
       query: {
         parcellation_id: string
         space_id: string
+        name?: string
       }
     }
     responses: {
@@ -2011,8 +2102,9 @@ export interface operations {
     parameters: {
       query: {
         parcellation_id: string
-        space_id: string
         region_id: string
+        space_id: string
+        name?: string
       }
     }
     responses: {
@@ -2034,8 +2126,9 @@ export interface operations {
     parameters: {
       query: {
         parcellation_id: string
-        space_id: string
         region_id: string
+        space_id: string
+        name?: string
       }
     }
     responses: {
@@ -2072,6 +2165,60 @@ export interface operations {
       200: {
         content: {
           "application/json": components["schemas"]["DataFrameModel"]
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"]
+        }
+      }
+    }
+  }
+  filter_map_maps_get: {
+    /**
+     * Filter Map 
+     * @description Get a list of maps according to specification
+     */
+    parameters?: {
+      query?: {
+        parcellation_id?: string
+        space_id?: string
+        map_type?: components["schemas"]["MapType"]
+        page?: number
+        size?: number
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Page_MapModel_"]
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"]
+        }
+      }
+    }
+  }
+  single_map_maps__map_id__get: {
+    /**
+     * Single Map 
+     * @description Get a list of maps according to specification
+     */
+    parameters: {
+      path: {
+        map_id: string
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["MapModel"]
         }
       }
       /** @description Validation Error */
@@ -2561,6 +2708,33 @@ export interface operations {
       200: {
         content: {
           "application/json": components["schemas"]["SiibraVoiModel"] | components["schemas"]["SiibraCorticalProfileModel"] | components["schemas"]["SiibraRegionalConnectivityModel"] | components["schemas"]["SiibraReceptorDensityFp"] | components["schemas"]["SiibraTabularModel"] | components["schemas"]["SiibraEbrainsDataFeatureModel"]
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"]
+        }
+      }
+    }
+  }
+  genes_vocabularies_genes_get: {
+    /**
+     * Genes 
+     * @description HTTP get (filtered) genes
+     */
+    parameters?: {
+      query?: {
+        find?: string
+        page?: number
+        size?: number
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Page_GeneModel_"]
         }
       }
       /** @description Validation Error */

@@ -1,4 +1,4 @@
-name: '[docker image]'
+name: '[ci/cd] build docker image/trigger deploy/check VIP urls'
 
 on:
   push:
@@ -8,8 +8,6 @@ on:
       - "dev"
     # do not rebuild if...
     paths-ignore:
-      # changes to .openshift directory... mostly devops config
-      - '.openshift/*'
       # docs (docs are built on readthedocs any way)
       - 'docs/**/*'
 

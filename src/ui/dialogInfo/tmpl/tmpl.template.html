@@ -64,7 +64,7 @@
 
   <ng-template [ngIf]="!data.actionsAsList">
     <ng-template ngFor [ngForOf]="data.actions || []" let-action>
-      <a *ngIf="action.startsWith('http'); else defaultActionTmpl"
+      <a *ngIf="action?.startsWith('http'); else defaultActionTmpl"
         [href]="action"
         sxplr-hide-when-local
         target="_blank"

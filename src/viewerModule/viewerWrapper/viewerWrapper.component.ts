@@ -138,7 +138,7 @@ export class ViewerWrapper {
         if (!el?.nativeElement?.contains(ev.target)) {
           return true
         }
-        if (hoveredRegions.length === 0) {
+        if ((hoveredRegions || []).length === 0) {
           return true
         }
         if (ev.ctrlKey) {

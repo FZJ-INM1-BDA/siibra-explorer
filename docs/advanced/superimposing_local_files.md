@@ -10,6 +10,12 @@ siibra-explorer experimentally supports overlaying spatial features on top of ex
 
 To start, navigate to the atlas/template/parcellation map of your choice, then drag and drop the file you would like to super impose.
 
+<figure>
+  <video controls="true" allowfullscreen="true">
+    <source src="https://data-proxy.ebrains.eu/api/v1/buckets/interactive-atlas-viewer/videos/20250221-drag-drop-siibra-paper.mp4" type="video/mp4">
+  </video>
+</figure>
+
 ## NIFTI
 
 !!! info

@@ -28,6 +28,7 @@ import { CodeSnippet } from "src/atlasComponents/sapi/codeSnippets/codeSnippet.d
 import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.directive";
 import { FeatureViewBase } from "./view/view-base.directive";
 import { NgLayerCtrlCmp } from "src/viewerModule/nehuba/nehubaViewerInterface/ngLayerCtl/ngLayerCtrl.component";
+import { ExperimentalService } from "src/experimental/experimental.service";
 
 @NgModule({
   imports: [
@@ -85,7 +86,8 @@ import { NgLayerCtrlCmp } from "src/viewerModule/nehuba/nehubaViewerInterface/ng
         }
         return returnObj
       }
-    }
+    },
+    ExperimentalService,
   ],
   schemas: [
     CUSTOM_ELEMENTS_SCHEMA,

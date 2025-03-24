@@ -4,18 +4,21 @@ import { ARIA_LABELS, CONST } from 'common/constants'
 import { BehaviorSubject, combineLatest, concat, of, timer } from "rxjs";
 import { map, take } from "rxjs/operators";
 import { MediaQueryDirective } from "src/util/directives/mediaQuery.directive";
+import { Action } from "src/util/types";
 
 export type UserLayerInfoData = {
   layerName: string
   filename: string
   warning: string[]
+  actions?: Action[]
+  meta?: any
 }
 
 @Component({
   selector: `sxplr-userlayer-info`,
   templateUrl: './userlayerInfo.template.html',
   styleUrls: [
-    './userlayerInfo.style.css'
+    './userlayerInfo.style.scss'
   ],
   hostDirectives: [
     MediaQueryDirective
@@ -29,7 +32,7 @@ export class UserLayerInfoCmp {
   ARIA_LABELS = ARIA_LABELS
   CONST = CONST
   public HIDE_NG_TUNE_CTRL = {
-    ONLY_SHOW_OPACITY: 'export-mode,lower_threshold,higher_threshold,brightness,contrast,colormap,hide-threshold-checkbox,hide-zero-value-checkbox'
+    ONLY_SHOW_OPACITY: 'text_mode,export-mode,lower_threshold,higher_threshold,brightness,contrast,colormap,hide-threshold-checkbox,hide-zero-value-checkbox'
   }
 
   constructor(

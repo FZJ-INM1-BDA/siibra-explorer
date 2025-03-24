@@ -107,12 +107,13 @@
       <mat-tab label="Volume Control">
         <ng-layer-ctl
           [ng-layer-ctl-name]="voi.ngVolume.url"
+          [ng-layer-ctl-format]="voi.ngVolume.format"
           [ng-layer-ctl-src]="voi.ngVolume.url"
           [ng-layer-ctl-transform]="voi.ngVolume.transform"
           [ng-layer-ctl-info]="voi.ngVolume.info"
           [ng-layer-ctl-opacity]="1.0"
           [ng-layer-ctl-meta]="voi.ngVolume.meta"
-          [ng-layer-ctrl-show]="true">
+          [ng-layer-ctl-show]="true">
         </ng-layer-ctl>
       </mat-tab>
     </ng-template>

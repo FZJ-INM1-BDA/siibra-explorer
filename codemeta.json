@@ -24,6 +24,26 @@
             "givenName": "Daviti"
         },
         {
+            "id": "_:author_3",
+            "type": "Person",
+            "affiliation": {
+                "type": "Organization",
+                "name": "Forshungszentrum Juelich"
+            },
+            "familyName": "Ahmet Nihat",
+            "givenName": "Simsek"
+        },
+        {
+            "id": "_:author_4",
+            "type": "Person",
+            "affiliation": {
+                "type": "Organization",
+                "name": "Forshungszentrum Juelich"
+            },
+            "familyName": "Christian",
+            "givenName": "Schiffer"
+        },
+        {
             "id": "https://orcid.org/0000-0002-9051-3701",
             "type": "Person",
             "affiliation": {
@@ -37,7 +57,7 @@
     ],
     "codeRepository": "git+https://github.com/fzj-inm1-bda/siibra-explorer.git",
     "dateCreated": "2024-08-28",
-    "dateModified": "2024-09-31",
+    "dateModified": "2025-03-24",
     "datePublished": "2019-04-26",
     "description": "`siibra-explorer` is a browser based 3D viewer for exploring brain atlases that cover different spatial resolutions and modalities. It is built around an interactive 3D view of the brain displaying a unique selection of detailed templates and parcellation maps for the human, macaque, rat or mouse brain, including BigBrain as a microscopic resolution human brain model at its full resolution of 20 micrometers. ",
     "license": "https://spdx.org/licenses/Apache-2.0",

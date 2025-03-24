@@ -1,4 +1,4 @@
-name: Release CI
+name: "[ci] run release checklist"
 on:
   pull_request:
     branches:

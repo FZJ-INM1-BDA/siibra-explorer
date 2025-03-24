@@ -22,7 +22,7 @@ from app.bkwdcompat import BkwdCompatMW
 from app.version_header import VersionHeaderMW
 from app.const import DOCUMENTATION_URL, INPUT_FORMAT, OUTPUT_FORMAT
 
-app = FastAPI()
+app = FastAPI(docs_url=None, redoc_url=None)
 
 ready_flag = False
 

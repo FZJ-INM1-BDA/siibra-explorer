@@ -14,6 +14,7 @@ import { TranslateQualificationPipe } from "./translateQualification.pipe";
 import { DedupRelatedRegionPipe } from "./dedupRelatedRegion.pipe";
 import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.directive";
 import { CodeSnippet } from "src/atlasComponents/sapi/codeSnippets/codeSnippet.directive";
+import { UtilModule } from "src/util";
 
 @NgModule({
   imports: [
@@ -29,6 +30,7 @@ import { CodeSnippet } from "src/atlasComponents/sapi/codeSnippets/codeSnippet.d
 
     ExperimentalFlagDirective,
     CodeSnippet,
+    UtilModule,
   ],
   declarations: [
     SapiViewsCoreRegionRegionListItem,
