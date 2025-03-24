@@ -463,7 +463,7 @@ export function decodeBool(num: number) {
   return rBool
 }
 
-const { encodeShader, parseColorMapFromStr } = globalThis['ngLayerTune']
+const { encodeShader, parseColorMapFromStr } = globalThis['ngLayerTune'] || {}
 
 export { encodeShader }
 
@@ -486,7 +486,7 @@ export const getShader = ({
     contrast,
     hideZero: false,
     opacity: 1.0,
-    removeBg: false
+    removeBg
   })
 }
 
