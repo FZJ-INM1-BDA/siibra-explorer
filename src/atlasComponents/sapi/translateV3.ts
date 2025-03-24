@@ -703,7 +703,9 @@ class TranslateV3 {
     if (url in TMP_META_REGISTRY) {
       return TMP_META_REGISTRY[url]
     }
-    const is1umRegisteredSlices = url.startsWith("https://1um.brainatlas.eu/registered_sections/bigbrain")
+    const iscpn = url.includes("tif/B20_")
+    const is1umRegisteredSlices = url.startsWith("https://1um.brainatlas.eu/registered_sections/bigbrain") || iscpn
+
     if (is1umRegisteredSlices) {
       const found = /B20_([0-9]{4})/.exec(url)
       if (found) {
@@ -711,7 +713,7 @@ class TranslateV3 {
         const realYDis = (sectionId * 2e4 - 70010000) / 1e6
         return {
           version: 1,
-          preferredColormap: ["greyscale"],
+          preferredColormap: iscpn ? ["rgba (4 channel)"] : ["greyscale"],
           bestViewPoints: [{
             type: "enclosed",
             points: BIGBRAIN_XZ.map(([x, z]) => ({

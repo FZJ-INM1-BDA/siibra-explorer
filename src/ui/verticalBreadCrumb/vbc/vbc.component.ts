@@ -439,7 +439,7 @@ export class VerticalBreadCrumbComponent {
     ).toPromise()
     const {
       zoomFactor: zoom
-    } = config.dataset.initialNgState.navigation
+    } = config.dataset.initialNgState.navigation as any
 
     this.store$.dispatch(
       atlasSelection.actions.navigateTo({

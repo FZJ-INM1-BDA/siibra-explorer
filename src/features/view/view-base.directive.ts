@@ -14,6 +14,19 @@ type ExtraParams = Partial<{
 
 type PlotlyResponse = PathReturn<"/feature/{feature_id}/plotly">
 
+/**
+ * experimental
+ * remove once cpn is properly introduced
+ * (with transform.json and meta.json etc)
+ */
+const BIGBRAIN_XZ = [
+  [-70.677, 62.222],
+  [-70.677, -58.788],
+  [68.533, -58.788],
+  [68.533, 62.222],
+]
+type _Voi = Omit<VoiFeature, keyof Feature>
+
 @Directive({
   selector: '[feature-view-base]',
   exportAs: 'featureViewBase'
@@ -241,8 +254,49 @@ export class FeatureViewBase {
     this.#extraParams
   ]).pipe(
     map(([ voi, plotly, param ]) => {
+      const additionalVois: _Voi[] = []
+      const found = /B20_([0-9]{4})/.exec(voi?.ngVolume?.url || '')
+
+      if (found) {
+        const sectionId = parseInt(found[1])
+        const realYDis = (sectionId * 2e4 - 70010000) / 1e6
+
+        const xform = [
+          [0, 0, 1, -70677183.3333333],
+          [0, 1, 0, realYDis * 1e6 - 20e3],
+          [1, 0, 0, -58788283.3333333],
+          [0, 0, 0, 1],
+        ]
+
+        additionalVois.push({
+          bbox: {
+            center: [0, realYDis, 0],
+            minpoint: [-70.677, realYDis, -58.788],
+            maxpoint: [68.533, realYDis, 62.222],
+            spaceId: "minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588"
+          },
+          ngVolume: {
+            info: null,
+            transform: xform,
+            url: `https://zam12230.jsc.fz-juelich.de/gpuvm/p/largedata2/bigbrains/projects/bigbrain_1micron_section_release/data/1micron/tif/B20_${sectionId}.tif/cpn`, // replace with /cpn later
+            meta: {
+              preferredColormap: ["rgba (4 channel)"],
+              version: 1,
+              bestViewPoints: [{
+                type: "enclosed",
+                points: BIGBRAIN_XZ.map(([x, z]) => ({
+                  type: "point",
+                  value: [x, realYDis, z]
+                }))
+              }]
+            },
+            format: "neuroglancer-precomputed",
+            insertIndex: 2
+          }
+        })
+      }
       return {
-        voi, plotly, cmpFeatElmts: null, selectedTemplate: param?.space, 
+        voi, plotly, cmpFeatElmts: null, selectedTemplate: param?.space, additionalVois
       }
     })
   )

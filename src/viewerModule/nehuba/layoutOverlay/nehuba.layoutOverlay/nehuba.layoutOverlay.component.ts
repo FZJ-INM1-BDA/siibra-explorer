@@ -462,7 +462,7 @@ export class NehubaLayoutOverlay implements OnDestroy{
     const {
       perspectiveZoom,
       navigation,
-    } = config.dataset.initialNgState
+    } = config.dataset.initialNgState as any
     const { zoomFactor: zoom } = navigation
     
     this.store$.dispatch(

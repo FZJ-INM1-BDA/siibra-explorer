@@ -126,6 +126,7 @@ export type VoiFeature = {
     transform: number[][]
     info: Record<string, any>
     meta?: MetaV1Schema
+    insertIndex?: number
   }
 } & Feature
 

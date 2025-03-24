@@ -1,16 +1,10 @@
 type X4Affine = number[][]
 
-type ShaderEnum =
-  | "greyscale"
-  | "viridis"
-  | "plasma"
-  | "magma"
-  | "inferno"
-  | "jet"
+
 /**
  * Preferred colormap in order of preference
  */
-type PreferredColormap = ShaderEnum[]
+type PreferredColormap = string[]
 type X1Vector = [number, number, number]
 type X1Vector1 = [number, number, number, number]
 /**

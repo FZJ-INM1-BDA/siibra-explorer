@@ -67,6 +67,9 @@ export class NgLayerCtrlCmp implements OnChanges, OnDestroy{
   @Input("ng-layer-ctl-meta")
   meta: MetaV1Schema
 
+  @Input("ng-layer-ctl-insert-index")
+  insertIndex = 1
+
   opacity: number = 1.0
   @Input('ng-layer-ctl-opacity')
   set _opacity(val: number | string) {
@@ -158,6 +161,9 @@ export class NgLayerCtrlCmp implements OnChanges, OnDestroy{
             clType: 'customlayer/nglayer',
             source: `${format}${this.source}`,
             opacity: this.opacity,
+            meta: {
+              insertIndex: this.insertIndex,
+            }
           }
         })
       )

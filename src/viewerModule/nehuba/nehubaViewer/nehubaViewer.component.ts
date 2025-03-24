@@ -617,8 +617,9 @@ export class NehubaViewerUnit implements OnDestroy {
           ...rest,
           ...(transform ? { transform } : {})
         }
+        const indexToInsert = layerObj[key]?.meta?.insertIndex || 1
         viewer.layerManager.addManagedLayer(
-          viewer.layerSpecification.getLayer(key, combined), 1)
+          viewer.layerSpecification.getLayer(key, combined), indexToInsert)
 
         return layerObj[key]
       })

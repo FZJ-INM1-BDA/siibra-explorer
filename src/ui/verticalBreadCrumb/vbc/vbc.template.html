@@ -1,5 +1,6 @@
 <ng-template [ngIf]="view$ | async" let-view>
 
+    <!-- main view -->
     <mat-accordion>
         
         <!-- atlas -->
@@ -420,8 +421,30 @@
                                 [ng-layer-ctl-info]="voi.ngVolume.info"
                                 [ng-layer-ctl-opacity]="1.0"
                                 [ng-layer-ctl-meta]="voi.ngVolume.meta"
-                                [ng-layer-ctrl-show]="true">
+                                [ng-layer-ctl-show]="false">
                             </ng-layer-ctl>
+                        </ng-template>
+
+                        <ng-template sxplrExperimentalFlag [experimental]="true">
+                        <ng-template ngFor [ngForOf]="fView.additionalVois" let-aVoi>
+                            <mat-slide-toggle
+                                iav-switch
+                                [iav-switch-state]="false"
+                                (change)="switch.toggle()"
+                                #switch="iavSwitch">
+                                Show segmentation
+                            </mat-slide-toggle>
+                            <ng-template [ngIf]="switch.switchState$ | async">
+                                <ng-layer-ctl
+                                    [ng-layer-ctl-name]="SXPLR_PREFIX + aVoi.ngVolume.url"
+                                    [ng-layer-ctl-src]="aVoi.ngVolume.url"
+                                    [ng-layer-ctl-transform]="aVoi.ngVolume.transform"
+                                    [ng-layer-ctl-meta]="aVoi.ngVolume.meta"
+                                    [ng-layer-ctl-insert-index]="aVoi.ngVolume.insertIndex"
+                                    [ng-layer-ctl-opacity]="1.0">
+                                </ng-layer-ctl>
+                            </ng-template>
+                        </ng-template>
                         </ng-template>
                         
                         <!-- plotly view -->

@@ -6,6 +6,7 @@ type CustomLayerBase = {
   meta?: {
     filename?: string
     messages?: string[]
+    insertIndex?: number
   }
 }
 

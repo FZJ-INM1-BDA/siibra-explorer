@@ -3,8 +3,8 @@ import { SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate } from "src/a
 import { translateV3Entities } from "src/atlasComponents/sapi/translateV3"
 import { rgbToHsl } from 'common/util'
 import { SAPI } from "src/atlasComponents/sapi/sapi.service";
-import { BehaviorSubject, combineLatest, concat, EMPTY, forkJoin, from, of } from "rxjs";
-import { catchError, filter, map, shareReplay, switchMap, take } from "rxjs/operators";
+import { BehaviorSubject, combineLatest, concat, EMPTY, forkJoin, from, merge, of } from "rxjs";
+import { catchError, filter, map, scan, shareReplay, switchMap, take, tap } from "rxjs/operators";
 import { DecisionCollapse } from "src/atlasComponents/sapi/decisionCollapse.service";
 import { PathReturn } from "src/atlasComponents/sapi/typeV3";
 
@@ -16,6 +16,7 @@ export class SapiViewsCoreRegionRegionBase {
 
   private _fetchFlag$ = new BehaviorSubject<boolean>(false)
   protected _fetchFlag = false
+  #manualBusySignal$ = new BehaviorSubject(false)
   @Input('sxplr-sapiviews-core-region-detail-flag')
   set fetchFlag(val: boolean) {
     this._fetchFlag$.next(val)
@@ -217,57 +218,57 @@ export class SapiViewsCoreRegionRegionBase {
   constructor(protected sapi: SAPI, private collapser: DecisionCollapse){
 
   }
+
   
-  protected regionalMaps$ = this.ATPR$.pipe(
+  private regionalMaps$ = this.ATPR$.pipe(
+    tap(() => this.#manualBusySignal$.next(true)),
     switchMap(({ parcellation, template, region }) =>
       concat(
-        of([] as PathReturn<"/map">["volumes"]),
-        this.sapi.getMap(parcellation.id, template.id, "STATISTICAL").pipe(
-          map(v => {
-            const mapIndices = v.indices[region.name]
-            return mapIndices.map(mapIdx => v.volumes[mapIdx.volume])
-          }),
-          catchError((_err, _obs) => {
-            /**
-             * if statistical map somehow fails to fetch (e.g. does not exist for this combination 
-             * of parc tmpl), fallback to labelled map
-             */
-            return this.sapi.getMap(parcellation.id, template.id, "LABELLED").pipe(
-              map(v => {
-                const mapIndices = v.indices[region.name]
-                return (mapIndices || []).map(mapIdx => v.volumes[mapIdx.volume])
-              })
+        of([] as PathReturn<"/maps/{map_id}">[]),
+        this.sapi.getMaps(parcellation.id, template.id).pipe(
+          switchMap(maps =>
+            merge(
+              ...maps.map(m => this.sapi.getMap(m["@id"]))
             )
-          })
+          ),
+          scan((acc, curr) => ([...acc, curr]), [] as PathReturn<"/maps/{map_id}">[]),
+          map(maps => {
+            // while it is possible to distinguish statistical vs labelled maps
+            // it is not advised to do so for presenting dois for the following reasons:
+            //
+            // 1. we fetch statistical/labelled map info in parallel, labelled map info returns first
+            // --> we have to try to fetch both, since we do not know if the current selection has statistical map or not
+            // 2a. we show labelled map doi. When/if statistical map doi shows up, we hot swap it
+            // --> sudden change of UI, highly discouraged (almost bait and switch)
+            // 2b. we wait until **both** calls return
+            // --> user could be waiting for a long time, staring at a spinner
+            return maps.map(m => {
+              const indices = m.indices[region.name] || []
+              return indices
+                .map(index => m.volumes[index.volume || 0])
+                .filter(v => !!v)
+            }).flat()
+          }),
         ),
-      )
+      ),
     ),
-    shareReplay(1)
+    tap(() => this.#manualBusySignal$.next(false)), 
+    shareReplay(1),
   )
-
-  public dois$ = combineLatest([
-    this.regionalMaps$.pipe(
-      map(sms => {
-        const returnUrls: string[] = []
-        for (const sm of sms) {
-          for (const ds of sm.datasets) {
-            for (const url of ds.urls) {
-              returnUrls.push(url.url)
-            }
-            
+  
+  public dois$ = this.regionalMaps$.pipe(
+    map(sms => {
+      const returnUrls: string[] = []
+      for (const sm of sms) {
+        for (const ds of sm.datasets) {
+          for (const url of ds.urls) {
+            returnUrls.push(url.url)
           }
+          
         }
-        return returnUrls
-      })
-    ),
-    concat(
-      of([] as string[]),
-      this.region$.pipe(
-        map(region => (region.link || []).map(l => l.href))
-      )
-    )
-  ]).pipe(
-    map(([ doisFromMap, doisFromRegion ]) => [...doisFromMap, ...doisFromRegion])
+      }
+      return returnUrls
+    })
   )
 
   public desc$ = this.regionalMaps$.pipe(
@@ -279,9 +280,13 @@ export class SapiViewsCoreRegionRegionBase {
       }
     }),
   )
-
   public contributors$ = this.regionalMaps$.pipe(
-    map(sm => sm.flatMap(f => f.datasets.flatMap(ds => ds.contributors.map(c => c.name))))
+    map(sm => {
+      for (const ds of (sm?.[0]?.datasets) || []) {
+        if (ds.contributors) {
+          return ds.contributors.map(c => c.name)
+        }
+      }
+    }),
   )
-
 }

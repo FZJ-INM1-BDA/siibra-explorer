@@ -14,7 +14,7 @@ import { Point } from "./point";
 import { FilterAnnotationsBySpace } from "../filterAnnotationBySpace.pipe";
 import { MatSnackBar } from 'src/sharedModules/angularMaterial.exports'
 import { actions } from "src/state/atlasSelection";
-import { atlasAppearance, atlasSelection } from "src/state";
+import { atlasSelection } from "src/state";
 import { SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { AnnotationLayer } from "src/atlasComponents/annotations";
 import { translateV3Entities } from "src/atlasComponents/sapi/translateV3";

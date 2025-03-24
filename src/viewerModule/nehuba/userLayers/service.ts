@@ -16,7 +16,7 @@ import { translateV3Entities } from "src/atlasComponents/sapi/translateV3"
 import { MetaV1Schema } from "src/atlasComponents/sapi/typeV3"
 import { AnnotationLayer } from "src/atlasComponents/annotations"
 import { rgbToHex } from 'common/util'
-import { MatDialogRef, MatSnackBar } from "src/sharedModules/angularMaterial.exports"
+import { MatSnackBar } from "src/sharedModules/angularMaterial.exports"
 import { arrayEqual } from "src/util/array"
 import { atlasSelection } from "src/state"
 import { Action } from "src/util/types"
@@ -39,18 +39,11 @@ const SUPPORTED_PREFIX = ["nifti://", "precomputed://", "zarr://", "n5://", "swc
 type ValidProtocol = typeof SUPPORTED_PREFIX[number]
 type ValidInputTypes = File|string
 
-type Message = {
-  severity: 'info' | 'warning' | 'error'
-  message: string
-}
-
-
 type ProcessorOutput = {
   option?: LayerOption
   url?: string
   protocol?: ValidProtocol
   meta: Meta
-  messages?: Message[]
   actions?: Action[]
   cleanup: () => void
 }
@@ -75,7 +68,6 @@ function RegisterSource(matcher: ProcessResource['matcher']) {
 })
 export class UserLayerService implements OnDestroy {
   #idToCleanup = new Map<string, () => void>()
-  #dialogRef: MatDialogRef<unknown>
 
   static VerifyUrl(source: string) {
     for (const prefix of SUPPORTED_PREFIX) {
@@ -247,7 +239,7 @@ export class UserLayerService implements OnDestroy {
       option: {
         legacySpecFlag: "old",
         shader: getShader({
-          colormap: EnumColorMapName.MAGMA,
+          colormap: "magma",
           removeBg: true
         }),
         opacity: 0.5,
@@ -314,7 +306,7 @@ export class UserLayerService implements OnDestroy {
       [0, 0, 0, 1, 0],
     ]
 
-    const messages: Message[] = []
+    const messages: string[] = []
     const actions: Action[] = []
 
     try {
@@ -447,16 +439,14 @@ export class UserLayerService implements OnDestroy {
       matrix[2].splice(2, 0, 0)
       matrix.splice(2, 0, [0, 0, 1, 0, 0])
     } catch (e) {
-      messages.push({
-        severity: 'error',
-        message: e.toString()
-      })
+      messages.push(e.toString())
     }
     
     return {
       cleanup: noop,
       meta: {
-        filename: `deepzoom://${url}`
+        filename: `deepzoom://${url}`,
+        messages,
       },
       option: {
         legacySpecFlag: "new",
@@ -486,7 +476,6 @@ export class UserLayerService implements OnDestroy {
       },
       protocol: "deepzoom://",
       url,
-      messages,
       actions,
     }
   }
@@ -628,7 +617,7 @@ export class UserLayerService implements OnDestroy {
   }
 
   #addLayer(processedOutput: ProcessorOutput){
-    const { option, protocol, url, meta, cleanup, actions, messages } = processedOutput
+    const { option, protocol, url, meta, cleanup, actions } = processedOutput
     
     const source = protocol && url && `${protocol}${url}`
     const id = url ? QuickHash.GetHash(url) : getUuid()
@@ -641,6 +630,7 @@ export class UserLayerService implements OnDestroy {
         clType: "customlayer/nglayer" as const,
         source,
         meta,
+        actions,
         ...option,
       }
       this.store$.dispatch(
@@ -648,11 +638,6 @@ export class UserLayerService implements OnDestroy {
           customLayer: layer,
         })
       )
-    }
-
-    if (this.#dialogRef) {
-      this.#dialogRef.close()
-      this.#dialogRef = null
     }
   }
 
