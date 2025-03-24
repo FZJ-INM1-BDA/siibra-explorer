@@ -296,11 +296,19 @@ export const spaceMiscInfoMap = new Map([
     name: 'waxholm',
     scale: 0.1,
   }],
+  ['nencki/nm/referencespace/v1.0.0/MARMOSET_NM_NISSL_2020', {
+    name: 'marmoset-nm',
+    scale: 0.1,
+  }],
 ])
 
 export function getNehubaConfig(space: SxplrTemplate): NehubaConfig {
 
-  const darkTheme = space?.id !== "minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588"
+  const darkTheme = (
+    space?.id !== "minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588" &&
+    space?.id !== 'nencki/nm/referencespace/v1.0.0/MARMOSET_NM_NISSL_2020'
+  )
+  const centerTranslate = space?.id === 'nencki/nm/referencespace/v1.0.0/MARMOSET_NM_NISSL_2020' ? [-6.52, 4, 8.74].map(v => v * 1e6) : null;
   const { scale } = spaceMiscInfoMap.get(space?.id) || { scale: 1 }
   const backgrd = darkTheme
     ? [0,0,0,1]
@@ -310,8 +318,8 @@ export function getNehubaConfig(space: SxplrTemplate): NehubaConfig {
     ? {"mode":"<","color":[0.1,0.1,0.1,1]}
     :{"color":[1,1,1,1],"mode":"=="}
   const drawSubstrates = darkTheme
-    ? {"color":[0.5,0.5,1,0.2], "normalizedTranslate": null}
-    : {"color":[0,0,0.5,0.15], "normalizedTranslate": null}
+    ? {"color":[0.5,0.5,1,0.2], "translate": centerTranslate}
+    : {"color":[0,0,0.5,0.15], "translate": centerTranslate}
   const drawZoomLevels = darkTheme
     ? {"cutOff":150000 * scale }
     : {"cutOff":200000 * scale,"color":[0.5,0,0,0.15] }
@@ -364,8 +372,8 @@ export function getNehubaConfig(space: SxplrTemplate): NehubaConfig {
         "removePerspectiveSlicesBackground": rmPsp,
         "perspectiveBackground": backgrd,
         "fixedZoomPerspectiveSlices": {
-          "sliceViewportWidth": 300,
-          "sliceViewportHeight": 300,
+          "sliceViewportWidth": space.id === 'nencki/nm/referencespace/v1.0.0/MARMOSET_NM_NISSL_2020' ? 580 : 300,
+          "sliceViewportHeight": space.id === 'nencki/nm/referencespace/v1.0.0/MARMOSET_NM_NISSL_2020' ? 580 : 300,
           "sliceZoom": 563818.3562426177 * scale,
           "sliceViewportSizeMultiplier": 2
         },
