@@ -10,7 +10,6 @@ import {
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service"
 import { RouterService } from "src/routerModule/router.service"
 import * as atlasAppearance from "src/state/atlasAppearance"
-import { EnumColorMapName } from "src/util/colorMaps"
 import { getOpacityFromMeta, getShader, getShaderFromMeta, noop, QuickHash } from "src/util/fn"
 import { getExportNehuba, getUuid } from "src/util/fn"
 import { UserLayerInfoCmp } from "./userlayerInfo/userlayerInfo.component"
@@ -143,7 +142,7 @@ export class UserLayerService implements OnDestroy {
         legacySpecFlag: "old",
         type,
         shader: getShader({
-          colormap: EnumColorMapName.MAGMA,
+          colormap: "magma",
           lowThreshold: meta.min || 0,
           highThreshold: meta.max || 1,
           removeBg: true
@@ -421,7 +420,7 @@ export class UserLayerService implements OnDestroy {
         },
         type: "image",
         visible: true,
-        shader: getShader({ colormap: EnumColorMapName.RGB }),
+        shader: getShader({ colormap: "rgb" }),
       },
       protocol: "deepzoom://",
       url,
