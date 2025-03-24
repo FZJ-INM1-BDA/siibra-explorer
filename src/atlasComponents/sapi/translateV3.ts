@@ -66,19 +66,6 @@ function metaFactory(url: string): MetaV1Schema{
       transform: [[-1,0,0,5662500],[0,0,1,-6562500],[0,-1,0,3962500],[0,0,0,1]]
     }
   }
-  if (url.includes("gaba_bz")) {
-    return {
-      version: 1,
-      preferredColormap: ["magma"],
-      data: {
-        type: "image/1d",
-        range: [{
-          min: 0,
-          max: 10000
-        }]
-      }
-    }
-  }
   return null
 }
 
