@@ -547,3 +547,30 @@ export function getFactor(unit: string){
   }
   throw new Error(`Cannot convert ${unit}`)
 }
+
+type NumberLike = number | (number[])
+
+export function mul(a: NumberLike, b: number): NumberLike{
+  if (typeof a === "number") {
+    return a * b
+  }
+  if (Array.isArray(a)) {
+    return a.map(v => mul(v, b)) as number[]
+  }
+}
+
+export function add(a: NumberLike, b: NumberLike) {
+  if (typeof a !== typeof b) {
+    throw new Error(`typeof must be equal`)
+  }
+  if (typeof a === "number" && typeof b === "number") {
+    return a + b
+  }
+  if (Array.isArray(a) && Array.isArray(b)) {
+    if (a.length !== b.length) {
+      throw new Error(`for Array, a.length must be equal to b.length`)
+    }
+    return a.map((v, i) => v + b[i])
+  }
+  throw new Error(`does not support none number like`)
+}

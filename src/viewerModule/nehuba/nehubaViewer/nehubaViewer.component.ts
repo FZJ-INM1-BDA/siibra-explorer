@@ -14,7 +14,7 @@ import { IColorMap, SET_COLORMAP_OBS, SET_LAYER_VISIBILITY } from "../layerCtrl.
 import { EXTERNAL_LAYER_CONTROL, IExternalLayerCtl, INgLayerCtrl, NG_LAYER_CONTROL, SET_SEGMENT_VISIBILITY, TNgLayerCtrl, Z_TRAVERSAL_MULTIPLIER } from "../layerCtrl.service/layerCtrl.util";
 import { NgCoordinateSpace, Unit } from "../types";
 import { PeriodicSvc } from "src/util/periodic.service";
-import { ViewerInternalStateSvc, AUTO_ROTATE } from "src/viewerModule/viewerInternalState.service";
+import { ViewerInternalStateSvc, AUTO_ROTATE, TInteralStatePayload } from "src/viewerModule/viewerInternalState.service";
 
 function translateUnit(unit: Unit) {
   if (unit === "m") {
@@ -118,6 +118,8 @@ export class NehubaViewerUnit implements OnDestroy {
 
   multplier = new Float32Array(1)
 
+  private internalStateNext: (arg: TInteralStatePayload<{ orientation: number[], perspectiveOrientation: number[], perspectiveZoom: number, zoom: number, position: number[] }>) => void
+
   constructor(
     public elementRef: ElementRef,
     private log: LoggingService,
@@ -176,6 +178,10 @@ export class NehubaViewerUnit implements OnDestroy {
             animate()
             return
           }
+          
+          if (arg.viewerType === "nehuba") {
+            this.setNavigationState(arg.payload)
+          }
         }
       })
 
@@ -186,6 +192,7 @@ export class NehubaViewerUnit implements OnDestroy {
         viewerType: "nehuba",
         payload: {}
       })
+      this.internalStateNext = next
     }
 
     if (this.nehubaViewer$) {
@@ -856,14 +863,22 @@ export class NehubaViewerUnit implements OnDestroy {
        */
       .filter(val => !this.initNav && val?.perspectiveZoom > 10)
       .subscribe(({ orientation, perspectiveOrientation, perspectiveZoom, position, zoom }) => {
-
-        this.viewerPositionChange.emit({
+        const payload = {
           orientation : Array.from(orientation),
           perspectiveOrientation : Array.from(perspectiveOrientation),
           perspectiveZoom: perspectiveZoom / PERSPECTIVE_ZOOM_FUDGE_FACTOR,
           zoom,
           position: Array.from(position),
+        } as any
+        this.viewerPositionChange.emit({
+          ...payload,
           positionReal : true,
+        })
+        this.internalStateNext({
+          "@id": "",
+          "@type": "TViewerInternalStateEmitterEvent",
+          payload,
+          viewerType: "nehuba"
         })
       }),
 

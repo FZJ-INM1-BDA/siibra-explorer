@@ -1,6 +1,6 @@
 import { CdkDragDrop, moveItemInArray } from "@angular/cdk/drag-drop";
 import { Component, Optional, inject } from "@angular/core";
-import { getUuid } from "src/util/fn";
+import { add, getUuid, mul } from "src/util/fn";
 import { timedValues } from "src/util/generator";
 import { AUTO_ROTATE, TAutoRotatePayload, ViewerInternalStateSvc } from "src/viewerModule/viewerInternalState.service";
 import { MatSnackBar } from 'src/sharedModules/angularMaterial.exports'
@@ -28,8 +28,6 @@ export class KeyFrameCtrlCmp {
 
   #onDestroy$ = inject(DestroyDirective).destroyed$
 
-  public loopFlag = false
-  public linearFlag = false
   public currState: any
   public currViewerType: string
   public internalStates: TStoredState[] = []
@@ -48,7 +46,7 @@ export class KeyFrameCtrlCmp {
 
   frameFormGrp = new FormGroup({
     loop: new FormControl<boolean>(false),
-    linearCamera: new FormGroup<boolean>(false),
+    linearCamera: new FormControl<boolean>(false),
     steps: new FormGroup({})
   })
 
@@ -93,6 +91,10 @@ export class KeyFrameCtrlCmp {
       complete: () => {
         this.#setAutoRotate(false, 0, false)
       }
+    })
+
+    this.#onDestroy$.subscribe(() => {
+      this.isPlaying = false
     })
   }
 
@@ -144,12 +146,19 @@ export class KeyFrameCtrlCmp {
     while (true) {
       if (!this.isPlaying) break
       try {
+        if (!this.internalStates[idx]) {
+          const loopFlag = this.frameFormGrp.controls.loop.value
+          if (!loopFlag) {
+            break
+          }
+          idx = idx - this.internalStates.length
+        }
+        
         await this.animateFrame(
           this.internalStates[idx % this.internalStates.length],
           this.internalStates[(idx + 1) % this.internalStates.length]
         )
         idx ++
-        if (idx >= this.internalStates.length-1 && !this.loopFlag) break
       } catch (e) {
         // user interrupted
         console.log(e)
@@ -159,6 +168,53 @@ export class KeyFrameCtrlCmp {
     this.isPlaying = false
   }
   private async animateFrame(fromFrame: TStoredState, toFrame: TStoredState) {
+    const { viewerType: fViewerType } = fromFrame
+    const { viewerType: tViewerType } = toFrame
+    if (fViewerType !== tViewerType) {
+      console.warn(`from and to type must be the same, but ${fViewerType} !== ${tViewerType}`)
+      return
+    }
+    let getFrame: ((value: number) => void)|undefined
+    if (fViewerType === "ThreeSurfer") {
+      getFrame = this.#getThreeSurferFrameGen(fromFrame, toFrame)
+    }
+    if (fViewerType === "nehuba") {
+      getFrame = this.#getNgFrameGen(fromFrame, toFrame)
+    }
+    if (!getFrame) {
+      // TODO catch when getFrame is not set
+      return
+    }
+    return new Promise((rs, rj) => {
+
+      const gen = timedValues(toFrame.duration)
+
+      const animate = () => {
+        if (!this.isPlaying) {
+          this.raf = null
+          return rj('User interrupted')
+        }
+        const next = gen.next()
+        const d = next.value
+        getFrame(d)
+
+        if (next.done) {
+          this.raf = null
+
+          rs('')
+        } else {
+          this.raf = requestAnimationFrame(() => {
+            animate()
+          })
+        }
+      }
+      this.raf = requestAnimationFrame(() => {
+        animate()
+      })
+    })
+  }
+
+  #getThreeSurferFrameGen(fromFrame: TStoredState, toFrame: TStoredState) {
     const toPayloadCamera = (toFrame.payload as any).camera
     const fromPayloadCamera = (fromFrame.payload as any).camera
 
@@ -167,9 +223,9 @@ export class KeyFrameCtrlCmp {
       y: toPayloadCamera.y - fromPayloadCamera.y,
       z: toPayloadCamera.z - fromPayloadCamera.z,
     }
-
+    const linearFlag = this.frameFormGrp.controls.linearCamera.value
     const applyDelta = (() => {
-      if (this.linearFlag) {
+      if (linearFlag) {
         return (d: number) => {
           return {
             x: delta.x * d + fromPayloadCamera.x,
@@ -193,16 +249,22 @@ export class KeyFrameCtrlCmp {
           toPayloadCamera.y,
           toPayloadCamera.z,
         )
+        
+        const modRatio = (vec2.lengthSq() / vec1.lengthSq()) ** 0.5
+        
         vec1.normalize()
         vec2.normalize()
 
         targetQ.setFromUnitVectors(vec1, vec2)
 
         return (d: number) => {
+          const scale = d * modRatio + (1 - d)
+
           const deltaQ = idQ.clone()
           deltaQ.slerp(targetQ, d)
           const v = startVec.clone()
           v.applyQuaternion(deltaQ)
+          v.multiplyScalar(scale)
           return {
             x: v.x,
             y: v.y,
@@ -211,45 +273,55 @@ export class KeyFrameCtrlCmp {
         }
       }
     })()
-
-    const gen = timedValues(toFrame.duration)
-
-    return new Promise((rs, rj) => {
-
-      const animate = () => {
-        if (!this.isPlaying) {
-          this.raf = null
-          return rj('User interrupted')
-        }
-        const next = gen.next()
-        const d = next.value
-
-        if (this.viewerInternalSvc) {
-          const camera = applyDelta(d)
-          this.viewerInternalSvc.applyInternalState({
-            "@id": getUuid(),
-            "@type": "TViewerInternalStateEmitterEvent",
-            viewerType: fromFrame.viewerType,
-            payload: {
-              camera
-            }
-          })
-        }
-
-        if (next.done) {
-          this.raf = null
-
-          rs('')
-        } else {
-          this.raf = requestAnimationFrame(() => {
-            animate()
-          })
-        }
+    return (value: number) => {
+      if (this.viewerInternalSvc) {
+        const camera = applyDelta(value)
+        this.viewerInternalSvc.applyInternalState({
+          "@id": getUuid(),
+          "@type": "TViewerInternalStateEmitterEvent",
+          viewerType: fromFrame.viewerType,
+          payload: {
+            camera
+          }
+        })
       }
-      this.raf = requestAnimationFrame(() => {
-        animate()
-      })
-    })
+    }
+  }
+
+  #getNgFrameGen(fromFrame: TStoredState, toFrame: TStoredState){
+    const { payload: fPayload } = fromFrame
+    const { payload: tPayload } = toFrame
+    const keys = [
+      "zoom", 
+      "perspectiveZoom", 
+      "position", 
+      "orientation", 
+      "perspectiveOrientation", 
+    ]
+
+    const delta = {}
+    for (const key of keys){
+      delta[key] = add(mul(fPayload[key], -1), tPayload[key])
+    }
+    return (value: number) => {
+      if (this.viewerInternalSvc) {
+        const clone = structuredClone(fPayload)
+        
+        for (const key of keys){
+          clone[key] = add(mul(delta[key], value), fPayload[key])
+        }
+
+        this.viewerInternalSvc.applyInternalState({
+          '@id': '',
+          '@type': 'TViewerInternalStateEmitterEvent',
+          viewerType: 'nehuba',
+          payload: {
+            ...clone,
+            positionReal: true
+          }
+        })
+      }
+    }
   }
 
   gotoFrame(item: TStoredState) {
