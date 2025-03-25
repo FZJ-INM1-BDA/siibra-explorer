@@ -342,4 +342,8 @@ export class KeyFrameCtrlCmp {
   drop(event: CdkDragDrop<string[]>) {
     moveItemInArray(this.internalStates, event.previousIndex, event.currentIndex);
   }
+
+  displayWith(value: number) {
+    return `${(value / 1e3).toFixed(1)}s`
+  }
 }
