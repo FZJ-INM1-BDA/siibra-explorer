@@ -29,13 +29,27 @@
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "css",
             "assets": [
-              "src/assets"
+              "src/assets",
+              {
+                "input": "node_modules/three-surfer",
+                "glob": "**/*",
+                "output": "lib/three-surfer"
+              },
+              {
+                "input": "node_modules/hbp-connectivity-component",
+                "glob": "**/*",
+                "output": "lib/hbp-connectivity-component"
+              },
+              {
+                "input": "node_modules/ng-layer-tune",
+                "glob": "**/*",
+                "output": "lib/ng-layer-tune"
+              }
             ],
             "styles": [
               "src/theme.scss",
               "src/overwrite.scss",
               "src/extra_styles.css",
-
               {
                 "input": "export-nehuba/dist/min/main.css",
                 "inject": false,
