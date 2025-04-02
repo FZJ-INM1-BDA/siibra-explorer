@@ -474,7 +474,8 @@ export const getShader = ({
   highThreshold = 1,
   brightness = 0,
   contrast = 0,
-  removeBg = false
+  removeBg = false,
+  opacity = 1.0
 } = {}): string => {
   const parsedCM = parseColorMapFromStr(colormap)
 
@@ -485,7 +486,7 @@ export const getShader = ({
     lowThreshold,
     contrast,
     hideZero: false,
-    opacity: 1.0,
+    opacity,
     removeBg
   })
 }
@@ -516,11 +517,13 @@ export function getShaderFromMeta(meta: MetaV1Schema){
     low = min
     high = max
   }
+  const opacity = meta?.["https://schema.brainatlas.eu/github/humanbrainproject/neuroglancer"]?.opacity ?? 1.0
   
   return getShader({
     colormap,
     lowThreshold: low,
-    highThreshold: high
+    highThreshold: high,
+    opacity
   })
 }
 
