@@ -68,8 +68,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-      with:
-        lfs: true
     - name: 'Set matomo env var'
       run: |
         echo "Using github.ref: $GITHUB_REF"
