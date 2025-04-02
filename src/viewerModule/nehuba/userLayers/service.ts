@@ -196,7 +196,11 @@ export class UserLayerService implements OnDestroy {
   }
 
   @RegisterSource(
-    async input => typeof input === "string" && (input.startsWith("precomputed://") || input.startsWith("zarr://") || input.startsWith("n5://"))
+    async input => typeof input === "string"
+      && SUPPORTED_PREFIX.some(prefix => input.startsWith(prefix))
+      // deepzoom has its own processor, which deals with the 2D nature of the volume
+      // as well as fetching the affine
+      && !input.startsWith("deepzoom://")
   )
   async processPrecomputed(source: string): Promise<ProcessorOutput>{
     let protocol: ValidProtocol
