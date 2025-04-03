@@ -5,6 +5,7 @@ metadata:
   labels:
     name: siibra-explorer-redirect-ingress
 spec:
+  ingressClassName: nginx
   rules:
   - host: interactive-viewer.apps.hbp.eu
     http:

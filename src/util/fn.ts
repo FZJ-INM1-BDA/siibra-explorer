@@ -475,7 +475,8 @@ export const getShader = ({
   highThreshold = 1,
   brightness = 0,
   contrast = 0,
-  removeBg = false
+  removeBg = false,
+  opacity = 1.0
 } = {}): string => {
   const parsedCM = parseColorMapFromStr(colormap)
 
@@ -486,7 +487,7 @@ export const getShader = ({
     lowThreshold,
     contrast,
     hideZero: false,
-    opacity: 1.0,
+    opacity,
     removeBg
   })
 }
@@ -517,11 +518,13 @@ export function getShaderFromMeta(meta: MetaV1Schema){
     low = min
     high = max
   }
+  const opacity = meta?.["https://schema.brainatlas.eu/github/humanbrainproject/neuroglancer"]?.opacity ?? 1.0
   
   return getShader({
     colormap,
     lowThreshold: low,
-    highThreshold: high
+    highThreshold: high,
+    opacity
   })
 }
 
@@ -574,4 +577,31 @@ export function getFactor(unit: string){
     }
   }
   throw new Error(`Cannot convert ${unit}`)
+}
+
+type NumberLike = number | (number[])
+
+export function mul(a: NumberLike, b: number): NumberLike{
+  if (typeof a === "number") {
+    return a * b
+  }
+  if (Array.isArray(a)) {
+    return a.map(v => mul(v, b)) as number[]
+  }
+}
+
+export function add(a: NumberLike, b: NumberLike) {
+  if (typeof a !== typeof b) {
+    throw new Error(`typeof must be equal`)
+  }
+  if (typeof a === "number" && typeof b === "number") {
+    return a + b
+  }
+  if (Array.isArray(a) && Array.isArray(b)) {
+    if (a.length !== b.length) {
+      throw new Error(`for Array, a.length must be equal to b.length`)
+    }
+    return a.map((v, i) => v + b[i])
+  }
+  throw new Error(`does not support none number like`)
 }
