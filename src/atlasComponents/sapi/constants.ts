@@ -1,5 +1,5 @@
 export const IDS = {
-  ATLAES: {
+  ATLASES: {
     HUMAN: "juelich/iav/atlas/v1.0.0/1",
     RAT: "minds/core/parcellationatlas/v1.0.0/522b368e-49a3-49fa-88d3-0870a307974a",
   },

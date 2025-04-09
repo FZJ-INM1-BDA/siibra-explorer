@@ -6,14 +6,14 @@ import { Feature } from 'src/atlasComponents/sapi/sxplrTypes';
 import { FeatureBase } from '../base';
 import * as userInteraction from "src/state/userInteraction"
 import { CategoryAccDirective } from "../category-acc.directive"
-import { combineLatest, concat, forkJoin, merge, of, Subject } from 'rxjs';
+import { combineLatest, concat, forkJoin, from, merge, of, Subject } from 'rxjs';
 import { DsExhausted, IsAlreadyPulling, PulledDataSource } from 'src/util/pullable';
 import { TranslatedFeature } from '../list/list.directive';
 import { MatDialog } from 'src/sharedModules/angularMaterial.exports';
 import { DestroyDirective } from 'src/util/directives/destroy.directive';
 import { FEATURE_CONCEPT_TOKEN, FeatureConcept, TPRB } from '../util';
 import { SPECIES_ENUM } from 'src/util/constants';
-import { atlasSelection } from 'src/state';
+import { atlasSelection, userPreference } from 'src/state';
 import { ExperimentalService } from 'src/experimental/experimental.service';
 
 const categoryAcc = <T extends Record<string, unknown>>(categories: T[]) => {
@@ -113,6 +113,53 @@ export class EntryComponent extends FeatureBase implements AfterViewInit {
         map(record => Object.values(record).flatMap(v => v))
       )
     )),
+    shareReplay(1),
+  )
+
+  geometry$ = combineLatest([
+    this.store.pipe(
+      select(userPreference.selectors.showExperimental)
+    ),
+    this.TPRBbox$.pipe(
+      shareReplay(1)
+    ),
+  ]).pipe(
+    switchMap(([showExmptFlag, val]) => {
+      if (!showExmptFlag || !val) {
+        return of([])
+      }
+      const { template, bbox } = val
+      if (template.id !== IDS.TEMPLATES.AMBA_CCF_V3) {
+        return of([])
+      }
+      const translateMm = [11400000 - 5737500, 13200000 - 6637500 + 1e6, 8000000 - 4037500].map(v => v/1e6)
+
+      const bboxStr = bbox.map(triplet => 
+        triplet.map((v, idx) => translateMm[idx] - v).join(",")
+      ).reverse().join("/")
+
+      const tmpHost = `https://zam12230.jsc.fz-juelich.de/macaque-md/geometry/`
+      return from(
+        fetch(`${tmpHost}/foo/0/${bboxStr}/stat`).then(res => res.json())
+      ).pipe(
+        switchMap(result => {
+          if ((result.count || 1e10) > 1e5) {
+            return of([])
+          }
+          return from(
+            fetch(`${tmpHost}/foo/0/${bboxStr}/geometry`).then(res => res.json())
+          ).pipe(
+            map(
+              (arr: number[][]) => arr.map(
+                triplet => triplet.map(
+                  (v, idx) => (translateMm[idx] - v) * 1e6
+                )
+              )
+            )
+          )
+        })
+      )
+    }),
     shareReplay(1),
   )
 

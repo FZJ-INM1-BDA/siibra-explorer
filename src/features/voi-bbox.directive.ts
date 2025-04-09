@@ -1,15 +1,34 @@
 import { Directive, Inject, Input, Optional, inject } from "@angular/core";
 import { Store } from "@ngrx/store";
-import { concat, interval, of, Subject } from "rxjs";
-import { debounce, distinctUntilChanged, filter, pairwise, take, takeUntil } from "rxjs/operators";
+import { BehaviorSubject, combineLatest, concat, interval, of, Subject } from "rxjs";
+import { debounce, filter, map, take, takeUntil } from "rxjs/operators";
 import { AnnotationLayer, TNgAnnotationAABBox, TNgAnnotationPoint } from "src/atlasComponents/annotations";
 import { Feature, VoiFeature } from "src/atlasComponents/sapi/sxplrTypes";
 import { userInteraction } from "src/state";
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
-import { arrayEqual } from "src/util/array";
 import { isVoiData } from "./guards"
 import { DestroyDirective } from "src/util/directives/destroy.directive";
 import { HOVER_INTERCEPTOR_INJECTOR, HoverInterceptor, THoverConfig } from "src/util/injectionTokens";
+
+type TripletNum = [number, number, number]
+
+type DisplayedPoint = {
+  id: string
+  type: 'point'
+  point: number[]
+}
+
+function isDisplayPoint(input: unknown): input is DisplayedPoint{
+  return input?.['type'] === "point"
+}
+
+type DisplayedBox = {
+  id: string
+  type: 'box'
+  minpoint: number[]
+  maxpoint: number[]
+  center: number[]
+}
 
 @Directive({
   selector: '[voiBbox]',
@@ -44,7 +63,8 @@ export class VoiBboxDirective {
       return null
     }
   }
-  #annotationIdToFeature = new Map<string, VoiFeature>()
+  #annotationIdToFeatureId = new Map<string, string>()
+  #featureIdToFeature = new Map<string, VoiFeature>()
   #features$ = new Subject<VoiFeature[]>()
   #voiFeatures: VoiFeature[] = []
   
@@ -56,6 +76,39 @@ export class VoiBboxDirective {
   get features(): VoiFeature[]{
     return this.#voiFeatures
   }
+
+  #pointGeometry$ = new BehaviorSubject<DisplayedPoint[]>([])
+  @Input()
+  set geometry(value: unknown) {
+    if (!Array.isArray(value)) {
+      this.#pointGeometry$.next([])
+      return
+    }
+    this.#pointGeometry$.next(
+      value.map(v => {
+        const rv: DisplayedPoint = {
+          id: JSON.stringify(v),
+          point: v,
+          type: 'point'
+        }
+        return rv
+      })
+    )
+  }
+
+  #boxedGeometry$ = concat(
+    of([] as VoiFeature[]),
+    this.#features$
+  ).pipe(
+    map(features => features.map(feat => {
+      const b: DisplayedBox = {
+        ...feat.bbox,
+        type: 'box',
+        id: feat.id
+      }
+      return b
+    }))
+  )
 
   #hoverMsgs: THoverConfig[] = []
 
@@ -73,44 +126,51 @@ export class VoiBboxDirective {
       this.#destory$.subscribe(() => deregister(handleClick))
     }
 
-    concat(
-      of([] as VoiFeature[]),
-      this.#features$
-    ).pipe(
+    this.#features$.pipe(
       takeUntil(this.#destory$),
-      distinctUntilChanged(arrayEqual((o, n) => o.id === n.id)),
-      pairwise(),
+    ).subscribe(features => {
+      this.#annotationIdToFeatureId.clear()
+      this.#featureIdToFeature.clear()
+      for (const f of features){
+        const aabb = this.#pointsToAABB(f.bbox.minpoint, f.bbox.maxpoint, `${f.id}-box`)
+        const pt = this.#pointToPoint(f.bbox.center, `${f.id}-point`)
+        this.#annotationIdToFeatureId.set(aabb.id, f.id)
+        this.#annotationIdToFeatureId.set(pt.id, f.id)
+        this.#featureIdToFeature.set(f.id, f)
+      }
+    })
+
+    combineLatest([
+      this.#boxedGeometry$,
+      this.#pointGeometry$,
+    ]).pipe(
+      map(([ boxes, points ]) => [...boxes, ...points]),
+      takeUntil(this.#destory$),
       debounce(() => 
         interval(16).pipe(
           filter(() => !!this.voiBBoxSvc),
           take(1),
         )
       ),
-    ).subscribe(([ prev, curr ]) => {
-      for (const v of prev) {
-        const box = this.#pointsToAABB(v.bbox.maxpoint, v.bbox.minpoint)
-        const point = this.#pointToPoint(v.bbox.center)
-        this.#annotationIdToFeature.delete(box.id)
-        this.#annotationIdToFeature.delete(point.id)
-        if (!this.voiBBoxSvc) continue
-        for (const ann of [box, point]) {
-          this.voiBBoxSvc.removeAnnotation({
-            id: ann.id
-          })
-        }
+    ).subscribe(async curr => {
+      
+      if (this.voiBBoxSvc) {
+        await this.voiBBoxSvc.clear()
       }
+      const annotations = []
       for (const v of curr) {
-        const box = this.#pointsToAABB(v.bbox.maxpoint, v.bbox.minpoint)
-        const point = this.#pointToPoint(v.bbox.center)
-        this.#annotationIdToFeature.set(box.id, v)
-        this.#annotationIdToFeature.set(point.id, v)
+        if (isDisplayPoint(v)) {
+          annotations.push(v)
+        } else {
+          const box = this.#pointsToAABB(v.maxpoint as TripletNum, v.minpoint as TripletNum, `${v.id}-box`)
+          const point = this.#pointToPoint(v.center as TripletNum, `${v.id}-point`)
+          annotations.push(box, point)
+        }
         if (!this.voiBBoxSvc) {
           throw new Error(`annotation is expected to be added, but annotation layer cannot be instantiated.`)
         }
-        for (const ann of [box, point]) {
-          this.voiBBoxSvc.updateAnnotation(ann)
-        }
       }
+      await this.voiBBoxSvc.updateAnnotation(annotations)
       if (this.voiBBoxSvc) this.voiBBoxSvc.setVisible(true)
     })
 
@@ -163,7 +223,9 @@ export class VoiBboxDirective {
   #hoveredFeat: VoiFeature
   handleOnHoverFeature(ann: { id?: string }){
     const { id } = ann || {}
-    const feature = this.#annotationIdToFeature.get(id)
+
+    const featureId = this.#annotationIdToFeatureId.get(id)
+    const feature = this.#featureIdToFeature.get(featureId)
     this.#hoveredFeat = feature
     this.store.dispatch(
       userInteraction.actions.setMouseoverVoi({ feature })
@@ -174,17 +236,19 @@ export class VoiBboxDirective {
     }
   }
 
-  #pointsToAABB(pointA: [number, number, number], pointB: [number, number, number]): TNgAnnotationAABBox{
+  #pointsToAABB(pointA: [number, number, number], pointB: [number, number, number], useId=null): TNgAnnotationAABBox{
+    const id = useId || `${VoiBboxDirective.VOI_LAYER_NAME}:${JSON.stringify(pointA)}:${JSON.stringify(pointB)}`
     return {
-      id: `${VoiBboxDirective.VOI_LAYER_NAME}:${JSON.stringify(pointA)}:${JSON.stringify(pointB)}`,
+      id,
       type: "aabbox",
       pointA: pointA.map(v => v*1e6) as [number, number, number],
       pointB: pointB.map(v => v*1e6) as [number, number, number],
     }
   }
-  #pointToPoint(point: [number, number, number]): TNgAnnotationPoint{
+  #pointToPoint(point: [number, number, number], useId=null): TNgAnnotationPoint{
+    const id = useId || `${VoiBboxDirective.VOI_LAYER_NAME}:${JSON.stringify(point)}`
     return {
-      id: `${VoiBboxDirective.VOI_LAYER_NAME}:${JSON.stringify(point)}`,
+      id,
       point: point.map(v => v*1e6) as [number, number, number],
       type: "point"
     }

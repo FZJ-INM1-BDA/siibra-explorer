@@ -68,10 +68,10 @@ export class RouterEffects {
            * if no atlas is selected by default
            */
           if (!atlasSelectionState.selectedAtlas) {
-            const humanAtlas = atlases.find(atlas => atlas.id === IDS.ATLAES.HUMAN)
+            const humanAtlas = atlases.find(atlas => atlas.id === IDS.ATLASES.HUMAN)
             if (humanAtlas) {
               return atlasSelection.actions.selectATPById({
-                atlasId: IDS.ATLAES.HUMAN,
+                atlasId: IDS.ATLASES.HUMAN,
                 parcellationId: IDS.PARCELLATION.JBA31,
                 templateId: IDS.TEMPLATES.MNI152,
               })

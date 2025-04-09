@@ -137,7 +137,7 @@ export class UserLayerService implements OnDestroy {
           colormap: "magma",
           lowThreshold: meta.min || 0,
           highThreshold: meta.max || 1,
-          removeBg: true
+          opacity: 0.5
         })
       },
       meta: {
@@ -227,6 +227,7 @@ export class UserLayerService implements OnDestroy {
   )
   async processRemoteNii(source: string): Promise<ProcessorOutput>{
     const url = source.replace(/^nifti:\/\//, "")
+    const defaultOpacity = 0.5
     return {
       cleanup: noop,
       meta: {
@@ -240,9 +241,10 @@ export class UserLayerService implements OnDestroy {
         legacySpecFlag: "old",
         shader: getShader({
           colormap: "magma",
-          removeBg: true
+          opacity: defaultOpacity,
+          // do not automatically remove background
         }),
-        opacity: 0.5,
+        opacity: defaultOpacity,
       },
       protocol: "nifti://",
       url

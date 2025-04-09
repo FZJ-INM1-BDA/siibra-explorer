@@ -686,12 +686,11 @@
                 #voiFeatureEntryCmp="featureEntryCmp">
             </sxplr-feature-entry>
             
-            <ng-template [ngIf]="(voiFeatureEntryCmp.totals$ | async) > 0">
-                <div *ngIf="switchdir.switchState$ | async"
-                    voiBbox
-                    [features]="voiFeatureEntryCmp.features$ | async">
-                </div>
-            </ng-template>
+            <div *ngIf="switchdir.switchState$ | async"
+                voiBbox
+                [geometry]="voiFeatureEntryCmp.geometry$ | async"
+                [features]="voiFeatureEntryCmp.features$ | async">
+            </div>
     
             <button mat-icon-button
                 [color]="(switchdir.switchState$ | async) ? 'accent' : 'default'"

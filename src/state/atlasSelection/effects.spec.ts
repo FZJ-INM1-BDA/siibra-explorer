@@ -180,7 +180,7 @@ describe("> effects.ts", () => {
                 },
                 previous: {
                   atlas: {
-                    id: IDS.ATLAES.RAT
+                    id: IDS.ATLASES.RAT
                   } as any,
                   parcellation: {
                     id: IDS.PARCELLATION.WAXHOLMV4
@@ -208,7 +208,7 @@ describe("> effects.ts", () => {
               const obs = hook({
                 current: {
                   atlas: {
-                    id: IDS.ATLAES.HUMAN
+                    id: IDS.ATLASES.HUMAN
                   } as any,
                   parcellation: {
                     id: IDS.PARCELLATION.JBA29
@@ -219,7 +219,7 @@ describe("> effects.ts", () => {
                 },
                 previous: {
                   atlas: {
-                    id: IDS.ATLAES.RAT
+                    id: IDS.ATLASES.RAT
                   } as any,
                   parcellation: {
                     id: IDS.PARCELLATION.WAXHOLMV4
@@ -335,7 +335,7 @@ describe("> effects.ts", () => {
         })
         const mockStore = TestBed.inject(MockStore)
         mockStore.overrideSelector(selectors.selectedAtlas, {
-          id: IDS.ATLAES.HUMAN
+          id: IDS.ATLASES.HUMAN
         } as SxplrAtlas)
         mockStore.overrideSelector(selectors.selectedTemplate, {
           id: IDS.TEMPLATES.MNI152

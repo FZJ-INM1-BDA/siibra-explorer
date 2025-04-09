@@ -57,7 +57,7 @@
     "file-loader": "^6.2.0",
     "hbp-connectivity-component": "0.6.8",
     "jszip": "^3.6.0",
-    "ng-layer-tune": "0.1.1",
+    "ng-layer-tune": "0.1.2",
     "postcss": "^8.3.6",
     "raw-loader": "^4.0.2",
     "rxjs": "~6.6.0",

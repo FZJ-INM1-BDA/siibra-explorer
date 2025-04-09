@@ -167,6 +167,19 @@ export class AnnotationLayer {
     )  
   }
 
+  async clear(){
+    const nglayer = await this.#getLayerObs().pipe(
+      switchMap(switchMapWaitFor({
+        condition: nglayer => !!nglayer?.layer?.localAnnotations,
+        leading: true
+      })),
+      take(1)
+    ).toPromise()
+    // await waitFor(() => !!nglayer?.layer?.localAnnotations)
+    const { localAnnotations } = nglayer.layer
+    localAnnotations.clear()
+  }
+
   async addAnnotation(spec: AnnotationSpec|AnnotationSpec[]){
     const nglayer = await this.#getLayer()
     if (!nglayer) {
@@ -188,7 +201,7 @@ export class AnnotationLayer {
       return false
     })
   }
-  async removeAnnotation(spec: { id: string }) {
+  async removeAnnotation(spec: { id: string }|{id: string}[]) {
     const nglayer = await this.#getLayerObs().pipe(
       switchMap(switchMapWaitFor({
         condition: nglayer => !!nglayer?.layer?.localAnnotations,
@@ -198,11 +211,14 @@ export class AnnotationLayer {
     ).toPromise()
     // await waitFor(() => !!nglayer?.layer?.localAnnotations)
     const { localAnnotations } = nglayer.layer
-    this.idset.delete(spec.id)
-    const ref = localAnnotations.references.get(spec.id)
-    if (ref) {
-      localAnnotations.delete(ref)
-      localAnnotations.references.delete(spec.id)
+    const specs = Array.isArray(spec) ? spec : [spec]
+    for (const spec of specs){
+      this.idset.delete(spec.id)
+      const ref = localAnnotations.references.get(spec.id)
+      if (ref) {
+        localAnnotations.delete(ref)
+        localAnnotations.references.delete(spec.id)
+      }
     }
   }
 
