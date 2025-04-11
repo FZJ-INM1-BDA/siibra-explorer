@@ -1,0 +1,9 @@
+<button mat-icon-button [disabled]="busy$ | async">
+    <ng-template [ngIf]="busy$ | async" [ngIfElse]="defaulttmpl">
+        <mat-spinner diameter="24"></mat-spinner>
+    </ng-template>
+    
+    <ng-template #defaulttmpl>
+        <mat-icon>download</mat-icon>
+    </ng-template>
+</button>

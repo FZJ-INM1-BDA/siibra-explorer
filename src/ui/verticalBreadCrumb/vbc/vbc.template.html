@@ -166,7 +166,7 @@
             <mat-divider></mat-divider>
 
             <div class="sxplr-d-flex">
-                <ng-template [ngTemplateOutlet]="parcOnlyActionTmpl"></ng-template>
+                <ng-template [ngTemplateOutlet]="parcActionTmpl"></ng-template>
             </div>
 
         </mat-expansion-panel>
@@ -410,6 +410,8 @@
                             }">
                         </doi-template>
 
+                        <mat-divider></mat-divider>
+
                         <!-- special views -->
 
                         <!-- voi special view -->
@@ -426,15 +428,49 @@
                         </ng-template>
 
                         <ng-template sxplrExperimentalFlag [experimental]="true">
+                        
+                        <mat-divider></mat-divider>
+
+                        <div class="sxplr-d-flex sxplr-mt-2">
+                            <mat-form-field class="flex-grow-3">
+                                <mat-label>
+                                    Visualize with a model
+                                </mat-label>
+                                <mat-select #vizSelect="matSelect">
+                                    <mat-option disabled selected>Select a model</mat-option>
+                                    <mat-option
+                                        *ngFor="let aVoi of fView.additionalVois"
+                                        [value]="aVoi.id">
+                                        {{ aVoi.name }}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                            
+                            <ng-template ngFor [ngForOf]="fView.additionalVois" let-aVoi>
+                                <ng-template [ngIf]="aVoi.id === vizSelect.value">
+                                    <button mat-icon-button
+                                        [matTooltip]="view.labels.DETAILS"
+                                        [sxplr-dialog]="DoiTemplate"
+                                        [sxplr-dialog-size]="null"
+                                        [sxplr-dialog-data]="{
+                                            title: aVoi.name,
+                                            desc: aVoi.desc,
+                                            contributors: aVoi.contributors | dedup, 
+                                            actions: aVoi.link | mapToProperty : 'href' | dedup
+                                        }">
+                                        <mat-icon>info</mat-icon>
+                                    </button>
+                                </ng-template>
+                            </ng-template>
+                            <button mat-icon-button color="warn"
+                                (click)="vizSelect.value = null"
+                                [disabled]="!vizSelect.value">
+                                <mat-icon>clear</mat-icon>
+                            </button>
+                        </div>
+                        
                         <ng-template ngFor [ngForOf]="fView.additionalVois" let-aVoi>
-                            <mat-slide-toggle
-                                iav-switch
-                                [iav-switch-state]="false"
-                                (change)="switch.toggle()"
-                                #switch="iavSwitch">
-                                Show segmentation
-                            </mat-slide-toggle>
-                            <ng-template [ngIf]="switch.switchState$ | async">
+                            <ng-template [ngIf]="aVoi.id === vizSelect.value">
                                 <ng-layer-ctl
                                     [ng-layer-ctl-name]="SXPLR_PREFIX + aVoi.ngVolume.url"
                                     [ng-layer-ctl-src]="aVoi.ngVolume.url"
@@ -584,20 +620,6 @@
 
     <!-- atlas templates -->
     <ng-template #atlasActionTmpl>
-        
-        <button sxplr-share-view mat-icon-button>
-            <i class="fas fa-share"></i>
-        </button>
-        <button mat-icon-button sxplrAtlasDownload #dl="atlasDlDct"
-            [disabled]="dl.busy$ | async">
-            
-            <ng-template [ngIf]="dl.busy$ | async" [ngIfElse]="notBusyDlTmpl">
-                <i class="fas fa-spinner spinning"></i>
-            </ng-template>
-            <ng-template #notBusyDlTmpl>
-                <i class="fas fa-download"></i>
-            </ng-template>
-        </button>
     </ng-template>
 
     <!-- space templates -->
@@ -634,6 +656,14 @@
             }">
             <mat-icon>info</mat-icon>
         </button>
+
+        <dumb-atlas-download
+            [template]="view.selectedATP.template"
+            [bbox]="view.currentViewport"
+            [strictMode]="'strict'">
+        </dumb-atlas-download>
+
+        <mat-divider [vertical]="true"></mat-divider>
 
         <!-- 
         only show
@@ -807,7 +837,7 @@
         </sxplr-sapiviews-core-rich-regionlistsearch>
     </ng-template>
 
-    <ng-template #parcOnlyActionTmpl>
+    <ng-template #parcActionTmpl>
 
         <!-- info button -->
         <button mat-icon-button
@@ -822,6 +852,18 @@
             [matTooltip]="view.labels.DETAILS">
             <mat-icon>info</mat-icon>
         </button>
+
+        <button mat-icon-button
+            [matTooltip]="view.labels.DOWNLOAD"
+            dumb-download-atlas
+            [parcellation]="view.selectedATP.parcellation"
+            [template]="view.selectedATP.template"
+            [bbox]="view.currentViewport"
+            [strictMode]="'strict'">
+            <mat-icon>download</mat-icon>
+        </button>
+
+        <mat-divider [vertical]="true"></mat-divider>
 
         <!-- parc delineation visibility -->
         <ng-template [ngIf]="view.parcellationVisible !== null">
@@ -916,6 +958,18 @@
                 <mat-icon>info</mat-icon>
             </button>
         </ng-template>
+
+        <!-- download -->
+        <button mat-icon-button
+            [matTooltip]="view.labels.DOWNLOAD"
+            dumb-download-atlas
+            [template]="view.selectedATP.template"
+            [parcellation]="view.selectedATP.parcellation"
+            [region]="view.selectedRegions[0]"
+            [bbox]="view.currentViewport"
+            [strictMode]="'strict'">
+            <mat-icon>download</mat-icon>
+        </button>
 
         <!-- related regions -->
         <ng-template [ngIf]="regionDirective.relatedRegions$ | async | dedupRelatedRegionPipe" let-relatedRegions>

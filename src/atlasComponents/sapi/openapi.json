@@ -1219,7 +1219,7 @@
         "operationId": "get_download_bundle_atlas_download_get",
         "parameters": [
           {
-            "required": true,
+            "required": false,
             "schema": {
               "type": "string",
               "title": "Space Id"
@@ -1228,7 +1228,7 @@
             "in": "query"
           },
           {
-            "required": true,
+            "required": false,
             "schema": {
               "type": "string",
               "title": "Parcellation Id"
@@ -1239,6 +1239,7 @@
           {
             "required": false,
             "schema": {
+              "type": "string",
               "title": "Bbox"
             },
             "name": "bbox",
@@ -1260,6 +1261,16 @@
               "title": "Feature Id"
             },
             "name": "feature_id",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "title": "Strict Mode",
+              "default": false
+            },
+            "name": "strict_mode",
             "in": "query"
           }
         ],

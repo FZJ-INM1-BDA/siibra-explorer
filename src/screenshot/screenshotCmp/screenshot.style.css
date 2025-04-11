@@ -4,7 +4,13 @@
   width:100%;
 }
 
-.cover
+.cover,
+:host-context([darktheme="false"]) .cover
+{
+  background-color: rgba(235,235,235, 0.5);
+}
+
+:host-context([darktheme="true"]) .cover
 {
   background-color: rgba(0,0,0, 0.5);
 }

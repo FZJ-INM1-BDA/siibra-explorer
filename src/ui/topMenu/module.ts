@@ -16,6 +16,8 @@ import { QuickTourModule } from "src/ui/quickTour/module";
 import { KeyFrameModule } from "src/keyframesModule/module";
 import { AngularMaterialModule } from "src/sharedModules";
 import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.directive";
+import { AtlasDownloadModule } from "src/atlas-download/atlas-download.module";
+import { ShareModule } from "src/share";
 
 
 @NgModule({
@@ -36,6 +38,8 @@ import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.di
     KeyFrameModule,
     QuickTourModule,
     ExperimentalFlagDirective,
+    AtlasDownloadModule,
+    ShareModule,
   ],
   declarations: [
     TopMenuCmp

@@ -2234,13 +2234,14 @@ export interface operations {
      * Get Download Bundle 
      * @description Prepare the bundle. Given a specification, prepare/bundle according to the specification.
      */
-    parameters: {
-      query: {
-        space_id: string
-        parcellation_id: string
-        bbox?: Record<string, never>
+    parameters?: {
+      query?: {
+        space_id?: string
+        parcellation_id?: string
+        bbox?: string
         region_id?: string
         feature_id?: string
+        strict_mode?: string
       }
     }
     responses: {

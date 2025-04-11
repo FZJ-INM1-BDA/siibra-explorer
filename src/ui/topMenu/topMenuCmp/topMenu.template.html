@@ -14,6 +14,11 @@
       </ng-container>
     </div>
 
+    <!-- share -->
+    <div iav-fab-speed-dial-child>
+      <ng-container *ngTemplateOutlet="shareBtnTmpl"></ng-container>
+    </div>
+
     <!-- plugin and tools -->
     <div iav-fab-speed-dial-child>
       <ng-container *ngTemplateOutlet="pluginAndToolsTmpl">
@@ -48,6 +53,10 @@
     <ng-container *ngTemplateOutlet="signinBtnTmpl">
     </ng-container>
 
+    <!-- share -->
+    <ng-container *ngTemplateOutlet="shareBtnTmpl">
+    </ng-container>
+
     <!-- plugin and tools -->
     <ng-container *ngTemplateOutlet="pluginAndToolsTmpl">
     </ng-container>
@@ -78,6 +87,22 @@
       <ng-template #notLoggedInTmpl>
         <i class="fas fa-user"></i>
       </ng-template>
+    </iav-dynamic-mat-button>
+  </div>
+</ng-template>
+
+<ng-template #shareBtnTmpl>
+  <div class="btnWrapper"
+    matTooltip="this view ..."
+    matTooltipPosition="below"
+    [matMenuTriggerFor]="shareMenu">
+  
+    <iav-dynamic-mat-button
+      [iav-dynamic-mat-button-style]="matBtnStyle"
+      [iav-dynamic-mat-button-color]="matBtnColor"
+      iav-dynamic-mat-button-aria-label="Show tools and plugins">
+
+      <mat-icon>view_in_ar</mat-icon>
     </iav-dynamic-mat-button>
   </div>
 </ng-template>
@@ -180,6 +205,29 @@
   </button>
   
   <plugin-banner></plugin-banner>
+</mat-menu>
+
+<!-- share dropdown -->
+<mat-menu #shareMenu>
+  <button mat-menu-item
+    sxplr-share-view>
+    <mat-icon>share</mat-icon>
+    <span>share</span>
+  </button>
+
+  <button mat-menu-item
+    sxplrAtlasDownload
+    #dl="atlasDlDct"
+    [disabled]="(dl.busy$ | async)">
+    <mat-icon
+      [ngClass]="{
+        'spinning': (dl.busy$ | async)
+      }"
+      fontSet="fas"
+      [fontIcon]="(dl.busy$ | async) ? 'fa-spinner' : 'fa-download'">
+    </mat-icon>
+    <span>{{ (dl.busy$ | async) ? 'download' : 'download' }}</span>
+  </button>
 </mat-menu>
 
 <!-- user dropdownmenu -->

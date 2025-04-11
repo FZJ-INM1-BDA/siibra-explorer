@@ -25,7 +25,7 @@ const BIGBRAIN_XZ = [
   [68.533, -58.788],
   [68.533, 62.222],
 ]
-type _Voi = Omit<VoiFeature, keyof Feature>
+type _Voi = VoiFeature
 
 @Directive({
   selector: '[feature-view-base]',
@@ -292,7 +292,32 @@ export class FeatureViewBase {
             },
             format: "neuroglancer-precomputed",
             insertIndex: 2
-          }
+          },
+          id: `${sectionId}-cpn`,
+          name: `Contour Proposal Network`,
+          contributors: [
+            `Eric Upschulte`,
+            `Alexander Oberstraß`
+          ],
+          desc: `Here is a sample description of CPN`,
+          link: [
+            {
+              href: `https://huggingface.co/spaces/ericup/celldetection`,
+              text: `huggingface.co/spaces/ericup/celldetection`
+            },
+            {
+              href: `https://github.com/FZJ-INM1-BDA/celldetection`,
+              text: `github.com/FZJ-INM1-BDA/celldetection`
+            },
+            {
+              href: `https://doi.org/10.1016/j.media.2022.102371`,
+              text: `10.1016/j.media.2022.102371`
+            },
+            {
+              href: `https://proceedings.mlr.press/v212/upschulte23a.html`,
+              text: `Uncertainty-Aware Contour Proposal Networks for Cell Segmentation in Multi-Modality High-Resolution Microscopy Images`
+            },
+          ]
         })
       }
       return {
