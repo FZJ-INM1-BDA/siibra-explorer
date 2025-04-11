@@ -76,6 +76,14 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     @Inject(DARKTHEME) private darktheme$: Observable<boolean>
   ) {
 
+    // stop propagation of copy event at body level
+    // since neuroglancer attach the copy event listener on the document level
+    // this prevent the event from reaching neuroglancer
+    // and will use the default behavior of copy (i.e. copy selected text)
+    this.document.body.addEventListener('copy', ev => {
+      ev.stopPropagation()
+    }, { capture: true })
+
     const error = this.el.nativeElement.getAttribute(CONST.DATA_ERROR_ATTR)
 
     if (error) {
