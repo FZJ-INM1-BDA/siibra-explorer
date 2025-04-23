@@ -464,11 +464,6 @@ export function decodeBool(num: number) {
   return rBool
 }
 
-const { encodeShader, parseColorMapFromStr } = globalThis['ngLayerTune'] || {}
-
-export { encodeShader }
-
-
 export const getShader = ({
   colormap = "greyscale",
   lowThreshold = 0,
@@ -478,6 +473,7 @@ export const getShader = ({
   removeBg = false,
   opacity = 1.0
 } = {}): string => {
+  const { encodeShader, parseColorMapFromStr } = globalThis['ngLayerTune'] || {}
   const parsedCM = parseColorMapFromStr(colormap)
 
   return encodeShader({
@@ -497,6 +493,7 @@ export function getOpacityFromMeta(meta: MetaV1Schema) {
 }
 
 export function getShaderFromMeta(meta: MetaV1Schema){
+  const { parseColorMapFromStr } = globalThis['ngLayerTune'] || {}
   let colormap = "greyscale"
 
   if (meta?.data?.type === "image/3d") {
