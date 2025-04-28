@@ -9,7 +9,7 @@ import { CategoryAccDirective } from "../category-acc.directive"
 import { combineLatest, concat, forkJoin, from, merge, of, Subject } from 'rxjs';
 import { DsExhausted, IsAlreadyPulling, PulledDataSource } from 'src/util/pullable';
 import { TranslatedFeature } from '../list/list.directive';
-import { MatDialog } from 'src/sharedModules/angularMaterial.exports';
+import { MatDialog, MatSnackBar } from 'src/sharedModules/angularMaterial.exports';
 import { DestroyDirective } from 'src/util/directives/destroy.directive';
 import { FEATURE_CONCEPT_TOKEN, FeatureConcept, TPRB } from '../util';
 import { SPECIES_ENUM } from 'src/util/constants';
@@ -84,6 +84,7 @@ export class EntryComponent extends FeatureBase implements AfterViewInit {
     private sapi: SAPI,
     private store: Store,
     private dialog: MatDialog,
+    private snackbar: MatSnackBar,
     private cdr: ChangeDetectorRef,
     private expmtSvc: ExperimentalService,
     @Inject(FEATURE_CONCEPT_TOKEN) private featConcept: FeatureConcept,
@@ -144,6 +145,7 @@ export class EntryComponent extends FeatureBase implements AfterViewInit {
       ).pipe(
         switchMap(result => {
           if ((result.count || 1e10) > 1e5) {
+            this.snackbar.open(`Pointclouds: too many points. Zoom in further to vizualize.`, null, { duration: 2500 })
             return of([])
           }
           return from(

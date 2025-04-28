@@ -41,6 +41,7 @@ nav:
   - Advanced functionalities:
     - State encoding in URL: "advanced/url_encoding.md"
     - Superimposing local files: "advanced/superimposing_local_files.md"
+    - Superimposing remote files: "advanced/superimposing_remote_files.md"
     - Annotating structures in the brain: "advanced/annotating_structures.md"
     - Differential gene expression analysis: "advanced/differential_gene_expression_analysis.md"
 

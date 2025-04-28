@@ -1,6 +1,6 @@
 # Superimposing Local Files
 
-siibra-explorer experimentally supports overlaying spatial features on top of existing atlas. They are never uploaded to any server, and are processed locally on your computer/browser.
+siibra-explorer supports overlaying local files on top of existing atlas. They are never uploaded to any server, and are processed locally on your computer/browser.
 
 !!! info
 	As the files never leave your browser, URL sharing will not include superimposed file.

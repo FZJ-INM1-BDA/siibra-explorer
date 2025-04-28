@@ -78,24 +78,22 @@ export class UserLayerService implements OnDestroy {
     )
   }
 
-  @RegisterSource(
-    async input => input instanceof File && input.name.endsWith(".swc")
-  )
-  async processSwc(file: File): ReturnType<ProcessResource['processor']> {
-    let message = `The swc rendering is experimental. Please contact us on any feedbacks. `
-    const swcText = await file.text()
+  async processSwcText(swcText: string, url: string, filename: string = "swc file"): ReturnType<ProcessResource['processor']> {
+    const messages = [`The swc rendering is experimental. Please contact us on any feedbacks. `]
     let src: TVALID_LINEAR_XFORM_SRC
     const dst: TVALID_LINEAR_XFORM_DST = "NEHUBA"
     if (/ccf/i.test(swcText)) {
       src = "CCF_V2_5"
-      message += `CCF detected, applying known transformation.`
+      messages.push(`CCF detected, applying applying CCF v2.5 transformation.`)
+    } else if (/https:\/\/mouselight\.janelia\.org/.test(swcText)) {
+      src = "CCF_V2_5"
+      messages.push(`janelia mouselight detected, applying CCF v2.5 transformation.`)
     }
     if (!src) {
-      message += `no known space detected. Applying default transformation.`
+      messages.push(`no known space detected. Applying default transformation.`)
     }
 
     const xform = await linearTransform(src, dst)
-    const url = URL.createObjectURL(file)
 
     return {
       option: {
@@ -107,11 +105,20 @@ export class UserLayerService implements OnDestroy {
       url,
       protocol: "swc://",
       meta: {
-        filename: file.name,
-        messages: [message],
+        filename: filename,
+        messages,
       },
-      cleanup: () => URL.revokeObjectURL(url)
+      cleanup: () => url.startsWith("blob") && URL.revokeObjectURL(url)
     }
+  }
+
+  @RegisterSource(
+    async input => input instanceof File && input.name.endsWith(".swc")
+  )
+  async processSwc(file: File): ReturnType<ProcessResource['processor']> {
+    const url = URL.createObjectURL(file)
+    const swcText = await file.text()
+    return await this.processSwcText(swcText, url, file.name)
   }
 
   async #processUnpackedNiiBuf(buf: ArrayBuffer, file: File): ReturnType<ProcessResource['processor']> {
@@ -271,6 +278,12 @@ export class UserLayerService implements OnDestroy {
 
     if (!protocol) {
       throw new Error(`Cannot parse source ${source}`)
+    }
+
+    if (protocol === "swc://") {
+      const resp = await fetch(url)
+      const text = await resp.text()
+      return await this.processSwcText(text, url, url)
     }
     
     const { transform, meta } = await forkJoin({
@@ -661,7 +674,6 @@ export class UserLayerService implements OnDestroy {
         distinctUntilChanged(),
         filter(url => !!url)
       ).subscribe(url => {
-        console.log("handling", url)
         this.handleUserInput(`${OVERLAY_LAYER_PROTOCOL}${url}`)}),
       this.store$.pipe(
         select(atlasAppearance.selectors.customLayers),
