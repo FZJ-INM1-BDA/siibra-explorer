@@ -690,8 +690,9 @@ class TranslateV3 {
     if (url in TMP_META_REGISTRY) {
       return TMP_META_REGISTRY[url]
     }
-    const iscpn = url.includes("tif/B20_")
-    const is1umRegisteredSlices = url.startsWith("https://1um.brainatlas.eu/registered_sections/bigbrain") || iscpn
+    const iscpn = url.includes("gpuvm-deploy/cuda")
+    const isTiamat1um = url.includes("mvp-tiamat/bb1micron/B20_")
+    const is1umRegisteredSlices = url.startsWith("https://1um.brainatlas.eu/registered_sections/bigbrain") || iscpn || isTiamat1um
 
     if (is1umRegisteredSlices) {
       const found = /B20_([0-9]{4})/.exec(url)
@@ -705,7 +706,8 @@ class TranslateV3 {
             type: "enclosed",
             points: BIGBRAIN_XZ.map(([x, z]) => ({
               type: "point",
-              value: [x, realYDis, z]
+              // best view point === center of voxel, not on the grid
+              value: [x, realYDis - 1e-2, z]
             }))
           }]
         }

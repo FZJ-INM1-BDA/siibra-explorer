@@ -7,6 +7,7 @@ import { Store } from '@ngrx/store';
 import { atlasSelection, userInteraction } from 'src/state';
 import { CFIndex } from '../compoundFeatureIndices';
 import { FeatureViewBase } from '../view/view-base.directive';
+import { ExperimentalService } from 'src/experimental/experimental.service';
 
 @Component({
   selector: 'sxplr-feature-view',
@@ -20,8 +21,9 @@ export class FeatureViewComponent extends FeatureViewBase{
     sapi: SAPI,
     private store: Store,
     @Inject(DARKTHEME) darktheme$: Observable<boolean>,
+    expmtSvc: ExperimentalService,
   ) {
-    super(sapi, darktheme$)
+    super(sapi, darktheme$, expmtSvc)
   }
 
   navigateToRegionByName(regionName: string){
