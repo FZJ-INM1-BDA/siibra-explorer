@@ -28,6 +28,7 @@ import { MarkdownModule } from "src/components/markdown";
 import { NgLayerCtrlCmp } from "src/viewerModule/nehuba/nehubaViewerInterface/ngLayerCtl/ngLayerCtrl.component";
 import { PlotComponent } from "src/features/plotly/plot/plot.component";
 import { MediaQueryDirective } from "src/util/directives/mediaQuery.directive";
+import { AnnotationDirective } from "src/atlasComponents/annotations/annotation.directive";
 
 @NgModule({
   imports: [
@@ -58,6 +59,7 @@ import { MediaQueryDirective } from "src/util/directives/mediaQuery.directive";
     NgLayerCtrlCmp,
     PlotComponent,
     MediaQueryDirective,
+    AnnotationDirective,
   ],
   declarations: [
     VerticalBreadCrumbComponent,

@@ -1,14 +1,14 @@
 import { Directive, Inject, Input, Optional, inject } from "@angular/core";
 import { Store } from "@ngrx/store";
-import { BehaviorSubject, combineLatest, concat, interval, of, Subject } from "rxjs";
-import { debounce, filter, map, take, takeUntil } from "rxjs/operators";
-import { AnnotationLayer, TNgAnnotationAABBox, TNgAnnotationPoint } from "src/atlasComponents/annotations";
+import { BehaviorSubject, combineLatest, concat, of, Subject } from "rxjs";
+import { debounceTime, map, takeUntil } from "rxjs/operators";
+import { TNgAnnotationAABBox, TNgAnnotationPoint } from "src/atlasComponents/annotations";
 import { Feature, VoiFeature } from "src/atlasComponents/sapi/sxplrTypes";
 import { userInteraction } from "src/state";
 import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR } from "src/util";
 import { isVoiData } from "./guards"
-import { DestroyDirective } from "src/util/directives/destroy.directive";
 import { HOVER_INTERCEPTOR_INJECTOR, HoverInterceptor, THoverConfig } from "src/util/injectionTokens";
+import { AnnotationDirective } from "src/atlasComponents/annotations/annotation.directive";
 
 type TripletNum = [number, number, number]
 
@@ -32,37 +32,16 @@ type DisplayedBox = {
 
 @Directive({
   selector: '[voiBbox]',
-  hostDirectives: [ DestroyDirective ]
+  hostDirectives: [ AnnotationDirective ]
 })
 export class VoiBboxDirective {
 
-  #destory$ = inject(DestroyDirective).destroyed$
+  #annotationDirective = inject(AnnotationDirective)  
+  #destory$ = this.#annotationDirective.destroyed$
 
   static VOI_LAYER_NAME = 'voi-annotation-layer'
   static VOI_ANNOTATION_COLOR = "#ffff00"
 
-  private _voiBBoxSvc: AnnotationLayer
-  get voiBBoxSvc(): AnnotationLayer {
-    if (this._voiBBoxSvc) return this._voiBBoxSvc
-    try {
-      const layer = AnnotationLayer.Get(
-        VoiBboxDirective.VOI_LAYER_NAME,
-        VoiBboxDirective.VOI_ANNOTATION_COLOR
-      )
-      this._voiBBoxSvc = layer
-      layer.onHover.pipe(
-        takeUntil(this.#destory$)
-      ).subscribe(val => this.handleOnHoverFeature(val || {}))
-
-      this.#destory$.subscribe(() => {
-        this._voiBBoxSvc.dispose()
-        this._voiBBoxSvc = null
-      })
-      return this._voiBBoxSvc
-    } catch (e) {
-      return null
-    }
-  }
   #annotationIdToFeatureId = new Map<string, string>()
   #featureIdToFeature = new Map<string, VoiFeature>()
   #features$ = new Subject<VoiFeature[]>()
@@ -119,6 +98,16 @@ export class VoiBboxDirective {
     @Optional() @Inject(HOVER_INTERCEPTOR_INJECTOR) 
     private hoverInterceptor: HoverInterceptor,
   ){
+
+    this.#annotationDirective.annotationColor = VoiBboxDirective.VOI_ANNOTATION_COLOR
+    this.#annotationDirective.annotationLayerName = VoiBboxDirective.VOI_LAYER_NAME
+
+    this.#annotationDirective.onHover.pipe(
+      takeUntil(this.#destory$)
+    ).subscribe(id => {
+      this.handleOnHoverFeature(id && { id })
+    })
+
     if (clickInterceptor) {
       const { register, deregister } = clickInterceptor
       const handleClick = this.handleClick.bind(this)
@@ -146,17 +135,10 @@ export class VoiBboxDirective {
     ]).pipe(
       map(([ boxes, points ]) => [...boxes, ...points]),
       takeUntil(this.#destory$),
-      debounce(() => 
-        interval(16).pipe(
-          filter(() => !!this.voiBBoxSvc),
-          take(1),
-        )
-      ),
-    ).subscribe(async curr => {
+      debounceTime(16),
+    ).subscribe(curr => {
+      this.#annotationDirective.annotations = []
       
-      if (this.voiBBoxSvc) {
-        await this.voiBBoxSvc.clear()
-      }
       const annotations = []
       for (const v of curr) {
         if (isDisplayPoint(v)) {
@@ -166,12 +148,9 @@ export class VoiBboxDirective {
           const point = this.#pointToPoint(v.center as TripletNum, `${v.id}-point`)
           annotations.push(box, point)
         }
-        if (!this.voiBBoxSvc) {
-          throw new Error(`annotation is expected to be added, but annotation layer cannot be instantiated.`)
-        }
       }
-      await this.voiBBoxSvc.updateAnnotation(annotations)
-      if (this.voiBBoxSvc) this.voiBBoxSvc.setVisible(true)
+      this.#annotationDirective.annotations = annotations
+      this.#annotationDirective.ngOnChanges()
     })
 
     this.#destory$.subscribe(() => {

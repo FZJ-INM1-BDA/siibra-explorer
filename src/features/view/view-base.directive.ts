@@ -278,7 +278,8 @@ export class FeatureViewBase {
           ngVolume: {
             info: null,
             transform: xform,
-            url: `https://zam12230.jsc.fz-juelich.de/gpuvm/p/largedata2/bigbrains/projects/bigbrain_1micron_section_release/data/1micron/tif/B20_${sectionId}.tif/cpn`, // replace with /cpn later
+            // replace with /cpn later
+            url: `https://zam12230.jsc.fz-juelich.de/gpuvm-deploy/cuda/bb1micron/B20_${sectionId}.tif::pipelines/cpn.json`,
             meta: {
               preferredColormap: ["rgba (4 channel)"],
               version: 1,
@@ -299,7 +300,7 @@ export class FeatureViewBase {
             `Eric Upschulte`,
             `Alexander Oberstraß`
           ],
-          desc: `Here is a sample description of CPN`,
+          desc: `Contour Proposal Network`,
           link: [
             {
               href: `https://huggingface.co/spaces/ericup/celldetection`,

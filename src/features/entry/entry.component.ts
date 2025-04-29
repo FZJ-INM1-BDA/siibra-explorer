@@ -6,7 +6,7 @@ import { Feature } from 'src/atlasComponents/sapi/sxplrTypes';
 import { FeatureBase } from '../base';
 import * as userInteraction from "src/state/userInteraction"
 import { CategoryAccDirective } from "../category-acc.directive"
-import { combineLatest, concat, forkJoin, from, merge, of, Subject } from 'rxjs';
+import { combineLatest, concat, EMPTY, forkJoin, from, merge, of, Subject } from 'rxjs';
 import { DsExhausted, IsAlreadyPulling, PulledDataSource } from 'src/util/pullable';
 import { TranslatedFeature } from '../list/list.directive';
 import { MatDialog, MatSnackBar } from 'src/sharedModules/angularMaterial.exports';
@@ -140,26 +140,29 @@ export class EntryComponent extends FeatureBase implements AfterViewInit {
       ).reverse().join("/")
 
       const tmpHost = `https://zam12230.jsc.fz-juelich.de/macaque-md/geometry/`
-      return from(
-        fetch(`${tmpHost}/foo/0/${bboxStr}/stat`).then(res => res.json())
-      ).pipe(
-        switchMap(result => {
-          if ((result.count || 1e10) > 1e5) {
-            this.snackbar.open(`Pointclouds: too many points. Zoom in further to vizualize.`, null, { duration: 2500 })
-            return of([])
-          }
-          return from(
-            fetch(`${tmpHost}/foo/0/${bboxStr}/geometry`).then(res => res.json())
-          ).pipe(
-            map(
-              (arr: number[][]) => arr.map(
-                triplet => triplet.map(
-                  (v, idx) => (translateMm[idx] - v) * 1e6
+      return concat(
+        of([]),
+        from(
+          fetch(`${tmpHost}/foo/0/${bboxStr}/stat`).then(res => res.json())
+        ).pipe(
+          switchMap(result => {
+            if ((result.count || 1e10) > 1e5) {
+              this.snackbar.open(`Pointclouds: too many points. Zoom in further to visualize.`, null, { duration: 2500 })
+              return EMPTY
+            }
+            return from(
+              fetch(`${tmpHost}/foo/0/${bboxStr}/geometry`).then(res => res.json())
+            ).pipe(
+              map(
+                (arr: number[][]) => arr.map(
+                  triplet => triplet.map(
+                    (v, idx) => (translateMm[idx] - v) * 1e6
+                  )
                 )
               )
             )
-          )
-        })
+          })
+        )
       )
     }),
     shareReplay(1),

@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, inject, Inject, Optio
 import { select, Store } from "@ngrx/store";
 import { BehaviorSubject, combineLatest, merge, Observable, of, Subject } from "rxjs";
 import { debounceTime, distinctUntilChanged, filter, map, switchMap, take, takeUntil, withLatestFrom } from "rxjs/operators";
-import { SAPI } from "src/atlasComponents/sapi";
+import { SAPI, IDS } from "src/atlasComponents/sapi";
 import { Feature, SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { FilterGroupedParcellationPipe, GroupedParcellation } from "src/atlasComponents/sapiViews/core/parcellation";
 import { atlasAppearance, atlasSelection, userInteraction, userPreference } from "src/state";
@@ -18,7 +18,6 @@ import { generalActionError } from "src/state/actions";
 import { MatExpansionPanel } from "@angular/material/expansion";
 import { arrayEqual } from "src/util/array";
 import { SXPLR_PREFIX } from "src/util/constants";
-
 
 const pipe = new FilterGroupedParcellationPipe()
 
@@ -55,6 +54,8 @@ function validateNumbers(input: (number|null|undefined)[]): input is number[]{
 export class VerticalBreadCrumbComponent {
   
   SXPLR_PREFIX = SXPLR_PREFIX
+
+  IDS = IDS
 
   @Output()
   show = new EventEmitter()

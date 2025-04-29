@@ -721,7 +721,21 @@
                 [geometry]="voiFeatureEntryCmp.geometry$ | async"
                 [features]="voiFeatureEntryCmp.features$ | async">
             </div>
-    
+
+            <ng-template [ngIf]="switchdir.switchState$ | async">
+                <ng-template [ngIf]="bbox.bbox$ | async" let-bbox>
+
+                    <div
+                        *ngIf="bbox.bbox && bbox.space?.id === IDS.TEMPLATES.AMBA_CCF_V3"
+                        ng-annotations
+                        annotationLayerName="viewport-bbox"
+                        annotationColor="#9999ff"
+                        [annotations]="[ (bbox.bbox | bboxToAABB) ]">
+                    </div>
+        
+                </ng-template>
+            </ng-template>
+
             <button mat-icon-button
                 [color]="(switchdir.switchState$ | async) ? 'accent' : 'default'"
                 (click)="switchdir.toggle()"
