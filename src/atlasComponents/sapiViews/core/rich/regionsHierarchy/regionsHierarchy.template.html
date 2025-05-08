@@ -21,7 +21,7 @@
     [matTooltip]="last && !labelMappedRegionNames.includes(region.name) ? TXT_CANNOT_BE_SELECTED : null"
     [ngClass]="{
       'sxplr-custom-cmp accent': accentedRegions | mapToProperty: 'name' | includes : region.name,
-      'muted-7': !labelMappedRegionNames.includes(region.name)
+      'muted': !labelMappedRegionNames.includes(region.name)
     }"
     [innerHTML]="region.name | hightlightPipe : (searchTerm$ | async)">
   </div>
@@ -37,7 +37,7 @@
       </mat-list-item>
 
       <mat-list-item>
-        <span class="muted-7" matListItemTitle>Region not mapped in the current selection</span>
+        <span class="muted" matListItemTitle>Region not mapped in the current selection</span>
       </mat-list-item>
       
       <mat-list-item>

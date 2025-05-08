@@ -673,20 +673,17 @@
         if we are in nehuba viewer
         -->
         <ng-template [ngIf]="view.useViewer === 'nehuba'">
-            <ng-template [ngIf]="view.currentViewport?.center" let-center>
+            <ng-template [ngIf]="view.currentViewport" let-vp>
 
                 <button
                     [matTooltip]="view.labels.COPY_CURRENT_POSITION"
                     mat-icon-button
-                    [iav-clipboard-copy]="
-                        center
-                        | numbers : 3
-                        | addUnitAndJoin : 'mm' : ', '
-                    ">
+                    [iav-clipboard-copy]="vp | viewportToText">
                     <i class="fas fa-copy"></i>
                 </button>
     
                 <button mat-icon-button
+                    *ngIf="vp?.center; let center"
                     [matTooltip]="view.labels.POSITION_ASSIGNMENT"
                     (click)="assignPoint(center, view.selectedATP.template)"
                     >

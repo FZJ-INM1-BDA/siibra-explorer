@@ -29,6 +29,7 @@ import { NgLayerCtrlCmp } from "src/viewerModule/nehuba/nehubaViewerInterface/ng
 import { PlotComponent } from "src/features/plotly/plot/plot.component";
 import { MediaQueryDirective } from "src/util/directives/mediaQuery.directive";
 import { AnnotationDirective } from "src/atlasComponents/annotations/annotation.directive";
+import { CurrentViewportToTextPipe } from "./pipes/currentViewPort.pipe";
 
 @NgModule({
   imports: [
@@ -64,6 +65,7 @@ import { AnnotationDirective } from "src/atlasComponents/annotations/annotation.
   declarations: [
     VerticalBreadCrumbComponent,
     OnFocusSelectDirective,
+    CurrentViewportToTextPipe,
   ],
   exports: [
     VerticalBreadCrumbComponent,

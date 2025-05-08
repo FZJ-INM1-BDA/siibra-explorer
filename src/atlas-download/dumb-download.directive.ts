@@ -83,7 +83,7 @@ export class DumpDownloadAtlasDownload{
         query['feature_id'] = feature.id
       }
       if (strictMode) {
-        query['query_mode'] = strictMode
+        query['strict_mode'] = strictMode
       }
       for (const key in query) {
         url.searchParams.set(key, query[key])
