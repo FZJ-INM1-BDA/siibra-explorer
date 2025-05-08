@@ -36,12 +36,12 @@ jobs:
           --history-max 3 \
           --reuse-values \
           --set image.tag=${{ inputs.IMAGE_TAG }} \
-          --set podLabels.image-digest=${{ inputs.IMAGE_DIGEST }} \
+          --set podAnnotations.image-digest=${{ inputs.IMAGE_DIGEST }} \
           ${{ inputs.DEPLOYMENT_NAME }} .helm/siibra-explorer/ \
         || helm --kubeconfig=$kubecfg_path \
           install\
           --set image.tag=${{ inputs.IMAGE_TAG }} \
-          --set podLabels.image-digest=${{ inputs.IMAGE_DIGEST }} \
+          --set podAnnotations.image-digest=${{ inputs.IMAGE_DIGEST }} \
           --set envObj.HOST_PATHNAME=/viewer \
           ${{ inputs.DEPLOYMENT_NAME }} .helm/siibra-explorer/
 
@@ -63,12 +63,12 @@ jobs:
           --history-max 3 \
           --reuse-values \
           --set image.tag=${{ inputs.IMAGE_TAG }} \
-          --set podLabels.image-digest=${{ inputs.IMAGE_DIGEST }} \
+          --set podAnnotations.image-digest=${{ inputs.IMAGE_DIGEST }} \
           ${{ inputs.DEPLOYMENT_NAME }} .helm/siibra-explorer/ \
         || helm --kubeconfig=$kubecfg_path \
           install\
           --set image.tag=${{ inputs.IMAGE_TAG }} \
-          --set podLabels.image-digest=${{ inputs.IMAGE_DIGEST }} \
+          --set podAnnotations.image-digest=${{ inputs.IMAGE_DIGEST }} \
           --set envObj.HOST_PATHNAME=/viewer-staging \
           --set envObj.OVERWRITE_API_ENDPOINT="https://siibra-api-rc.apps.tc.humanbrainproject.eu/v3_0" \
           ${{ inputs.DEPLOYMENT_NAME }} .helm/siibra-explorer/
@@ -91,13 +91,13 @@ jobs:
           --history-max 3 \
           --reuse-values \
           --set image.tag=${{ inputs.IMAGE_TAG }} \
-          --set podLabels.image-digest=${{ inputs.IMAGE_DIGEST }} \
+          --set podAnnotations.image-digest=${{ inputs.IMAGE_DIGEST }} \
           --set envObj.OVERWRITE_API_ENDPOINT="https://siibra-api-rc.apps.tc.humanbrainproject.eu/v3_0" \
           ${{ inputs.DEPLOYMENT_NAME }} .helm/siibra-explorer/ \
         || helm --kubeconfig=$kubecfg_path \
           install\
           --set image.tag=${{ inputs.IMAGE_TAG }} \
-          --set podLabels.image-digest=${{ inputs.IMAGE_DIGEST }} \
+          --set podAnnotations.image-digest=${{ inputs.IMAGE_DIGEST }} \
           --set envObj.HOST_PATHNAME=/viewer-expmt \
           ${{ inputs.DEPLOYMENT_NAME }} .helm/siibra-explorer/
           
