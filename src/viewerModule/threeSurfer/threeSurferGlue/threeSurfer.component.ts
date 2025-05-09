@@ -4,7 +4,6 @@ import { BehaviorSubject, combineLatest, concat, forkJoin, from, merge, NEVER, O
 import { catchError, debounceTime, distinctUntilChanged, filter, map, scan, shareReplay, startWith, switchMap, tap, withLatestFrom } from "rxjs/operators";
 import { ComponentStore, LockError } from "src/viewerModule/componentStore";
 import { select, Store } from "@ngrx/store";
-import { MatSnackBar } from "src/sharedModules/angularMaterial.exports"
 import { getUuid, switchMapWaitFor } from "src/util/fn";
 import { AUTO_ROTATE, TInteralStatePayload, ViewerInternalStateSvc } from "src/viewerModule/viewerInternalState.service";
 import { atlasAppearance, atlasSelection } from "src/state";
@@ -429,7 +428,6 @@ export class ThreeSurferGlueCmp implements IViewer<'threeSurfer'>, AfterViewInit
     private store$: Store,
     private navStateStoreRelay: ComponentStore<TCameraOrientation>,
     private sapi: SAPI,
-    private snackbar: MatSnackBar,
     @Optional() intViewerStateSvc: ViewerInternalStateSvc,
   ){
     if (intViewerStateSvc) {

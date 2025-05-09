@@ -4,7 +4,6 @@ import { map, shareReplay, switchMap, tap } from "rxjs/operators";
 import { CachedFunction, getExportNehuba, noop } from "src/util/fn";
 import { MatSnackBar } from 'src/sharedModules/angularMaterial.exports'
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
-import { EnumColorMapName } from "src/util/colorMaps";
 import { BehaviorSubject, forkJoin, from, Observable, of, Subject, throwError } from "rxjs";
 import {
   translateV3Entities
@@ -20,7 +19,7 @@ export const useViewer = {
 } as const
 
 export const SIIBRA_API_VERSION_HEADER_KEY='x-siibra-api-version'
-export const EXPECTED_SIIBRA_API_VERSION = '0.3.24'
+export const EXPECTED_SIIBRA_API_VERSION = '0.3.25'
 
 type PaginatedResponse<T> = {
   items: T[]
@@ -680,7 +679,7 @@ type ProcessTypedArrayResult = {
   }
   [PARSE_TYPEDARRAY.CANVAS_COLORMAP_RGBA]: {
     input?: {
-      colormap?: EnumColorMapName
+      colormap?: string
       log?: boolean
     }
     output: {

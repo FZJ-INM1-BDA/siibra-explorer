@@ -23,7 +23,7 @@ export const environment = {
   KIOSK_MODE: false,
 
   // experimental feature flag
-  EXPERIMENTAL_FEATURE_FLAG: false,
+  EXPERIMENTAL_FEATURE_FLAG: true,
 
   ENABLE_LEAP_MOTION: false,
 }

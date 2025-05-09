@@ -24,7 +24,7 @@
 
   </form>
 
-  <form *ngIf="currViewerType === 'ThreeSurfer'" [formGroup]="frameFormGrp">
+  <form [formGroup]="frameFormGrp">
 
     <mat-divider class="m-2"></mat-divider>
 
@@ -57,20 +57,22 @@
     <mat-list cdkDropList (cdkDropListDropped)="drop($event)">
       <mat-list-item *ngFor="let state of internalStates" cdkDrag>
         <button mat-icon-button
-        cdkDragHandle>
+          cdkDragHandle>
           <i class="fas fa-grip-vertical"></i>
         </button>
 
-        <!-- <mat-form-field>
-          <mat-label>name</mat-label>
-          <input type="text" matInput [(ngModel)]="state.name">
-        </mat-form-field>
-        
-        <mat-form-field class="duration-container">
-          <mat-label>ms</mat-label>
-          <input type="number" matInput [(ngModel)]="state.duration">
-        </mat-form-field>
-        -->
+        <span>{{ state.name }}</span>
+        <span class="text-muted">({{ (state.duration / 1e3).toFixed(1) }}s)</span>
+
+        <!-- pass the whole state, to avoid the spread operator dereferencing the state object -->
+        <!-- the whole point is to use two-way binding to easily update the name/duration. -->
+        <button mat-icon-button
+          [sxplr-dialog]="dialogTmpl"
+          [sxplr-dialog-data]="{state: state}"
+          sxplr-dialog-size="auto">
+          <i class="fas fa-cog"></i>
+        </button>
+       
         <button mat-icon-button
           (click)="gotoFrame(state)">
           <i class="fas fa-map-marker-alt"></i>
@@ -87,3 +89,21 @@
   </form>
 
 </div>
+
+<ng-template #dialogTmpl let-data>
+  <h1 mat-dialog-title>Update frame detail</h1>
+  <div mat-dialog-content>
+    <div>
+      <mat-form-field>
+        <mat-label>name</mat-label>
+        <input type="text" matInput [(ngModel)]="data.state.name">
+      </mat-form-field>
+    </div>
+    <div>
+      <mat-label>duration</mat-label>
+      <mat-slider min="100" max="10000" step="100" discrete [displayWith]="displayWith">
+        <input matSliderThumb [(ngModel)]="data.state.duration">
+      </mat-slider>
+    </div>
+  </div>
+</ng-template>

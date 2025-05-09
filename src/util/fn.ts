@@ -1,6 +1,5 @@
 import { interval, Observable, of } from 'rxjs'
 import { filter, mapTo, take } from 'rxjs/operators'
-import { CMByName, EnumColorMapName, mapKeyColorMap } from './colorMaps'
 import { MetaV1Schema } from 'src/atlasComponents/sapi/typeV3'
 
 
@@ -444,34 +443,7 @@ export async function waitFor(predicate: () => boolean) {
     if (predicate()) break
     await wait(16)
   }
-}
-/**
- * copied from ng-layer-tune@0.0.22
- * TODO export to an individual component/library
- * OR use monorepo
- */
-const cmEncodingVersion = 'encodedCmState-0.1'
-
-type TGetShaderCfg = {
-  colormap: EnumColorMapName
-  lowThreshold: number
-  highThreshold: number
-  brightness: number
-  contrast: number
-  removeBg: boolean
-  hideZero: boolean
-  opacity: number
-}
-
-export function decodeBool(num: number) {
-  const rBool: boolean[] = []
-  for (let i = 0; i < 8; i ++) {
-    rBool.push( ((num >> i) & 1) === 1 )
-  }
-  return rBool
-}
-
-export function encodeBool(...flags: boolean[]) {
+}export function encodeBool(...flags: boolean[]) {
   if (flags.length > 8) {
     throw new Error(`encodeBool can only handle upto 8 bools`)
   }
@@ -483,81 +455,40 @@ export function encodeBool(...flags: boolean[]) {
   })
   return rValue
 }
-
-
-export function encodeState(cfg: TGetShaderCfg): string {
-  const {
-    brightness,
-    colormap,
-    contrast,
-    hideZero,
-    highThreshold,
-    lowThreshold,
-    opacity,
-    removeBg
-  } = cfg
-
-  /**
-   * encode Enum as key of Enum
-   */
-  const cmstring = Object.keys(EnumColorMapName).find(v => EnumColorMapName[v] === colormap)
-
-  const array = new Float32Array([
-    brightness,
-    contrast,
-    lowThreshold,
-    highThreshold,
-    opacity,
-    encodeBool(hideZero, removeBg)
-  ])
-  
-  const encodedVal = window.btoa(new Uint8Array(array.buffer).reduce((data, v) => data + String.fromCharCode(v), ''))
-  return `${cmEncodingVersion}:${cmstring}:${encodedVal}`
+export function decodeBool(num: number) {
+  const rBool: boolean[] = []
+  for (let i = 0; i < 8; i ++) {
+    rBool.push( ((num >> i) & 1) === 1 )
+  }
+  return rBool
 }
 
+const { encodeShader, parseColorMapFromStr } = globalThis['ngLayerTune'] || {}
+
+export { encodeShader }
+
+
 export const getShader = ({
-  colormap = EnumColorMapName.GREYSCALE,
+  colormap = "greyscale",
   lowThreshold = 0,
   highThreshold = 1,
   brightness = 0,
   contrast = 0,
-  removeBg = false
+  removeBg = false,
+  opacity = 1.0
 } = {}): string => {
-  const { header, main, premain, override } = mapKeyColorMap.get(colormap) || (() => {
-    return mapKeyColorMap.get(EnumColorMapName.GREYSCALE)
-  })()
+  const parsedCM = parseColorMapFromStr(colormap)
 
-  const encodedStr = encodeState({
-    colormap,
+  return encodeShader({
+    colormap: parsedCM,
     brightness,
     highThreshold,
     lowThreshold,
     contrast,
     hideZero: false,
-    opacity: 1.0,
+    opacity,
     removeBg
   })
-
-  if (override) {
-    return `// ${encodedStr}\n${override()}`
-  }
-
-  // so that if lowthreshold is defined to be 0, at least some background removal will be done
-  const _lowThreshold = lowThreshold + 1e-10
-  return `// ${encodedStr}
-${header}
-${premain}
-void main() {
-  float raw_x = toNormalized(getDataValue());
-  float x = (raw_x - ${_lowThreshold.toFixed(10)}) / (${highThreshold - _lowThreshold}) ${ brightness > 0 ? '+' : '-' } ${Math.abs(brightness).toFixed(10)};
-
-  ${ removeBg ? 'if(x>1.0){emitTransparent();}else if(x<0.0){emitTransparent();}else{' : '' }
-    vec3 rgb;
-    ${main}
-    emitRGB(rgb*exp(${contrast.toFixed(10)}));
-  ${ removeBg ? '}' : '' }
-}
-`
 }
 
 export function getOpacityFromMeta(meta: MetaV1Schema) {
@@ -565,14 +496,14 @@ export function getOpacityFromMeta(meta: MetaV1Schema) {
 }
 
 export function getShaderFromMeta(meta: MetaV1Schema){
-  let colormap = EnumColorMapName.GREYSCALE
+  let colormap = "greyscale"
 
   if (meta?.data?.type === "image/3d") {
-    colormap = EnumColorMapName.RGB
+    colormap = "rgb (3 channel)"
   } else {
     for (const _colormap of meta?.preferredColormap || []) {
-      if (_colormap in CMByName) {
-        colormap = CMByName[_colormap]
+      if (parseColorMapFromStr(_colormap)) {
+        colormap = parseColorMapFromStr(_colormap)
         break
       }
     }
@@ -586,11 +517,13 @@ export function getShaderFromMeta(meta: MetaV1Schema){
     low = min
     high = max
   }
+  const opacity = meta?.["https://schema.brainatlas.eu/github/humanbrainproject/neuroglancer"]?.opacity ?? 1.0
   
   return getShader({
     colormap,
     lowThreshold: low,
-    highThreshold: high
+    highThreshold: high,
+    opacity
   })
 }
 
@@ -616,4 +549,31 @@ export function getFactor(unit: string){
     }
   }
   throw new Error(`Cannot convert ${unit}`)
+}
+
+type NumberLike = number | (number[])
+
+export function mul(a: NumberLike, b: number): NumberLike{
+  if (typeof a === "number") {
+    return a * b
+  }
+  if (Array.isArray(a)) {
+    return a.map(v => mul(v, b)) as number[]
+  }
+}
+
+export function add(a: NumberLike, b: NumberLike) {
+  if (typeof a !== typeof b) {
+    throw new Error(`typeof must be equal`)
+  }
+  if (typeof a === "number" && typeof b === "number") {
+    return a + b
+  }
+  if (Array.isArray(a) && Array.isArray(b)) {
+    if (a.length !== b.length) {
+      throw new Error(`for Array, a.length must be equal to b.length`)
+    }
+    return a.map((v, i) => v + b[i])
+  }
+  throw new Error(`does not support none number like`)
 }
