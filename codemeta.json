@@ -57,7 +57,7 @@
     ],
     "codeRepository": "git+https://github.com/fzj-inm1-bda/siibra-explorer.git",
     "dateCreated": "2024-08-28",
-    "dateModified": "2025-04-11",
+    "dateModified": "2025-05-13",
     "datePublished": "2019-04-26",
     "description": "`siibra-explorer` is a browser based 3D viewer for exploring brain atlases that cover different spatial resolutions and modalities. It is built around an interactive 3D view of the brain displaying a unique selection of detailed templates and parcellation maps for the human, macaque, rat or mouse brain, including BigBrain as a microscopic resolution human brain model at its full resolution of 20 micrometers. ",
     "license": "https://spdx.org/licenses/Apache-2.0",
@@ -66,9 +66,9 @@
         "python 3",
         "typescript"
     ],
-    "schema:releaseNotes": "# v2.14.18\n\n## Bugfix\n\n- Fixed x-overlay-layer nifti, swc\n- Fixed `ctrl+c` string copy in viewer\n- Fixed parcellation visibility toggle\n\n## Feature\n\n- Remove dependency on unpkg\n- (experimental) keyframe support for nehuba viewer\n\n## Behind the scenes\n\n- unify colormap shader generation and access\n- do not track perspective images with git-lfs\n",
+    "schema:releaseNotes": "# v2.14.19\n\n## Bugfix\n\n- Fixed Safari not loading bug",
     "runtimePlatform": "docker",
-    "version": "2.14.18",
+    "version": "2.14.19",
     "contIntegration": "https://github.com/FZJ-INM1-BDA/siibra-explorer/actions",
     "codemeta:continuousIntegration": {
         "id": "https://github.com/FZJ-INM1-BDA/siibra-explorer/actions"

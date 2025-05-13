@@ -85,8 +85,12 @@ jobs:
         then
           echo "Either staging, using staging env..."
           echo "SIIBRA_API_ENDPOINTS=${{ env.SIIBRA_API_RC }}" >> $GITHUB_ENV
+        elif [[ "$GITHUB_REF" == 'refs/heads/dev' ]]
+        then
+          echo "Either dev, ..."
+          echo "SIIBRA_API_ENDPOINTS=${{ env.SIIBRA_API_RC }}" >> $GITHUB_ENV
         else
-          echo "Currently, only master and staging are built"
+          echo "Currently, only master, staging, dev are built"
           exit 1
         fi
 
@@ -97,6 +101,7 @@ jobs:
           echo "prod/staging build, do not enable experimental features"
         else
           echo "dev bulid, enable experimental features"
+          echo "EXPERIMENTAL_FEATURE_FLAG=true" >> $GITHUB_ENV
         fi
     - id: 'build-docker-image'
       name: 'Build docker image'
