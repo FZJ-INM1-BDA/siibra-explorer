@@ -215,21 +215,6 @@ jobs:
       client-id: ${{ secrets.EBRAINS_SIIBRA_EXPLORER_OIDC_CLIENTID}}
       client-secret: ${{ secrets.EBRAINS_SIIBRA_EXPLORER_OIDC_CLIENTSECRET}}
 
-  trigger-deploy-expmt-rancher:
-    if: ${{ needs.set-vars.outputs.BRANCH_NAME == 'staging' && success() }}
-    needs:
-      - build-docker-img
-      - set-vars
-    uses: ./.github/workflows/deploy-helm.yml
-    with:
-      DEPLOYMENT_NAME: expmt
-      IMAGE_TAG: staging
-
-      # GIT_DIGEST may (sometimes) be all numbers. prepend 'h' to cast to str
-      IMAGE_DIGEST: h${{ needs.set-vars.outputs.GIT_DIGEST }}
-    secrets:
-      KUBECONFIG: ${{ secrets.KUBECONFIG }}
-
   trigger-deploy-master-rancher:
     if: ${{ needs.set-vars.outputs.BRANCH_NAME == 'master' && success() }}
     needs:
