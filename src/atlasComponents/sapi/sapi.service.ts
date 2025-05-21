@@ -299,7 +299,11 @@ export class SAPI{
         return translateV3Entities.translateAtlas(atlas)
       })
     )),
-    map(atlases => atlases.sort((a, b) => (speciesOrder as string[]).indexOf(a.species) - (speciesOrder as string[]).indexOf(b.species))),
+    map(atlases => atlases.sort((a, b) => {
+      const order = speciesOrder as string[]
+      // if a.species is not indexed, it will be -1, and will thus be on ranked lowest
+      return (order.indexOf(a.species) - order.indexOf(b.species)) * -1
+    })),
     tap(() => {
       const respVersion = SAPI.API_VERSION
       if (respVersion !== EXPECTED_SIIBRA_API_VERSION) {

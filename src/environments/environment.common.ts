@@ -8,10 +8,9 @@ export const environment = {
   // some libraries rely on the exact string formatting to work properly
   SIIBRA_API_ENDPOINTS: 
     // 'http://localhost:5000/v3_0', // endpoint-local-10081
-    // 'https://siibra-api-latest.apps-dev.hbp.eu/v3_0', //endpoint-latest
-    // 'https://siibra-api-rc.apps.hbp.eu/v3_0', // endpoint-rc
-    // 'https://siibra-api-stable.apps.hbp.eu/v3_0', // endpoint-stable
-    'https://siibra-api-rc.apps.tc.humanbrainproject.eu/v3_0', // endpoint-rc-tc
+    // 'https://siibra-api.ebrains.eu/v3_0', // endpoint-stable
+    'https://siibra-api-rc.apps.ebrains.eu/v3_0', // endpoint-rc-tc
+    // 'https://zam12230.jsc.fz-juelich.de/data-validation/api-2/v3_0',
   SPATIAL_TRANSFORM_BACKEND: 'https://hbp-spatial-backend.apps.hbp.eu',
   MATOMO_URL: null,
   MATOMO_ID: null,

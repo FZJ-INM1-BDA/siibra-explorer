@@ -89,10 +89,10 @@ export const SPECIES_ENUM = {
  * atlas should follow the following order
  */
 export const speciesOrder = [
-  SPECIES_ENUM.HOMO_SAPIENS,
-  SPECIES_ENUM.MACACA_FASCICULARIS,
-  SPECIES_ENUM.RATTUS_NORVEGICUS,
   SPECIES_ENUM.MUS_MUSCULUS,
+  SPECIES_ENUM.RATTUS_NORVEGICUS,
+  SPECIES_ENUM.MACACA_FASCICULARIS,
+  SPECIES_ENUM.HOMO_SAPIENS,
 ]
 
 export const parcBanList: string[] = [
