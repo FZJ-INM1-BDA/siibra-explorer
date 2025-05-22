@@ -150,7 +150,9 @@ export class LayerCtrlEffects {
         const { parcNgLayers, tmplAuxNgLayers, tmplNgLayers, sxplrAnnotations } = ngLayers
         
         const customBaseLayers: atlasAppearance.const.NgLayerCustomLayer[] = []
-        for (const layers of [parcNgLayers, tmplAuxNgLayers, tmplNgLayers]) {
+
+        // order matters. first append tmplNgLayers, then tmpl auxnglayers, then parc layers
+        for (const layers of [tmplNgLayers, tmplAuxNgLayers, parcNgLayers]) {
           for (const key in layers) {
             const v = layers[key]
 
