@@ -3,7 +3,7 @@ import { select, Store } from "@ngrx/store";
 import { combineLatest, merge, Observable, of, Subject, Subscription } from "rxjs";
 import { debounceTime, distinctUntilChanged, filter, map, pairwise, shareReplay, startWith, switchMap, withLatestFrom } from "rxjs/operators";
 import { IColorMap, INgLayerCtrl, TNgLayerCtrl } from "./layerCtrl.util";
-import { annotation, atlasAppearance, atlasSelection } from "src/state";
+import { atlasAppearance, atlasSelection } from "src/state";
 import { serializeSegment } from "../util";
 import { LayerCtrlEffects } from "./layerCtrl.effects";
 import { arrayEqual } from "src/util/array";
@@ -13,6 +13,7 @@ import { PMAP_LAYER_NAME } from "../constants"
 import { getShader } from "src/util/fn";
 import { BaseService } from "../base.service/base.service";
 import { ParcellationVisibilityService } from "src/atlasComponents/sapiViews/core/parcellation/parcellationVis.service";
+import * as nehubaStore from "../store"
 
 export const BACKUP_COLOR = {
   red: 255,
@@ -175,25 +176,15 @@ export class NehubaLayerControlService implements OnDestroy{
      * on custom landmarks loaded, set mesh transparency
      */
     this.sub.push(
-      merge(
-        this.store$.pipe(
-          select(annotation.selectors.annotations),
-          map(landmarks => landmarks.length > 0),
-        ),
-        this.store$.pipe(
-          select(atlasAppearance.selectors.customLayers),
-          map(customLayers => customLayers.filter(l => l.clType === "customlayer/nglayer" && typeof l.source === "string" && /^swc:\/\//.test(l.source)).length > 0),
-        )
-      ).pipe(
-        startWith(false),
+      this.store$.pipe(
+        select(nehubaStore.selectors.auxMeshTransparency),
         withLatestFrom(this.defaultNgLayers$)
-      ).subscribe(([flag, { tmplAuxNgLayers }]) => {
+      ).subscribe(([alpha, { tmplAuxNgLayers } ]) => {
+        
         const payload: {
           [key: string]: number
         } = {}
-        const alpha = flag
-          ? 0.2
-          : 1.0
+        
         for (const ngId in tmplAuxNgLayers) {
           payload[ngId] = alpha
         }

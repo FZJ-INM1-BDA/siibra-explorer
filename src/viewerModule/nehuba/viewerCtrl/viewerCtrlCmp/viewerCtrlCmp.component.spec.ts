@@ -6,7 +6,7 @@ import { BehaviorSubject, of } from "rxjs"
 import { ComponentsModule } from "src/components"
 import { AngularMaterialModule } from "src/sharedModules"
 import { UtilModule } from "src/util"
-import { actionSetAuxMeshes, selectorAuxMeshes } from "../../store"
+import { actionSetAuxMeshes, selectorAuxMeshes, selectors } from "../../store"
 import { NEHUBA_INSTANCE_INJTKN } from "../../util"
 import { ViewerCtrlCmp } from "./viewerCtrlCmp.component"
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed'
@@ -72,6 +72,7 @@ describe('> viewerCtrlCmp.component.ts', () => {
       mockStore = TestBed.inject(MockStore)
       mockStore.overrideSelector(atlasSelection.selectors.selectedTemplate, {} as any)
       mockStore.overrideSelector(atlasAppearance.selectors.octantRemoval, true)
+      mockStore.overrideSelector(selectors.auxMeshTransparency, 1)
       mockStore.overrideSelector(selectorAuxMeshes, [])
     })
 

@@ -15,6 +15,21 @@
       </span>
       <i [matTooltip]="CONST.REMOVE_FRONTAL_OCTANT_HELPER_TEXT" class="fas fa-question"></i>
     </mat-slide-toggle>
+    <ng-template [ngIf]="view$ | async" let-view>
+
+      <mat-slide-toggle
+        [checked]="view.auxTransparent"
+        [disabled]="removeOctantFlag"
+        (change)="toggleAux()"
+        name="glass-brain">
+        <span class="text">
+          Glass Brain
+        </span>
+        <ng-template [ngIf]="removeOctantFlag">
+          <i [matTooltip]="view.CONST.GLASS_BRAIN_ENABLE" class="fas fa-exclamation-triangle"></i>
+        </ng-template>
+      </mat-slide-toggle>
+    </ng-template>
   </mat-card-content>
 
   <!-- aux mesh controller -->

@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, OnInit } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { merge, of, Subscription } from "rxjs";
-import { pairwise, withLatestFrom} from "rxjs/operators";
+import { combineLatest, merge, of, Subscription } from "rxjs";
+import { map, pairwise, withLatestFrom} from "rxjs/operators";
 import { ARIA_LABELS, CONST } from 'common/constants'
-import { actionSetAuxMeshes, selectorAuxMeshes } from "../../store";
+import * as nehubaStore from "../../store";
 import { UntypedFormControl, UntypedFormGroup } from "@angular/forms";
 import { atlasAppearance } from "src/state";
 
@@ -22,6 +22,26 @@ export class ViewerCtrlCmp implements OnInit{
   public ARIA_LABELS = ARIA_LABELS
   public CONST = CONST
 
+  public view$ = combineLatest([
+    this.store$.pipe(
+      select(nehubaStore.selectors.auxMeshTransparency),
+      map(alpha => alpha < 1)
+    )
+  ]).pipe(
+    map(([ auxTransparent ]) => {
+      return {
+        auxTransparent,
+        CONST
+      }
+    })
+  )
+
+  toggleAux(){
+    this.store$.dispatch(
+      nehubaStore.actions.toggleAuxTransparency()
+    )
+  }
+
   private sub: Subscription[] = []
 
   private _removeOctantFlag: boolean = true
@@ -31,6 +51,14 @@ export class ViewerCtrlCmp implements OnInit{
   set removeOctantFlag(val: boolean){
     if (val === this._removeOctantFlag) return
     this._removeOctantFlag = val
+    // on remove frontal octant, reset transparency
+    if (val) {
+      this.store$.dispatch(
+        nehubaStore.actions.setAuxTransparency({
+          alpha: 1
+        })
+      )
+    }
     this.setOctantRemoval(this._removeOctantFlag)
   }
 
@@ -41,7 +69,7 @@ export class ViewerCtrlCmp implements OnInit{
   public auxMeshFormGroup: UntypedFormGroup = new UntypedFormGroup({})
   private auxMeshesNamesSet: Set<string> = new Set()
   public auxMeshes$ = this.store$.pipe(
-    select(selectorAuxMeshes),
+    select(nehubaStore.selectors.selectorAuxMeshes),
   )
 
   ngOnInit(): void {
@@ -89,7 +117,7 @@ export class ViewerCtrlCmp implements OnInit{
 
         if (changed) {
           this.store$.dispatch(
-            actionSetAuxMeshes({
+            nehubaStore.actions.actionSetAuxMeshes({
               payload: auxMeshesCopy
             })
           )

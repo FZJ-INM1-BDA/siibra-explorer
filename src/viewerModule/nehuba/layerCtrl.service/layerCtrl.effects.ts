@@ -1,17 +1,18 @@
 import { Injectable } from "@angular/core";
 import { createEffect } from "@ngrx/effects";
 import { select, Store } from "@ngrx/store";
-import { concat, forkJoin, from, of } from "rxjs";
+import { concat, forkJoin, from, merge, of } from "rxjs";
 import { switchMap, withLatestFrom, catchError, map, debounceTime, shareReplay, distinctUntilChanged, tap, pairwise } from "rxjs/operators";
 import { NgLayerSpec, NgPrecompMeshSpec, NgSegLayerSpec, SxplrAtlas, SxplrParcellation, SxplrTemplate, VoiFeature } from "src/atlasComponents/sapi/sxplrTypes";
 import { SAPI } from "src/atlasComponents/sapi"
-import { atlasAppearance, atlasSelection } from "src/state";
+import { atlasAppearance, atlasSelection, annotation } from "src/state";
 import { arrayEqual } from "src/util/array";
 import { getShader } from "src/util/fn";
 import { PMAP_LAYER_NAME } from "../constants";
 import { QuickHash } from "src/util/fn";
 import { getParcNgId } from "../config.service";
 import { SXPLR_ANNOTATIONS_KEY } from "src/util/constants";
+import * as nehubaStore from "../store"
 
 @Injectable()
 export class LayerCtrlEffects {
@@ -192,6 +193,23 @@ export class LayerCtrlEffects {
           customLayers: nLayers
         })
       )
+    })
+  ))
+
+  onCustomAnnotation$ = createEffect(() => merge(
+    this.store.pipe(
+      select(annotation.selectors.annotations),
+      map(landmarks => landmarks.length > 0),
+    ),
+    this.store.pipe(
+      select(atlasAppearance.selectors.customLayers),
+      map(customLayers => customLayers.filter(l => l.clType === "customlayer/nglayer" && typeof l.source === "string" && /^swc:\/\//.test(l.source)).length > 0),
+    )
+  ).pipe(
+    map(flag => {
+      return nehubaStore.actions.setAuxTransparency({
+        alpha: flag ? 0.2 : 1.0
+      })
     })
   ))
 
