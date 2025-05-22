@@ -37,26 +37,27 @@ export const reducer = createReducer(
     }
   ),
   on(
-    actions.addCustomLayer,
-    (state, { customLayer }) => {
+    actions.addCustomLayers,
+    (state, { customLayers: addCLayers }) => {
       const { customLayers } = state
-
+      const idToAdd = new Set(addCLayers.map(({ id }) => id))
       return {
         ...state,
         customLayers: [
-          customLayer,
-          ...customLayers.filter(l => l.id !== customLayer.id)
+          ...addCLayers,
+          ...customLayers.filter(l => !idToAdd.has(l.id))
         ]
       }
     }
   ),
   on(
-    actions.removeCustomLayer,
-    (state, { id }) => {
+    actions.removeCustomLayers,
+    (state, { customLayers: removeCLayers }) => {
+      const idsToRemove = new Set(removeCLayers.map(({ id }) => id))
       const { customLayers } = state
       return {
         ...state,
-        customLayers: customLayers.filter(l => l.id !== id)
+        customLayers: customLayers.filter(l => !idsToRemove.has(l.id) )
       }
     }
   ),

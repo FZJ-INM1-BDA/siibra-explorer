@@ -190,12 +190,12 @@ export class ConnectivityBrowserComponent implements OnChanges {
       }
       
       this.store$.dispatch(
-        atlasAppearance.actions.addCustomLayer({
-          customLayer: {
+        atlasAppearance.actions.addCustomLayers({
+          customLayers: [{
             clType: 'customlayer/colormap',
             id: ConnectivityBrowserComponent.LayerId,
             colormap: map
-          }
+          }]
         })
       )
     })
@@ -264,8 +264,8 @@ export class ConnectivityBrowserComponent implements OnChanges {
 
   removeCustomLayer() {
     this.store$.dispatch(
-      atlasAppearance.actions.removeCustomLayer({
-        id: ConnectivityBrowserComponent.LayerId
+      atlasAppearance.actions.removeCustomLayers({
+        customLayers: [{id: ConnectivityBrowserComponent.LayerId}]
       })
     )
   }

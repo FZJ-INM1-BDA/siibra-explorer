@@ -1,8 +1,8 @@
 import { Directive, ViewContainerRef, ComponentRef, OnDestroy, Output, EventEmitter, Optional, ChangeDetectorRef } from "@angular/core";
 import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
 import { Store, select } from "@ngrx/store";
-import { Subscription, Observable, combineLatest } from "rxjs";
-import { distinctUntilChanged, filter, debounceTime, scan, map, switchMap, take } from "rxjs/operators";
+import { Subscription, Observable, combineLatest, forkJoin, EMPTY, of } from "rxjs";
+import { distinctUntilChanged, filter, scan, map, switchMap, take } from "rxjs/operators";
 import { serializeSegment } from "../util";
 import { LoggingService } from "src/logging";
 import { arrayOfPrimitiveEqual } from 'src/util/fn'
@@ -15,6 +15,7 @@ import { LayerCtrlEffects } from "../layerCtrl.service/layerCtrl.effects";
 import { NavigationBaseSvc } from "../navigation.service/navigation.base.service";
 import { translateV3Entities } from "src/atlasComponents/sapi/translateV3";
 import { MetaV1Schema } from "src/atlasComponents/sapi/volumeMeta";
+import { SXPLR_ANNOTATIONS_KEY } from "src/util/constants";
 
 
 const determineProtocol = (url: string) => {
@@ -171,15 +172,36 @@ export class NehubaViewerContainerDirective implements OnDestroy{
       }),
       this.store$.pipe(
         atlasSelection.fromRootStore.distinctATP(),
-        map(({ template }) => template),
-        distinctUntilChanged((o, n) => o?.id === n?.id),
-        switchMap(template => 
-          combineLatest([
+        
+        distinctUntilChanged((o, n) => {
+          return (
+            o?.template?.id === n?.template?.id
+            && o?.parcellation?.id === n?.parcellation?.id
+          )
+        }),
+        switchMap(({template, parcellation }) => 
+          forkJoin([
+            
             this.store$.pipe(
               select(atlasAppearance.selectors.customLayers),
               map(cl => cl.filter(l => l.clType === "baselayer/nglayer") as atlasAppearance.const.NgLayerCustomLayer[]),
               filter(layers => layers.length > 0),
               distinctUntilChanged(arrayEqual((oi, ni) => oi?.id === ni?.id)),
+              switchMap(layers => {
+                
+                const templIds = new Set(layers.map(v => v.sxplrAnnotations[SXPLR_ANNOTATIONS_KEY.TEMPLATE_ID]).filter(v => !!v))
+                const parcellationIds = new Set(layers.map(v => v.sxplrAnnotations[SXPLR_ANNOTATIONS_KEY.PARCELLATION_ID]).filter(v => !!v))
+                if (templIds.size !== 1 || parcellationIds.size !== 1) {
+                  return EMPTY
+                }
+                const templId = Array.from(templIds)[0]
+                const parcellationId = Array.from(parcellationIds)[0]
+                if (templId !== template?.id || parcellationId !== parcellation?.id) {
+                  return EMPTY
+                }
+                return of(layers)
+              }),
+              take(1),
             ),
             translateV3Entities.translateSpaceToVolumeImageMeta(template)
           ]).pipe(
@@ -203,7 +225,6 @@ export class NehubaViewerContainerDirective implements OnDestroy{
             })
           )
         ),
-        debounceTime(160),
       ).subscribe(async config => {
         const overwritingInitState = this.navigation
           ? cvtNavigationObjToNehubaConfig(this.navigation, config.dataset.initialNgState)

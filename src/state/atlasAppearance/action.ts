@@ -15,17 +15,17 @@ export const setShowDelineation = createAction(
   }>()
 )
 
-export const addCustomLayer = createAction(
+export const addCustomLayers = createAction(
   `${nameSpace} addCustomLayer`,
   props<{
-    customLayer: CustomLayer
+    customLayers: CustomLayer[]
   }>()
 )
 
-export const removeCustomLayer = createAction(
+export const removeCustomLayers = createAction(
   `${nameSpace} removeCustomLayer`,
   props<{
-    id: string
+    customLayers: {id: string}[]
   }>()
 )
 

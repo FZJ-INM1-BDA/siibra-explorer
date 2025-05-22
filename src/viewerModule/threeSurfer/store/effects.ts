@@ -58,11 +58,9 @@ export class ThreeSurferEffects {
     ),
     switchMap(([_, layers]) => 
       of(
-        ...layers.map(layer => 
-          atlasAppearance.actions.removeCustomLayer({
-            id: layer.id
-          })  
-        )
+        atlasAppearance.actions.removeCustomLayers({
+          customLayers: layers
+        })
       )
     )
   ))
@@ -107,13 +105,11 @@ export class ThreeSurferEffects {
             source: src.url
           })
         }
-        return of(...[
-          ...layers.map(customLayer => 
-            atlasAppearance.actions.addCustomLayer({
-              customLayer
-            })
-          )
-        ])
+        return of(
+          atlasAppearance.actions.addCustomLayers({
+            customLayers: layers
+          })
+        )
       })
     ))
   ))
@@ -131,11 +127,9 @@ export class ThreeSurferEffects {
         })
       }
       return of(
-        ...labelMaps.map(customLayer => 
-          atlasAppearance.actions.addCustomLayer({
-            customLayer
-          })  
-        )
+        atlasAppearance.actions.addCustomLayers({
+          customLayers: labelMaps
+        })
       )
     })
   ))

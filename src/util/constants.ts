@@ -105,3 +105,8 @@ export const parcBanList: string[] = [
 export const GET_ATTR_TOKEN = new InjectionToken("GET_ATTR_TOKEN")
 
 export type GetAttr = (attr: string) => string|null
+
+export const SXPLR_ANNOTATIONS_KEY = {
+  TEMPLATE_ID: "sxplrAnnotation.template.id",
+  PARCELLATION_ID: "sxplrAnnotation.parcellation.id",
+} as const

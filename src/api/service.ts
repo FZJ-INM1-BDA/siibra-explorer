@@ -492,8 +492,8 @@ export class ApiService implements BoothResponder<ApiBoothEvents>{
       const { layers } = event.params as ApiBoothEvents['loadLayers']['request'] | ApiBoothEvents['updateLayers']['request']
       for (const layer of layers) {
         this.store.dispatch(
-          atlasAppearance.actions.addCustomLayer({
-            customLayer: layer
+          atlasAppearance.actions.addCustomLayers({
+            customLayers: [layer]
           })
         )
       }
@@ -503,7 +503,7 @@ export class ApiService implements BoothResponder<ApiBoothEvents>{
       const { layers } = event.params as ApiBoothEvents['removeLayers']['request']
       for (const layer of layers) {
         this.store.dispatch(
-          atlasAppearance.actions.removeCustomLayer(layer)
+          atlasAppearance.actions.removeCustomLayers({customLayers: [layer]})
         )
       }
       break

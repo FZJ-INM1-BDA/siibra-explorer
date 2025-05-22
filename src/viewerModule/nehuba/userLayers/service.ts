@@ -574,8 +574,8 @@ export class UserLayerService implements OnDestroy {
         ...option,
       }
       this.store$.dispatch(
-        atlasAppearance.actions.addCustomLayer({
-          customLayer: layer,
+        atlasAppearance.actions.addCustomLayers({
+          customLayers: [layer],
         })
       )
     }
@@ -609,7 +609,7 @@ export class UserLayerService implements OnDestroy {
       cleanup && cleanup()
       if (source) {
         this.store$.dispatch(
-          atlasAppearance.actions.removeCustomLayer({ id })
+          atlasAppearance.actions.removeCustomLayers({ customLayers: [{id}] })
         )
       }
       this.#idToCleanup.delete(id)
