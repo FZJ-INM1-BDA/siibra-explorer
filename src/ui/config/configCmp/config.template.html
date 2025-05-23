@@ -74,7 +74,9 @@
   </mat-tab>
 
   <!-- viewer preference -->
-  <mat-tab *ngIf="environment.EXPERIMENTAL_FEATURE_FLAG" label="Viewer Preference">
+  <ng-template sxplrExperimentalFlag [experimental]="true">
+
+  <mat-tab label="Viewer Preference">
 
     <div class="sxplr-custom-cmp text sxplr-m-2">
       
@@ -270,5 +272,7 @@
       
     </div>
   </mat-tab>
+
+  </ng-template>
 </mat-tab-group>
 

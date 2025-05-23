@@ -100,7 +100,7 @@
         "python 3",
         "typescript"
     ],
-    "schema:releaseNotes": "# v2.14.20\n\n## Feature\n\n- Show/Hide delineation now persist in state\n- (experimental) glass brain\n\n## Bugfix\n\n- Fixed some instability of annotation mode. \n\n## Behind the scenes\n\n- Clarified authors & contributors\n- Improve performance by batching adding & removing layers\n- Added text to reflect that annoations will also be shared\n",
+    "schema:releaseNotes": "# v2.14.20\n\n## Feature\n\n- Show/Hide delineation now persist in state\n- (experimental) glass brain\n\n## Bugfix\n\n- Fixed some instability of annotation mode. \n\n## Behind the scenes\n\n- Clarified authors & contributors\n- Improve performance by batching adding & removing layers\n- Added text to reflect that annoations will also be shared\n- Enabled viewer config in experimental mode\n",
     "runtimePlatform": "docker",
     "version": "2.14.20",
     "contIntegration": "https://github.com/FZJ-INM1-BDA/siibra-explorer/actions",

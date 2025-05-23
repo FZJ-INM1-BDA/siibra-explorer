@@ -1,6 +1,6 @@
 import { Injectable, OnDestroy } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { combineLatest, merge, Observable, of, Subject, Subscription } from "rxjs";
+import { combineLatest, merge, Observable, Subject, Subscription } from "rxjs";
 import { debounceTime, distinctUntilChanged, filter, map, pairwise, shareReplay, startWith, switchMap, withLatestFrom } from "rxjs/operators";
 import { IColorMap, INgLayerCtrl, TNgLayerCtrl } from "./layerCtrl.util";
 import { atlasAppearance, atlasSelection } from "src/state";

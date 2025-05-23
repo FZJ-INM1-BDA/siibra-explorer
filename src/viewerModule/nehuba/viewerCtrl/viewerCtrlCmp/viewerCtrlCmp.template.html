@@ -15,7 +15,10 @@
       </span>
       <i [matTooltip]="CONST.REMOVE_FRONTAL_OCTANT_HELPER_TEXT" class="fas fa-question"></i>
     </mat-slide-toggle>
+
     <ng-template [ngIf]="view$ | async" let-view>
+
+      <ng-template sxplrExperimentalFlag [experimental]="true">
 
       <mat-slide-toggle
         [checked]="view.auxTransparent"
@@ -29,6 +32,9 @@
           <i [matTooltip]="view.CONST.GLASS_BRAIN_ENABLE" class="fas fa-exclamation-triangle"></i>
         </ng-template>
       </mat-slide-toggle>
+      
+      </ng-template>
+
     </ng-template>
   </mat-card-content>
 

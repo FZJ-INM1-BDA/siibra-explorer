@@ -8,7 +8,7 @@ import { atlasAppearance, atlasSelection, defaultState, MainState, plugins, user
 import { decodeToNumber, encodeNumber, encodeURIFull, separator } from "./cipher";
 import { TUrlAtlas, TUrlPathObj, TUrlStandaloneVolume } from "./type";
 import { decodePath, encodeId, decodeId, encodePath } from "./util";
-import { CachedFunction, QuickHash, decodeBool, encodeBool, isNullish, mutateDeepMerge } from "src/util/fn";
+import { CachedFunction, QuickHash, decodeBool, encodeBool, mutateDeepMerge } from "src/util/fn";
 import { NEHUBA_CONFIG_SERVICE_TOKEN, NehubaConfigSvc } from "src/viewerModule/nehuba/config.service";
 import * as nehubaStore from "src/viewerModule/nehuba/store"
 import { INIT_ROUTE_TO_STATE } from "src/util/injectionTokens";
@@ -24,6 +24,22 @@ type ViewerConfigState = {
 type ViewerCfgStateV2 = {
   auxMeshAlpha: number
 } & ViewerConfigState
+
+const PANEL_MODE_DICT: Record<userInterface.PanelMode, number> = {
+  "FOUR_PANEL": 1,
+  "PIP_PANEL": 2,
+  "H_ONE_THREE": 3,
+  "V_ONE_THREE": 4,
+  "SINGLE_PANEL": 5
+}
+
+const PANEL_MODE_DECODE = (() => {
+  const returnVal: Record<number, userInterface.PanelMode> = {}
+  for (const [key, value] of Object.entries(PANEL_MODE_DICT)) {
+    returnVal[value] = key as userInterface.PanelMode
+  }
+  return returnVal
+})()
 
 const decodeMiscState = {
   "v1": (encodedVal: string) => {
@@ -41,15 +57,10 @@ const decodeMiscState = {
     const array = Uint8Array.from(window.atob(encodedVal), v => v.charCodeAt(0))
 
     const panelModeVal = array[0]
-    if (panelModeVal === 1) {
-      returnVal.panelMode = "FOUR_PANEL"
-    } else if (panelModeVal) {
-      returnVal.panelMode = "PIP_PANEL"
-    } else {
-      console.warn(`panelmode set to ${panelModeVal}, which is unknown, set to default (4 panel)`)
-      returnVal.panelMode = "FOUR_PANEL"
+    returnVal.panelMode = "FOUR_PANEL"
+    if (panelModeVal in PANEL_MODE_DECODE) {
+      returnVal.panelMode = PANEL_MODE_DECODE[panelModeVal]
     }
-    
     let panelOrderVal = array[1]
     let panelOrder = ""
     while (panelOrder.length < 4) {
@@ -85,9 +96,21 @@ const decodeMiscState = {
     const v1State = decodeMiscState['v1'](v1Str)
 
     const meshAlpha = decodedArray[0] / 255
+
+    let panelOrderVal = decodedArray[2]
+    const panelOrder = []
+    while (panelOrder.length < 4) {
+      panelOrder.unshift(
+        panelOrderVal & 3
+      )
+      // n.b. only store 2 bit increment
+      panelOrderVal = panelOrderVal >> 2
+    }
+    
     const returnVal: ViewerCfgStateV2 = {
       ...v1State,
-      auxMeshAlpha: meshAlpha
+      auxMeshAlpha: meshAlpha,
+      panelOrder: panelOrder.join(""),
     }
     return returnVal
   }
@@ -360,12 +383,24 @@ export class RouteStateTransformSvc {
   encodeMiscState(config: ViewerCfgStateV2): string {
     const { panelMode, panelOrder, octantRemoval, showDelineation, auxMeshAlpha } = config
     let panelModeVal = 1
-    if (panelMode === "PIP_PANEL") {
-      panelModeVal = 2
+    if (panelMode) {
+      panelModeVal = PANEL_MODE_DICT[panelMode]
     }
-    let panelOrderVal = 4
-    if (("0123".split("")).includes(panelOrder[0])){
-      panelOrderVal = parseInt(panelOrder[0])
+    let panelOrderVal = 0
+  
+    
+    // validate panelOrder
+    let order = panelOrder.split("").map(v => parseInt(v))
+    if (order.length !== 4 || [0,1,2,3].some(v => !order.includes(v))) {
+      // if order is not of length 4, 
+      // OR if the order does not contain exhaustive list 0, 1, 2, 3
+      // use 0, 1, 2, 3 as default
+      order = [0, 1, 2, 3]
+    }
+    // n.b. only store 2 bit increment
+    for (const v of order){
+      panelOrderVal = panelOrderVal << 2
+      panelOrderVal += v
     }
     const meshAlpha = auxMeshAlpha * 255
     const encodedBools = encodeBool(octantRemoval, showDelineation)
