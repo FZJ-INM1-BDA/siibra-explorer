@@ -1,4 +1,4 @@
-import { Inject, Injectable, OnDestroy, Optional } from "@angular/core";
+import { Injectable, OnDestroy } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { combineLatest, merge, Observable, of, Subject, Subscription } from "rxjs";
 import { debounceTime, distinctUntilChanged, filter, map, pairwise, shareReplay, startWith, switchMap, withLatestFrom } from "rxjs/operators";
@@ -12,7 +12,6 @@ import { AnnotationLayer } from "src/atlasComponents/annotations";
 import { PMAP_LAYER_NAME } from "../constants"
 import { getShader } from "src/util/fn";
 import { BaseService } from "../base.service/base.service";
-import { ParcellationVisibilityService } from "src/atlasComponents/sapiViews/core/parcellation/parcellationVis.service";
 import * as nehubaStore from "../store"
 
 export const BACKUP_COLOR = {
@@ -137,9 +136,6 @@ export class NehubaLayerControlService implements OnDestroy{
     private store$: Store<any>,
     private layerEffects: LayerCtrlEffects,
     private baseService: BaseService,
-    @Optional()
-    @Inject(ParcellationVisibilityService)
-    private parcVisSvc: ParcellationVisibilityService,
   ){
 
     this.sub.push(
@@ -205,7 +201,9 @@ export class NehubaLayerControlService implements OnDestroy{
 
   public expectedVisibleLayerNames$ = combineLatest([
     this.defaultNgLayers$,
-    (this.parcVisSvc?.visibility$ || of(true)) 
+    this.store$.pipe(
+      select(atlasAppearance.selectors.showDelineation)
+    )
   ]).pipe(
     map(([{ parcNgLayers, tmplAuxNgLayers, tmplNgLayers }, parcVisible]) => {
       return [

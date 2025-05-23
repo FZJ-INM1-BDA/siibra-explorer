@@ -37,6 +37,15 @@ export const reducer = createReducer(
     }
   ),
   on(
+    actions.toggleParcDelineation,
+    state => {
+      return {
+        ...state,
+        showDelineation: !state.showDelineation
+      }
+    }
+  ),
+  on(
     actions.addCustomLayers,
     (state, { customLayers: addCLayers }) => {
       const { customLayers } = state

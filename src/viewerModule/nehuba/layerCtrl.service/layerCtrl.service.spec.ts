@@ -29,7 +29,13 @@ describe('> layerctrl.service.ts', () => {
             }
           },
           NehubaLayerControlService,
-          provideMockStore(),
+          provideMockStore({
+            initialState: {
+              [layerCtrlUtil.NEHUBA_VIEWER_FEATURE_KEY]: {
+                auxTransparency: 1.0
+              }
+            }
+          }),
           {
             provide: LayerCtrlEffects,
             useValue: {

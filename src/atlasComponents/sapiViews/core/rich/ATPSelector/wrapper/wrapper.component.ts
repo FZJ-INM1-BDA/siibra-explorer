@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Inject, Input, OnDestroy, Output } from "@angular/core";
-import { MatDialog } from "src/sharedModules/angularMaterial.exports";
 import { select, Store } from "@ngrx/store";
 import { Observable, Subject, Subscription } from "rxjs";
 import { switchMap, withLatestFrom } from "rxjs/operators";
@@ -7,7 +6,6 @@ import { SAPI } from "src/atlasComponents/sapi/sapi.service";
 import { atlasAppearance, atlasSelection } from "src/state";
 import { fromRootStore } from "src/state/atlasSelection";
 import { DARKTHEME } from "src/util/injectionTokens";
-import { ParcellationVisibilityService } from "../../../parcellation/parcellationVis.service";
 import { darkThemePalette, lightThemePalette, ATP } from "../pureATP.directive"
 
 @Component({
@@ -56,10 +54,8 @@ export class WrapperATPSelector implements OnDestroy{
   )
 
   constructor(
-    private dialog: MatDialog,
     private store$: Store,
     private sapi: SAPI,
-    private svc: ParcellationVisibilityService,
     @Inject(DARKTHEME) public darktheme$: Observable<boolean>
   ){
     this.#subscription.push(
@@ -91,7 +87,9 @@ export class WrapperATPSelector implements OnDestroy{
   }
 
   toggleParcellationVisibility() {
-    this.svc.toggleVisibility()
+    this.store$.dispatch(
+      atlasAppearance.actions.toggleParcDelineation()
+    )
   }
 
   ngOnDestroy(): void {

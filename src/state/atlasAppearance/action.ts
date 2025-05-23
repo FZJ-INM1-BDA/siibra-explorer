@@ -15,6 +15,10 @@ export const setShowDelineation = createAction(
   }>()
 )
 
+export const toggleParcDelineation = createAction(
+  `${nameSpace} toggleDelineation`,
+)
+
 export const addCustomLayers = createAction(
   `${nameSpace} addCustomLayer`,
   props<{
