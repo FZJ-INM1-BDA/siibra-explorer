@@ -17,5 +17,4 @@ export interface INehubaFeature {
   panelOrder: string
   octantRemoval: boolean
   auxMeshes: IAuxMesh[]
-  auxTransparency: number
 }

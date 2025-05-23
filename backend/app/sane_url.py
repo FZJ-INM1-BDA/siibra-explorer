@@ -178,8 +178,13 @@ class SaneUrlModel(BaseModel):
 
 @router.post("/{short_id:str}")
 async def post_short(short_id: str, saneurl: SaneUrlModel, request:Request):
+    json_body: Dict[str, Any] = await request.json()
+    saneurl_model = saneurl.model_dump()
+    for key, value in json_body.items():
+        if key.startswith("x-"):
+            saneurl_model[key] = value
     try:
-        data_proxy_store.set(short_id, saneurl.model_dump(), request=request)
+        data_proxy_store.set(short_id, saneurl_model, request=request)
         return Response(status_code=201)
     except Exception as e:
         raise HTTPException(500, str(e))

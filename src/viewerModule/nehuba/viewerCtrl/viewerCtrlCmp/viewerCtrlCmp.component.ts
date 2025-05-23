@@ -24,13 +24,17 @@ export class ViewerCtrlCmp implements OnInit{
 
   public view$ = combineLatest([
     this.store$.pipe(
-      select(nehubaStore.selectors.auxMeshTransparency),
+      select(atlasAppearance.selectors.meshTransparency),
       map(alpha => alpha < 1)
+    ),
+    this.store$.pipe(
+      select(atlasAppearance.selectors.octantRemoval)
     )
   ]).pipe(
-    map(([ auxTransparent ]) => {
+    map(([ auxTransparent, octantRemoved ]) => {
       return {
         auxTransparent,
+        octantRemoved,
         CONST
       }
     })
@@ -38,33 +42,11 @@ export class ViewerCtrlCmp implements OnInit{
 
   toggleAux(){
     this.store$.dispatch(
-      nehubaStore.actions.toggleAuxTransparency()
+      atlasAppearance.actions.toggleMeshTransparency()
     )
   }
 
   private sub: Subscription[] = []
-
-  private _removeOctantFlag: boolean = true
-  get removeOctantFlag(): boolean{
-    return this._removeOctantFlag
-  }
-  set removeOctantFlag(val: boolean){
-    if (val === this._removeOctantFlag) return
-    this._removeOctantFlag = val
-    // on remove frontal octant, reset transparency
-    if (val) {
-      this.store$.dispatch(
-        nehubaStore.actions.setAuxTransparency({
-          alpha: 1
-        })
-      )
-    }
-    this.setOctantRemoval(this._removeOctantFlag)
-  }
-
-  public nehubaViewerPerspectiveOctantRemoval$ = this.store$.pipe(
-    select(atlasAppearance.selectors.octantRemoval),
-  )
 
   public auxMeshFormGroup: UntypedFormGroup = new UntypedFormGroup({})
   private auxMeshesNamesSet: Set<string> = new Set()
@@ -74,10 +56,6 @@ export class ViewerCtrlCmp implements OnInit{
 
   ngOnInit(): void {
     this.sub.push(
-
-      this.nehubaViewerPerspectiveOctantRemoval$.subscribe(
-        flag => this.removeOctantFlag = flag
-      ),
 
       merge(
         of(null),
@@ -132,11 +110,9 @@ export class ViewerCtrlCmp implements OnInit{
 
   }
 
-  public setOctantRemoval(octantRemovalFlag: boolean): void {
+  public toggleOctantRemoval(){
     this.store$.dispatch(
-      atlasAppearance.actions.setOctantRemoval({
-        flag: octantRemovalFlag
-      })
+      atlasAppearance.actions.toggleOctantRemoval()
     )
   }
 

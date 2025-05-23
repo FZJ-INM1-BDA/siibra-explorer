@@ -772,18 +772,27 @@ export class NehubaViewerUnit implements OnDestroy {
     ctrl.restoreState(newVal)
   }
 
-  private setLayerTransparency(layerName: string, alpha: number) {
-    const layer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(layerName)
-    if (!(layer?.layer)) return
-
-    /**
-     * for segmentation layer
-     */
-    if (layer.layer.displayState) layer.layer.displayState.objectAlpha.restoreState(alpha)
-    /**
-     * for image layer
-     */
-    if (layer.layer.opacity) layer.layer.opacity.restoreState(alpha)
+  private async setLayerTransparency(layerName: string, alpha: number) {
+    await waitFor(() => {
+      const layer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(layerName)
+      
+      /**
+       * for segmentation layer
+       */
+      if (layer?.layer?.displayState) {
+        layer.layer.displayState.objectAlpha.restoreState(alpha)
+        return true
+      }
+      
+      /**
+       * for image layer
+       */
+      if (layer?.layer?.opacity) {
+        layer.layer.opacity.restoreState(alpha)
+        return true
+      }
+      return false
+    })
   }
 
   private setLayerShader(layerName: string, shader: string) {

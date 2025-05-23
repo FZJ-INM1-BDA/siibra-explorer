@@ -8,6 +8,21 @@ export const setOctantRemoval = createAction(
   }>()
 )
 
+export const setMeshTransparency = createAction(
+  `${nameSpace} setMeshTransparency`,
+  props<{
+    alpha: number
+  }>()
+)
+
+export const toggleMeshTransparency = createAction(
+  `${nameSpace} toggleMeshTransparency`
+)
+
+export const toggleOctantRemoval = createAction(
+  `${nameSpace} toggleOctantRemoval`
+)
+
 export const setShowDelineation = createAction(
   `${nameSpace} setShowDelineation`,
   props<{

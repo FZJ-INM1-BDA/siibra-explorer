@@ -23,14 +23,3 @@ export const actionSetAuxMeshes = createAction(
     payload: IAuxMesh[]
   }>()
 )
-
-export const setAuxTransparency = createAction(
-  `[${NEHUBA_VIEWER_FEATURE_KEY}] setAuxMeshTransparency`,
-  props<{
-    alpha: number
-  }>()
-)
-
-export const toggleAuxTransparency = createAction(
-  `[${NEHUBA_VIEWER_FEATURE_KEY}] toggleAuxMeshTransparency`
-)

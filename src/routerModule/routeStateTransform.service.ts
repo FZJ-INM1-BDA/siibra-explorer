@@ -10,7 +10,6 @@ import { TUrlAtlas, TUrlPathObj, TUrlStandaloneVolume } from "./type";
 import { decodePath, encodeId, decodeId, encodePath } from "./util";
 import { CachedFunction, QuickHash, decodeBool, encodeBool, mutateDeepMerge } from "src/util/fn";
 import { NEHUBA_CONFIG_SERVICE_TOKEN, NehubaConfigSvc } from "src/viewerModule/nehuba/config.service";
-import * as nehubaStore from "src/viewerModule/nehuba/store"
 import { INIT_ROUTE_TO_STATE } from "src/util/injectionTokens";
 import { RecursivePartial } from "src/util/recursivePartial";
 
@@ -292,15 +291,16 @@ export class RouteStateTransformSvc {
     const viewerConfigState = returnObj['vs'] && returnObj['vs'][0]
     if (viewerConfigState) {
 
-      const { panelMode, panelOrder, showDelineation, octantRemoval } = !!viewerConfigState
+      const { panelMode, panelOrder, showDelineation, octantRemoval, auxMeshAlpha } = !!viewerConfigState
       ? this.decodeMiscState(viewerConfigState)
-      : { panelMode: "FOUR_PANEL" as const, panelOrder: "0123", showDelineation: true, octantRemoval: true }
+      : { panelMode: "FOUR_PANEL" as const, panelOrder: "0123", showDelineation: true, octantRemoval: true, auxMeshAlpha: 1.0 }
   
       returnState['[state.ui]'].panelMode = panelMode
       returnState['[state.ui]'].panelOrder = panelOrder
 
       returnState["[state.atlasAppearance]"].showDelineation = showDelineation
       returnState["[state.atlasAppearance]"].octantRemoval = octantRemoval  
+      returnState["[state.atlasAppearance]"].meshTransparency = auxMeshAlpha
   
     }
     // pluginState should always be defined, regardless if standalone volume or not
@@ -449,7 +449,7 @@ export class RouteStateTransformSvc {
     const panelOrder = userInterface.selectors.panelOrder(state)
     const octantRemoval = atlasAppearance.selectors.octantRemoval(state)
     const showDelineation = atlasAppearance.selectors.showDelineation(state)
-    const auxMeshAlpha = nehubaStore.selectors.auxMeshTransparency(state)
+    const auxMeshAlpha = atlasAppearance.selectors.meshTransparency(state)
 
     const searchParam = new URLSearchParams()
   

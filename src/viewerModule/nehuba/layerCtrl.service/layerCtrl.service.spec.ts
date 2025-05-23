@@ -1,7 +1,6 @@
 import { fakeAsync, TestBed } from "@angular/core/testing"
 import { MockStore, provideMockStore } from "@ngrx/store/testing"
 import { NehubaLayerControlService } from "./layerCtrl.service"
-import * as layerCtrlUtil from '../constants'
 import {
   annotation,
   atlasAppearance,
@@ -29,13 +28,7 @@ describe('> layerctrl.service.ts', () => {
             }
           },
           NehubaLayerControlService,
-          provideMockStore({
-            initialState: {
-              [layerCtrlUtil.NEHUBA_VIEWER_FEATURE_KEY]: {
-                auxTransparency: 1.0
-              }
-            }
-          }),
+          provideMockStore(),
           {
             provide: LayerCtrlEffects,
             useValue: {

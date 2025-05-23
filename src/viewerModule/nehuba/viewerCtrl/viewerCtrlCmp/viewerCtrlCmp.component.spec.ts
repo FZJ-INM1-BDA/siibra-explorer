@@ -72,7 +72,7 @@ describe('> viewerCtrlCmp.component.ts', () => {
       mockStore = TestBed.inject(MockStore)
       mockStore.overrideSelector(atlasSelection.selectors.selectedTemplate, {} as any)
       mockStore.overrideSelector(atlasAppearance.selectors.octantRemoval, true)
-      mockStore.overrideSelector(selectors.auxMeshTransparency, 1)
+      mockStore.overrideSelector(atlasAppearance.selectors.meshTransparency, 1)
       mockStore.overrideSelector(selectorAuxMeshes, [])
     })
 

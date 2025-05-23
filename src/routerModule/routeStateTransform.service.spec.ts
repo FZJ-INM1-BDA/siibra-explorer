@@ -6,7 +6,6 @@ import { DefaultUrlSerializer } from "@angular/router"
 import { atlasAppearance, atlasSelection, userInteraction, userInterface } from "src/state"
 import { QuickHash } from "src/util/fn"
 import { NEHUBA_CONFIG_SERVICE_TOKEN } from "src/viewerModule/nehuba/config.service"
-import * as nehubaStore from "src/viewerModule/nehuba/store"
 import { MockStore, provideMockStore } from "@ngrx/store/testing"
 
 const serializer = new DefaultUrlSerializer()
@@ -140,7 +139,7 @@ describe("> routeStateTransform.service.ts", () => {
           store.overrideSelector(userInterface.selectors.panelOrder, "0123")
           store.overrideSelector(atlasAppearance.selectors.octantRemoval, false)
           store.overrideSelector(atlasAppearance.selectors.showDelineation, true)
-          store.overrideSelector(nehubaStore.selectors.auxMeshTransparency, 1.0)
+          store.overrideSelector(atlasAppearance.selectors.meshTransparency, 1.0)
         })
 
         afterEach(() => {

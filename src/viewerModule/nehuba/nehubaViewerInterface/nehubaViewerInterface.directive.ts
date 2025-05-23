@@ -5,7 +5,7 @@ import { Subscription, Observable, combineLatest, forkJoin, EMPTY, of } from "rx
 import { distinctUntilChanged, filter, scan, map, switchMap, take } from "rxjs/operators";
 import { serializeSegment } from "../util";
 import { LoggingService } from "src/logging";
-import { arrayOfPrimitiveEqual } from 'src/util/fn'
+import { arrayOfPrimitiveEqual, switchMapWaitFor } from 'src/util/fn'
 import { INavObj } from "../constants"
 import { NehubaConfig, defaultNehubaConfig, getNehubaConfig } from "../config.service";
 import { atlasAppearance, atlasSelection, userPreference } from "src/state";
@@ -165,10 +165,23 @@ export class NehubaViewerContainerDirective implements OnDestroy{
     this.cdr.detach()
 
     this.subscriptions.push(
-      this.nehubaViewerPerspectiveOctantRemoval$.pipe(
-        distinctUntilChanged()
+      this.store$.pipe(
+        select(atlasAppearance.selectors.octantRemoval),
+        distinctUntilChanged(),
+        switchMap(
+          switchMapWaitFor({
+            condition: () => !!this.nehubaViewerInstance,
+            interval: 160,
+            leading: true
+          })
+        )
       ).subscribe(flag =>{
-        this.toggleOctantRemoval(flag)
+        
+        if (!this.nehubaViewerInstance) {
+          this.log.error(`this.nehubaViewerInstance is not yet available`)
+          return
+        }
+        this.nehubaViewerInstance.toggleOctantRemoval(flag)
       }),
       this.store$.pipe(
         atlasSelection.fromRootStore.distinctATP(),
@@ -292,10 +305,6 @@ export class NehubaViewerContainerDirective implements OnDestroy{
     )
   }
 
-  private nehubaViewerPerspectiveOctantRemoval$ = this.store$.pipe(
-    select(atlasAppearance.selectors.octantRemoval),
-  )
-
   private gpuLimit$: Observable<number> = this.store$.pipe(
     select(userPreference.selectors.gpuLimit)
   )
@@ -317,13 +326,6 @@ export class NehubaViewerContainerDirective implements OnDestroy{
     }
   }
 
-  public toggleOctantRemoval(flag: boolean): void{
-    if (!this.nehubaViewerInstance) {
-      this.log.error(`this.nehubaViewerInstance is not yet available`)
-      return
-    }
-    this.nehubaViewerInstance.toggleOctantRemoval(flag)
-  }
 
   async createNehubaInstance(nehubaConfig: NehubaConfig): Promise<void>{
     this.clear()

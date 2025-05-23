@@ -5,6 +5,7 @@ import { UseViewer, CustomLayer } from "./const"
 export type AtlasAppearanceStore = {
   useViewer: UseViewer
   octantRemoval: boolean
+  meshTransparency: number
   showDelineation: boolean
   customLayers: CustomLayer[]
 }
@@ -13,7 +14,8 @@ export const defaultState: AtlasAppearanceStore = {
   useViewer: null,
   octantRemoval: true,
   showDelineation: true,
-  customLayers: []
+  customLayers: [],
+  meshTransparency: 1.0
 }
 
 export const reducer = createReducer(
@@ -24,6 +26,33 @@ export const reducer = createReducer(
       return {
         ...state,
         octantRemoval: flag
+      }
+    }
+  ),
+  on(
+    actions.toggleOctantRemoval,
+    state => {
+      return {
+        ...state,
+        octantRemoval: !state.octantRemoval
+      }
+    }
+  ),
+  on(
+    actions.setMeshTransparency,
+    (state, { alpha }) => {
+      return {
+        ...state,
+        meshTransparency: alpha
+      }
+    }
+  ),
+  on(
+    actions.toggleMeshTransparency,
+    state => {
+      return {
+        ...state,
+        meshTransparency: state.meshTransparency < 1.0 ? 1.0 : 0.2
       }
     }
   ),

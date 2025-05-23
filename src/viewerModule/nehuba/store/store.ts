@@ -21,7 +21,6 @@ const defaultState: INehubaFeature = {
   panelOrder: '0123',
   octantRemoval: true,
   auxMeshes: [],
-  auxTransparency: 1.0
 }
 
 export const reducer = createReducer(
@@ -52,17 +51,5 @@ export const reducer = createReducer(
       auxMeshes: []
     }
   }),
-  on(actions.setAuxTransparency, (state, { alpha }) => {
-    return {
-      ...state,
-      auxTransparency: alpha
-    }
-  }),
   
-  on(actions.toggleAuxTransparency, state => {
-    return {
-      ...state,
-      auxTransparency: state.auxTransparency < 1 ? 1 : 0.2
-    }
-  })
 )

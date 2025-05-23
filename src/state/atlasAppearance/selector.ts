@@ -14,6 +14,11 @@ export const showDelineation = createSelector(
   state => state.showDelineation
 )
 
+export const meshTransparency = createSelector(
+  selectStore,
+  state => state.meshTransparency
+)
+
 export const customLayers = createSelector(
   selectStore,
   state => state.customLayers

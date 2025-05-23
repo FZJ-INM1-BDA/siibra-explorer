@@ -173,7 +173,7 @@ export class NehubaLayerControlService implements OnDestroy{
      */
     this.sub.push(
       this.store$.pipe(
-        select(nehubaStore.selectors.auxMeshTransparency),
+        select(atlasAppearance.selectors.meshTransparency),
         withLatestFrom(this.defaultNgLayers$)
       ).subscribe(([alpha, { tmplAuxNgLayers } ]) => {
         
