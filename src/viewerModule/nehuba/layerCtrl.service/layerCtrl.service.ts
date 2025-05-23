@@ -12,7 +12,6 @@ import { AnnotationLayer } from "src/atlasComponents/annotations";
 import { PMAP_LAYER_NAME } from "../constants"
 import { getShader } from "src/util/fn";
 import { BaseService } from "../base.service/base.service";
-import * as nehubaStore from "../store"
 
 export const BACKUP_COLOR = {
   red: 255,
@@ -160,6 +159,16 @@ export class NehubaLayerControlService implements OnDestroy{
           payload: layerObj
         })
       }),
+
+      this.ngLayersController$.subscribe(ev => {
+        if (this.#ngLayerCtrlCb.length === 0) {
+          this.#buffered.push(ev)
+          return
+        }
+        for (const cb of this.#ngLayerCtrlCb){
+          cb(ev)
+        }
+      })
     )
 
     this.sub.push(
@@ -168,14 +177,13 @@ export class NehubaLayerControlService implements OnDestroy{
       })
     )
 
-    /**
-     * on custom landmarks loaded, set mesh transparency
-     */
     this.sub.push(
-      this.store$.pipe(
-        select(atlasAppearance.selectors.meshTransparency),
-        withLatestFrom(this.defaultNgLayers$)
-      ).subscribe(([alpha, { tmplAuxNgLayers } ]) => {
+      combineLatest([
+        this.store$.pipe(
+          select(atlasAppearance.selectors.meshTransparency),
+        ),
+        this.defaultNgLayers$
+      ]).subscribe(([alpha, { tmplAuxNgLayers } ]) => {
         
         const payload: {
           [key: string]: number
@@ -311,6 +319,24 @@ export class NehubaLayerControlService implements OnDestroy{
     shareReplay(1)
   )
   private manualNgLayersControl$ = new Subject<TNgLayerCtrl<keyof INgLayerCtrl>>()
+
+  /**
+   * ngctl events can be missed, (e.g. setmeshtransparency)
+   * this convoluted setup traps all events, and emit them when "subscribed"
+   * TODO rework into a datasource (i.e. pull oriented) rather than observable
+   */
+  #buffered: TNgLayerCtrl<keyof INgLayerCtrl>[] = []
+  #ngLayerCtrlCb: ((arg: TNgLayerCtrl<keyof INgLayerCtrl>) => void)[] = []
+  registerNgCtrl(callback: (arg: TNgLayerCtrl<keyof INgLayerCtrl>) => void){
+
+    this.#ngLayerCtrlCb.push(callback)
+    while (this.#buffered.length > 0) {
+      callback(this.#buffered.shift()) 
+    }
+    return () => {
+      this.#ngLayerCtrlCb = this.#ngLayerCtrlCb.filter(cb => cb !== callback)
+    }
+  }
   ngLayersController$: Observable<TNgLayerCtrl<keyof INgLayerCtrl>> = merge(
     this.ngLayers$.pipe(
       map(({ newLayers }) => newLayers),

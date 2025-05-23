@@ -2,17 +2,19 @@ import { CommonModule } from "@angular/common"
 import { ComponentFixture, TestBed } from "@angular/core/testing"
 import { FormsModule, ReactiveFormsModule } from "@angular/forms"
 import { MockStore, provideMockStore } from "@ngrx/store/testing"
-import { BehaviorSubject, of } from "rxjs"
+import { BehaviorSubject } from "rxjs"
 import { ComponentsModule } from "src/components"
 import { AngularMaterialModule } from "src/sharedModules"
 import { UtilModule } from "src/util"
-import { actionSetAuxMeshes, selectorAuxMeshes, selectors } from "../../store"
+import { actionSetAuxMeshes, selectorAuxMeshes } from "../../store"
 import { NEHUBA_INSTANCE_INJTKN } from "../../util"
 import { ViewerCtrlCmp } from "./viewerCtrlCmp.component"
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed'
 import { HarnessLoader } from "@angular/cdk/testing"
 import { MatSlideToggleHarness } from "src/sharedModules/angularMaterial.exports"
-import { atlasAppearance, atlasSelection } from "src/state"
+import { atlasAppearance, atlasSelection, userPreference } from "src/state"
+import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.directive"
+import { CUSTOM_ELEMENTS_SCHEMA } from "@angular/core"
 
 
 describe('> viewerCtrlCmp.component.ts', () => {
@@ -20,6 +22,7 @@ describe('> viewerCtrlCmp.component.ts', () => {
     let fixture: ComponentFixture<ViewerCtrlCmp>
     let loader: HarnessLoader
     let mockStore: MockStore
+    let dispatchSpy: jasmine.Spy
 
     let mockNehubaViewer = {
       nehubaViewer: {
@@ -54,8 +57,12 @@ describe('> viewerCtrlCmp.component.ts', () => {
           ReactiveFormsModule,
           ComponentsModule,
           UtilModule,
+          ExperimentalFlagDirective,
         ],
         declarations: [ ViewerCtrlCmp ],
+        schemas: [
+          CUSTOM_ELEMENTS_SCHEMA
+        ],
         providers: [
           provideMockStore(),
           {
@@ -63,17 +70,25 @@ describe('> viewerCtrlCmp.component.ts', () => {
             useFactory: () => {
               return new BehaviorSubject(mockNehubaViewer).asObservable()
             }
-          }
+          },
         ]
       }).compileComponents()
+
 
     })
     beforeEach(() => {
       mockStore = TestBed.inject(MockStore)
+      
+      dispatchSpy = spyOn(mockStore, "dispatch").and.callThrough()
       mockStore.overrideSelector(atlasSelection.selectors.selectedTemplate, {} as any)
       mockStore.overrideSelector(atlasAppearance.selectors.octantRemoval, true)
       mockStore.overrideSelector(atlasAppearance.selectors.meshTransparency, 1)
+      mockStore.overrideSelector(userPreference.selectors.showExperimental, true)
       mockStore.overrideSelector(selectorAuxMeshes, [])
+    })
+
+    afterEach(() => {
+      dispatchSpy.calls.reset()
     })
 
     describe('> can be init', () => {
@@ -100,14 +115,7 @@ describe('> viewerCtrlCmp.component.ts', () => {
 
       describe('> octant removal', () => {
         const toggleName = 'remove-frontal-octant'
-        let setOctantRemovalSpy: jasmine.Spy
-        beforeEach(() => {
-          setOctantRemovalSpy = spyOn(fixture.componentInstance, 'setOctantRemoval')
-        })
-        afterEach(() => {
-          setOctantRemovalSpy.calls.reset()
-        })
-  
+
         it('> toggleslider should exist', async () => {
           const slideToggle = await loader.getAllHarnesses(
             MatSlideToggleHarness.with({
@@ -117,17 +125,15 @@ describe('> viewerCtrlCmp.component.ts', () => {
           expect(slideToggle.length).toBe(1)
         })
   
-        it('> toggling it should result in setOctantRemoval to be called', async () => {
+        it('> toggling it should result in action dispatched', async () => {
           const slideToggle = await loader.getAllHarnesses(
             MatSlideToggleHarness.with({
               name: toggleName,
             })
           )
-          const wasChecked = await slideToggle[0].isChecked()
           await slideToggle[0].toggle()
-          expect(
-            setOctantRemovalSpy
-          ).toHaveBeenCalledWith(!wasChecked)
+          
+          expect(dispatchSpy).toHaveBeenCalledWith(atlasAppearance.actions.toggleOctantRemoval())
         })
       })
     })
@@ -170,7 +176,6 @@ describe('> viewerCtrlCmp.component.ts', () => {
       })
 
       it('> toggling it should call dispatch', async () => {
-        const dispatchSpy = spyOn(mockStore, 'dispatch')
 
         const slideToggle = await loader.getAllHarnesses(
           MatSlideToggleHarness.with({
