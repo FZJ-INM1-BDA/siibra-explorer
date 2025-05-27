@@ -100,13 +100,13 @@ export type ApiBoothEvents = {
       flag: boolean
     }
     response: 'OK'
-  },
+  }
   setAuxMeshAlpha: {
     request: {
       alpha: number
-    },
+    }
     response: 'OK'
-  },
+  }
   rmAnnotations: {
     request: {
       annotations: AtId[]
