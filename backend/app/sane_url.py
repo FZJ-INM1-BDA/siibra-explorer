@@ -78,7 +78,7 @@ class SaneUrlDPStore(DataproxyStore):
     
     def _prepare_aux(self, request: Optional[Request]=None):
         user = get_user_from_request(request) if request else None
-        expected_auth_state = request.headers["x-sxplr-auth-state"] == "true"
+        expected_auth_state = request.headers.get("x-sxplr-auth-state", "false") == "true"
         actual_auth_state = user is not None
         assert expected_auth_state == actual_auth_state, f"User login state cannot be determined. Frontend expected {expected_auth_state}, server expected {actual_auth_state}"
         return {
@@ -179,6 +179,10 @@ class SaneUrlModel(BaseModel):
 @router.post("/{short_id:str}")
 async def post_short(short_id: str, saneurl: SaneUrlModel, request:Request):
     json_body: Dict[str, Any] = await request.json()
+    
+    if "/x-" in saneurl.hashPath:
+        raise HTTPException(401, "hashPath should not contain the character sequence '/x-'")
+    
     saneurl_model = saneurl.model_dump()
     for key, value in json_body.items():
         if key.startswith("x-"):

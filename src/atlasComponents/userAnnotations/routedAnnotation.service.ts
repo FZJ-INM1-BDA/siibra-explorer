@@ -36,6 +36,7 @@ export class RoutedAnnotationService{
           annSvc.importAnnotation(geom)
         }
       }
+      routerSvc.setCustomRoute(userAnnotationRouteKey, null)
     })
   }
 }

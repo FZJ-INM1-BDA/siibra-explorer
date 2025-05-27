@@ -65,6 +65,13 @@
 
 </mat-form-field>
 
+<ng-template sxplrExperimentalFlag [experimental]="true">
+<button mat-icon-button
+  [iav-clipboard-copy]="stateTobeSaved | json">
+  <i class="fas fa-bug"></i>
+</button>
+</ng-template>
+
 <button mat-flat-button
   (click)="saveLink()"
   color="primary"
