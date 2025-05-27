@@ -3,7 +3,7 @@ import { NgModule } from "@angular/core";
 import { RouterModule } from '@angular/router'
 import { RouterService } from "./router.service";
 import { RouteStateTransformSvc } from "./routeStateTransform.service";
-import { DECODE_ENCODE, routes, decodeCustomState } from "./util";
+import { DECODE_ENCODE, routes, decodeCustomState, verifyCustomState } from "./util";
 import { EffectsModule } from "@ngrx/effects";
 import { RouterEffects } from "./effects";
 import { NEHUBA_CONFIG_SERVICE_TOKEN, getParcNgId, getNehubaConfig } from "src/viewerModule/nehuba/config.service";
@@ -27,7 +27,7 @@ import { NEHUBA_CONFIG_SERVICE_TOKEN, getParcNgId, getNehubaConfig } from "src/v
     RouteStateTransformSvc,
     {
       provide: DECODE_ENCODE,
-      useValue: { decodeCustomState }
+      useValue: { decodeCustomState, verifyCustomState }
     },
     {
       provide: NEHUBA_CONFIG_SERVICE_TOKEN,
