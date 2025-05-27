@@ -1,0 +1,559 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "jsonrpc": {
+      "const": "2.0"
+    },
+    "id": {
+      "type": "string"
+    },
+    "result": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/PTParcellation"
+      }
+    }
+  },
+  "definitions": {
+    "PTParcellation": {
+      "properties": {
+        "@type": {
+          "type": "string",
+          "title": "@Type"
+        },
+        "@id": {
+          "type": "string",
+          "title": "@Id"
+        },
+        "name": {
+          "type": "string",
+          "title": "Name"
+        },
+        "modality": {
+          "type": "string",
+          "title": "Modality"
+        },
+        "datasets": {
+          "items": {
+            "$ref": "#/components/schemas/EbrainsDatasetModel"
+          },
+          "type": "array",
+          "title": "Datasets"
+        },
+        "brainAtlasVersions": {
+          "items": {
+            "$ref": "#/components/schemas/BrainAtlasVersionModel"
+          },
+          "type": "array",
+          "title": "Brainatlasversions"
+        },
+        "version": {
+          "$ref": "#/components/schemas/SiibraParcellationVersionModel"
+        },
+        "shortname": {
+          "type": "string",
+          "title": "Shortname"
+        }
+      },
+      "type": "object",
+      "required": [
+        "@type",
+        "@id",
+        "name",
+        "datasets",
+        "brainAtlasVersions"
+      ],
+      "title": "SiibraParcellationModel",
+      "description": "SiibraParcellationModel"
+    }
+  },
+  "components": {
+    "schemas": {
+      "EbrainsDatasetModel": {
+        "properties": {
+          "@type": {
+            "type": "string",
+            "title": "@Type"
+          },
+          "@id": {
+            "type": "string",
+            "title": "@Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "urls": {
+            "items": {
+              "$ref": "#/components/schemas/EbrainsDsUrl"
+            },
+            "type": "array",
+            "title": "Urls"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "contributors": {
+            "items": {
+              "$ref": "#/components/schemas/EbrainsDsPerson"
+            },
+            "type": "array",
+            "title": "Contributors"
+          },
+          "ebrains_page": {
+            "type": "string",
+            "title": "Ebrains Page"
+          },
+          "custodians": {
+            "items": {
+              "$ref": "#/components/schemas/EbrainsDsPerson"
+            },
+            "type": "array",
+            "title": "Custodians"
+          }
+        },
+        "type": "object",
+        "required": [
+          "@type",
+          "@id",
+          "name",
+          "urls",
+          "contributors",
+          "custodians"
+        ],
+        "title": "EbrainsDatasetModel",
+        "description": "EbrainsDatasetModel"
+      },
+      "BrainAtlasVersionModel": {
+        "properties": {
+          "@type": {
+            "type": "string",
+            "title": "@Type"
+          },
+          "@context": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VocabModel"
+              }
+            ],
+            "title": "@Context",
+            "default": {
+              "@vocab": "https://openminds.ebrains.eu/vocab/"
+            }
+          },
+          "@id": {
+            "type": "string",
+            "title": "@Id",
+            "description": "Metadata node identifier."
+          },
+          "abbreviation": {
+            "type": "string",
+            "title": "abbreviation"
+          },
+          "accessibility": {
+            "type": "object",
+            "title": "accessibility",
+            "description": "Level to which something is accessible to someone or something."
+          },
+          "atlasType": {
+            "type": "object",
+            "title": "atlasType"
+          },
+          "author": {
+            "items": {},
+            "type": "array",
+            "minItems": 1,
+            "title": "author",
+            "description": "Creator of a literary or creative work, as well as a dataset publication."
+          },
+          "coordinateSpace": {
+            "type": "object",
+            "title": "coordinateSpace",
+            "description": "Two or three dimensional geometric setting."
+          },
+          "copyright": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Copyright"
+              }
+            ],
+            "title": "Copyright",
+            "description": "Structured information on the copyright."
+          },
+          "custodian": {
+            "items": {},
+            "type": "array",
+            "minItems": 1,
+            "title": "custodian",
+            "description": "The 'custodian' is a legal person who is responsible for the content and quality of the data, metadata, and/or code of a research product."
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 2000,
+            "title": "description",
+            "description": "Longer statement or account giving the characteristics of someone or something."
+          },
+          "digitalIdentifier": {
+            "type": "object",
+            "title": "digitalIdentifier",
+            "description": "Digital handle to identify objects or legal persons."
+          },
+          "fullDocumentation": {
+            "type": "object",
+            "title": "fullDocumentation",
+            "description": "Non-abridged instructions, comments, and information for using a particular product."
+          },
+          "fullName": {
+            "type": "string",
+            "title": "fullName",
+            "description": "Whole, non-abbreviated name of something or somebody."
+          },
+          "funding": {
+            "items": {},
+            "type": "array",
+            "minItems": 1,
+            "title": "funding",
+            "description": "Money provided by a legal person for a particular purpose."
+          },
+          "hasTerminologyVersion": {
+            "$ref": "#/components/schemas/HasTerminologyVersion"
+          },
+          "homepage": {
+            "type": "object",
+            "title": "homepage",
+            "description": "Main website of something or someone."
+          },
+          "howToCite": {
+            "type": "string",
+            "title": "howToCite",
+            "description": "Preferred format for citing a particular object or legal person."
+          },
+          "isAlternativeVersionOf": {
+            "items": {},
+            "type": "array",
+            "minItems": 1,
+            "title": "isAlternativeVersionOf",
+            "description": "Reference to an original form where the essence was preserved, but presented in an alternative form."
+          },
+          "isNewVersionOf": {
+            "type": "object",
+            "title": "isNewVersionOf",
+            "description": "Reference to a previous (potentially outdated) particular form of something."
+          },
+          "keyword": {
+            "items": {},
+            "type": "array",
+            "maxItems": 5,
+            "minItems": 1,
+            "title": "keyword",
+            "description": "Significant word or concept that are representative of something or someone."
+          },
+          "license": {
+            "type": "object",
+            "title": "license",
+            "description": "Grant by a party to another party as an element of an agreement between those parties that permits to do, use, or own something."
+          },
+          "ontologyIdentifier": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "ontologyIdentifier",
+            "description": "Term or code used to identify something or someone registered within a particular ontology."
+          },
+          "otherContribution": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OtherContribution"
+              }
+            ],
+            "title": "Othercontribution",
+            "description": "Structured information on the contribution made to a research product."
+          },
+          "relatedPublication": {
+            "items": {},
+            "type": "array",
+            "minItems": 1,
+            "title": "relatedPublication",
+            "description": "Reference to something that was made available for the general public to see or buy."
+          },
+          "releaseDate": {
+            "type": "string",
+            "title": "releaseDate",
+            "description": "Fixed date on which a product is due to become or was made available for the general public to see or buy"
+          },
+          "repository": {
+            "type": "object",
+            "title": "repository",
+            "description": "Place, room, or container where something is deposited or stored."
+          },
+          "shortName": {
+            "type": "string",
+            "maxLength": 30,
+            "title": "shortName",
+            "description": "Shortened or fully abbreviated name of something or somebody."
+          },
+          "supportChannel": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "supportChannel",
+            "description": "Way of communication used to interact with users or customers."
+          },
+          "versionIdentifier": {
+            "type": "string",
+            "title": "versionIdentifier",
+            "description": "Term or code used to identify the version of something."
+          },
+          "versionInnovation": {
+            "type": "string",
+            "title": "versionInnovation",
+            "description": "Documentation on what changed in comparison to a previously published form of something."
+          }
+        },
+        "type": "object",
+        "required": [
+          "@type",
+          "@id",
+          "accessibility",
+          "coordinateSpace",
+          "fullDocumentation",
+          "hasTerminologyVersion",
+          "license",
+          "releaseDate",
+          "shortName",
+          "versionIdentifier",
+          "versionInnovation"
+        ],
+        "title": "BrainAtlasVersionModel",
+        "description": "ConfigBaseModel"
+      },
+      "SiibraParcellationVersionModel": {
+        "properties": {
+          "@type": {
+            "type": "string",
+            "title": "@Type"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "deprecated": {
+            "type": "boolean",
+            "title": "Deprecated"
+          },
+          "prev": {
+            "$ref": "#/components/schemas/SiibraAtIdModel"
+          },
+          "next": {
+            "$ref": "#/components/schemas/SiibraAtIdModel"
+          }
+        },
+        "type": "object",
+        "required": [
+          "@type",
+          "name"
+        ],
+        "title": "SiibraParcellationVersionModel",
+        "description": "SiibraParcellationVersionModel"
+      },
+      "EbrainsDsUrl": {
+        "properties": {
+          "@type": {
+            "type": "string",
+            "title": "@Type"
+          },
+          "url": {
+            "type": "string",
+            "title": "Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "@type",
+          "url"
+        ],
+        "title": "EbrainsDsUrl",
+        "description": "EbrainsDsUrl"
+      },
+      "EbrainsDsPerson": {
+        "properties": {
+          "@type": {
+            "type": "string",
+            "title": "@Type"
+          },
+          "@id": {
+            "type": "string",
+            "title": "@Id"
+          },
+          "schema.org/shortName": {
+            "type": "string",
+            "title": "Schema.Org/Shortname"
+          },
+          "identifier": {
+            "type": "string",
+            "title": "Identifier"
+          },
+          "shortName": {
+            "type": "string",
+            "title": "Shortname"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "@type",
+          "@id",
+          "schema.org/shortName",
+          "identifier",
+          "shortName",
+          "name"
+        ],
+        "title": "EbrainsDsPerson",
+        "description": "EbrainsDsPerson"
+      },
+      "VocabModel": {
+        "properties": {
+          "@vocab": {
+            "type": "string",
+            "title": "@Vocab"
+          }
+        },
+        "type": "object",
+        "required": [
+          "@vocab"
+        ],
+        "title": "VocabModel"
+      },
+      "Copyright": {
+        "properties": {
+          "@context": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VocabModel"
+              }
+            ],
+            "title": "@Context",
+            "default": {
+              "@vocab": "https://openminds.ebrains.eu/vocab/"
+            }
+          },
+          "holder": {
+            "items": {},
+            "type": "array",
+            "minItems": 1,
+            "title": "holder",
+            "description": "Legal person in possession of something."
+          },
+          "year": {
+            "type": "string",
+            "pattern": "([0-9]{4})",
+            "title": "year",
+            "description": "Cycle in the Gregorian calendar specified by a number and comprised of 365 or 366 days divided into 12 months beginning with January and ending with December."
+          }
+        },
+        "type": "object",
+        "required": [
+          "holder",
+          "year"
+        ],
+        "title": "Copyright"
+      },
+      "HasTerminologyVersion": {
+        "properties": {
+          "@context": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VocabModel"
+              }
+            ],
+            "title": "@Context",
+            "default": {
+              "@vocab": "https://openminds.ebrains.eu/vocab/"
+            }
+          },
+          "definedIn": {
+            "items": {},
+            "type": "array",
+            "minItems": 1,
+            "title": "definedIn",
+            "description": "Reference to a file instance in which something is stored."
+          },
+          "hasEntityVersion": {
+            "items": {},
+            "type": "array",
+            "minItems": 1,
+            "title": "hasEntityVersion"
+          },
+          "ontologyIdentifier": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "ontologyIdentifier",
+            "description": "Term or code used to identify something or someone registered within a particular ontology."
+          }
+        },
+        "type": "object",
+        "required": [
+          "hasEntityVersion"
+        ],
+        "title": "HasTerminologyVersion"
+      },
+      "OtherContribution": {
+        "properties": {
+          "@context": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VocabModel"
+              }
+            ],
+            "title": "@Context",
+            "default": {
+              "@vocab": "https://openminds.ebrains.eu/vocab/"
+            }
+          },
+          "contributionType": {
+            "items": {},
+            "type": "array",
+            "minItems": 1,
+            "title": "contributionType",
+            "description": "Distinct class of what was given or supplied as a part or share."
+          },
+          "contributor": {
+            "title": "contributor",
+            "description": "Legal person that gave or supplied something as a part or share."
+          }
+        },
+        "type": "object",
+        "required": [
+          "contributionType",
+          "contributor"
+        ],
+        "title": "OtherContribution"
+      },
+      "SiibraAtIdModel": {
+        "properties": {
+          "@id": {
+            "type": "string",
+            "title": "@Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "@id"
+        ],
+        "title": "SiibraAtIdModel"
+      }
+    }
+  }
+}

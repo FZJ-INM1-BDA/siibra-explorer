@@ -7,8 +7,10 @@ import * as nodeObjLiteralType from "./nodeObjLiteralType.mjs"
 import * as nodeObjTypeLiteral from "./nodeObjTypeLiteral.mjs"
 import * as TokenStringKW from "./TokenStringKW.mjs"
 import * as TokenBooleanKW from "./TokenBooleanKW.mjs"
+import * as TokenNumberKW from "./TokenNumberKW.mjs"
 import * as nodeObjIntersectionType from "./nodeObjIntersectionType.mjs"
 import * as nodeObjUnionType from "./nodeObjUnionType.mjs"
+
 
 /**
  * @typedef {Object} JSPrimitives
@@ -57,6 +59,7 @@ export async function processNode(acc, input, defs){
     nodeObjTypeLiteral,
     TokenStringKW,
     TokenBooleanKW,
+    TokenNumberKW,
     nodeObjIntersectionType,
     nodeObjUnionType,
   ]) {

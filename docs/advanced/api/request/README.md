@@ -1,3 +1,4 @@
+<!-- DO NOT MODIFY DIRECTLY. CREATED PROGRAMMATICALLY WITH src/api/generateSchema.mjs -->
 # Request API
 
 Request  messages are sent when the plugin requests siibra-explorer to do something on its behalf.

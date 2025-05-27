@@ -1,3 +1,4 @@
+<!-- DO NOT MODIFY DIRECTLY. CREATED PROGRAMMATICALLY WITH src/api/generateSchema.mjs -->
 # Post message API
 
 This page outline how an other application can communicate with siibra-explorer. This includes, but is not limited to how plugins communicate with siibra-explorer. 

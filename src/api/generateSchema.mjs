@@ -1,7 +1,7 @@
 import ts from 'typescript'
 import path, { dirname } from 'path'
 import { fileURLToPath } from "url"
-import { readFile, writeFile } from "node:fs/promises"
+import { readFile, writeFile, readdir, stat, copyFile, mkdir } from "node:fs/promises"
 import { clearDirectory, resolveAllDefs, populateReadme } from "./tsUtil.mjs"
 import { processNode } from "./tsUtil/index.mjs"
 
@@ -230,6 +230,30 @@ async function populateBoothEvents(convoNode, node){
   await populateReadme(dirnames.request)
 }
 
+
+/**
+ * 
+ * @param {string} root 
+ * @returns {Promise<string[]>}
+ */
+async function allMdJsonFiles(root){
+  const files = await readdir(root)
+  const returnVal = []
+  for (const file of files){
+    const filepath = path.join(root, file)
+    const filestat = await stat(filepath)
+    if (filestat.isFile() && (file.endsWith(".json") || file.endsWith(".md"))) {
+      returnVal.push(filepath)
+    }
+    if (filestat.isDirectory()) {
+      returnVal.push(
+        ...(await allMdJsonFiles(filepath))
+      )
+    }
+  }
+  return returnVal
+}
+
 const main = async () => {
   const pathToApiService = path.join(__dirname, '../api/service.ts')
   const src = await readFile(pathToApiService, 'utf-8')
@@ -238,18 +262,55 @@ const main = async () => {
     src,
     ts.ScriptTarget.Latest
   )
-  node.forEachChild(n => {
+  
+  const broadcast = node.forEachChild(n => {
     if (n.name?.text === "BroadCastingApiEvents") {
-      populateBroadCast(n, node)
-    }
-    if (n.name?.text === "HeartbeatEvents") {
-      populateHeartbeatEvents(n, node)
-    }
-    if (n.name?.text === "ApiBoothEvents") {
-      populateBoothEvents(n, node)
+      return n
     }
   })
-    
+  await populateBroadCast(broadcast, node)
+  
+  const heartbeat = node.forEachChild(n => {
+    if (n.name?.text === "HeartbeatEvents") {
+      return n
+    }
+  })
+  await populateHeartbeatEvents(heartbeat, node)
+
+  const booth = node.forEachChild(n => {
+    if (n.name?.text === "ApiBoothEvents") {
+      return n
+    }
+  })
+  await populateBoothEvents(booth, node)
+
+
+  // copy to doc directory
+  
+  const root = path.join(__dirname, "..", "..")
+  const apiJsonMd = await allMdJsonFiles(path.join(root, "src/api"))
+  const relativeFilePaths = apiJsonMd.map(filename => 
+    path.relative(
+      path.join(root, "src"),
+      filename
+    )
+  )
+  for (const filename of apiJsonMd){
+    const relative = path.relative(
+      path.join(root, "src"),
+      filename
+    )
+    const dstpath = path.join(root, "docs/advanced", relative)
+    const dstdir = path.dirname(dstpath)
+    await mkdir(dstdir, {
+      recursive: true,
+    })
+    await copyFile(filename, dstpath)
+    if (filename.endsWith(".md")) {
+      const md = await readFile(dstpath)
+      await writeFile(dstpath, `<!-- DO NOT MODIFY DIRECTLY. CREATED PROGRAMMATICALLY WITH src/api/generateSchema.mjs -->\n${md}`)
+    }
+  }
 }
 
 main()
