@@ -443,7 +443,8 @@ export async function waitFor(predicate: () => boolean) {
     if (predicate()) break
     await wait(16)
   }
-}export function encodeBool(...flags: boolean[]) {
+}
+export function encodeBool(...flags: boolean[]) {
   if (flags.length > 8) {
     throw new Error(`encodeBool can only handle upto 8 bools`)
   }

@@ -62,6 +62,18 @@ Feature: SaneURL a.k.a. URL shortener
         Given <https://atlases.ebrains.eu/viewer-staging/saneUrl/stnr>
         Then Works
     
+    Scenario: Permalink works (PMAP)
+        Given <https://atlases.ebrains.eu/viewer-staging/go/BST_r_MNI152>
+        Then Works
+
+    Scenario: Permalink works (MPM)
+        Given <https://atlases.ebrains.eu/viewer-staging/go/BST_r_MPM_MNI152>
+        Then Works
+    
+    Scenario: Permalink works (no delineation overlay)
+        Given <https://atlases.ebrains.eu/viewer-staging/go/BST_BigBrain_1um>
+        Then Works
+    
 
     Scenario: VIP link works (human)
         Given <https://atlases.ebrains.eu/viewer-staging/human>
