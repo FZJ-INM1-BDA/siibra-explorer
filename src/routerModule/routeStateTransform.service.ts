@@ -78,7 +78,10 @@ const decodeMiscState = {
 
     const [ octantRemoval, showDelineation ] = decodeBool(array[2])
     returnVal.octantRemoval = octantRemoval
-    returnVal.showDelineation = showDelineation
+
+    // this is to fix the v1 implementation where the showdelineation is accidentally flipped
+    // see https://github.com/FZJ-INM1-BDA/siibra-explorer/blob/b38e7948fc1c3e36f219aaa12c64726b34b5e132/src/routerModule/routeStateTransform.service.ts#L369
+    returnVal.showDelineation = !showDelineation
     
     return returnVal
   },
@@ -108,6 +111,9 @@ const decodeMiscState = {
     
     const returnVal: ViewerCfgStateV2 = {
       ...v1State,
+      // this is to fix the v1 implementation where the showdelineation is accidentally flipped
+      // see https://github.com/FZJ-INM1-BDA/siibra-explorer/blob/b38e7948fc1c3e36f219aaa12c64726b34b5e132/src/routerModule/routeStateTransform.service.ts#L369
+      showDelineation: !v1State.showDelineation,
       auxMeshAlpha: meshAlpha,
       panelOrder: panelOrder.join(""),
     }
@@ -294,7 +300,6 @@ export class RouteStateTransformSvc {
       const { panelMode, panelOrder, showDelineation, octantRemoval, auxMeshAlpha } = !!viewerConfigState
       ? this.decodeMiscState(viewerConfigState)
       : { panelMode: "FOUR_PANEL" as const, panelOrder: "0123", showDelineation: true, octantRemoval: true, auxMeshAlpha: 1.0 }
-  
       returnState['[state.ui]'].panelMode = panelMode
       returnState['[state.ui]'].panelOrder = panelOrder
 

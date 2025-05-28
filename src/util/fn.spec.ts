@@ -2,7 +2,7 @@ import { fakeAsync, tick } from '@angular/core/testing'
 import { hot } from 'jasmine-marbles'
 import { Observable, of } from 'rxjs'
 import { switchMap } from 'rxjs/operators'
-import { switchMapWaitFor, bufferUntil, arrayOfPrimitiveEqual } from './fn'
+import { switchMapWaitFor, bufferUntil, arrayOfPrimitiveEqual, encodeBool, decodeBool } from './fn'
 
 describe(`> util/fn.ts`, () => {
 
@@ -124,6 +124,24 @@ describe(`> util/fn.ts`, () => {
             expect(arrayOfPrimitiveEqual(examples[1], examples[0])).toBeTrue()
           })
         })
+      })
+    }
+  })
+
+  describe("> encode decode bools", () => {
+    const testcases = [
+      [true, true],
+      [false, false],
+      [true, false],
+      [false, true],
+    ]
+    for (const testcase of testcases){
+      it(`> works for ${testcase}`, () => {
+        const encoded = encodeBool(...testcase)
+        const decoded = decodeBool(encoded)
+        expect(
+          decoded.slice(0, testcase.length)
+        ).toEqual(testcase)
       })
     }
   })
