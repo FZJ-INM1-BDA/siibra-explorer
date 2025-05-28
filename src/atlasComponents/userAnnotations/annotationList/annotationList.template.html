@@ -122,6 +122,10 @@
         Create custom URL
     </h2>
     <div mat-dialog-content>
+        <span class="sxplr-text-muted">
+            {{ descText$ | async }}
+        </span>
+        <mat-divider></mat-divider>
         <iav-sane-url [stateTobeSaved]="stateAggregator.jsonifiedState$ | async | mergeObj : userAnnRoute">
         </iav-sane-url>
     </div>

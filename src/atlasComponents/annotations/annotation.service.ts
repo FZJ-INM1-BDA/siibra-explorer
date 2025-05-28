@@ -1,6 +1,6 @@
-import { BehaviorSubject, from, Observable, of } from "rxjs";
-import { distinctUntilChanged, map, switchMap, take } from "rxjs/operators";
-import { getUuid, retry, switchMapWaitFor } from "src/util/fn";
+import { BehaviorSubject, Observable } from "rxjs";
+import { distinctUntilChanged } from "rxjs/operators";
+import { getUuid, retry } from "src/util/fn";
 import { PeriodicSvc } from "src/util/periodic.service";
 import { NehubaLayerControlService } from "src/viewerModule/nehuba/layerCtrl.service";
 
@@ -77,6 +77,24 @@ export class AnnotationLayer {
     return layer
   }
 
+  static LayerReady(){
+    return (_target: Record<string, any>, _propertyKey: string, descriptor: PropertyDescriptor) => {
+      const originalMethod = descriptor.value
+      descriptor.value = function(...args: any[]) {
+        PeriodicSvc.AddToQueue(() => {
+          if (!this.layer) return false
+          if (!this.layer.isReady()) return false
+          try {
+            originalMethod.apply(this, args)
+          } catch (e) {
+            console.warn(`LayerReady decorated failed`, e)
+          }
+          return true
+        })
+      }
+    }
+  }
+
   private _onHover = new BehaviorSubject<{ id: string, offset: number }>(null)
   public onHover: Observable<{ id: string, offset: number }> = this._onHover.asObservable().pipe(
     distinctUntilChanged((o, n) => o?.id === n?.id)
@@ -84,14 +102,26 @@ export class AnnotationLayer {
   private onDestroyCb: (() => void)[] = []
   
   private idset = new Set<string>()
+
+  #layer: any
+  get layer() {
+    return this.#layer
+  }
+  #coupled: boolean = false
+  get coupled() {
+    return this.#coupled
+  }
+  #disposed: boolean = false
+  get disposed(){
+    return this.#disposed
+  }
+
   constructor(
     private name: string = getUuid(),
     private color="#ffffff",
     affine=ID_AFFINE,
   ){
-    this.#getViewerObs().pipe(
-      take(1)
-    ).subscribe(viewer => {
+    promiseViewer().then(viewer => {
       this.#coupleToViewer(viewer, affine)
     })
   }
@@ -107,7 +137,7 @@ export class AnnotationLayer {
         transform: affine,
       }
     )
-    const _layer = viewer.layerManager.addManagedLayer(layerSpec)
+    this.#layer = viewer.layerManager.addManagedLayer(layerSpec)
     const mouseState = viewer.mouseState
     const res: () => void = mouseState.changed.add(() => {
       const payload = mouseState.active
@@ -129,12 +159,17 @@ export class AnnotationLayer {
 
     // })
     NehubaLayerControlService.RegisterLayerName(this.name)
+    viewer.registerDisposer(() => {
+      this.dispose()
+    })
   }
+
+  @AnnotationLayer.LayerReady()
   async setVisible(flag: boolean){
-    const nglayer = await this.#getLayer()
-    nglayer && nglayer.setVisible(flag)
+    this.#layer.setVisible(flag)
   }
   dispose() {
+    this.#disposed = true
     NehubaLayerControlService.DeregisterLayerName(this.name)
     AnnotationLayer.Map.delete(this.name)
     this._onHover.complete()
@@ -143,12 +178,12 @@ export class AnnotationLayer {
     }
 
     try {
-      const viewer = this.#getViewer()
-      const l = viewer.layerManager.getLayerByName(this.name)
-      viewer.layerManager.removeManagedLayer(l)
+      if (this.#layer){
+        this.#layer.manager.layerManager.removeManagedLayer(this.#layer)
+      }
     // eslint-disable-next-line no-empty
     } catch (e) {
-      console.error("removing layer failed", e)
+      // errors if viewer is disposed first, which trigger layer.dispose() called
     }
   }
 
@@ -157,9 +192,9 @@ export class AnnotationLayer {
    * 
    * @param spec 
    */
-  async #addSingleAnn(spec: AnnotationSpec) {
-    const nglayer = await this.#getLayer()
-    const localAnnotations = nglayer.layer.localAnnotations
+  @AnnotationLayer.LayerReady()
+  async _addSingleAnn(spec: AnnotationSpec) {
+    const localAnnotations = this.#layer.layer.localAnnotations
     this.idset.add(spec.id)
     const annSpec = this.parseNgSpecType(spec)
     localAnnotations.add(
@@ -180,45 +215,25 @@ export class AnnotationLayer {
     localAnnotations.clear()
   }
 
+  @AnnotationLayer.LayerReady()
   async addAnnotation(spec: AnnotationSpec|AnnotationSpec[]){
-    const nglayer = await this.#getLayer()
-    if (!nglayer) {
-      throw new Error(`layer has already been disposed`)
+    if (Array.isArray(spec)) {
+      for (const item of spec) {
+        this._addSingleAnn(item)
+      }
+    } else {
+      this._addSingleAnn(spec)
     }
-
-    PeriodicSvc.AddToQueue(() => {
-      if (nglayer.isReady()) {
-        if (Array.isArray(spec)) {
-          for (const item of spec) {
-            this.#addSingleAnn(item)
-          }
-        } else {
-          this.#addSingleAnn(spec)
-        }
-        
-        return true
-      }
-      return false
-    })
   }
-  async removeAnnotation(spec: { id: string }|{id: string}[]) {
-    const nglayer = await this.#getLayerObs().pipe(
-      switchMap(switchMapWaitFor({
-        condition: nglayer => !!nglayer?.layer?.localAnnotations,
-        leading: true
-      })),
-      take(1)
-    ).toPromise()
-    // await waitFor(() => !!nglayer?.layer?.localAnnotations)
-    const { localAnnotations } = nglayer.layer
-    const specs = Array.isArray(spec) ? spec : [spec]
-    for (const spec of specs){
-      this.idset.delete(spec.id)
-      const ref = localAnnotations.references.get(spec.id)
-      if (ref) {
-        localAnnotations.delete(ref)
-        localAnnotations.references.delete(spec.id)
-      }
+
+  @AnnotationLayer.LayerReady()
+  async removeAnnotation(spec: { id: string }) {
+    const { localAnnotations } = this.#layer.layer
+    this.idset.delete(spec.id)
+    const ref = localAnnotations.references.get(spec.id)
+    if (ref) {
+      localAnnotations.delete(ref)
+      localAnnotations.references.delete(spec.id)
     }
   }
 
@@ -227,12 +242,10 @@ export class AnnotationLayer {
    * 
    * @param spec 
    */
-  async #updateSingleAnn(spec: AnnotationSpec) {
+  @AnnotationLayer.LayerReady()
+  async _updateSingleAnn(spec: AnnotationSpec) {
     try {
-
-      const nglayer = this.#unsafeGetLayer()
-      
-      const { localAnnotations } = nglayer.layer
+      const { localAnnotations } = this.#layer.layer
       const ref = localAnnotations.references.get(spec.id)
       const _spec = this.parseNgSpecType(spec)
       if (ref) {
@@ -248,61 +261,17 @@ export class AnnotationLayer {
       console.error(`update single annotation error:`, e)
       return
     }
-    
   }
 
+  @AnnotationLayer.LayerReady()
   async updateAnnotation(spec: AnnotationSpec|AnnotationSpec[]) {
-    
-    const _nglayer = await this.#getLayerObs().pipe(
-      switchMap(switchMapWaitFor({
-        condition: nglayer => !!nglayer?.layer?.localAnnotations,
-        leading: true
-      })),
-      take(1)
-    ).toPromise()
-    // await waitFor(() => !!this.nglayer?.layer?.localAnnotations)
     if (Array.isArray(spec)) {
       for (const item of spec){
-        this.#updateSingleAnn(item)
+        this._updateSingleAnn(item)
       }
       return
     }
-    this.#updateSingleAnn(spec)
-  }
-
-  #getViewer(){
-    
-    if ((window as any).viewer) return (window as any).viewer
-    throw new Error(`window.viewer not defined`)
-  }
-
-  #getViewerObs(): Observable<any>{
-
-    const tryAgain = () => retry(() => this.#getViewer(), { timeout: 160, retries: 100 })
-    
-    try {
-      const viewer = this.#getViewer()
-      return of(viewer)
-    } catch {
-      return from(tryAgain()) 
-    }
-  }
-
-  #getLayerObs(): Observable<any> {
-    return this.#getViewerObs().pipe(
-      map(viewer => viewer.layerManager.getLayerByName(this.name))
-    )
-  }
-
-  #getLayer(): Promise<any> {
-    return this.#getLayerObs().pipe(
-      take(1)
-    ).toPromise()
-  }
-
-  #unsafeGetLayer() {
-    const viewer = this.#getViewer()
-    return viewer.layerManager.getLayerByName(this.name)
+    this._updateSingleAnn(spec)
   }
 
   private parseNgSpecType(spec: AnnotationSpec): _AnnotationSpec{
@@ -328,4 +297,20 @@ export class AnnotationLayer {
       ...overwrite,
     } as _AnnotationSpec
   }
+}
+
+export function getViewer(){
+  const viewer = (window as any).viewer
+  if (viewer) {
+    return viewer
+  }
+  throw new Error(`window.viewer not defined`)
+}
+
+export async function promiseViewer(){
+  try {
+    return getViewer()
+  } catch (e) {
+    return await retry(() => getViewer(), { timeout: 160, retries: 1e10 })
+  } 
 }

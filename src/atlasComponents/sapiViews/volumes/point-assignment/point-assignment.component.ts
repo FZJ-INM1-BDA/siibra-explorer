@@ -60,3 +60,27 @@ export class PointAssignmentComponent extends PointAssignmentDirective {
     }
   }
 }
+
+const escapeDoubleQuotes = (input: string) => input.replace(/"/g, s => `"${s}`)
+
+export function processRow(v: unknown[]): string{
+  const returnValue: string[] = []
+  for (const item of v) {
+    if (typeof item === "number") {
+      returnValue.push(JSON.stringify(item))
+      continue
+    }
+    
+    if (typeof item === "string") {
+      returnValue.push(item)
+      continue
+    }
+    returnValue.push(JSON.stringify(item))
+  }
+  return returnValue.map(v => {
+    if (v.includes(",") || v.includes(`"`)) {
+      return `"${escapeDoubleQuotes(v)}"`
+    }
+    return v
+  }).join(",")
+}

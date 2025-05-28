@@ -1,7 +1,6 @@
 import { fakeAsync, TestBed } from "@angular/core/testing"
 import { MockStore, provideMockStore } from "@ngrx/store/testing"
 import { NehubaLayerControlService } from "./layerCtrl.service"
-import * as layerCtrlUtil from '../constants'
 import {
   annotation,
   atlasAppearance,
@@ -49,6 +48,7 @@ describe('> layerctrl.service.ts', () => {
       mockStore = TestBed.inject(MockStore)
       mockStore.overrideSelector(atlasAppearance.selectors.customLayers, [])
       mockStore.overrideSelector(atlasAppearance.selectors.showDelineation, true)
+      mockStore.overrideSelector(atlasAppearance.selectors.meshTransparency, 1.0)
       mockStore.overrideSelector(annotation.selectors.annotations, [])
       mockStore.overrideSelector(atlasSelection.selectors.selectedRegions, [])
       mockStore.overrideSelector(atlasSelection.selectors.selectedTemplate, {} as any)

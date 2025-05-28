@@ -153,17 +153,15 @@ export class Effect {
         map.set(region, region.color)
       }
       const actions = [
-        ...layers.map(({ id }) =>
-          atlasAppearance.actions.removeCustomLayer({
-            id
-          })
-        ),
-        atlasAppearance.actions.addCustomLayer({
-          customLayer: {
+        atlasAppearance.actions.removeCustomLayers({
+          customLayers: layers
+        }),
+        atlasAppearance.actions.addCustomLayers({
+          customLayers: [{
             clType: "baselayer/colormap",
             id: 'base-colormap-id',
             colormap: map
-          }
+          }]
         })
       ]
       return of(...actions)

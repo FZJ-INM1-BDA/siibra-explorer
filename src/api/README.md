@@ -10,30 +10,15 @@ All APIs are categorized under `{broadcast|handshake|request}/sxplr.{$EVENT_NAME
 
 The json files are JSON schema, of the shape of the request/response API clients can expect. The shape described by the aforementioned JSON schema complies with [jsonrpc 2.0](https://www.jsonrpc.org/specification) specification.
 
-- `fromSxplr`
+## [Handshake events](handshake/README.md)
 
-Request originates from siibra-explorer. Either `handshake` or `broadcast` events
+All handshake events originates from siibra-explorer. Handshake events are expected to be responded to. Without handshake, siibra-explorer will not honor any [Request events](#request-events) , nor will it send any [Broadcast events](#broadcast-events) until handshake event is responded to.
 
-- `toSxplr`
+## [Broadcast events](broadcast/README.md)
 
-Request origintes from the client. `request` events
+All broadcast events originates from siibra-explorer. Broadcast events usually signifies when the state of siibra-explorer changes (with a debounce). Broadcast events expects and requires no response from the plugin.
 
-- `request`
+## [Request events](request/README.md)
 
-Describes the schema of the request
+All request events originates from the plugin. Often, this is a request from the plugin to do something on behave of the user. A response will always be sent on completion (this could take from milliseconds to seconds, if user interaction is required).
 
-- `reesponse`
-
-Describe the schema of the response (if any)
-
-- `handshake`
-
-Sent from siibra-explorer to the client, and expects a response. Requests from a non-responding client is ignored. Broadcasts will not be made to non-responding clients.
-
-- `broadcast`
-
-Sent from siibra-explorer to client. Sent when (with a debounce timer) the state of siibra-explorer changes (either user initiated or otherwise).  Siibra-explorer does not expect a response. Siibra-explorer will only broadcast to clients who responded to a hand shake.
-
-- `request`
-
-Sent from the client to siibra-explorer. If the `id` field is present, siibra-explorer will respond success or error of the operation.

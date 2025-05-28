@@ -8,11 +8,8 @@ import { UtilModule } from "src/util";
 import { SapiViewsUtilModule } from "../../util";
 import { FilterGroupedParcellationPipe } from "./filterGroupedParcellations.pipe";
 import { ParcTmplDoiPipe } from "./parcTmplDoi.pipe";
-import { ParcellationVisibilityService } from "./parcellationVis.service";
 import { ParcellationGroupSelectedPipe } from "./parcellationGroupSelected.pipe";
 import { IsGroupedParcellation } from "./isGroupedParcellation.pipe";
-import { EffectsModule } from "@ngrx/effects";
-import { ParcellationVisEffect } from "./parcellationVis.effect";
 import { ParcellationIsVersioned } from "./isVersioned.pipe";
 import { ParcellationIsNewest } from "./isNewest.pipe";
 
@@ -25,9 +22,6 @@ import { ParcellationIsNewest } from "./isNewest.pipe";
     SapiViewsUtilModule,
     DialogModule,
     StrictLocalModule,
-    EffectsModule.forFeature([
-      ParcellationVisEffect
-    ])
   ],
   declarations: [
     FilterGroupedParcellationPipe,
@@ -46,7 +40,6 @@ import { ParcellationIsNewest } from "./isNewest.pipe";
     ParcellationIsNewest,
   ],
   providers: [
-    ParcellationVisibilityService,
   ]
 })
 

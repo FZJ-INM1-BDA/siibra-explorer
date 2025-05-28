@@ -95,10 +95,10 @@ export const PARCELLATION_GROUPS = {
  * atlas should follow the following order
  */
 export const speciesOrder = [
-  SPECIES_ENUM.HOMO_SAPIENS,
-  SPECIES_ENUM.MACACA_FASCICULARIS,
-  SPECIES_ENUM.RATTUS_NORVEGICUS,
   SPECIES_ENUM.MUS_MUSCULUS,
+  SPECIES_ENUM.RATTUS_NORVEGICUS,
+  SPECIES_ENUM.MACACA_FASCICULARIS,
+  SPECIES_ENUM.HOMO_SAPIENS,
 ]
 
 export const parcellationGroupOrder = [
@@ -122,3 +122,7 @@ export type GetAttr = (attr: string) => string|null
  * prefix hinting that the object is controlled by siibra-explorer
  */
 export const SXPLR_PREFIX = "sxplr-"
+export const SXPLR_ANNOTATIONS_KEY = {
+  TEMPLATE_ID: "sxplrAnnotation.template.id",
+  PARCELLATION_ID: "sxplrAnnotation.parcellation.id",
+} as const

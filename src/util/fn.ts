@@ -464,6 +464,7 @@ export function decodeBool(num: number) {
   return rBool
 }
 
+
 export const getShader = ({
   colormap = "greyscale",
   lowThreshold = 0,

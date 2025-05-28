@@ -22,7 +22,6 @@ import { EffectsModule } from "@ngrx/effects";
 import { MeshEffects } from "./mesh.effects/mesh.effects";
 import { NehubaLayoutOverlayModule } from "./layoutOverlay";
 import { NgAnnotationService } from "./annotation/service";
-import { NgAnnotationEffects } from "./annotation/effects";
 import { NehubaViewerContainer } from "./nehubaViewerInterface/nehubaViewerContainer.component";
 import { NehubaUserLayerModule } from "./userLayers";
 import { DialogModule } from "src/ui/dialogInfo";
@@ -57,7 +56,6 @@ import { CoordinateText } from "src/components/coordTextBox/coordText.directive"
     ),
     EffectsModule.forFeature([
       MeshEffects,
-      NgAnnotationEffects,
     ]),
     QuickTourModule,
     NehubaLayoutOverlayModule,

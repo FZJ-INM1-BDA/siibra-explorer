@@ -5,7 +5,6 @@ import { debounceTime, distinctUntilChanged, map, shareReplay, startWith, take }
 import { isIdentityQuat } from 'src/viewerModule/nehuba/util';
 import { MatSlideToggleChange } from 'src/sharedModules/angularMaterial.exports'
 import { atlasSelection, userPreference, userInterface } from 'src/state';
-import { environment } from "src/environments/environment"
 import { Z_TRAVERSAL_MULTIPLIER } from 'src/viewerModule/nehuba/layerCtrl.service/layerCtrl.util';
 import { FormControl, FormGroup } from '@angular/forms';
 
@@ -39,11 +38,6 @@ export class ConfigComponent implements OnInit, OnDestroy {
   public GPU_TOOLTIP = GPU_TOOLTIP
   public ANIMATION_TOOLTIP = ANIMATION_TOOLTIP
   public MOBILE_UI_TOOLTIP = MOBILE_UI_TOOLTIP
-
-  /**
-   * n.b. do not use store to set experimental flag here, since this also shows the control to toggle exp control on and off
-   */
-  public environment = environment
 
   public experimentalFlag$ = this.store.pipe(
     select(userPreference.selectors.showExperimental)

@@ -9,6 +9,7 @@ import { AuthModule } from "src/auth";
 import { ShareSheetComponent } from "./shareSheet/shareSheet.component";
 import { ShareDirective } from "./share.directive";
 import { StateModule } from "src/state";
+import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.directive";
 
 @NgModule({
   imports: [
@@ -19,6 +20,7 @@ import { StateModule } from "src/state";
     ReactiveFormsModule,
     AuthModule,
     StateModule,
+    ExperimentalFlagDirective,
   ],
   declarations: [
     ClipboardCopy,

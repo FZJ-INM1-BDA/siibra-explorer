@@ -3,7 +3,7 @@ import { select, Store } from "@ngrx/store";
 import { combineLatest, merge, Observable, Subject, Subscription } from "rxjs";
 import { debounceTime, distinctUntilChanged, filter, map, pairwise, shareReplay, startWith, switchMap, withLatestFrom } from "rxjs/operators";
 import { IColorMap, INgLayerCtrl, TNgLayerCtrl } from "./layerCtrl.util";
-import { annotation, atlasAppearance, atlasSelection } from "src/state";
+import { atlasAppearance, atlasSelection } from "src/state";
 import { serializeSegment } from "../util";
 import { LayerCtrlEffects } from "./layerCtrl.effects";
 import { arrayEqual } from "src/util/array";
@@ -45,15 +45,19 @@ export class NehubaLayerControlService implements OnDestroy{
   private activeColorMap$ = combineLatest([
     combineLatest([
       this.completeNgIdLabelRegionMap$,
-      this.customLayers$,
+      this.customLayers$.pipe(
+        map(layers => layers.filter(l => l.clType === "customlayer/colormap") as atlasAppearance.const.ColorMapCustomLayer[]),
+        distinctUntilChanged(arrayEqual((o, n) => o.id === n.id))
+      ),
+      this.customLayers$.pipe(
+        map(layers => layers.filter(l => l.clType === "baselayer/colormap") as atlasAppearance.const.ColorMapCustomLayer[]),
+        distinctUntilChanged(arrayEqual((o, n) => o.id === n.id))
+      ),
       this.selectedRegion$,
     ]).pipe(
-      map(([record, layers, selectedRegions]) => {
+      map(([record, cmCustomLayers, cmBaseLayers, selectedRegions]) => {
         const returnVal: IColorMap = {}
 
-        const cmCustomLayers = layers.filter(l => l.clType === "customlayer/colormap") as atlasAppearance.const.ColorMapCustomLayer[]
-        const cmBaseLayers = layers.filter(l => l.clType === "baselayer/colormap") as atlasAppearance.const.ColorMapCustomLayer[]
-        
         const usingCustomCM = cmCustomLayers.length > 0
 
         const useCm = (() => {
@@ -155,6 +159,16 @@ export class NehubaLayerControlService implements OnDestroy{
           payload: layerObj
         })
       }),
+
+      this.ngLayersController$.subscribe(ev => {
+        if (this.#ngLayerCtrlCb.length === 0) {
+          this.#buffered.push(ev)
+          return
+        }
+        for (const cb of this.#ngLayerCtrlCb){
+          cb(ev)
+        }
+      })
     )
 
     this.sub.push(
@@ -163,29 +177,18 @@ export class NehubaLayerControlService implements OnDestroy{
       })
     )
 
-    /**
-     * on custom landmarks loaded, set mesh transparency
-     */
     this.sub.push(
-      merge(
+      combineLatest([
         this.store$.pipe(
-          select(annotation.selectors.annotations),
-          map(landmarks => landmarks.length > 0),
+          select(atlasAppearance.selectors.meshTransparency),
         ),
-        this.store$.pipe(
-          select(atlasAppearance.selectors.customLayers),
-          map(customLayers => customLayers.filter(l => l.clType === "customlayer/nglayer" && typeof l.source === "string" && /^swc:\/\//.test(l.source)).length > 0),
-        )
-      ).pipe(
-        startWith(false),
-        withLatestFrom(this.defaultNgLayers$)
-      ).subscribe(([flag, { tmplAuxNgLayers }]) => {
+        this.defaultNgLayers$
+      ]).subscribe(([alpha, { tmplAuxNgLayers } ]) => {
+        
         const payload: {
           [key: string]: number
         } = {}
-        const alpha = flag
-          ? 0.2
-          : 1.0
+        
         for (const ngId in tmplAuxNgLayers) {
           payload[ngId] = alpha
         }
@@ -204,10 +207,19 @@ export class NehubaLayerControlService implements OnDestroy{
     shareReplay(1)
   )
 
-  public expectedLayerNames$ = this.defaultNgLayers$.pipe(
-    map(({ parcNgLayers, tmplAuxNgLayers, tmplNgLayers }) => {
+  public expectedVisibleLayerNames$ = combineLatest([
+    this.defaultNgLayers$,
+    this.store$.pipe(
+      select(atlasAppearance.selectors.showDelineation)
+    )
+  ]).pipe(
+    map(([{ parcNgLayers, tmplAuxNgLayers, tmplNgLayers }, parcVisible]) => {
       return [
-        ...Object.keys(parcNgLayers),
+        ...(
+          parcVisible
+          ? Object.keys(parcNgLayers)
+          : []
+        ),
         ...Object.keys(tmplAuxNgLayers),
         ...Object.keys(tmplNgLayers),
       ]
@@ -307,6 +319,24 @@ export class NehubaLayerControlService implements OnDestroy{
     shareReplay(1)
   )
   private manualNgLayersControl$ = new Subject<TNgLayerCtrl<keyof INgLayerCtrl>>()
+
+  /**
+   * ngctl events can be missed, (e.g. setmeshtransparency)
+   * this convoluted setup traps all events, and emit them when "subscribed"
+   * TODO rework into a datasource (i.e. pull oriented) rather than observable
+   */
+  #buffered: TNgLayerCtrl<keyof INgLayerCtrl>[] = []
+  #ngLayerCtrlCb: ((arg: TNgLayerCtrl<keyof INgLayerCtrl>) => void)[] = []
+  registerNgCtrl(callback: (arg: TNgLayerCtrl<keyof INgLayerCtrl>) => void){
+
+    this.#ngLayerCtrlCb.push(callback)
+    while (this.#buffered.length > 0) {
+      callback(this.#buffered.shift()) 
+    }
+    return () => {
+      this.#ngLayerCtrlCb = this.#ngLayerCtrlCb.filter(cb => cb !== callback)
+    }
+  }
   ngLayersController$: Observable<TNgLayerCtrl<keyof INgLayerCtrl>> = merge(
     this.ngLayers$.pipe(
       map(({ newLayers }) => newLayers),
@@ -367,7 +397,7 @@ export class NehubaLayerControlService implements OnDestroy{
   )
 
   public visibleLayer$: Observable<string[]> = combineLatest([
-    this.expectedLayerNames$.pipe(
+    this.expectedVisibleLayerNames$.pipe(
       map(expectedLayerNames => {
         const ngIdSet = new Set<string>([...expectedLayerNames])
         return Array.from(ngIdSet)

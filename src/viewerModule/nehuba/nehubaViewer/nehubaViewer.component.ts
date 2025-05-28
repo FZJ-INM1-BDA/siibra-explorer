@@ -2,7 +2,7 @@ import { Component, ElementRef, EventEmitter, OnDestroy, Output, Inject, Optiona
 import { Subscription, BehaviorSubject, Observable, Subject, of, interval, combineLatest } from 'rxjs'
 import { debounceTime, filter, scan, switchMap, take, distinctUntilChanged, debounce, map } from "rxjs/operators";
 import { LoggingService } from "src/logging";
-import { bufferUntil, getExportNehuba, getUuid, switchMapWaitFor } from "src/util/fn";
+import { getExportNehuba, getUuid, switchMapWaitFor, waitFor } from "src/util/fn";
 import { deserializeSegment, NEHUBA_INSTANCE_INJTKN } from "../util";
 import { arrayOrderedEql, rgbToHex } from 'common/util'
 import { IMeshesToLoad, SET_MESHES_TO_LOAD, PERSPECTIVE_ZOOM_FUDGE_FACTOR } from "../constants";
@@ -129,7 +129,7 @@ export class NehubaViewerUnit implements OnDestroy {
     @Optional() @Inject(SET_COLORMAP_OBS) private setColormap$: Observable<IColorMap>,
     @Optional() @Inject(SET_LAYER_VISIBILITY) private layerVis$: Observable<string[]>,
     @Optional() @Inject(SET_SEGMENT_VISIBILITY) private segVis$: Observable<string[]>,
-    @Optional() @Inject(NG_LAYER_CONTROL) private layerCtrl$: Observable<TNgLayerCtrl<keyof INgLayerCtrl>>,
+    @Optional() @Inject(NG_LAYER_CONTROL) private layerCtrlCb: (callback: (arg: TNgLayerCtrl<keyof INgLayerCtrl>) => void) => () => void,
     @Optional() @Inject(Z_TRAVERSAL_MULTIPLIER) multiplier$: Observable<number>,
     @Optional() @Inject(EXTERNAL_LAYER_CONTROL) private externalLayerCtrl: IExternalLayerCtl,
     @Optional() intViewerStateSvc: ViewerInternalStateSvc,
@@ -338,14 +338,13 @@ export class NehubaViewerUnit implements OnDestroy {
       this.log.error(`SET_SEGMENT_VISIBILITY not provided`)
     }
 
-    if (this.layerCtrl$) {
-      this.ondestroySubscriptions.push(
-        this.layerCtrl$.pipe(
-          bufferUntil(({
-            condition: () => this._nehubaReady
-          }))
-        ).subscribe(messages => {
-          for (const message of messages) {
+    if (layerCtrlCb) {
+      (async () => {
+        await waitFor(() => this._nehubaReady)
+
+        this.onDestroyCb.push(
+          layerCtrlCb(message => {
+
             if (message.type === 'add') {
               const p = message as TNgLayerCtrl<'add'>
               this.loadLayer(p.payload)
@@ -372,9 +371,9 @@ export class NehubaViewerUnit implements OnDestroy {
                 this.setLayerShader(key, p.payload[key])
               }
             }
-          }
-        })
-      )
+          })
+        )
+      })()
     } else {
       this.log.error(`NG_LAYER_CONTROL not provided`)
     }
@@ -773,18 +772,27 @@ export class NehubaViewerUnit implements OnDestroy {
     ctrl.restoreState(newVal)
   }
 
-  private setLayerTransparency(layerName: string, alpha: number) {
-    const layer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(layerName)
-    if (!(layer?.layer)) return
-
-    /**
-     * for segmentation layer
-     */
-    if (layer.layer.displayState) layer.layer.displayState.objectAlpha.restoreState(alpha)
-    /**
-     * for image layer
-     */
-    if (layer.layer.opacity) layer.layer.opacity.restoreState(alpha)
+  private async setLayerTransparency(layerName: string, alpha: number) {
+    await waitFor(() => {
+      const layer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(layerName)
+      
+      /**
+       * for segmentation layer
+       */
+      if (layer?.layer?.displayState) {
+        layer.layer.displayState.objectAlpha.restoreState(alpha)
+        return true
+      }
+      
+      /**
+       * for image layer
+       */
+      if (layer?.layer?.opacity) {
+        layer.layer.opacity.restoreState(alpha)
+        return true
+      }
+      return false
+    })
   }
 
   private setLayerShader(layerName: string, shader: string) {

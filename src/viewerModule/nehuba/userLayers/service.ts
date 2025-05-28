@@ -653,8 +653,8 @@ export class UserLayerService implements OnDestroy {
         ...option,
       }
       this.store$.dispatch(
-        atlasAppearance.actions.addCustomLayer({
-          customLayer: layer,
+        atlasAppearance.actions.addCustomLayers({
+          customLayers: [layer],
         })
       )
     }

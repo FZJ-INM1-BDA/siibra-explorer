@@ -39,6 +39,25 @@ export class AnnotationList {
   public managedAnnotations$ = this.annotSvc.spaceFilteredManagedAnnotations$
   public annotationInOtherSpaces$ = this.annotSvc.otherSpaceManagedAnnotations$
 
+  public descText$ = combineLatest([
+    this.managedAnnotations$,
+    this.annotationInOtherSpaces$
+  ]).pipe(
+    map(([ annot, otherAnnot ]) => {
+      if (annot.length === 0 && otherAnnot.length === 0) {
+        return `Custom URL will not contain any annotations.`
+      }
+      let message = `Custom URL will also contain `
+      if (annot.length > 0) {
+        message += `${annot.length} annotation(s) in this reference space `
+      }
+      if (otherAnnot.length > 0) {
+        message += `${otherAnnot.length} annotation(s) in other reference spaces.`
+      }
+      return message
+    })
+  )
+
   public manAnnExists$ = this.managedAnnotations$.pipe(
     map(arr => !!arr && arr.length > 0),
     startWith(false)

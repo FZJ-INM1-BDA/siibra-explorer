@@ -44,9 +44,12 @@ nav:
     - Superimposing remote files: "advanced/superimposing_remote_files.md"
     - Annotating structures in the brain: "advanced/annotating_structures.md"
     - Differential gene expression analysis: "advanced/differential_gene_expression_analysis.md"
+    - Plugin API: "advanced/api/README.md"
 
   - Release notes:
     - v2.15.0: 'releases/v2.15.0.md'
+    - v2.14.20: 'releases/v2.14.20.md'
+    - v2.14.19: 'releases/v2.14.19.md'
     - v2.14.18: 'releases/v2.14.18.md'
     - v2.14.17: 'releases/v2.14.17.md'
     - v2.14.16: 'releases/v2.14.16.md'

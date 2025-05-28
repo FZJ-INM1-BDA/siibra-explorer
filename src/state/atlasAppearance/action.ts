@@ -8,6 +8,21 @@ export const setOctantRemoval = createAction(
   }>()
 )
 
+export const setMeshTransparency = createAction(
+  `${nameSpace} setMeshTransparency`,
+  props<{
+    alpha: number
+  }>()
+)
+
+export const toggleMeshTransparency = createAction(
+  `${nameSpace} toggleMeshTransparency`
+)
+
+export const toggleOctantRemoval = createAction(
+  `${nameSpace} toggleOctantRemoval`
+)
+
 export const setShowDelineation = createAction(
   `${nameSpace} setShowDelineation`,
   props<{
@@ -15,17 +30,21 @@ export const setShowDelineation = createAction(
   }>()
 )
 
-export const addCustomLayer = createAction(
+export const toggleParcDelineation = createAction(
+  `${nameSpace} toggleDelineation`,
+)
+
+export const addCustomLayers = createAction(
   `${nameSpace} addCustomLayer`,
   props<{
-    customLayer: CustomLayer
+    customLayers: CustomLayer[]
   }>()
 )
 
-export const removeCustomLayer = createAction(
+export const removeCustomLayers = createAction(
   `${nameSpace} removeCustomLayer`,
   props<{
-    id: string
+    customLayers: {id: string}[]
   }>()
 )
 

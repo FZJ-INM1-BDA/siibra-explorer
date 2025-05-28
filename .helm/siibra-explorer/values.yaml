@@ -47,17 +47,6 @@ ingress:
   enabled: false
   className: ""
   annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
-  hosts:
-    - host: siibra-explorer.apps.tc.humanbrainproject.eu
-      paths:
-        - path: /viewer
-          pathType: Prefix
-  tls:
-   - secretName: siibra-explorer-prod-secret
-     hosts:
-       - siibra-explorer.apps.tc.humanbrainproject.eu
 
 resources:
   # We usually recommend not to specify default resources and to leave this as a conscious
@@ -67,9 +56,11 @@ resources:
   limits:
     cpu: 200m
     memory: 256Mi
+    ephemeral-storage: 64Mi
   requests:
     cpu: 100m
     memory: 128Mi
+    ephemeral-storage: 64Mi
 
 autoscaling:
   enabled: false
@@ -98,4 +89,4 @@ affinity: {}
 envObj:
   OVERWRITE_SPATIAL_ENDPOINT: https://siibra-spatial-backend.apps.tc.humanbrainproject.eu
   HOST_PATHNAME: /viewer
-  OVERWRITE_API_ENDPOINT: https://siibra-api-prod.apps.tc.humanbrainproject.eu/v3_0
+  OVERWRITE_API_ENDPOINT: https://siibra-api.apps.ebrains.eu/v3_0

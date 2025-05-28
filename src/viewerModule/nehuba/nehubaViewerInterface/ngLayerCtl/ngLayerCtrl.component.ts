@@ -152,8 +152,8 @@ export class NgLayerCtrlCmp implements OnChanges, OnDestroy{
       }
       
       this.store.dispatch(
-        atlasAppearance.actions.addCustomLayer({
-          customLayer: {
+        atlasAppearance.actions.addCustomLayers({
+          customLayers: [{
             id: name,
             legacySpecFlag: 'old',
             shader: this.shader,
@@ -164,13 +164,13 @@ export class NgLayerCtrlCmp implements OnChanges, OnDestroy{
             meta: {
               insertIndex: this.insertIndex,
             }
-          }
+          }]
         })
       )
       this.removeLayer = () => {
         this.store.dispatch(
-          atlasAppearance.actions.removeCustomLayer({
-            id: name
+          atlasAppearance.actions.removeCustomLayers({
+            customLayers: [{id: name}]
           })
         )
       }
