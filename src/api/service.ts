@@ -95,7 +95,18 @@ export type ApiBoothEvents = {
     }
     response: 'OK'
   }
-
+  setOctantRemoval: {
+    request: {
+      flag: boolean
+    }
+    response: 'OK'
+  }
+  setAuxMeshAlpha: {
+    request: {
+      alpha: number
+    }
+    response: 'OK'
+  }
   rmAnnotations: {
     request: {
       annotations: AtId[]
@@ -487,13 +498,39 @@ export class ApiService implements BoothResponder<ApiBoothEvents>{
       }
       break
     }
+    case 'setOctantRemoval': {
+      const { flag } = event.params as ApiBoothEvents['setOctantRemoval']['request']
+      this.store.dispatch(
+        atlasAppearance.actions.setOctantRemoval({
+          flag
+        })
+      )
+      return {
+        jsonrpc: '2.0',
+        id: event.id,
+        result: 'OK'
+      }
+    }
+    case 'setAuxMeshAlpha': {
+      const { alpha } = event.params as ApiBoothEvents['setAuxMeshAlpha']['request']
+      this.store.dispatch(
+        atlasAppearance.actions.setMeshTransparency({
+          alpha
+        })
+      )
+      return {
+        jsonrpc: '2.0',
+        id: event.id,
+        result: 'OK'
+      }
+    }
     case 'loadLayers':
     case 'updateLayers': {
       const { layers } = event.params as ApiBoothEvents['loadLayers']['request'] | ApiBoothEvents['updateLayers']['request']
       for (const layer of layers) {
         this.store.dispatch(
-          atlasAppearance.actions.addCustomLayer({
-            customLayer: layer
+          atlasAppearance.actions.addCustomLayers({
+            customLayers: [layer]
           })
         )
       }
@@ -503,7 +540,7 @@ export class ApiService implements BoothResponder<ApiBoothEvents>{
       const { layers } = event.params as ApiBoothEvents['removeLayers']['request']
       for (const layer of layers) {
         this.store.dispatch(
-          atlasAppearance.actions.removeCustomLayer(layer)
+          atlasAppearance.actions.removeCustomLayers({customLayers: [layer]})
         )
       }
       break

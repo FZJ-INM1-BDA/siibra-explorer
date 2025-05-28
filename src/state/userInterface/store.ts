@@ -8,8 +8,8 @@ export type UiStore = {
 }
 
 export const defaultState: UiStore = {
-  panelMode: null,
-  panelOrder: null,
+  panelMode: "FOUR_PANEL",
+  panelOrder: "0123",
 }
 
 export const reducer = createReducer(

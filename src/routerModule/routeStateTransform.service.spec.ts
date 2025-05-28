@@ -139,7 +139,7 @@ describe("> routeStateTransform.service.ts", () => {
           store.overrideSelector(userInterface.selectors.panelOrder, "0123")
           store.overrideSelector(atlasAppearance.selectors.octantRemoval, false)
           store.overrideSelector(atlasAppearance.selectors.showDelineation, true)
-          
+          store.overrideSelector(atlasAppearance.selectors.meshTransparency, 1.0)
         })
 
         afterEach(() => {

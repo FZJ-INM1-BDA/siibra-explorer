@@ -7,6 +7,7 @@ type CustomLayerBase = {
 
 type NgLayerBase = {
   clType: 'customlayer/nglayer' | 'baselayer/nglayer'
+  sxplrAnnotations?: Record<string, string>
 } & CustomLayerBase
 
 export type ColorMapCustomLayer = {

@@ -1,16 +1,17 @@
 import { Injectable } from "@angular/core";
 import { createEffect } from "@ngrx/effects";
 import { select, Store } from "@ngrx/store";
-import { forkJoin, from, of } from "rxjs";
-import { switchMap, withLatestFrom, catchError, map, debounceTime, shareReplay, distinctUntilChanged, tap } from "rxjs/operators";
+import { concat, forkJoin, from, merge, of } from "rxjs";
+import { switchMap, withLatestFrom, catchError, map, debounceTime, shareReplay, distinctUntilChanged, tap, pairwise, filter } from "rxjs/operators";
 import { NgLayerSpec, NgPrecompMeshSpec, NgSegLayerSpec, SxplrAtlas, SxplrParcellation, SxplrTemplate, VoiFeature } from "src/atlasComponents/sapi/sxplrTypes";
 import { SAPI } from "src/atlasComponents/sapi"
-import { atlasAppearance, atlasSelection } from "src/state";
+import { atlasAppearance, atlasSelection, annotation } from "src/state";
 import { arrayEqual } from "src/util/array";
 import { getShader } from "src/util/fn";
 import { PMAP_LAYER_NAME } from "../constants";
 import { QuickHash } from "src/util/fn";
 import { getParcNgId } from "../config.service";
+import { SXPLR_ANNOTATIONS_KEY } from "src/util/constants";
 
 @Injectable()
 export class LayerCtrlEffects {
@@ -41,8 +42,8 @@ export class LayerCtrlEffects {
   onRegionSelect = createEffect(() => this.store.pipe(
     select(atlasAppearance.selectors.useViewer),
     switchMap(viewer => {
-      const rmPmapAction = atlasAppearance.actions.removeCustomLayer({
-        id: PMAP_LAYER_NAME
+      const rmPmapAction = atlasAppearance.actions.removeCustomLayers({
+        customLayers: [{id: PMAP_LAYER_NAME}]
       })
       if (viewer !== "NEHUBA") {
         this.#cleanupUrl()
@@ -65,8 +66,8 @@ export class LayerCtrlEffects {
               this.#pmapUrl = URL.createObjectURL(new Blob([buffer], {type: "application/octet-stream"}))
               return of(
                 rmPmapAction,
-                atlasAppearance.actions.addCustomLayer({
-                  customLayer: {
+                atlasAppearance.actions.addCustomLayers({
+                  customLayers: [{
                     legacySpecFlag: "old",
                     clType: "customlayer/nglayer",
                     id: PMAP_LAYER_NAME,
@@ -79,7 +80,7 @@ export class LayerCtrlEffects {
                     }),
                     type: 'image',
                     opacity: 0.5
-                  }
+                  }]
                 })
               )
             }),
@@ -90,28 +91,6 @@ export class LayerCtrlEffects {
     })
   ))
 
-  onATPClearBaseLayers = createEffect(() => this.#onATP$.pipe(
-    withLatestFrom(
-      this.store.pipe(
-        select(atlasAppearance.selectors.customLayers),
-        map(
-          cl => cl.filter(layer =>
-            layer.clType === "baselayer/nglayer"
-            || layer.clType === "customlayer/nglayer"
-          )
-        )
-      )
-    ),
-    switchMap(([_, layers]) => 
-      of(
-        ...layers.map(layer => 
-          atlasAppearance.actions.removeCustomLayer({
-            id: layer.id
-          })  
-        )
-      )
-    )
-  ))
 
   onATPDebounceNgLayers$ = this.#onATP$.pipe(
     debounceTime(16),
@@ -154,48 +133,83 @@ export class LayerCtrlEffects {
             }
             return returnVal
           })
-        )
+        ),
+        sxplrAnnotations: of({
+          [SXPLR_ANNOTATIONS_KEY.TEMPLATE_ID]: template?.id,
+          [SXPLR_ANNOTATIONS_KEY.PARCELLATION_ID]: parcellation?.id,
+        })
       })
     ),
     shareReplay(1),
   )
 
-  onATPDebounceAddBaseLayers$ = createEffect(() => this.onATPDebounceNgLayers$.pipe(
-    switchMap(ngLayers => {
-      const { parcNgLayers, tmplAuxNgLayers, tmplNgLayers } = ngLayers
-      
-      const customBaseLayers: atlasAppearance.const.NgLayerCustomLayer[] = []
-      for (const layers of [parcNgLayers, tmplAuxNgLayers, tmplNgLayers]) {
-        for (const key in layers) {
-          const v = layers[key]
+  onATPDebounceUpdateBaseLayers$ = createEffect(() => concat(
+    of([] as atlasAppearance.const.NgLayerCustomLayer[]),
+    this.onATPDebounceNgLayers$.pipe(
+      switchMap(ngLayers => {
+        const { parcNgLayers, tmplAuxNgLayers, tmplNgLayers, sxplrAnnotations } = ngLayers
+        
+        const customBaseLayers: atlasAppearance.const.NgLayerCustomLayer[] = []
 
-          if (v.legacySpecFlag === "old") {
-            customBaseLayers.push({
-              clType: "baselayer/nglayer",
-              legacySpecFlag: "old",
-              id: key,
-              ...v
-            })
+        // order matters. first append tmplNgLayers, then tmpl auxnglayers, then parc layers
+        for (const layers of [tmplNgLayers, tmplAuxNgLayers, parcNgLayers]) {
+          for (const key in layers) {
+            const v = layers[key]
+
+            if (v.legacySpecFlag === "old") {
+              customBaseLayers.push({
+                clType: "baselayer/nglayer",
+                legacySpecFlag: "old",
+                id: key,
+                sxplrAnnotations,
+                ...v
+              })
+            }
+
+            if (v.legacySpecFlag === "new") {
+              customBaseLayers.push({
+                legacySpecFlag: "new",
+                clType: "baselayer/nglayer",
+                id: key,
+                sxplrAnnotations,
+                ...v
+              })
+            }
+
           }
-
-          if (v.legacySpecFlag === "new") {
-            customBaseLayers.push({
-              legacySpecFlag: "new",
-              clType: "baselayer/nglayer",
-              id: key,
-              ...v
-            })
-          }
-
         }
-      }
+        return of(customBaseLayers)
+      })
+    )
+  ).pipe(
+    pairwise(),
+    switchMap(([oLayers, nLayers]) => {
       return of(
-        ...customBaseLayers.map(layer => 
-          atlasAppearance.actions.addCustomLayer({
-            customLayer: layer
-          })  
-        )
+        atlasAppearance.actions.removeCustomLayers({
+          customLayers: oLayers
+        }),
+        atlasAppearance.actions.addCustomLayers({
+          customLayers: nLayers
+        })
       )
+    })
+  ))
+
+  onCustomAnnotation$ = createEffect(() => merge(
+    this.store.pipe(
+      select(annotation.selectors.annotations),
+      map(landmarks => landmarks.length > 0),
+    ),
+    this.store.pipe(
+      select(atlasAppearance.selectors.customLayers),
+      map(customLayers => customLayers.filter(l => l.clType === "customlayer/nglayer" && typeof l.source === "string" && /^swc:\/\//.test(l.source)).length > 0),
+    )
+  ).pipe(
+    filter(flag => flag),
+    map(() => {
+      return atlasAppearance.actions.setMeshTransparency({
+        alpha: 0.2
+      })
     })
   ))
 

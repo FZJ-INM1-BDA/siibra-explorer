@@ -8,6 +8,7 @@ import { ViewerCtrlCmp } from "./viewerCtrlCmp/viewerCtrlCmp.component";
 import { PerspectiveViewSlider } from "./perspectiveViewSlider/perspectiveViewSlider.component";
 import { SnapPerspectiveOrientationCmp } from "src/viewerModule/nehuba/viewerCtrl/snapPerspectiveOrientation/snapPerspectiveOrientation.component";
 import { WindowResizeModule } from "src/util/windowResize";
+import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.directive";
 
 @NgModule({
   imports: [
@@ -18,6 +19,7 @@ import { WindowResizeModule } from "src/util/windowResize";
     ReactiveFormsModule,
     ComponentsModule,
     WindowResizeModule,
+    ExperimentalFlagDirective,
   ],
   declarations: [
     ViewerCtrlCmp,

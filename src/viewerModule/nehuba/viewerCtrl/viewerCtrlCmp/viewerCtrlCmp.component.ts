@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, OnInit } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { merge, of, Subscription } from "rxjs";
-import { pairwise, withLatestFrom} from "rxjs/operators";
+import { combineLatest, merge, of, Subscription } from "rxjs";
+import { map, pairwise, withLatestFrom} from "rxjs/operators";
 import { ARIA_LABELS, CONST } from 'common/constants'
-import { actionSetAuxMeshes, selectorAuxMeshes } from "../../store";
+import * as nehubaStore from "../../store";
 import { UntypedFormControl, UntypedFormGroup } from "@angular/forms";
 import { atlasAppearance } from "src/state";
 
@@ -22,34 +22,40 @@ export class ViewerCtrlCmp implements OnInit{
   public ARIA_LABELS = ARIA_LABELS
   public CONST = CONST
 
-  private sub: Subscription[] = []
-
-  private _removeOctantFlag: boolean = true
-  get removeOctantFlag(): boolean{
-    return this._removeOctantFlag
-  }
-  set removeOctantFlag(val: boolean){
-    if (val === this._removeOctantFlag) return
-    this._removeOctantFlag = val
-    this.setOctantRemoval(this._removeOctantFlag)
-  }
-
-  public nehubaViewerPerspectiveOctantRemoval$ = this.store$.pipe(
-    select(atlasAppearance.selectors.octantRemoval),
+  public view$ = combineLatest([
+    this.store$.pipe(
+      select(atlasAppearance.selectors.meshTransparency),
+      map(alpha => alpha < 1)
+    ),
+    this.store$.pipe(
+      select(atlasAppearance.selectors.octantRemoval)
+    )
+  ]).pipe(
+    map(([ auxTransparent, octantRemoved ]) => {
+      return {
+        auxTransparent,
+        octantRemoved,
+        CONST
+      }
+    })
   )
+
+  toggleAux(){
+    this.store$.dispatch(
+      atlasAppearance.actions.toggleMeshTransparency()
+    )
+  }
+
+  private sub: Subscription[] = []
 
   public auxMeshFormGroup: UntypedFormGroup = new UntypedFormGroup({})
   private auxMeshesNamesSet: Set<string> = new Set()
   public auxMeshes$ = this.store$.pipe(
-    select(selectorAuxMeshes),
+    select(nehubaStore.selectors.selectorAuxMeshes),
   )
 
   ngOnInit(): void {
     this.sub.push(
-
-      this.nehubaViewerPerspectiveOctantRemoval$.subscribe(
-        flag => this.removeOctantFlag = flag
-      ),
 
       merge(
         of(null),
@@ -89,7 +95,7 @@ export class ViewerCtrlCmp implements OnInit{
 
         if (changed) {
           this.store$.dispatch(
-            actionSetAuxMeshes({
+            nehubaStore.actions.actionSetAuxMeshes({
               payload: auxMeshesCopy
             })
           )
@@ -104,11 +110,9 @@ export class ViewerCtrlCmp implements OnInit{
 
   }
 
-  public setOctantRemoval(octantRemovalFlag: boolean): void {
+  public toggleOctantRemoval(){
     this.store$.dispatch(
-      atlasAppearance.actions.setOctantRemoval({
-        flag: octantRemovalFlag
-      })
+      atlasAppearance.actions.toggleOctantRemoval()
     )
   }
 

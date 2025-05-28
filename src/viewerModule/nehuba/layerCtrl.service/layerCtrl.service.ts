@@ -1,9 +1,9 @@
-import { Inject, Injectable, OnDestroy, Optional } from "@angular/core";
+import { Injectable, OnDestroy } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { combineLatest, merge, Observable, of, Subject, Subscription } from "rxjs";
+import { combineLatest, merge, Observable, Subject, Subscription } from "rxjs";
 import { debounceTime, distinctUntilChanged, filter, map, pairwise, shareReplay, startWith, switchMap, withLatestFrom } from "rxjs/operators";
 import { IColorMap, INgLayerCtrl, TNgLayerCtrl } from "./layerCtrl.util";
-import { annotation, atlasAppearance, atlasSelection } from "src/state";
+import { atlasAppearance, atlasSelection } from "src/state";
 import { serializeSegment } from "../util";
 import { LayerCtrlEffects } from "./layerCtrl.effects";
 import { arrayEqual } from "src/util/array";
@@ -12,7 +12,6 @@ import { AnnotationLayer } from "src/atlasComponents/annotations";
 import { PMAP_LAYER_NAME } from "../constants"
 import { getShader } from "src/util/fn";
 import { BaseService } from "../base.service/base.service";
-import { ParcellationVisibilityService } from "src/atlasComponents/sapiViews/core/parcellation/parcellationVis.service";
 
 export const BACKUP_COLOR = {
   red: 255,
@@ -136,9 +135,6 @@ export class NehubaLayerControlService implements OnDestroy{
     private store$: Store<any>,
     private layerEffects: LayerCtrlEffects,
     private baseService: BaseService,
-    @Optional()
-    @Inject(ParcellationVisibilityService)
-    private parcVisSvc: ParcellationVisibilityService,
   ){
 
     this.sub.push(
@@ -163,6 +159,16 @@ export class NehubaLayerControlService implements OnDestroy{
           payload: layerObj
         })
       }),
+
+      this.ngLayersController$.subscribe(ev => {
+        if (this.#ngLayerCtrlCb.length === 0) {
+          this.#buffered.push(ev)
+          return
+        }
+        for (const cb of this.#ngLayerCtrlCb){
+          cb(ev)
+        }
+      })
     )
 
     this.sub.push(
@@ -171,29 +177,18 @@ export class NehubaLayerControlService implements OnDestroy{
       })
     )
 
-    /**
-     * on custom landmarks loaded, set mesh transparency
-     */
     this.sub.push(
-      merge(
+      combineLatest([
         this.store$.pipe(
-          select(annotation.selectors.annotations),
-          map(landmarks => landmarks.length > 0),
+          select(atlasAppearance.selectors.meshTransparency),
         ),
-        this.store$.pipe(
-          select(atlasAppearance.selectors.customLayers),
-          map(customLayers => customLayers.filter(l => l.clType === "customlayer/nglayer" && typeof l.source === "string" && /^swc:\/\//.test(l.source)).length > 0),
-        )
-      ).pipe(
-        startWith(false),
-        withLatestFrom(this.defaultNgLayers$)
-      ).subscribe(([flag, { tmplAuxNgLayers }]) => {
+        this.defaultNgLayers$
+      ]).subscribe(([alpha, { tmplAuxNgLayers } ]) => {
+        
         const payload: {
           [key: string]: number
         } = {}
-        const alpha = flag
-          ? 0.2
-          : 1.0
+        
         for (const ngId in tmplAuxNgLayers) {
           payload[ngId] = alpha
         }
@@ -214,7 +209,9 @@ export class NehubaLayerControlService implements OnDestroy{
 
   public expectedVisibleLayerNames$ = combineLatest([
     this.defaultNgLayers$,
-    (this.parcVisSvc?.visibility$ || of(true)) 
+    this.store$.pipe(
+      select(atlasAppearance.selectors.showDelineation)
+    )
   ]).pipe(
     map(([{ parcNgLayers, tmplAuxNgLayers, tmplNgLayers }, parcVisible]) => {
       return [
@@ -322,6 +319,24 @@ export class NehubaLayerControlService implements OnDestroy{
     shareReplay(1)
   )
   private manualNgLayersControl$ = new Subject<TNgLayerCtrl<keyof INgLayerCtrl>>()
+
+  /**
+   * ngctl events can be missed, (e.g. setmeshtransparency)
+   * this convoluted setup traps all events, and emit them when "subscribed"
+   * TODO rework into a datasource (i.e. pull oriented) rather than observable
+   */
+  #buffered: TNgLayerCtrl<keyof INgLayerCtrl>[] = []
+  #ngLayerCtrlCb: ((arg: TNgLayerCtrl<keyof INgLayerCtrl>) => void)[] = []
+  registerNgCtrl(callback: (arg: TNgLayerCtrl<keyof INgLayerCtrl>) => void){
+
+    this.#ngLayerCtrlCb.push(callback)
+    while (this.#buffered.length > 0) {
+      callback(this.#buffered.shift()) 
+    }
+    return () => {
+      this.#ngLayerCtrlCb = this.#ngLayerCtrlCb.filter(cb => cb !== callback)
+    }
+  }
   ngLayersController$: Observable<TNgLayerCtrl<keyof INgLayerCtrl>> = merge(
     this.ngLayers$.pipe(
       map(({ newLayers }) => newLayers),

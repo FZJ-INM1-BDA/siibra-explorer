@@ -54,4 +54,6 @@ window.addEventListener('pagehide', () => {
 | sxplr.selectAtlas | client | [jsonschema](sxplr.selectAtlas__toSxplr__request.json) | [jsonschema](sxplr.selectAtlas__toSxplr__response.json) |
 | sxplr.selectParcellation | client | [jsonschema](sxplr.selectParcellation__toSxplr__request.json) | [jsonschema](sxplr.selectParcellation__toSxplr__response.json) |
 | sxplr.selectTemplate | client | [jsonschema](sxplr.selectTemplate__toSxplr__request.json) | [jsonschema](sxplr.selectTemplate__toSxplr__response.json) |
+| sxplr.setAuxMeshAlpha | client | [jsonschema](sxplr.setAuxMeshAlpha__toSxplr__request.json) | [jsonschema](sxplr.setAuxMeshAlpha__toSxplr__response.json) |
+| sxplr.setOctantRemoval | client | [jsonschema](sxplr.setOctantRemoval__toSxplr__request.json) | [jsonschema](sxplr.setOctantRemoval__toSxplr__response.json) |
 | sxplr.updateLayers | client | [jsonschema](sxplr.updateLayers__toSxplr__request.json) | [jsonschema](sxplr.updateLayers__toSxplr__response.json) |

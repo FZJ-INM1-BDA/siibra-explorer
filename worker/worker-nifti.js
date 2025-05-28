@@ -119,6 +119,89 @@
         out[2] = 0.25 * S;
       }
       return out;
+    },
+    multiply(out, a, b) {
+      let a00 = a[0],
+        a01 = a[1],
+        a02 = a[2],
+        a03 = a[3];
+      let a10 = a[4],
+        a11 = a[5],
+        a12 = a[6],
+        a13 = a[7];
+      let a20 = a[8],
+        a21 = a[9],
+        a22 = a[10],
+        a23 = a[11];
+      let a30 = a[12],
+        a31 = a[13],
+        a32 = a[14],
+        a33 = a[15];
+      // Cache only the current line of the second matrix
+      let b0 = b[0],
+        b1 = b[1],
+        b2 = b[2],
+        b3 = b[3];
+      out[0] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
+      out[1] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
+      out[2] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
+      out[3] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
+      b0 = b[4];
+      b1 = b[5];
+      b2 = b[6];
+      b3 = b[7];
+      out[4] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
+      out[5] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
+      out[6] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
+      out[7] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
+      b0 = b[8];
+      b1 = b[9];
+      b2 = b[10];
+      b3 = b[11];
+      out[8] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
+      out[9] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
+      out[10] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
+      out[11] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
+      b0 = b[12];
+      b1 = b[13];
+      b2 = b[14];
+      b3 = b[15];
+      out[12] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
+      out[13] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
+      out[14] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
+      out[15] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
+      return out;
+    }
+  }
+  const quat = {
+    multiply(out, a, b) {
+      let ax = a[0],
+        ay = a[1],
+        az = a[2],
+        aw = a[3];
+      let bx = b[0],
+        by = b[1],
+        bz = b[2],
+        bw = b[3];
+      out[0] = ax * bw + aw * bx + ay * bz - az * by;
+      out[1] = ay * bw + aw * by + az * bx - ax * bz;
+      out[2] = az * bw + aw * bz + ax * by - ay * bx;
+      out[3] = aw * bw - ax * bx - ay * by - az * bz;
+      return out;
+    },
+    invert(out, a) {
+      let a0 = a[0],
+        a1 = a[1],
+        a2 = a[2],
+        a3 = a[3];
+      let dot = a0 * a0 + a1 * a1 + a2 * a2 + a3 * a3;
+      let invDot = dot ? 1.0 / dot : 0;
+      // TODO: Would be faster to return [0,0,0,0] immediately if dot == 0
+      out[0] = -a0 * invDot;
+      out[1] = -a1 * invDot;
+      out[2] = -a2 * invDot;
+      out[3] = a3 * invDot;
+      return out;
     }
   }
   /**
@@ -191,6 +274,10 @@
     numBitsPerVoxel: {
       offset: 72,
       type: DTYPE.SHORT
+    },
+    pixDims: {
+      offset: 76,
+      type: DTYPE.FLOAT
     },
     qformCode: {
       offset: 252,
@@ -273,6 +360,10 @@
     numBitsPerVoxel: {
       offset: 14,
       type: DTYPE.SHORT
+    },
+    pixDims: {
+      offset: 104,
+      type: DTYPE.DOUBLE
     },
     qformCode: {
       offset: 344,
@@ -430,6 +521,7 @@
       const sformCode = readData(dataView, dict.sformCode, le)
 
       if (qformCode === 0) {
+        const pixDims0 = readData(dataView, dict.pixDims, le)
         const step = BYTE_LENGTH[dict.srow.type]
         const affine = []
         for (let ctrOut = 0; ctrOut < 3; ctrOut += 1) {
@@ -445,14 +537,23 @@
         }
         affine.push(0, 0, 0, 1)
         mat4.transpose(affine, affine)
-        const quat = [0, 0, 0, 1]
-        mat4.getRotation(quat, affine)
+        if (pixDims0 === -1) {
+          mat4.multiply(affine, affine,
+            [1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, -1, 0,
+            0, 0, 0, 1])
+        }
+        
+        const q = [0, 0, 0, 1]
+        mat4.getRotation(q, affine)
+
         const translation = [0, 0, 0]
         mat4.getTranslation(translation, affine)
 
-        setData(dataView, dict.quaternB, quat[0], le)
-        setData(dataView, dict.quaternC, quat[1], le)
-        setData(dataView, dict.quaternD, quat[2], le)
+        setData(dataView, dict.quaternB, q[0], le)
+        setData(dataView, dict.quaternC, q[1], le)
+        setData(dataView, dict.quaternD, q[2], le)
         
         setData(dataView, dict.qoffsetX, translation[0], le)
         setData(dataView, dict.qoffsetY, translation[1], le)

@@ -4,6 +4,7 @@ import { LayoutModule } from "src/layouts/layout.module";
 import { AngularMaterialModule } from "src/sharedModules";
 import { ConfigComponent } from "./configCmp/config.component";
 import { ReactiveFormsModule } from "@angular/forms";
+import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.directive";
 
 @NgModule({
   imports: [
@@ -11,6 +12,7 @@ import { ReactiveFormsModule } from "@angular/forms";
     AngularMaterialModule,
     LayoutModule,
     ReactiveFormsModule,
+    ExperimentalFlagDirective,
   ],
   declarations: [
     ConfigComponent,

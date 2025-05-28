@@ -42,7 +42,7 @@ import { SET_MESHES_TO_LOAD } from "../constants";
     },
     {
       provide: NG_LAYER_CONTROL,
-      useFactory: (layerCtrl: NehubaLayerControlService) => layerCtrl.ngLayersController$,
+      useFactory: (layerCtrl: NehubaLayerControlService) => layerCtrl.registerNgCtrl.bind(layerCtrl),
       deps: [ NehubaLayerControlService ]
     },
     NehubaLayerControlService,

@@ -1,0 +1,163 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "jsonrpc": {
+      "const": "2.0"
+    },
+    "method": {
+      "const": "sxplr.addAnnotations"
+    },
+    "params": {
+      "properties": {
+        "annotations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SxplrCoordinatePointExtension"
+          }
+        }
+      },
+      "type": "object"
+    }
+  },
+  "definitions": {
+    "SxplrCoordinatePointExtension": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/AtId"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "color": {
+              "type": "string"
+            },
+            "openminds": {
+              "$ref": "#/components/schemas/CoordinatePointModel"
+            }
+          }
+        }
+      ]
+    },
+    "AtId": {
+      "type": "object",
+      "properties": {
+        "@id": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CoordinatePointModel": {
+        "properties": {
+          "@type": {
+            "type": "string",
+            "title": "@Type"
+          },
+          "@context": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VocabModel"
+              }
+            ],
+            "title": "@Context",
+            "default": {
+              "@vocab": "https://openminds.ebrains.eu/vocab/"
+            }
+          },
+          "@id": {
+            "type": "string",
+            "title": "@Id",
+            "description": "Metadata node identifier."
+          },
+          "coordinateSpace": {
+            "type": "object",
+            "title": "coordinateSpace",
+            "description": "Two or three dimensional geometric setting."
+          },
+          "coordinates": {
+            "items": {
+              "$ref": "#/components/schemas/api__models__openminds__SANDS__v3__miscellaneous__coordinatePoint__Coordinates"
+            },
+            "type": "array",
+            "title": "Coordinates",
+            "description": "Structured information on a quantitative value."
+          }
+        },
+        "type": "object",
+        "required": [
+          "@type",
+          "@id",
+          "coordinateSpace",
+          "coordinates"
+        ],
+        "title": "CoordinatePointModel",
+        "description": "CoordinatePointModel"
+      },
+      "VocabModel": {
+        "properties": {
+          "@vocab": {
+            "type": "string",
+            "title": "@Vocab"
+          }
+        },
+        "type": "object",
+        "required": [
+          "@vocab"
+        ],
+        "title": "VocabModel"
+      },
+      "api__models__openminds__SANDS__v3__miscellaneous__coordinatePoint__Coordinates": {
+        "properties": {
+          "@context": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VocabModel"
+              }
+            ],
+            "title": "@Context",
+            "default": {
+              "@vocab": "https://openminds.ebrains.eu/vocab/"
+            }
+          },
+          "typeOfUncertainty": {
+            "title": "typeOfUncertainty",
+            "description": "Distinct technique used to quantify the uncertainty of a measurement."
+          },
+          "uncertainty": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 2,
+            "minItems": 2,
+            "title": "uncertainty",
+            "description": "Quantitative value range defining the uncertainty of a measurement."
+          },
+          "unit": {
+            "title": "unit",
+            "description": "Determinate quantity adopted as a standard of measurement."
+          },
+          "value": {
+            "type": "number",
+            "title": "value",
+            "description": "Entry for a property."
+          }
+        },
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "title": "Coordinates"
+      }
+    }
+  }
+}

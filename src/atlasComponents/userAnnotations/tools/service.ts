@@ -3,11 +3,11 @@ import { ARIA_LABELS } from 'common/constants'
 import { Inject, Optional } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { BehaviorSubject, combineLatest, fromEvent, merge, Observable, of, Subject, Subscription } from "rxjs";
-import {map, switchMap, filter, shareReplay, pairwise, distinctUntilChanged, take } from "rxjs/operators";
+import {map, switchMap, filter, shareReplay, pairwise, distinctUntilChanged, take, withLatestFrom } from "rxjs/operators";
 import { NehubaViewerUnit } from "src/viewerModule/nehuba";
 import { NEHUBA_INSTANCE_INJTKN } from "src/viewerModule/nehuba/util";
 import { AbsToolClass, ANNOTATION_EVENT_INJ_TOKEN, IAnnotationEvents, IAnnotationGeometry, INgAnnotationTypes, INJ_ANNOT_TARGET, TAnnotationEvent, ClassInterface, TCallbackFunction, TSands, TGeometryJson, TCallback, DESC_TYPE } from "./type";
-import { getExportNehuba, switchMapWaitFor } from "src/util/fn";
+import { getExportNehuba, retry, switchMapWaitFor } from "src/util/fn";
 import { Polygon } from "./poly";
 import { Line } from "./line";
 import { Point } from "./point";
@@ -15,11 +15,12 @@ import { FilterAnnotationsBySpace } from "../filterAnnotationBySpace.pipe";
 import { MatSnackBar } from 'src/sharedModules/angularMaterial.exports'
 import { actions } from "src/state/atlasSelection";
 import { atlasSelection } from "src/state";
-import { SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
-import { AnnotationLayer } from "src/atlasComponents/annotations";
+import { AnnotationLayer, getViewer } from "src/atlasComponents/annotations";
 import { translateV3Entities } from "src/atlasComponents/sapi/translateV3";
 import { HOVER_INTERCEPTOR_INJECTOR, HoverInterceptor, THoverConfig } from "src/util/injectionTokens";
 
+
+const ANNOTATED_SYMBOL = Symbol("ANNOTATED_SYMBOL")
 const LOCAL_STORAGE_KEY = 'userAnnotationKey'
 const ANNOTATION_LAYER_NAME = "modular_tool_layer_name"
 
@@ -83,7 +84,6 @@ export class ModularUserAnnotationToolService implements OnDestroy{
   private activeToolName: string
   private forcedAnnotationRefresh$ = new BehaviorSubject(null)
 
-  private selectedTmpl: SxplrTemplate
   private selectedTmpl$ = this.store.pipe(
     select(atlasSelection.selectors.selectedTemplate),
   )
@@ -506,12 +506,20 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     )
 
     this.subscription.push(
-      templateIsVolumetric$.subscribe(flag => {
-        let sub: Subscription
+      this.selectedTmpl$.pipe(
+        distinctUntilChanged((o, n) => o?.id === n?.id)
+      ).subscribe(() => {
         if (this.annotationLayer) {
           this.annotationLayer.dispose()
           this.annotationLayer = null
         }
+      }),
+      templateIsVolumetric$.pipe(
+        withLatestFrom(this.store.pipe(
+          select(atlasSelection.selectors.selectedTemplate)
+        ))
+      ).subscribe(async ([flag, selectedTmpl]) => {
+        let sub: Subscription
         if (sub) {
           sub.unsubscribe()
           sub = null
@@ -520,11 +528,25 @@ export class ModularUserAnnotationToolService implements OnDestroy{
         if (!flag) {
           return
         }
+        const viewer = await retry(() => {
+          const viewer = getViewer()
+          if (viewer && !viewer[ANNOTATED_SYMBOL]) {
+            return viewer
+          }
+          throw new Error(`viewer not defined, or already annotated`)
+        }, { timeout: 160, retries: 100 })
+
+        viewer[ANNOTATED_SYMBOL] = selectedTmpl?.id
         
         this.annotationLayer = new AnnotationLayer(
           ANNOTATION_LAYER_NAME,
           ModularUserAnnotationToolService.USER_ANNOTATION_LAYER_SPEC.annotationColor
         )
+        const mode = await this.store.pipe(
+          select(atlasSelection.selectors.viewerMode),
+          take(1),
+        ).toPromise()
+        this.annotationLayer.setVisible(mode === ModularUserAnnotationToolService.VIEWER_MODE)
         sub = this.annotationLayer.onHover.subscribe(val => {
           this.annotnEvSubj.next({
             type: 'hoverAnnotation',
@@ -552,7 +574,6 @@ export class ModularUserAnnotationToolService implements OnDestroy{
      */
     this.subscription.push(
       this.selectedTmpl$.subscribe(tmpl => {
-        this.selectedTmpl = tmpl
         this.annotnEvSubj.next({
           type: 'metadataEv',
           detail: {

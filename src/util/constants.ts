@@ -89,10 +89,10 @@ export const SPECIES_ENUM = {
  * atlas should follow the following order
  */
 export const speciesOrder = [
-  SPECIES_ENUM.HOMO_SAPIENS,
-  SPECIES_ENUM.MACACA_FASCICULARIS,
-  SPECIES_ENUM.RATTUS_NORVEGICUS,
   SPECIES_ENUM.MUS_MUSCULUS,
+  SPECIES_ENUM.RATTUS_NORVEGICUS,
+  SPECIES_ENUM.MACACA_FASCICULARIS,
+  SPECIES_ENUM.HOMO_SAPIENS,
 ]
 
 export const parcBanList: string[] = [
@@ -105,3 +105,8 @@ export const parcBanList: string[] = [
 export const GET_ATTR_TOKEN = new InjectionToken("GET_ATTR_TOKEN")
 
 export type GetAttr = (attr: string) => string|null
+
+export const SXPLR_ANNOTATIONS_KEY = {
+  TEMPLATE_ID: "sxplrAnnotation.template.id",
+  PARCELLATION_ID: "sxplrAnnotation.parcellation.id",
+} as const

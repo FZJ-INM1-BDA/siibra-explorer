@@ -7,14 +7,38 @@
   </mat-card-header>
 
   <mat-card-content>
-    <mat-slide-toggle [(ngModel)]="removeOctantFlag"
-      [aria-label]="ARIA_LABELS.TOGGLE_FRONTAL_OCTANT"
-      name="remove-frontal-octant">
-      <span class="text">
-        Remove frontal octant
-      </span>
-      <i [matTooltip]="CONST.REMOVE_FRONTAL_OCTANT_HELPER_TEXT" class="fas fa-question"></i>
-    </mat-slide-toggle>
+    
+    <ng-template [ngIf]="view$ | async" let-view>
+      <mat-slide-toggle
+        [checked]="view.octantRemoved"
+        (change)="toggleOctantRemoval()"
+        [aria-label]="ARIA_LABELS.TOGGLE_FRONTAL_OCTANT"
+        name="remove-frontal-octant">
+        <span class="text">
+          Remove frontal octant
+        </span>
+        <i [matTooltip]="CONST.REMOVE_FRONTAL_OCTANT_HELPER_TEXT" class="fas fa-question"></i>
+      </mat-slide-toggle>
+
+
+      <ng-template sxplrExperimentalFlag [experimental]="true">
+
+      <mat-slide-toggle
+        [checked]="view.auxTransparent"
+        [disabled]="view.octantRemoved"
+        (change)="toggleAux()"
+        name="glass-brain">
+        <span class="text">
+          Glass Brain
+        </span>
+        <ng-template [ngIf]="view.octantRemoved">
+          <i [matTooltip]="view.CONST.GLASS_BRAIN_ENABLE" class="fas fa-exclamation-triangle"></i>
+        </ng-template>
+      </mat-slide-toggle>
+      
+      </ng-template>
+
+    </ng-template>
   </mat-card-content>
 
   <!-- aux mesh controller -->

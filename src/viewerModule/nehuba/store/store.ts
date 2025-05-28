@@ -1,5 +1,5 @@
 import { createReducer, on } from "@ngrx/store";
-import { actionRemoveAuxMesh, actionSetAuxMesh, actionSetAuxMeshes } from "./actions";
+import * as actions from "./actions"
 import { INehubaFeature } from "./type";
 
 
@@ -20,18 +20,18 @@ const defaultState: INehubaFeature = {
   panelMode: EnumPanelMode.FOUR_PANEL,
   panelOrder: '0123',
   octantRemoval: true,
-  auxMeshes: []
+  auxMeshes: [],
 }
 
 export const reducer = createReducer(
   defaultState,
-  on(actionSetAuxMeshes, (state, { payload }) => {
+  on(actions.actionSetAuxMeshes, (state, { payload }) => {
     return {
       ...state,
       auxMeshes: payload
     }
   }),
-  on(actionSetAuxMesh, (state, { payload }) => {
+  on(actions.actionSetAuxMesh, (state, { payload }) => {
     return {
       ...state,
       auxMeshes: state.auxMeshes.map(v => v['@id'] === payload['@id']
@@ -39,16 +39,17 @@ export const reducer = createReducer(
         : v)
     }
   }),
-  on(actionRemoveAuxMesh, (state, {payload}) => {
+  on(actions.actionRemoveAuxMesh, (state, {payload}) => {
     return {
       ...state,
       auxMeshes: state.auxMeshes.filter(v => v['@id'] !== payload['@id'])
     }
   }),
-  on(actionRemoveAuxMesh, state => {
+  on(actions.actionRemoveAuxMesh, state => {
     return {
       ...state,
       auxMeshes: []
     }
-  })
+  }),
+  
 )

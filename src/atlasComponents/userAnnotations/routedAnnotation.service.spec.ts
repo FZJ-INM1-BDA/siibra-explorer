@@ -10,7 +10,8 @@ describe('> routedannotation.service.ts', () => {
   describe('> RoutedAnnotationService', () => {
     const customRouteSub = new BehaviorSubject(null)
     const spyRService = {
-      customRoute$: customRouteSub.asObservable()
+      customRoute$: customRouteSub.asObservable(),
+      setCustomRoute: jasmine.createSpy("setCustomRoute")
     }
     
     const spyAnnSvc = {
@@ -45,6 +46,7 @@ describe('> routedannotation.service.ts', () => {
       spyAnnSvc.switchAnnotationMode.calls.reset()
       spyAnnSvc.parseAnnotationObject.calls.reset()
       spyAnnSvc.importAnnotation.calls.reset()
+      spyRService.setCustomRoute.calls.reset()
     })
 
     it('> can be init', () => {
@@ -84,6 +86,7 @@ describe('> routedannotation.service.ts', () => {
         const spySaneUrlSvc = TestBed.inject(SaneUrlSvc) as any
         expect(spySaneUrlSvc.getKeyVal).toHaveBeenCalled()
         expect(spySaneUrlSvc.getKeyVal).toHaveBeenCalledWith(mockVal)
+        expect(spyRService.setCustomRoute).toHaveBeenCalledWith(userAnnotationRouteKey, null)
       }))
 
       it('> switchannotation mode is called with "on"', fakeAsync(() => {

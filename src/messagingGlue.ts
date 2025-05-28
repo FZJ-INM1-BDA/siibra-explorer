@@ -92,15 +92,15 @@ export class MessagingGlue implements IWindowMessaging, OnDestroy {
       }
 
       this.store.dispatch(
-        atlasAppearance.actions.addCustomLayer({
-          customLayer: layer
+        atlasAppearance.actions.addCustomLayers({
+          customLayers: [layer]
         })
       )
 
       this.mapIdUnload.set(swcLayerUuid, () => {
         this.store.dispatch(
-          atlasAppearance.actions.removeCustomLayer({
-            id: swcLayerUuid
+          atlasAppearance.actions.removeCustomLayers({
+            customLayers: [{id: swcLayerUuid}]
           })
         )
         unload()
