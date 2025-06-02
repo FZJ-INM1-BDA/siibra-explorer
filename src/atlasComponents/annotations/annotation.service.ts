@@ -202,19 +202,6 @@ export class AnnotationLayer {
     )  
   }
 
-  async clear(){
-    const nglayer = await this.#getLayerObs().pipe(
-      switchMap(switchMapWaitFor({
-        condition: nglayer => !!nglayer?.layer?.localAnnotations,
-        leading: true
-      })),
-      take(1)
-    ).toPromise()
-    // await waitFor(() => !!nglayer?.layer?.localAnnotations)
-    const { localAnnotations } = nglayer.layer
-    localAnnotations.clear()
-  }
-
   @AnnotationLayer.LayerReady()
   async addAnnotation(spec: AnnotationSpec|AnnotationSpec[]){
     if (Array.isArray(spec)) {

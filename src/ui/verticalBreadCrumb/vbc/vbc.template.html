@@ -82,8 +82,55 @@
                 <mat-icon>expand_more</mat-icon>
             </div>
              
-            
-            <ng-template [ngTemplateOutlet]="templateBodyTmpl"></ng-template>
+            <form [formGroup]="navigationCtlForm">
+                <ng-template [ngIf]="view.useViewer === 'nehuba'">
+                    <ng-template [ngIf]="view.currentViewport" let-vp>
+                        <div class="vbc-row">
+                            <div class="sxplr-align-items-center sxplr-d-flex sxplr-m-2">
+                                <span>
+                                    Navigation
+                                </span>
+                            </div>
+                        </div>
+                        <div class="vbc-row">
+                            <mat-form-field *ngFor="let axis of ['x', 'y', 'z']">
+                                <mat-label>{{ axis }}</mat-label>
+                                <input matInput [formControlName]="axis" vbc-on-focus-select>
+                            </mat-form-field>
+                            <button mat-icon-button
+                                class="vbc-row-fixed"
+                                color="warn"
+                                [matTooltip]="view.labels.RESET_TRANSLATION"
+                                (click)="resetNavigation({ position: true })">
+                                <mat-icon>restart_alt</mat-icon>
+                            </button>
+                            
+                            <button mat-icon-button
+                                class="vbc-row-fixed"
+                                *ngIf="vp?.center; let center"
+                                [matTooltip]="view.labels.POSITION_ASSIGNMENT"
+                                (click)="assignPoint(center, view.selectedATP.template)"
+                                >
+                                <mat-icon>search</mat-icon>
+                            </button>
+                        </div>
+
+                        <mat-divider></mat-divider>
+                        <div class="vbc-row">
+
+                            <div class="sxplr-d-flex sxplr-align-items-center sxplr-m-2">
+                                <span>
+                                    Viewport
+                                </span>
+                            </div>
+                            <!-- {{ view.zoom }} -->
+                            <div class="sxplr-d-inline-flex sxplr-m-2 vbc-row-fixed">
+                                <ng-template [ngTemplateOutlet]="templateVpActionsTmpl"></ng-template>
+                            </div>
+                        </div>
+                    </ng-template>
+                </ng-template>
+            </form>
 
             <mat-divider [inset]="false"></mat-divider>
 
@@ -208,14 +255,26 @@
             <mat-divider></mat-divider>
 
             <ng-template [ngIf]="view.selectedRegions.length === 1">
-                <div class="title-1-container sxplr-custom-cmp hoverable">
-                    <h4>
-                        {{ view.selectedRegions[0].name }}
+                <div class="title-1-container sxplr-custom-cmp hoverable" mat-ripple
+                    iav-stop="click"
+                    [sxplr-dialog]="regionHierarchyTmpl"
+                    [matTooltip]="view.labels.REGION_HIERARCHY"
+                    sxplr-dialog-size="xl">
+                    <h4 class="sxplr-d-flex sxplr-align-items-center">
+                        <span class="sxplr-flex-var">
+                            {{ view.selectedRegions[0].name }}
+                        </span>
+                        <span class="sxplr-flex-static">
+                            <i class="fas fa-sitemap"></i>
+                        </span>
                     </h4>
                 </div>
                 
                 <mat-divider></mat-divider>
-                <ng-template [ngTemplateOutlet]="singleRegionActionTmpl"></ng-template>
+                
+                <div class="sxplr-d-flex">
+                    <ng-template [ngTemplateOutlet]="singleRegionActionTmpl"></ng-template>
+                </div>
             </ng-template>
             
             <ng-template [ngIf]="view.selectedRegions.length > 1">
@@ -243,7 +302,7 @@
                             Point Assignment
                         </ng-template>
                         <ng-template [ngIf]="!selPtExpPanel.expanded">
-                            <mat-icon>query_stats</mat-icon>
+                            <mat-icon>search</mat-icon>
                         </ng-template>
                         
                     </mat-panel-title>
@@ -377,7 +436,7 @@
                             </ng-template>
                         </ng-template>
                         <ng-template [ngIf]="!selFtExpPanel.expanded">
-                            <mat-icon>dataset_linked</mat-icon>
+                            <mat-icon>menu_book</mat-icon>
                         </ng-template>
                     </mat-panel-title>
                     
@@ -623,79 +682,20 @@
     </ng-template>
 
     <!-- space templates -->
-    <ng-template #templateBodyTmpl>
-        <form [formGroup]="navigationCtlForm">
-            <ng-template [ngIf]="view.useViewer === 'nehuba'">
-                <div class="vbc-row">
-                    <mat-form-field *ngFor="let axis of ['x', 'y', 'z']">
-                        <mat-label>{{ axis }}</mat-label>
-                        <input matInput [formControlName]="axis" vbc-on-focus-select>
-                    </mat-form-field>
-                    <button mat-icon-button
-                        class="vbc-row-fixed"
-                        color="warn"
-                        [matTooltip]="view.labels.RESET_TRANSLATION"
-                        (click)="resetNavigation({ position: true })">
-                        <mat-icon>restart_alt</mat-icon>
-                    </button>
-                </div>
-            </ng-template>
-        </form>
-    </ng-template>
 
-    <ng-template #templateActionsTmpl>
-        <button mat-icon-button
-            [matTooltip]="view.labels.DETAILS"
-            [sxplr-dialog]="DoiTemplate"
-            [sxplr-dialog-size]="null"
-            [sxplr-dialog-data]="{
-                title: view.selectedATP.template.name,
-                desc: view.selectedATP.template.desc,
-                contributors: view.selectedATP.template.contributors | dedup, 
-                actions: view.selectedATP.template | parcTmplDoiPipe
-            }">
-            <mat-icon>info</mat-icon>
-        </button>
-
-        <dumb-atlas-download
-            [template]="view.selectedATP.template"
-            [bbox]="view.currentViewport"
-            [strictMode]="'strict'">
-        </dumb-atlas-download>
-
-        <mat-divider [vertical]="true"></mat-divider>
-
-        <!-- 
-        only show
-        1/ copy coordinate
-        2/ point assignement
-        3/ spatial features
-        if we are in nehuba viewer
-        -->
-        <ng-template [ngIf]="view.useViewer === 'nehuba'">
-            <ng-template [ngIf]="view.currentViewport" let-vp>
-
-                <button
-                    [matTooltip]="view.labels.COPY_CURRENT_POSITION"
-                    mat-icon-button
-                    [iav-clipboard-copy]="vp | viewportToText">
-                    <i class="fas fa-copy"></i>
-                </button>
-    
-                <button mat-icon-button
-                    *ngIf="vp?.center; let center"
-                    [matTooltip]="view.labels.POSITION_ASSIGNMENT"
-                    (click)="assignPoint(center, view.selectedATP.template)"
-                    >
-                    <mat-icon>query_stats</mat-icon>
-                </button>
-            </ng-template>
-    
-            <mat-divider [vertical]="true"></mat-divider>
+    <ng-template #templateVpActionsTmpl>
+        <ng-template [ngIf]="view.currentViewport" let-vp>
             
-            <div iav-switch #switchdir="iavSwitch">
+            <button
+                [matTooltip]="view.labels.COPY_CURRENT_POSITION"
+                mat-icon-button
+                [iav-clipboard-copy]="vp | viewportToText">
+                <i class="fas fa-copy"></i>
+            </button>
+
+            <mat-divider [vertical]="true"></mat-divider>
     
-            </div>
+            <div iav-switch #switchdir="iavSwitch"></div>
             <div sxplr-sapiviews-core-space-boundingbox
                 (sxplr-sapiviews-core-space-boundingbox-changed)="voiFeatureEntryCmp?.pullAll()"
                 [sxplr-sapiviews-core-space-boundingbox-atlas]="view.selectedATP.atlas"
@@ -723,10 +723,9 @@
                 <ng-template [ngIf]="bbox.bbox$ | async" let-bbox>
 
                     <div
-                        *ngIf="bbox.bbox && bbox.space?.id === IDS.TEMPLATES.AMBA_CCF_V3"
                         ng-annotations
                         annotationLayerName="viewport-bbox"
-                        annotationColor="#9999ff"
+                        annotationColor="#ffffff"
                         [annotations]="[ (bbox.bbox | bboxToAABB) ]">
                     </div>
         
@@ -739,38 +738,59 @@
                 [matTooltip]="view.labels.TOGGLE_SPATIAL_BOXES">
                 <i [class]="(switchdir.switchState$ | async) ? 'fas fa-lightbulb' : 'far fa-lightbulb'"></i>
             </button>
-    
-    
-            <ng-template [ngIf]="voiFeatureEntryCmp.totals$ | async" let-totals>
-                
-                <ng-template [ngIf]="totals > 0">
-                    
-                    <ng-template #anchorTmpl>
-                        <tpbr-viewer [tpbr-concept]="voiFeatureEntryCmp.TPRBbox$ | async">
-                        </tpbr-viewer>
-                    </ng-template>
-    
-                    <button mat-icon-button
-                        [matTooltip]="view.labels.RELATED_DATASETS"
-                        [sxplr-dialog]="dumbFeatureDialogTmpl"
-                        [sxplr-dialog-config]="{
-                            autoFocus: true
-                        }"
-                        [sxplr-dialog-data]="{
-                            busy$: voiFeatureEntryCmp.busy$,
-                            features$: voiFeatureEntryCmp.features$,
-                            anchorTmpl: anchorTmpl
-                        }"
-                        sxplr-dialog-size="xl">
-                        <mat-icon [matBadge]="totals" aria-hidden="false">dataset_linked</mat-icon>
-                    </button>
+
+            <ng-template #anchorTmpl>
+                <tpbr-viewer [tpbr-concept]="voiFeatureEntryCmp.TPRBbox$ | async">
+                </tpbr-viewer>
+            </ng-template>
+
+            <button mat-icon-button
+                [matTooltip]="view.labels.RELATED_DATASETS"
+                [sxplr-dialog]="dumbFeatureDialogTmpl"
+                [sxplr-dialog-config]="{
+                    autoFocus: true
+                }"
+                [sxplr-dialog-data]="{
+                    busy$: voiFeatureEntryCmp.busy$,
+                    features$: voiFeatureEntryCmp.features$,
+                    anchorTmpl: anchorTmpl
+                }"
+                sxplr-dialog-size="xl">
+                <ng-template [ngIf]="voiFeatureEntryCmp.busy$ | async" [ngIfElse]="notBusyTmpl">
+                    <mat-spinner
+                        [matBadge]="voiFeatureEntryCmp.totals$ | async"
+                        [diameter]="24"></mat-spinner>
                 </ng-template>
-            </ng-template>
+
+                <ng-template #notBusyTmpl>
+                    <mat-icon [matBadge]="voiFeatureEntryCmp.totals$ | async">menu_book</mat-icon>
+                </ng-template>
+            </button>
     
-            <ng-template [ngIf]="voiFeatureEntryCmp.busy$ | async">
-                <mat-spinner class="action-v-center" diameter="24"></mat-spinner>
-            </ng-template>
+
         </ng-template>
+    </ng-template>
+
+    <ng-template #templateActionsTmpl>
+        <button mat-icon-button
+            [matTooltip]="view.labels.DETAILS"
+            [sxplr-dialog]="DoiTemplate"
+            [sxplr-dialog-size]="null"
+            [sxplr-dialog-data]="{
+                title: view.selectedATP.template.name,
+                desc: view.selectedATP.template.desc,
+                contributors: view.selectedATP.template.contributors | dedup, 
+                actions: view.selectedATP.template | parcTmplDoiPipe
+            }">
+            <mat-icon>info</mat-icon>
+        </button>
+
+        <dumb-atlas-download
+            [template]="view.selectedATP.template"
+            [bbox]="view.currentViewport"
+            [strictMode]="'strict'">
+        </dumb-atlas-download>
+
     </ng-template>
 
     <!-- parcelation templates -->
@@ -924,7 +944,7 @@
                     anchorTmpl: anchorTmpl
                 }"
                 sxplr-dialog-size="xl">
-                <mat-icon [matBadge]="parcFeature.totals$ | async" aria-hidden="false">dataset_linked</mat-icon>
+                <mat-icon [matBadge]="parcFeature.totals$ | async" aria-hidden="false">menu_book</mat-icon>
             </button>
         </ng-template>
 
@@ -1072,6 +1092,7 @@
         </sxplr-feature-entry>
 
         <ng-template [ngIf]="(regFeatures.totals$ | async) > 0">
+            <mat-divider [vertical]="true"></mat-divider>
             <button mat-icon-button
                 (click)="regFeatures.pullAll()"
                 [matTooltip]="view.labels.RELATED_DATASETS"
@@ -1087,7 +1108,7 @@
                 sxplr-dialog-size="xl">
                 <mat-icon
                     [matBadge]="regFeatures.totals$ | async"
-                    aria-hidden="false">dataset_linked</mat-icon>
+                    aria-hidden="false">menu_book</mat-icon>
             </button>
         </ng-template>
 

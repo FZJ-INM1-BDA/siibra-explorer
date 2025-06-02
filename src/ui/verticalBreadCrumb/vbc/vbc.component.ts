@@ -11,7 +11,6 @@ import { enLabels } from "src/uiLabels"
 import { FormControl, FormGroup } from "@angular/forms";
 import { geometryEqual, getUuid } from "src/util/fn";
 import { DestroyDirective } from "src/util/directives/destroy.directive";
-import { ParcellationVisibilityService } from "src/atlasComponents/sapiViews/core/parcellation/parcellationVis.service";
 import { DoiTemplate } from "src/ui/doi/doi.component"
 import { translateRegionName } from "src/atlasComponents/sapi/translateV3";
 import { generalActionError } from "src/state/actions";
@@ -233,6 +232,17 @@ export class VerticalBreadCrumbComponent {
       }
     })
   )
+  private atlasSelection$ = combineLatest([
+    this.store$.pipe(
+      select(atlasSelection.selectors.navigation),
+      map(nav => nav?.zoom || 1),
+      distinctUntilChanged(),
+    )
+  ]).pipe(
+    map(([ zoom ]) => {
+      return { zoom }
+    })
+  )
 
   userPreferences$ = combineLatest([
     of(enLabels),
@@ -241,7 +251,9 @@ export class VerticalBreadCrumbComponent {
     ),
     this.#minimizedCards$,
     this.#maximizedCard$,
-    this.svc?.visibility$ || of(null as boolean|null)
+    this.store$.pipe(
+      select(atlasAppearance.selectors.showDelineation)
+    ),
   ]).pipe(
     map(([ labels, showExperimental, minimizedCards, maximizedCard, parcellationVisible ]) => {
       return {
@@ -258,7 +270,8 @@ export class VerticalBreadCrumbComponent {
     this.#allAtlases$,
     this.userSelection$,
     this.userSelectionDeducedState$,
-    this.userPreferences$
+    this.userPreferences$,
+    this.atlasSelection$,
   ]).pipe(
     map(([
       atlases,
@@ -277,7 +290,8 @@ export class VerticalBreadCrumbComponent {
         customLayers,
       },
       { useViewer },
-      { labels, showExperimental, minimizedCards, parcellationVisible, maximizedCard, }]) => {
+      { labels, showExperimental, minimizedCards, parcellationVisible, maximizedCard, },
+      { zoom }]) => {
       
       const parentIds = new Set(allAvailableRegions.flatMap(v => v.parentIds))
 
@@ -286,7 +300,8 @@ export class VerticalBreadCrumbComponent {
         useAccordion: true, maximizedCard,
         leafRegions: allAvailableRegions.filter(r => !parentIds.has(r.id)),
         branchRegions: allAvailableRegions.filter(r => parentIds.has(r.id)),
-        debug: false
+        debug: false,
+        zoom
       }
     })
   )
@@ -295,7 +310,6 @@ export class VerticalBreadCrumbComponent {
     private store$: Store,
     private sapi: SAPI,
     @Inject(NEHUBA_CONFIG_SERVICE_TOKEN) private nehubaConfigSvc: NehubaConfigSvc,
-    @Optional() @Inject(ParcellationVisibilityService) private svc: ParcellationVisibilityService,
   ){
     
     const navStateFromState$: Observable<NavigationState> = this.store$.pipe(
@@ -490,7 +504,9 @@ export class VerticalBreadCrumbComponent {
   }
   public removeCustomLayer(id: string){
     this.store$.dispatch(
-      atlasAppearance.actions.removeCustomLayer({ id })
+      atlasAppearance.actions.removeCustomLayers({
+        customLayers: [{ id }]
+      })
     )
   }
 
@@ -657,7 +673,9 @@ export class VerticalBreadCrumbComponent {
   }
 
   public toggleParcellationVisibility(){
-    this.svc && this.svc.toggleVisibility()
+    this.store$.dispatch(
+      atlasAppearance.actions.toggleParcDelineation()
+    )
   }
 
   public nameEql(a: any, b: any){
