@@ -34,7 +34,6 @@ jobs:
         && helm --kubeconfig=$kubecfg_path \
           upgrade \
           --history-max 3 \
-          --reuse-values \
           --set image.tag=${{ inputs.IMAGE_TAG }} \
           --set podAnnotations.image-digest=${{ inputs.IMAGE_DIGEST }} \
           ${{ inputs.DEPLOYMENT_NAME }} .helm/siibra-explorer/ \
@@ -42,7 +41,6 @@ jobs:
           install\
           --set image.tag=${{ inputs.IMAGE_TAG }} \
           --set podAnnotations.image-digest=${{ inputs.IMAGE_DIGEST }} \
-          --set envObj.HOST_PATHNAME=/viewer \
           ${{ inputs.DEPLOYMENT_NAME }} .helm/siibra-explorer/
 
         rm $kubecfg_path
