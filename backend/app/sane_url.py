@@ -145,6 +145,9 @@ data_proxy_store = SaneUrlDPStore()
 async def get_short(short_id:str, request: Request):
     accept = request.headers.get("Accept", "")
     is_browser = "text/html" in accept
+    headers = {
+        "Vary": "accept"
+    }
     try:
         existing_json: Dict[str, Any] = data_proxy_store.get(short_id)
         if is_browser:
@@ -157,17 +160,17 @@ async def get_short(short_id:str, request: Request):
 
             extra_routes_str = "" if len(extra_routes) == 0 else ("/" + "/".join(extra_routes))
 
-            return RedirectResponse(f"{HOST_PATHNAME}/#{hashed_path}{extra_routes_str}")
-        return JSONResponse(existing_json)
+            return RedirectResponse(f"{HOST_PATHNAME}/#{hashed_path}{extra_routes_str}", headers=headers)
+        return JSONResponse(existing_json, headers=headers)
     except DataproxyStore.NotFound as e:
         if is_browser:
             request.session[ERROR_KEY] = f"Short ID {short_id} not found."
-            return RedirectResponse(HOST_PATHNAME or "/")
+            return RedirectResponse(HOST_PATHNAME or "/", headers=headers)
         raise HTTPException(404, str(e))
     except DataproxyStore.GenericException as e:
         if is_browser:
             request.session[ERROR_KEY] = f"Error: {str(e)}"
-            return RedirectResponse(HOST_PATHNAME or "/")
+            return RedirectResponse(HOST_PATHNAME or "/", headers=headers)
         raise HTTPException(500, str(e))
 
 

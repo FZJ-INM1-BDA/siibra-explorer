@@ -63,6 +63,7 @@ jobs:
           --history-max 3 \
           --reuse-values \
           --set image.tag=${{ inputs.IMAGE_TAG }} \
+          --set envObj.OVERWRITE_API_ENDPOINT="https://siibra-api-rc.apps.ebrains.eu/v3_0" \
           --set podAnnotations.image-digest=${{ inputs.IMAGE_DIGEST }} \
           ${{ inputs.DEPLOYMENT_NAME }} .helm/siibra-explorer/ \
         || helm --kubeconfig=$kubecfg_path \
