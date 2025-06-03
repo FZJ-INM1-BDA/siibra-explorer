@@ -87,6 +87,6 @@ tolerations: []
 affinity: {}
 
 envObj:
-  OVERWRITE_SPATIAL_ENDPOINT: https://siibra-spatial-backend.apps.tc.humanbrainproject.eu
+  OVERWRITE_SPATIAL_ENDPOINT: https://siibra-spatial-backend.apps.ebrains.eu
   HOST_PATHNAME: /viewer
   OVERWRITE_API_ENDPOINT: https://siibra-api.apps.ebrains.eu/v3_0

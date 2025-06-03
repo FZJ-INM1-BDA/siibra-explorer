@@ -89,9 +89,9 @@ jobs:
         && helm --kubeconfig=$kubecfg_path \
           upgrade \
           --history-max 3 \
-          --reuse-values \
           --set image.tag=${{ inputs.IMAGE_TAG }} \
           --set podAnnotations.image-digest=${{ inputs.IMAGE_DIGEST }} \
+          --set envObj.HOST_PATHNAME=/viewer-dev \
           --set envObj.OVERWRITE_API_ENDPOINT="https://siibra-api-rc.apps.ebrains.eu/v3_0" \
           ${{ inputs.DEPLOYMENT_NAME }} .helm/siibra-explorer/ \
         || helm --kubeconfig=$kubecfg_path \
