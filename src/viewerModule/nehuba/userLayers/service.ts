@@ -33,6 +33,7 @@ type Meta = {
 }
 
 const OVERLAY_LAYER_KEY = "x-overlay-layer"
+const OVERLAY_LAYER_SEP = ","
 const OVERLAY_LAYER_PROTOCOL = `${OVERLAY_LAYER_KEY}://`
 const SUPPORTED_PREFIX = ["nifti://", "precomputed://", "zarr://", "n5://", "swc://", "deepzoom://"] as const
 
@@ -49,7 +50,7 @@ type ProcessorOutput = {
 }
 type ProcessResource = {
   matcher: (input: ValidInputTypes) => Promise<boolean>
-  processor: (input: ValidInputTypes) => Promise<ProcessorOutput>
+  processor: (input: ValidInputTypes) => Promise<ProcessorOutput[]>
 }
 
 const SOURCE_PROCESSOR: ProcessResource[] = []
@@ -95,7 +96,7 @@ export class UserLayerService implements OnDestroy {
 
     const xform = await linearTransform(src, dst)
 
-    return {
+    return [{
       option: {
         legacySpecFlag: "old",
         type: 'segmentation',
@@ -109,7 +110,7 @@ export class UserLayerService implements OnDestroy {
         messages,
       },
       cleanup: () => url.startsWith("blob") && URL.revokeObjectURL(url)
-    }
+    }]
   }
 
   @RegisterSource(
@@ -134,7 +135,7 @@ export class UserLayerService implements OnDestroy {
     const type = file.name.includes(".label.nii")
     ? 'segmentation'
     : 'image'
-    return {
+    return [{
       protocol: 'nifti://',
       url,
       option: {
@@ -153,7 +154,7 @@ export class UserLayerService implements OnDestroy {
         ...meta
       },
       cleanup: () => URL.revokeObjectURL(url)
-    }
+    }]
   }
 
   @RegisterSource(
@@ -203,7 +204,7 @@ export class UserLayerService implements OnDestroy {
       point: triplet.map(v => v) as [number, number, number]
     })))
 
-    return {
+    return [{
       cleanup: () => {
         layer.dispose()
       },
@@ -211,31 +212,50 @@ export class UserLayerService implements OnDestroy {
         filename: file.name
       },
 
-    }
+    }]
   }
 
   @RegisterSource(
     async input => typeof input === "string" && input.startsWith(OVERLAY_LAYER_PROTOCOL)
   )
   async processOverlayPath(source: string) {
-    const strippedSrc = source.replace(OVERLAY_LAYER_PROTOCOL, "")
-    this.routerSvc.setCustomRoute(OVERLAY_LAYER_KEY, strippedSrc)
-    const { cleanup, ...rest } = await this.#processInput(strippedSrc)
-    return {
-      ...rest,
-      cleanup: () => {
-        this.routerSvc.setCustomRoute(OVERLAY_LAYER_KEY, null)
-        cleanup()
+    const strippedSrcs = source.replace(OVERLAY_LAYER_PROTOCOL, "")
+    this.routerSvc.setCustomRoute(OVERLAY_LAYER_KEY, strippedSrcs)
+    const srcs = strippedSrcs.split(OVERLAY_LAYER_SEP)
+    const clonedSrcs = [...srcs]
+    const trimSrc = (src: string) => {
+      const idx = clonedSrcs.indexOf(src)
+      if (idx < 0) {
+        return clonedSrcs
       }
+      clonedSrcs.splice(idx, 1)
+      return clonedSrcs
     }
+    const allOutputs: ProcessorOutput[] = []
+    for (const src of srcs){
+      const outputs = await this.#processInput(src)
+      const fixedOutputs = outputs.map(({ cleanup, ...rest }) => {
+        return {
+          ...rest,
+          cleanup: () => {
+            cleanup()
+            const trimmedSrc = trimSrc(src)
+            const newKey = trimmedSrc.length === 0 ? null : trimmedSrc.join(OVERLAY_LAYER_SEP)
+            this.routerSvc.setCustomRoute(OVERLAY_LAYER_KEY, newKey)
+          }
+        }
+      })
+      allOutputs.push(...fixedOutputs)
+    }
+    return allOutputs
   }
   @RegisterSource(
     async input => typeof input === "string" && input.startsWith("nifti://")
   )
-  async processRemoteNii(source: string): Promise<ProcessorOutput>{
+  async processRemoteNii(source: string): Promise<ProcessorOutput[]>{
     const url = source.replace(/^nifti:\/\//, "")
     const defaultOpacity = 0.5
-    return {
+    return [{
       cleanup: noop,
       meta: {
         filename: source,
@@ -255,7 +275,7 @@ export class UserLayerService implements OnDestroy {
       },
       protocol: "nifti://",
       url
-    }
+    }]
   }
 
   @RegisterSource(
@@ -265,7 +285,7 @@ export class UserLayerService implements OnDestroy {
       // as well as fetching the affine
       && !input.startsWith("deepzoom://")
   )
-  async processPrecomputed(source: string): Promise<ProcessorOutput>{
+  async processPrecomputed(source: string): Promise<ProcessorOutput[]>{
     let protocol: ValidProtocol
     let url: string
     for (const proto of SUPPORTED_PREFIX){
@@ -286,7 +306,8 @@ export class UserLayerService implements OnDestroy {
       return await this.processSwcText(text, url, url)
     }
     
-    const { transform, meta } = await forkJoin({
+    const { info, transform, meta } = await forkJoin({
+      info: translateV3Entities.cFetch(`${url}/info`).then(res => res.json()),
       transform: translateV3Entities.cFetch(`${url}/transform.json`)
         .then(res => res.json() as Promise<MetaV1Schema["transform"]>)
         .catch(_e => null as MetaV1Schema["transform"]),
@@ -295,8 +316,10 @@ export class UserLayerService implements OnDestroy {
         .catch(_e => null as MetaV1Schema)  
       )
     }).toPromise()
+
+    const isSeg = info?.type === "segmentation"
     
-    return {
+    return [{
       cleanup: noop,
       meta: {
         filename: url
@@ -306,16 +329,17 @@ export class UserLayerService implements OnDestroy {
         transform: meta?.transform || transform,
         shader: getShaderFromMeta(meta),
         opacity: getOpacityFromMeta(meta),
+        type: isSeg ? "segmentation" : "image"
       },
       protocol,
       url
-    }
+    }]
   }
 
   @RegisterSource(
     async input => typeof input === "string" && input.startsWith("deepzoom://")
   )
-  async processDzi(source: string): Promise<ProcessorOutput> {
+  async processDzi(source: string): Promise<ProcessorOutput[]> {
     const url = source.replace("deepzoom://", "")
 
     let matrix = [
@@ -461,7 +485,7 @@ export class UserLayerService implements OnDestroy {
       messages.push(e.toString())
     }
     
-    return {
+    return [{
       cleanup: noop,
       meta: {
         filename: `deepzoom://${url}`,
@@ -496,7 +520,7 @@ export class UserLayerService implements OnDestroy {
       protocol: "deepzoom://",
       url,
       actions,
-    }
+    }]
   }
 
   @RegisterSource(async input => {
@@ -529,7 +553,7 @@ export class UserLayerService implements OnDestroy {
     }
     return false
   })
-  async processPCJson(file: File): Promise<ProcessorOutput>{
+  async processPCJson(file: File): Promise<ProcessorOutput[]>{
     const arr = JSON.parse(await file.text())
     const layers: AnnotationLayer[] = []
     for (const item of arr) {
@@ -563,7 +587,7 @@ export class UserLayerService implements OnDestroy {
     }
     // TODO also return a custom layer
     // so it can be shown in the overlay
-    return {
+    return [{
       cleanup: () => {
         for (const layer of layers){
           layer.dispose()
@@ -572,7 +596,7 @@ export class UserLayerService implements OnDestroy {
       meta: {
         filename: file.name,
       }
-    }
+    }]
   }
 
   @RegisterSource(async input => {
@@ -581,7 +605,7 @@ export class UserLayerService implements OnDestroy {
     }
     return false
   })
-  async processPtCld(file: File):  Promise<ProcessorOutput>{
+  async processPtCld(file: File):  Promise<ProcessorOutput[]>{
 
     const text = await file.text()
     
@@ -597,17 +621,17 @@ export class UserLayerService implements OnDestroy {
     
     // TODO also return a custom layer
     // so it can be shown in the overlay
-    return {
+    return [{
       cleanup: () => {
         layer.dispose()
       },
       meta: {
         filename: file.name,
       }
-    }
+    }]
   }
 
-  async #processInput(input: ValidInputTypes): Promise<ProcessorOutput> {
+  async #processInput(input: ValidInputTypes): Promise<ProcessorOutput[]> {
     for (const { matcher, processor } of SOURCE_PROCESSOR) {
       if (await matcher(input)) {
         return await processor.apply(this, [input])
@@ -621,15 +645,18 @@ export class UserLayerService implements OnDestroy {
 
   async handleUserInput(input: ValidInputTypes){
     try {
-      const output = await this.#processInput(input)
-      const { url, cleanup } = output
-      const id = url
-      if (this.#idToCleanup.has(id)) {
-        return
+      const outputs = await this.#processInput(input)
+      for (const output of outputs){
+
+        const { url, cleanup } = output
+        const id = url
+        if (this.#idToCleanup.has(id)) {
+          continue
+        }
+        this.#idToCleanup.set(id, cleanup)
+        this.#addLayer(output)
       }
-      this.#idToCleanup.set(id, cleanup)
-      this.#addLayer(output)
-      return
+      
     } catch (e) {
       this.snackbar.open(`Error opening file: ${e.toString()}`, "Dismiss")
     }
