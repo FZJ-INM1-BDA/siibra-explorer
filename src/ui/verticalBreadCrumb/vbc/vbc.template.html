@@ -21,7 +21,7 @@
                 </mat-panel-description>
             </mat-expansion-panel-header>
 
-            <div class="title-1-container sxplr-custom-cmp hoverable"
+            <div class="title-1-container sxplr-custom-cmp hoverable mat-elevation-z1"
                 mat-ripple
                 role="select"
                 [matTooltip]="view.labels.SELECTED_DIFFERENT_ATLAS"
@@ -66,7 +66,7 @@
 
             <!-- body -->
 
-            <div class="title-1-container sxplr-custom-cmp hoverable"
+            <div class="title-1-container sxplr-custom-cmp hoverable mat-elevation-z1"
                 mat-ripple
                 role="select"
                 [matTooltip]="view.labels.SELECTED_DIFFERENT_TEMPLATE"
@@ -161,7 +161,7 @@
 
             <div class="title-1-container">
 
-                <div class="title-1-container sxplr-custom-cmp hoverable"
+                <div class="title-1-container sxplr-custom-cmp hoverable mat-elevation-z1"
                     mat-ripple
                     role="select"
                     [matTooltip]="view.labels.SELECTED_DIFFERENT_PARCELLATION"
@@ -255,7 +255,7 @@
             <mat-divider></mat-divider>
 
             <ng-template [ngIf]="view.selectedRegions.length === 1">
-                <div class="title-1-container sxplr-custom-cmp hoverable" mat-ripple
+                <div class="title-1-container sxplr-custom-cmp hoverable mat-elevation-z1" mat-ripple
                     iav-stop="click"
                     [sxplr-dialog]="regionHierarchyTmpl"
                     [matTooltip]="view.labels.REGION_HIERARCHY"
@@ -278,7 +278,7 @@
             </ng-template>
             
             <ng-template [ngIf]="view.selectedRegions.length > 1">
-                <div class="title-1-container sxplr-custom-cmp hoverable">
+                <div class="title-1-container sxplr-custom-cmp hoverable mat-elevation-z1">
                     <h4>
                         Selected {{ view.selectedRegions.length }} areas
                     </h4>

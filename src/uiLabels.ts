@@ -21,7 +21,7 @@ export const enLabels = {
   CLEAR_OVERLAY: "clear overlay",
   
   COPY_REGION_NAMES: "copy selected region names",
-  COPY_CURRENT_POSITION: "copy the current position",
+  COPY_CURRENT_POSITION: "copy the current viewport",
   POSITION_ASSIGNMENT: "assignment of this position",
 
   SELECTED_DIFFERENT_ATLAS: "select a different atlas",
