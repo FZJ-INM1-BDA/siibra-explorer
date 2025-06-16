@@ -233,6 +233,15 @@ mat-accordion
             overflow: hidden;
             text-overflow: ellipsis;
         }
+
+        mat-panel-title.category-title
+        {
+            opacity: 0.5;
+            font-size: 85%;
+            // TODO if a button exist in the same row as title, margin-top auto messes up the
+            // layout. Fix then uncomment
+            // margin-top: auto;
+        }
     }
 }
 

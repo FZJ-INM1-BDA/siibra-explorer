@@ -30,6 +30,7 @@ import { PlotComponent } from "src/features/plotly/plot/plot.component";
 import { MediaQueryDirective } from "src/util/directives/mediaQuery.directive";
 import { AnnotationDirective } from "src/atlasComponents/annotations/annotation.directive";
 import { CurrentViewportToTextPipe } from "./pipes/currentViewPort.pipe";
+import { UserAnnotationsModule } from "src/atlasComponents/userAnnotations";
 
 @NgModule({
   imports: [
@@ -61,6 +62,7 @@ import { CurrentViewportToTextPipe } from "./pipes/currentViewPort.pipe";
     PlotComponent,
     MediaQueryDirective,
     AnnotationDirective,
+    UserAnnotationsModule,
   ],
   declarations: [
     VerticalBreadCrumbComponent,

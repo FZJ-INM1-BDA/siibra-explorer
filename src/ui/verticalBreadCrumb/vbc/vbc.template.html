@@ -8,13 +8,8 @@
             #atlasExpPanel="matExpansionPanel"
             hideToggle>
             <mat-expansion-panel-header>
-                <mat-panel-title>
-                    <ng-template [ngIf]="atlasExpPanel.expanded">
-                        Species
-                    </ng-template>
-                    <ng-template [ngIf]="!atlasExpPanel.expanded">
-                        <i class="pseudo-mat-icon fas fa-dna"></i>
-                    </ng-template>
+                <mat-panel-title class="category-title">
+                    Species
                 </mat-panel-title>
                 <mat-panel-description *ngIf="!atlasExpPanel.expanded">
                     {{ atlas.name }}
@@ -51,13 +46,8 @@
             #spaceExpPanel="matExpansionPanel"
             hideToggle>
             <mat-expansion-panel-header>
-                <mat-panel-title>
-                    <ng-template [ngIf]="spaceExpPanel.expanded">
-                        Space
-                    </ng-template>
-                    <ng-template [ngIf]="!spaceExpPanel.expanded">
-                        <mat-icon>view_in_ar</mat-icon>
-                    </ng-template>
+                <mat-panel-title class="category-title">
+                    Space
                 </mat-panel-title>
                 <mat-panel-description *ngIf="!spaceExpPanel.expanded">
                     {{ template.name }}
@@ -145,14 +135,8 @@
             #parcExpPanel="matExpansionPanel"
             hideToggle>
             <mat-expansion-panel-header>
-                <mat-panel-title>
-                    <ng-template [ngIf]="parcExpPanel.expanded">
-                        Reference Atlas
-                    </ng-template>
-                    <ng-template [ngIf]="!parcExpPanel.expanded">
-                        <mat-icon>account_tree</mat-icon>
-                    </ng-template>
-                    
+                <mat-panel-title class="category-title">
+                    Reference Atlas
                 </mat-panel-title>
                 <mat-panel-description *ngIf="!parcExpPanel.expanded">
                     {{ parcellation.name }}
@@ -225,14 +209,8 @@
             hideToggle>
             
             <mat-expansion-panel-header>
-                <mat-panel-title>
-                    <ng-template [ngIf]="selRegExpPanel.expanded">
-                        Brain Area
-                    </ng-template>
-                    <ng-template [ngIf]="!selRegExpPanel.expanded">
-                        <i class="pseudo-mat-icon fas fa-brain"></i>
-                    </ng-template>
-                    
+                <mat-panel-title class="category-title">
+                    Brain Area
                 </mat-panel-title>
                 
                 <mat-panel-description *ngIf="!selRegExpPanel.expanded">
@@ -278,15 +256,33 @@
             </ng-template>
             
             <ng-template [ngIf]="view.selectedRegions.length > 1">
-                <div class="title-1-container sxplr-custom-cmp hoverable mat-elevation-z1">
-                    <h4>
-                        Selected {{ view.selectedRegions.length }} areas
+                <div class="title-1-container sxplr-custom-cmp hoverable mat-elevation-z1" mat-ripple
+                    iav-stop="click"
+                    [sxplr-dialog]="regionHierarchyTmpl"
+                    [matTooltip]="view.labels.REGION_HIERARCHY"
+                    sxplr-dialog-size="xl">
+                    <h4 class="sxplr-d-flex sxplr-align-items-center">
+                        <span class="sxplr-flex-var">
+                            Selected {{ view.selectedRegions.length }} areas
+                        </span>
+                        <span class="sxplr-flex-static">
+                            <i class="fas fa-sitemap"></i>
+                        </span>
                     </h4>
                 </div>
                 
                 <mat-divider></mat-divider>
                 <ng-template [ngTemplateOutlet]="multipleRegionActionTmpl"></ng-template>
             </ng-template>
+        </mat-expansion-panel>
+
+        <mat-expansion-panel *ngIf="view.inAnnot.length > 0">
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                    Geometric Annotations
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+
         </mat-expansion-panel>
 
         <!-- point assignment -->
@@ -297,14 +293,8 @@
                 hideToggle>
                 
                 <mat-expansion-panel-header>
-                    <mat-panel-title>
-                        <ng-template [ngIf]="selPtExpPanel.expanded">
-                            Point Assignment
-                        </ng-template>
-                        <ng-template [ngIf]="!selPtExpPanel.expanded">
-                            <mat-icon>search</mat-icon>
-                        </ng-template>
-                        
+                    <mat-panel-title class="category-title">
+                        Point Assignment
                     </mat-panel-title>
                     
                     <mat-panel-description *ngIf="!selPtExpPanel.expanded">
@@ -424,20 +414,17 @@
                 }">
                 
                 <mat-expansion-panel-header>
-                    <mat-panel-title>
-                        <ng-template [ngIf]="selFtExpPanel.expanded">
-                            <ng-template [ngIf]="featureView.view$ | async" let-fView [ngIfElse]="fallbackTmpl">
-                                <ng-template [ngIf]="fView.category" let-category [ngIfElse]="fallbackTmpl">
-                                    {{ category }}
-                                </ng-template>
-                            </ng-template>
-                            <ng-template #fallbackTmpl>
-                                feature
+                    <mat-panel-title class="category-title">
+                        
+                        <ng-template [ngIf]="featureView.view$ | async" let-fView [ngIfElse]="fallbackTmpl">
+                            <ng-template [ngIf]="fView.category" let-category [ngIfElse]="fallbackTmpl">
+                                {{ category }}
                             </ng-template>
                         </ng-template>
-                        <ng-template [ngIf]="!selFtExpPanel.expanded">
-                            <mat-icon>menu_book</mat-icon>
+                        <ng-template #fallbackTmpl>
+                            feature
                         </ng-template>
+                        
                     </mat-panel-title>
                     
                     <mat-panel-description *ngIf="!selFtExpPanel.expanded">
@@ -596,15 +583,15 @@
                 [expanded]="true"
                 #customLExpPanel="matExpansionPanel">
                 <mat-expansion-panel-header>
-                    <mat-panel-title>
-                        <ng-template [ngIf]="!customLExpPanel.expanded">
-                            <ng-template [ngIf]="customLayer.source | isLocalBlob">
-                                <mat-icon>cloud_off</mat-icon>
-                            </ng-template>
-                            <ng-template [ngIf]="!(customLayer.source | isLocalBlob)">
-                                <mat-icon>cloud</mat-icon>
-                            </ng-template>
+                    <mat-panel-title class="category-title">
+
+                        <ng-template [ngIf]="customLayer.source | isLocalBlob">
+                            Local file
                         </ng-template>
+                        <ng-template [ngIf]="!(customLayer.source | isLocalBlob)">
+                            Remote file
+                        </ng-template>
+                        
                         <ng-template [ngIf]="customLExpPanel.expanded">
                             {{ customLayer?.meta?.filename || 'Custom Layer' }}
                         </ng-template>

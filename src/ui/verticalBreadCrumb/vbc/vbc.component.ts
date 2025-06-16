@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, inject, Inject, Output, ViewChild } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { BehaviorSubject, combineLatest, merge, Observable, of, Subject } from "rxjs";
-import { debounceTime, distinctUntilChanged, filter, map, switchMap, take, takeUntil, withLatestFrom } from "rxjs/operators";
+import { debounceTime, distinctUntilChanged, filter, map, startWith, switchMap, take, takeUntil, withLatestFrom } from "rxjs/operators";
 import { SAPI, IDS } from "src/atlasComponents/sapi";
 import { Feature, SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { FilterGroupedParcellationPipe, GroupedParcellation } from "src/atlasComponents/sapiViews/core/parcellation";
@@ -17,6 +17,8 @@ import { generalActionError } from "src/state/actions";
 import { MatExpansionPanel } from "@angular/material/expansion";
 import { arrayEqual } from "src/util/array";
 import { SXPLR_PREFIX } from "src/util/constants";
+import { ModularUserAnnotationToolService } from "src/atlasComponents/userAnnotations/tools/service";
+import { IAnnotationGeometry } from "src/atlasComponents/userAnnotations/tools/type";
 
 const pipe = new FilterGroupedParcellationPipe()
 
@@ -266,12 +268,26 @@ export class VerticalBreadCrumbComponent {
     })
   )
 
+  #annots$ = combineLatest([
+    this.annotSvc.spaceFilteredManagedAnnotations$.pipe(
+      startWith([] as IAnnotationGeometry[])
+    ),
+    this.annotSvc.otherSpaceManagedAnnotations$.pipe(
+      startWith([] as IAnnotationGeometry[])
+    ),
+  ]).pipe(
+    map(([ inAnnot, outAnnot ]) => ({
+      inAnnot, outAnnot
+    }))
+  )
+
   view$ = combineLatest([
     this.#allAtlases$,
     this.userSelection$,
     this.userSelectionDeducedState$,
     this.userPreferences$,
     this.atlasSelection$,
+    this.#annots$,
   ]).pipe(
     map(([
       atlases,
@@ -291,7 +307,8 @@ export class VerticalBreadCrumbComponent {
       },
       { useViewer },
       { labels, showExperimental, minimizedCards, parcellationVisible, maximizedCard, },
-      { zoom }]) => {
+      { zoom },
+      { inAnnot, outAnnot }]) => {
       
       const parentIds = new Set(allAvailableRegions.flatMap(v => v.parentIds))
 
@@ -301,7 +318,8 @@ export class VerticalBreadCrumbComponent {
         leafRegions: allAvailableRegions.filter(r => !parentIds.has(r.id)),
         branchRegions: allAvailableRegions.filter(r => parentIds.has(r.id)),
         debug: false,
-        zoom
+        zoom,
+        inAnnot, outAnnot
       }
     })
   )
@@ -309,6 +327,7 @@ export class VerticalBreadCrumbComponent {
   constructor(
     private store$: Store,
     private sapi: SAPI,
+    private annotSvc: ModularUserAnnotationToolService,
     @Inject(NEHUBA_CONFIG_SERVICE_TOKEN) private nehubaConfigSvc: NehubaConfigSvc,
   ){
     
