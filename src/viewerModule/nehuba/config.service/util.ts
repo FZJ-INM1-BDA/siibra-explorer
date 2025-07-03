@@ -187,6 +187,10 @@ export function getParcNgId(atlas: SxplrAtlas, tmpl: SxplrTemplate, parc: SxplrP
     return `_${MultiDimMap.GetKey(atlas.id, tmpl.id, parc.id, "whole brain")}`
   }
 
+  if (parc.id === IDS.PARCELLATION.JBABBV2) {
+    return `_${MultiDimMap.GetKey(atlas.id, tmpl.id, parc.id, region.name)}`
+  }
+
   if (!laterality) {
     return null
   }
