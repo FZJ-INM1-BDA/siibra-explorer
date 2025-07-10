@@ -74,7 +74,10 @@ jobs:
       SIIBRA_API_LATEST: 'https://siibra-api-latest.apps-dev.hbp.eu/v3_0'
 
       REGISTRY: ghcr.io
-      IMAGE_NAME: ${{ github.repository }}
+
+      # https://github.com/orgs/community/discussions/10553#discussioncomment-10538593
+      # IMAGE_NAME: ${{ github.repository }}
+      IMAGE_NAME: fzj-inm1-bda/siibra-explorer
 
     steps:
     - uses: actions/checkout@v4
