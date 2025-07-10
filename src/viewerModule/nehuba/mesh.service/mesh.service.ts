@@ -5,7 +5,7 @@ import { map, switchMap } from "rxjs/operators";
 import { IMeshesToLoad } from '../constants'
 import { selectorAuxMeshes } from "../store";
 import { LayerCtrlEffects } from "../layerCtrl.service/layerCtrl.effects";
-import { atlasSelection } from "src/state";
+import { atlasAppearance, atlasSelection } from "src/state";
 import { BaseService } from "../base.service/base.service";
 import { IDS } from "src/atlasComponents/sapi"
 
@@ -132,15 +132,21 @@ export class NehubaMeshService implements OnDestroy {
     ),
     this.store$.pipe(
       select(atlasSelection.selectors.selectedParcellation)
+    ),
+    this.store$.pipe(
+      select(atlasAppearance.selectors.showAllSegMeshes)
     )
   ]).pipe(
-    switchMap(([ allSegMesh, selectedSegMesh, auxmesh, selectedTemplate, selectedParcellation ]) => {
+    switchMap(([ allSegMesh, selectedSegMesh, auxmesh, selectedTemplate, selectedParcellation, showAllMeshes ]) => {
       /**
        * TODO monkey patching jba29 in colin to show all meshes
        * 
        */
       if ((selectedParcellation.id === IDS.PARCELLATION.JBA29 || IDS.PARCELLATION.JBA30 === selectedParcellation.id) && selectedTemplate.id === IDS.TEMPLATES.COLIN27) {
         return of(...allSegMesh)
+      }
+      if (showAllMeshes) {
+        return of(...auxmesh, ...allSegMesh)
       }
       const hasSegSelected = selectedSegMesh.some(v => v.labelIndicies.length !== 0)
       const hasAuxMesh = auxmesh.length > 0

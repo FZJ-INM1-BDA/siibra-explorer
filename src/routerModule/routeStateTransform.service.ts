@@ -22,6 +22,7 @@ type ViewerConfigState = {
 
 type ViewerCfgStateV2 = {
   auxMeshAlpha: number
+  showAllSegMeshes: boolean
 } & ViewerConfigState
 
 const PANEL_MODE_DICT: Record<userInterface.PanelMode, number> = {
@@ -48,7 +49,8 @@ const decodeMiscState = {
       panelMode: "FOUR_PANEL",
       panelOrder: "0123",
       showDelineation: true,
-      auxMeshAlpha: 1.0
+      auxMeshAlpha: 1.0,
+      showAllSegMeshes: false,
     }
     if (!encodedVal) {
       return returnVal
@@ -76,12 +78,14 @@ const decodeMiscState = {
     }
     returnVal.panelOrder = panelOrder
 
-    const [ octantRemoval, showDelineation ] = decodeBool(array[2])
+    const [ octantRemoval, showDelineation, showAllSegMeshes ] = decodeBool(array[2])
     returnVal.octantRemoval = octantRemoval
 
     // this is to fix the v1 implementation where the showdelineation is accidentally flipped
     // see https://github.com/FZJ-INM1-BDA/siibra-explorer/blob/b38e7948fc1c3e36f219aaa12c64726b34b5e132/src/routerModule/routeStateTransform.service.ts#L369
     returnVal.showDelineation = !showDelineation
+
+    returnVal.showAllSegMeshes = showAllSegMeshes
     
     return returnVal
   },
@@ -297,15 +301,16 @@ export class RouteStateTransformSvc {
     const viewerConfigState = returnObj['vs'] && returnObj['vs'][0]
     if (viewerConfigState) {
 
-      const { panelMode, panelOrder, showDelineation, octantRemoval, auxMeshAlpha } = !!viewerConfigState
+      const { panelMode, panelOrder, showDelineation, octantRemoval, auxMeshAlpha, showAllSegMeshes } = !!viewerConfigState
       ? this.decodeMiscState(viewerConfigState)
-      : { panelMode: "FOUR_PANEL" as const, panelOrder: "0123", showDelineation: true, octantRemoval: true, auxMeshAlpha: 1.0 }
+      : { panelMode: "FOUR_PANEL" as const, panelOrder: "0123", showDelineation: true, octantRemoval: true, auxMeshAlpha: 1.0, showAllSegMeshes: false }
       returnState['[state.ui]'].panelMode = panelMode
       returnState['[state.ui]'].panelOrder = panelOrder
 
       returnState["[state.atlasAppearance]"].showDelineation = showDelineation
       returnState["[state.atlasAppearance]"].octantRemoval = octantRemoval  
       returnState["[state.atlasAppearance]"].meshTransparency = auxMeshAlpha
+      returnState["[state.atlasAppearance]"].showAllSegMeshes = showAllSegMeshes
   
     }
     // pluginState should always be defined, regardless if standalone volume or not
@@ -381,12 +386,12 @@ export class RouteStateTransformSvc {
 
   @CachedFunction({
     serialization: (config: ViewerCfgStateV2) => {
-      const { auxMeshAlpha, octantRemoval, panelMode, panelOrder, showDelineation } = config
-      return `${auxMeshAlpha}.${octantRemoval}.${panelMode}.${panelOrder}.${showDelineation}`
+      const { auxMeshAlpha, octantRemoval, panelMode, panelOrder, showDelineation, showAllSegMeshes } = config
+      return `${auxMeshAlpha}.${octantRemoval}.${panelMode}.${panelOrder}.${showDelineation}.${showAllSegMeshes}`
     }
   })
   encodeMiscState(config: ViewerCfgStateV2): string {
-    const { panelMode, panelOrder, octantRemoval, showDelineation, auxMeshAlpha } = config
+    const { panelMode, panelOrder, octantRemoval, showDelineation, auxMeshAlpha, showAllSegMeshes } = config
     let panelModeVal = 1
     if (panelMode) {
       panelModeVal = PANEL_MODE_DICT[panelMode]
@@ -408,7 +413,7 @@ export class RouteStateTransformSvc {
       panelOrderVal += v
     }
     const meshAlpha = auxMeshAlpha * 255
-    const encodedBools = encodeBool(octantRemoval, showDelineation)
+    const encodedBools = encodeBool(octantRemoval, showDelineation, showAllSegMeshes)
     const array = new Uint8Array([
       meshAlpha,
       panelModeVal,
@@ -455,6 +460,7 @@ export class RouteStateTransformSvc {
     const octantRemoval = atlasAppearance.selectors.octantRemoval(state)
     const showDelineation = atlasAppearance.selectors.showDelineation(state)
     const auxMeshAlpha = atlasAppearance.selectors.meshTransparency(state)
+    const showAllSegMeshes = atlasAppearance.selectors.showAllSegMeshes(state)
 
     const searchParam = new URLSearchParams()
   
@@ -496,7 +502,7 @@ export class RouteStateTransformSvc {
           )
         )
       })(),
-      vs: this.encodeMiscState({ octantRemoval, panelMode, panelOrder, showDelineation, auxMeshAlpha })
+      vs: this.encodeMiscState({ octantRemoval, panelMode, panelOrder, showDelineation, auxMeshAlpha, showAllSegMeshes })
     }
   
     /**

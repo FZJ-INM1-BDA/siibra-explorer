@@ -29,12 +29,16 @@ export class ViewerCtrlCmp implements OnInit{
     ),
     this.store$.pipe(
       select(atlasAppearance.selectors.octantRemoval)
+    ),
+    this.store$.pipe(
+      select(atlasAppearance.selectors.showAllSegMeshes)
     )
   ]).pipe(
-    map(([ auxTransparent, octantRemoved ]) => {
+    map(([ auxTransparent, octantRemoved, showAllMeshes ]) => {
       return {
         auxTransparent,
         octantRemoved,
+        showAllMeshes,
         CONST
       }
     })
@@ -43,6 +47,12 @@ export class ViewerCtrlCmp implements OnInit{
   toggleAux(){
     this.store$.dispatch(
       atlasAppearance.actions.toggleMeshTransparency()
+    )
+  }
+
+  setShowAllMeshes(flag: boolean){
+    this.store$.dispatch(
+      atlasAppearance.actions.setShowAllSegMeshes({ flag })
     )
   }
 

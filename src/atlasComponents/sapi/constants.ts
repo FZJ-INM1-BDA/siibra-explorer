@@ -20,6 +20,7 @@ export const IDS = {
     CORTICAL_LAYERS: "juelich/iav/atlas/v1.0.0/3",
     MEBRAINS: "minds/core/parcellationatlas/v1.0.0/e3235c039c6f54c3ba151568c829f117",
     JBABBV2: "jba-bb-v2",
+    SULCI: "atlas-humansulci",
   }
 }
 
