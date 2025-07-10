@@ -1,4 +1,4 @@
-FROM node:16 as builder
+FROM node:16 AS builder
 
 ARG BACKEND_URL
 ENV BACKEND_URL=${BACKEND_URL}
