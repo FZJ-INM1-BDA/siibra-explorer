@@ -140,6 +140,7 @@ describe("> routeStateTransform.service.ts", () => {
           store.overrideSelector(atlasAppearance.selectors.octantRemoval, false)
           store.overrideSelector(atlasAppearance.selectors.showDelineation, true)
           store.overrideSelector(atlasAppearance.selectors.meshTransparency, 1.0)
+          store.overrideSelector(atlasAppearance.selectors.showAllSegMeshes, false)
         })
 
         afterEach(() => {
