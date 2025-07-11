@@ -111,8 +111,7 @@ export class PointAssignmentDirective implements OnDestroy, OnInit{
   point$ = new BehaviorSubject<TSandsPoint>(null)
   @Input()
   set point(val: TSandsPoint|TFace) {
-    const { '@type': type } = val
-    if (type === "siibra-explorer/surface/face") {
+    if (val?.["@type"] === "siibra-explorer/surface/face") {
       return
     }
     this.point$.next(val)

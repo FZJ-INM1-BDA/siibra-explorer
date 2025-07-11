@@ -2,6 +2,10 @@
     <div *ngIf="tpbr.template">
         {{ tpbr.template.name }}
     </div>
+
+    <div *ngIf="tpbr.pointStr">
+        Located at: {{ tpbr.pointStr }}
+    </div>
     
     <ng-template [ngIf]="tpbr.bboxStringAlt" let-alt>
         <div>

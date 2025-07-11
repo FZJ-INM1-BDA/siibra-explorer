@@ -309,6 +309,30 @@
 
       <!-- volumetric i.e. nehuba -->
       <ng-container *ngSwitchCase="'nehuba'">
+        <ng-template sxplrExperimentalFlag [experimental]="true">
+        <mat-card>
+          <mat-card-header>
+            <mat-card-title>
+              {{ context.payload.mouse.real | nmToMm | numbers | addUnitAndJoin : '' }} (mm)
+            </mat-card-title>
+            <mat-card-subtitle>
+              Point in {{ data.metadata.template.name }}
+            </mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-actions>
+            <button mat-icon-button
+              matTooltip="Check the assignment of this point in the current reference atlas"
+              (click)="selectPoint({ point: context.payload.mouse.real }, data.metadata.template)">
+              <mat-icon>search</mat-icon>
+            </button>
+            <button mat-icon-button>
+              <mat-icon>bookmark</mat-icon>
+            </button>
+          </mat-card-actions>
+        </mat-card>
+        </ng-template>
+
+        <ng-template sxplrExperimentalFlag [deprecated]="true">
         <mat-action-list class="sxplr-p-0">
           <button mat-list-item
             (click)="selectPoint({ point: context.payload.mouse.real }, data.metadata.template)">
@@ -328,6 +352,7 @@
             </span>
           </button>
         </mat-action-list>
+        </ng-template>
 
       </ng-container>
 

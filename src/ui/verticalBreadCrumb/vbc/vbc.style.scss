@@ -8,6 +8,7 @@
 .vbc-row
 {
     display: flex;
+    align-items: center;
 
     &> .vbc-row-fixed
     {
@@ -17,6 +18,20 @@
     {
         flex: 1 1 0px;
     }
+}
+
+mat-divider.panel-divider
+{
+    margin: 0 -4rem;
+}
+
+.list-hover-icon-container
+{
+    height: 0;
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    transform: translateY(-2rem);
 }
 
 div.vbc-card-container.vbc-hidden
@@ -250,7 +265,7 @@ mat-accordion
     display: flex;
     align-items: center;
 
-    h4
+    h4,h5
     {
         flex: 1 1 0;
     }
@@ -259,6 +274,13 @@ mat-accordion
         flex: 0 0 auto;
     }
 }
+
+.title-2-container
+{
+    display: flex;
+    flex-direction: column;
+}
+
 
 .disabled-button-container
 {

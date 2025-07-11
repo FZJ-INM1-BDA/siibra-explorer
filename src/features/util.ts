@@ -9,6 +9,7 @@ export type TPRB = {
   parcellation?: SxplrParcellation
   region?: SxplrRegion
   bbox?: BBox
+  point?: number[]
 }
 
 export type FeatureConcept = {

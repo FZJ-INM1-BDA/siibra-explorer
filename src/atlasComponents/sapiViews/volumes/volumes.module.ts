@@ -12,11 +12,14 @@ import { ShareModule } from 'src/share';
 import { PointAssignmentDirective } from './point-assignment.directive';
 import { SimpleAssignmentView } from './assignment-views/simple/assignment-view-simple.component';
 import { FullAssignmentView } from './assignment-views/full/assignment-view-full.component';
+import { PointAssignmentFull } from './point-assignment-full/point-assignment-full.component';
+import { TPBRViewCmp } from 'src/features/TPBRView/TPBRView.component';
 
 
 @NgModule({
   declarations: [
     PointAssignmentComponent,
+    PointAssignmentFull,
     SandsToNumPipe,
     PointAssignmentDirective,
   ],
@@ -31,9 +34,11 @@ import { FullAssignmentView } from './assignment-views/full/assignment-view-full
     ShareModule,
     SimpleAssignmentView,
     FullAssignmentView,
+    TPBRViewCmp,
   ],
   exports: [
     PointAssignmentComponent,
+    PointAssignmentFull,
     SandsToNumPipe,
     PointAssignmentDirective,
   ]

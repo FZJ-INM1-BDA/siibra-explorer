@@ -657,10 +657,6 @@ export class VerticalBreadCrumbComponent {
         }
       })
     )
-
-    if (this.ptAsgmtExpPanel) {
-      this.ptAsgmtExpPanel.open()
-    }
   }
 
   public isActive<T extends SxplrAtlas|SxplrTemplate|SxplrParcellation>(current: T) {

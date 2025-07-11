@@ -432,7 +432,7 @@ export class UserLayerService implements OnDestroy {
         [...Array.from(m0), 0],
         [...Array.from(m1), 0],
         [...Array.from(m2), 0],
-        [...Array.from(m3), 0],
+        [...Array.from(m3), 1],
       ] as number[][]
       const m = mat4.fromValues(..._m.flatMap(v => v))
       const voxelDimension = Array.from(vec3.multiply(vec3.create(), [width, height, 1], voxelSizes)) as number[]

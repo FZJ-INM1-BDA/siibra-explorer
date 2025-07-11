@@ -1,0 +1,31 @@
+<h2 mat-dialog-title>Assignment</h2>
+
+<tpbr-viewer
+    [tpbr-concept]="{
+        template: template$ | async,
+        parcellation: parcellation$ | async,
+        point: (point$ | async | sandsToNum).coords
+    }">
+</tpbr-viewer>
+
+<ng-template [ngIf]="busy$ | async">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+</ng-template>
+
+<mat-dialog-content>
+    <sxplr-assignment-view-full
+        (clickOnRegionName)="handleClickRegionName($event.target, $event.event.ctrlKey)"
+        [result]="df$ | async">
+    </sxplr-assignment-view-full>
+</mat-dialog-content>
+<mat-dialog-actions align="center">
+    <button mat-raised-button color="primary"
+        [zip-files-output]="zipfileConfig$ | async"
+        zip-files-output-zip-filename="pointassignment.zip">
+        <i class="fas fa-download"></i>
+        <span>
+            Download CSV
+        </span>
+    </button>
+    <button mat-button mat-dialog-close>Close</button>
+</mat-dialog-actions>

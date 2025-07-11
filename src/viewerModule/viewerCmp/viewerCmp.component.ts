@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, TemplateRef, ViewChild, inject } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { BehaviorSubject, combineLatest, Observable, of } from "rxjs";
-import { debounceTime, distinctUntilChanged, map, shareReplay, switchMap, take, takeUntil } from "rxjs/operators";
+import { debounceTime, distinctUntilChanged, filter, map, shareReplay, switchMap, take, takeUntil, withLatestFrom } from "rxjs/operators";
 import { CONST, ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
 import { IQuickTourData } from "src/ui/quickTour";
 import { EnumViewerEvt, TViewerEvtCtxData, TViewerEvent } from "../viewer.interface";
@@ -19,7 +19,9 @@ import { generalActionError } from "src/state/actions";
 import { enLabels } from "src/uiLabels";
 import { UserLayerService } from "../nehuba/userLayers/service";
 import { TFileInputEvent } from "src/getFileInput/type";
-import { MatSnackBar } from "src/sharedModules";
+import { MatDialog, MatSnackBar } from "src/sharedModules";
+import { ModularUserAnnotationToolService } from "src/atlasComponents/userAnnotations/tools/service";
+import { PointAssignmentFull } from "src/atlasComponents/sapiViews/volumes/point-assignment-full/point-assignment-full.component";
 
 interface HasName {
   name: string
@@ -227,6 +229,8 @@ export class ViewerCmp {
     private sapi: SAPI,
     private snackbar: MatSnackBar,
     private userLayerSvc: UserLayerService,
+    private userAnnotSvc: ModularUserAnnotationToolService,
+    private dialog: MatDialog,
   ){
 
     this.view$.pipe(
@@ -283,6 +287,29 @@ export class ViewerCmp {
     ).subscribe(
       t => this.templateSelected = t
     )
+
+
+    this.#selectedPoint$.pipe(
+      takeUntil(this.destroy$),
+      filter(point => !!point),
+      withLatestFrom(
+        this.store$.pipe(
+          atlasSelection.fromRootStore.distinctATP()
+        )
+      )
+    ).subscribe(([point, { template, parcellation }]) => {
+      const ref = this.dialog.open(PointAssignmentFull, {
+        data: {
+          point, template, parcellation
+        }
+      })
+
+      ref.afterClosed().subscribe(() => {
+        this.store$.dispatch(
+          atlasSelection.actions.clearSelectedPoint()
+        )
+      })
+    })
 
     combineLatest([
       this.templateSelected$,
