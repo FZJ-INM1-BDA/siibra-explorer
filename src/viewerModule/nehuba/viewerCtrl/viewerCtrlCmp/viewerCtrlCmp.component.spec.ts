@@ -84,6 +84,8 @@ describe('> viewerCtrlCmp.component.ts', () => {
       mockStore.overrideSelector(atlasAppearance.selectors.octantRemoval, true)
       mockStore.overrideSelector(atlasAppearance.selectors.meshTransparency, 1)
       mockStore.overrideSelector(userPreference.selectors.showExperimental, true)
+      
+      mockStore.overrideSelector(atlasAppearance.selectors.showAllSegMeshes, false)
       mockStore.overrideSelector(selectorAuxMeshes, [])
     })
 

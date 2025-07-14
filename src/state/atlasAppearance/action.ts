@@ -54,3 +54,10 @@ export const setUseViewer = createAction(
     viewer: UseViewer
   }>()
 )
+
+export const setShowAllSegMeshes = createAction(
+  `[${nameSpace}] setShowAllMeshes`,
+  props<{
+    flag: boolean
+  }>()
+)

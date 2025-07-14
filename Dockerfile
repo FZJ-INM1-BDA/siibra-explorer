@@ -1,10 +1,10 @@
-FROM node:16 as builder
+FROM node:16 AS builder
 
 ARG BACKEND_URL
 ENV BACKEND_URL=${BACKEND_URL}
 
 ARG SIIBRA_API_ENDPOINTS
-ENV SIIBRA_API_ENDPOINTS=${SIIBRA_API_ENDPOINTS:-https://siibra-api-stable.apps.hbp.eu/v3_0,https://siibra-api-prod.apps.tc.humanbrainproject.eu/v3_0}
+ENV SIIBRA_API_ENDPOINTS=${SIIBRA_API_ENDPOINTS:-https://siibra-api-stable.apps.hbp.eu/v3_0,https://siibra-api.apps.ebrains.eu/v3_0}
 
 ARG STRICT_LOCAL
 ENV STRICT_LOCAL=${STRICT_LOCAL:-false}

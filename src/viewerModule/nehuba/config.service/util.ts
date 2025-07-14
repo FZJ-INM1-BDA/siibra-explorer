@@ -172,6 +172,7 @@ export function getParcNgId(atlas: SxplrAtlas, tmpl: SxplrTemplate, parc: SxplrP
   let laterality: string = "whole brain"
   if (region.name.indexOf("left") >= 0) laterality = "left hemisphere"
   if (region.name.indexOf("right") >= 0) laterality = "right hemisphere"
+  if (parc.id === IDS.PARCELLATION.SULCI) laterality = "whole brain"
 
   /**
    * for JBA29 in big brain, there exist several volumes. (e.g. v1, v2, v5, interpolated, etc)
@@ -185,6 +186,10 @@ export function getParcNgId(atlas: SxplrAtlas, tmpl: SxplrTemplate, parc: SxplrP
 
   if (parc.id === IDS.PARCELLATION.JBA30 && tmpl.id !== IDS.TEMPLATES.FSAVERAGE) {
     return `_${MultiDimMap.GetKey(atlas.id, tmpl.id, parc.id, "whole brain")}`
+  }
+
+  if (parc.id === IDS.PARCELLATION.JBABBV2) {
+    return `_${MultiDimMap.GetKey(atlas.id, tmpl.id, parc.id, region.name)}`
   }
 
   if (!laterality) {
