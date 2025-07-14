@@ -132,6 +132,7 @@ jobs:
         context: .
         push: true
         tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.BRANCH_NAME }}
+        no-cache: true
         build-args: |
           BUILD_HASH=${{ env.GIT_DIGEST }}
           MATOMO_URL=${{ env.MATOMO_URL }}
