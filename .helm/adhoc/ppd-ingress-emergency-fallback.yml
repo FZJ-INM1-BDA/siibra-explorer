@@ -46,6 +46,13 @@ spec:
             name: prod-siibra-explorer
             port: 
               number: 8080
+      - pathType: Prefix
+        path: "/viewer-dev"
+        backend:
+          service:
+            name: dev-siibra-explorer
+            port: 
+              number: 8080
   tls:
   - secretName: sxplr-ppd-emergency-fallback-secret
     hosts:
