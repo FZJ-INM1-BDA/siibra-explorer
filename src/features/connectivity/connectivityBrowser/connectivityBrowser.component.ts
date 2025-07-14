@@ -14,6 +14,7 @@ import { PathReturn } from "src/atlasComponents/sapi/typeV3";
 import { arrayEqual } from "src/util/array";
 import { switchMapWaitFor } from "src/util/fn";
 import { DestroyDirective } from "src/util/directives/destroy.directive";
+import { CONST } from "common/constants"
 
 type PathParam = DS['value'][number]
 type ConnFeat = PathReturn<"/feature/RegionalConnectivity/{feature_id}">
@@ -27,6 +28,8 @@ type ConnFeat = PathReturn<"/feature/RegionalConnectivity/{feature_id}">
   ]
 })
 export class ConnectivityBrowserComponent implements OnChanges {
+
+  CONST = CONST
 
   #destroy$ = inject(DestroyDirective).destroyed$
 

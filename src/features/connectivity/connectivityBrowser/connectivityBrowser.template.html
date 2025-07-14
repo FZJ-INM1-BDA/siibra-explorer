@@ -104,10 +104,12 @@
             <ng-template [ngIf]="view$ | async | getProperty : 'connections'" let-conn
                 [ngIfElse]="noConnTmpl">
                 <div class="d-flex align-items-center">
-                    <form [formGroup]="displayForm">
+                    <form [formGroup]="displayForm"
+                        [matTooltip]="log10CheckBox.disabled ? CONST.LOG_10_DISABLED : null">
                         <mat-checkbox
                             class="mr-2"
-                            formControlName="logChecked">
+                            formControlName="logChecked"
+                            #log10CheckBox="matCheckbox">
                             Log 10
                         </mat-checkbox>
                     </form>
