@@ -1,216 +1,217 @@
-import { DataSource } from "@angular/cdk/collections"
-import { BehaviorSubject, Observable, ReplaySubject, Subscription, concat, of, timer } from "rxjs"
-import { finalize, map, scan, shareReplay, startWith, tap } from "rxjs/operators"
-import { cachedPromise } from "./fn"
+import { CollectionViewer, DataSource } from "@angular/cdk/collections"
+import { BehaviorSubject, Observable, Subscription, combineLatest, concat, from } from "rxjs"
+import { map, shareReplay, switchMap, take } from "rxjs/operators"
+import { waitFor } from "./fn"
 
-export interface IPuller<T> {
-  next: (cb: (val: T) => void) => void
-  complete: (cb: () => void) => void
+interface NPaginatedArg<T> {
+  getPage: (pageNo: number) => Promise<T[]>
+  perPage: number
+  init: () => Promise<void>
 }
 
-interface PaginatedArg<T> {
-  pull?: () => Promise<T[]>
-  children?: PulledDataSource<T>[]
-  annotations?: Record<string, string>
-  serialize?: (a: T) => string
-}
-
-export class IsAlreadyPulling extends Error {}
-export class DsExhausted extends Error {}
-
-
-/**
- * Modifed Datasource
- * Allowing pull driven datasource
- * With backwards compatibility with original datasource.
- */
-export class PulledDataSource<T> extends DataSource<T> {
-
-  protected annotations: Record<string, string>
-
-  #pull: () => Promise<T[]>
+export class CustomDataSource<T> extends DataSource<T> {
   
-  completed = false
-  private _data = new ReplaySubject<T[]>()
-  data$ = this._data.pipe(
-    startWith([] as T[]),
-    scan((acc, curr) => [...acc, ...curr]),
-    tap((v: T[]) => {
-      this.currentValue = v
-    }),
-    shareReplay(1)
-  )
+  #cachedResult: T[] = []
+  #fetchedPages = new Set()
+  initFlag = false
 
-
-  currentValue: T[] = []
-  finalValue: T[] = []
-
-  protected _isPulling = false
-  protected _isPulling$ = new BehaviorSubject<boolean>(false)
-  isPulling$ = this._isPulling$.pipe(
-    shareReplay(1)
-  )
-  set isPulling(val: boolean) {
-    this._isPulling = val
-    this._isPulling$.next(val)
+  total$ = new BehaviorSubject(0)
+  #total = 0
+  get total(){
+    return this.#total
   }
-  get isPulling(){
-    return this._isPulling
+  set total(val: number) {
+    if (val === this.#total) {
+      return
+    }
+    this.#total = val
+    this.total$.next(val)
+    this.#cachedResult = Array.from({ length: this.#total })
+    this.#fetchedPages.clear()
   }
 
-  @cachedPromise()
-  async pull(): Promise<T[]> {
-    if (this.completed) {
-      throw new DsExhausted()
+  #getPage: (page: number) => Promise<T[]>
+  #perPage = 50
+  #subscription = new Subscription()
+  constructor(arg?: NPaginatedArg<T>){
+    super()
+    const { getPage, perPage, init } = arg || { init: async () => null }
+    let missingParam = true
+    if (getPage && perPage) {
+      this.#getPage = getPage
+      this.#perPage = perPage
+      missingParam = false
     }
-    if (this.isPulling) {
-      throw new IsAlreadyPulling(`PulledDataSource is already pulling`)
-    }
+    this.isBusy$.next(true)
+    init().then(() => {
+      this.initFlag = true
+      this.isBusy$.next(false)
+    })
 
-    if (!this.#pull) {
+    if (missingParam) {
+      throw new Error(`getRange or (getPage && perPage) method must be provided for PulledDataSource`)
+    }
+  }
+  #datastream = new BehaviorSubject<T[]>(this.#cachedResult)
+  isBusy$ = new BehaviorSubject(false)
+  connect(collectionViewer: CollectionViewer): Observable<readonly T[]> {
+    this.#subscription.add(
+      collectionViewer.viewChange.subscribe(async ({ start, end }) => {
+        if (start === end) {
+          return
+        }
+        const [sp, ep] = this.#getPageNos(start, end)
+        for (let i = sp; i <= ep; i ++){
+          this.#execGetPage(i)
+        }
+      })
+    )
+    return this.#datastream
+  }
+  disconnect(): void {
+    this.#subscription.unsubscribe()
+  }
+
+  #getPageNos(start: number, end: number){
+    if (end <= start) {
+      throw new Error(`end must be > start, but ${end} <= ${start}`)
+    }
+    const startPage = Math.floor(start / this.#perPage) + 1
+    const endPage = Math.floor((end - 1) / this.#perPage) + 1
+    return [startPage, endPage]
+  }
+
+  async #execGetPage(page: number) {
+
+    if (this.#fetchedPages.has(page)) {
+      return
+    }
+    this.isBusy$.next(true)
+    const items = await this.#getPage(page)
+
+    // total must be set before this
+    // give caller a chance to set total
+    this.#cachedResult.splice(
+      (page - 1) * this.#perPage,
+      this.#perPage,
+      ...items
+    )
+    this.#datastream.next(this.#cachedResult)
+    this.#fetchedPages.add(page)
+    this.isBusy$.next(false)
+  }
+
+  pullAll(){
+    const totalPagae = Math.ceil(this.total / this.#perPage)
+    for (let i = 1; i <=totalPagae; i++ ){
+      this.#execGetPage(i)
+    }
+    return this.#datastream
+  }
+
+  async getRange(start: number, end: number){
+    if (start === end) {
       return []
     }
-    this.isPulling = true
-    let newResults = []
-    try {
-      newResults = await this.#pull()
-    } catch (e) {
-      console.error("Pulling failed", e)
-    } finally {
-      this.isPulling = false
+    const [sp, ep] = this.#getPageNos(start, end)
+    const allPr: Promise<void>[] = []
+    for (let i = sp; i <= ep; i ++){
+      allPr.push(
+        this.#execGetPage(i)
+      )
     }
-    if (newResults.length === 0) {
-      this.complete()
-    }
-    this._data.next(newResults)
-    return newResults
+    await Promise.all(allPr)
+    return this.#cachedResult.slice(start, end)
   }
-
-  constructor(arg?: PaginatedArg<T>){
-    super()
-    const { pull, annotations } = arg || {}
-    if (!pull) {
-      throw new Error(`pull method must be provided for PulledDataSource`)
-    }
-    this.#pull = pull
-    this.annotations = annotations
-    
-  }
-
-  connect(): Observable<readonly T[]> {
-    return this.data$
-  }
-  complete() {
-    this.completed = true
-    // must assign final value synchronously
-    this.finalValue = this.currentValue || []
-    this._data.complete()
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  disconnect(): void {}
 }
 
-export class ParentDatasource<T> extends PulledDataSource<T> {
-
-  private _data$ = new BehaviorSubject<T[]>([])
-  data$ = this._data$.pipe(
+export class ParentCustomDataSource<T> extends DataSource<T> {
+  #datastream = new BehaviorSubject<T[]>([])
+  #subscription = new Subscription()
+  total = 0
+  initFlag = false
+  total$ = combineLatest(
+    this.children.map(c => c.total$),
+  ).pipe(
+    map(values => values.reduce((acc, curr) => acc + curr, 0)),
     shareReplay(1),
-    map(v => {
-      if (!this.#serialize) {
-        return v
-      }
-      const seen = new Set()
-      const returnVal: T[] = []
-      for (const item of v){
-        const key = this.#serialize(item)
-        const hasSeen = seen.has(key)
-        if (!hasSeen) {
-          returnVal.push(item)
-        }
-        seen.add(key)
-      }
-      return returnVal
-    })
   )
-  
-  #serialize: (a: T) => string
-
-  #subscriptions: Subscription[] = []
-  _children: PulledDataSource<T>[] = []
-  constructor(arg: PaginatedArg<T>){
-    super({ pull: async () => [], annotations: arg.annotations })
-    const { children, serialize } = arg
-    this._children = children
-    this.#serialize = serialize
+  isBusy$ = combineLatest(this.children.map(c => c.isBusy$)).pipe(
+    map(flags => flags.some(f => f))
+  )
+  constructor(private children: CustomDataSource<T>[]){
+    super()
+    this.init()
   }
+  connect(collectionViewer: CollectionViewer): Observable<readonly T[]> {
+    this.#subscription.add(
+      collectionViewer.viewChange.subscribe(async range => {
+        const { start, end } = range
+        await waitFor(() => this.children.every(c => c.initFlag))
 
-  set isPulling(val: boolean){
-    throw new Error(`Cannot set isPulling for parent pullable`)
-  }
-  get isPulling(){
-    return this._children.some(c => c.isPulling)
-  }
+        const data = Array.from<T>({ length: this.total })
+        let seekIndex = start
+        let currIndex = 0
+        let breakflag = false
 
-  @cachedPromise()
-  async pull() {
-    for (const ds of this._children) {
-      if (!ds.completed) {
-        return await ds.pull()
-      }
-    }
-    throw new DsExhausted()
+        for (const c of this.children){
+          if (breakflag) {
+            continue
+          }
+          if ((currIndex + c.total) < seekIndex ) {
+            currIndex += c.total
+            continue
+          }
+
+          const startIdx = seekIndex - currIndex
+          let endIdx = end - currIndex
+          if (endIdx <= c.total) {
+            breakflag = true
+          } else {
+            endIdx = c.total
+          }
+
+          const insertIdx = seekIndex
+          const deleteCount = endIdx - startIdx
+
+          
+          c.getRange(
+            startIdx,
+            endIdx
+          ).then(arr => {
+            data.splice(insertIdx, deleteCount, ...arr)
+            console.log("emit", data)
+            this.#datastream.next(data)
+          })
+
+          currIndex += c.total
+          seekIndex = currIndex
+        }
+      })
+    )
+    return from(waitFor(() => this.initFlag)).pipe(
+      switchMap(() => this.#datastream)
+    )
+  }
+  disconnect(): void {
+    this.#subscription.unsubscribe()
   }
 
   /**
-   * 
-   * @TODO ParentPullable connect() must be invoked, before the data$ stream become active
-   * @returns {Observable} of all children features
+   * @description Heavy operation. Eagerly gets all features
    */
-  connect(): Observable<readonly T[]> {
-    if (this._children.length === 0) {
-      return of([] as T[])
-    }
-
-    this.#subscriptions.push(
-      concat(
-        ...this._children.map(ds => ds.connect()),
-        /**
-         * final emitted value
-         * in some circumstances, all children would have been completed. 
-         * the first synchronous empty array flushes the current value
-         * the second timed empty array completes the observable
-         * 
-         * Observable must not be completed synchronously, as this leads to the final value not emitted. 
-         * 
-         * @TODO rather than subscribe, turn this into pure observable
-         * 
-         */
-        of([] as T[]).pipe(
-          tap(() => this.finalValue = this.currentValue)
-        ),
-        timer(160).pipe(
-          map(() => [] as T[])
-        )
-      ).pipe(
-        map(arr => {
-          const alreadyCompleted = this._children.filter(c => c.completed)
-          const prevValues = alreadyCompleted.flatMap(v => v.finalValue)
-          return [...prevValues, ...arr]
-        }),
-        finalize(() => {
-          this._data$.complete()
-        })
-      ).subscribe(v => {
-        this.currentValue = v
-        this._data$.next(v)
-      })
+  pullAll(){
+    return concat(
+      ...this.children.map(c => c.pullAll())
     )
-    return this.data$
   }
 
-  disconnect(): void {
-    super.disconnect()
-    while (this.#subscriptions.length > 0) this.#subscriptions.pop().unsubscribe()
+  async init(){
+    await waitFor(() => this.children.every(c => c.initFlag))
+    this.total = await this.total$.pipe(
+      take(1)
+    ).toPromise()
+    this.#datastream.next(Array.from({ length: this.total }))
+    this.initFlag = true
   }
 }
