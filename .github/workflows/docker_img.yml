@@ -19,6 +19,7 @@ jobs:
       BUILD_TEXT: ${{ steps.set-vars-step.outputs.BUILD_TEXT }}
       DEPLOY_ID: ${{ steps.set-vars-step.outputs.DEPLOY_ID }}
       SXPLR_VERSION: ${{ steps.set-vars-step.outputs.SXPLR_VERSION }}
+      EXPERIMENTAL_FEATURE_FLAG: ${{ steps.set-vars-step.outputs.EXPERIMENTAL_FEATURE_FLAG }}
     steps:
     - uses: actions/checkout@v4
     - id: 'set-vars-step'
@@ -52,71 +53,43 @@ jobs:
         echo "SXPLR_VERSION=$SXPLR_VERSION"
         echo "SXPLR_VERSION=$SXPLR_VERSION" >> $GITHUB_OUTPUT
 
-  build-docker-img:
-  
+        if [[ "$GITHUB_REF" == 'refs/heads/master' ]] || [[ "$GITHUB_REF" == 'refs/heads/staging' ]]
+        then
+          echo "prod/staging build, do not enable experimental features"
+        else
+          echo "dev bulid, enable experimental features"
+          echo "EXPERIMENTAL_FEATURE_FLAG=true" >> $GITHUB_OUTPUT
+        fi
+
+
+  build-docker-img-ghcr:
+
+    runs-on: ubuntu-latest
+    needs:
+    - set-vars
+
+    env:
+      MATOMO_ID: '12'
+      MATOMO_URL: 'https://stats.humanbrainproject.eu/'
+      PRODUCTION: 'true'
+      SIIBRA_API_STABLE: 'https://siibra-api-stable.apps.hbp.eu/v3_0,https://siibra-api.apps.ebrains.eu/v3_0'
+      REGISTRY: ghcr.io
+
+      # https://github.com/orgs/community/discussions/10553#discussioncomment-10538593
+      # IMAGE_NAME: ${{ github.repository }}
+      IMAGE_NAME: fzj-inm1-bda/siibra-explorer
+      GIT_DIGEST: ${{ needs.set-vars.outputs.GIT_DIGEST }}
+      BRANCH_NAME: ${{ needs.set-vars.outputs.BRANCH_NAME }}
+      EXPERIMENTAL_FEATURE_FLAG: ${{ needs.set-vars.outputs.EXPERIMENTAL_FEATURE_FLAG }}
+
     permissions:
       contents: read
       packages: write
       # attestations: write
       id-token: write
 
-    runs-on: ubuntu-latest
-    needs:
-    - set-vars
-    env:
-      MATOMO_ID_PROD: '12'
-      MATOMO_URL_PROD: 'https://stats.humanbrainproject.eu/'
-      PRODUCTION: 'true'
-      DOCKER_REGISTRY: 'docker-registry.ebrains.eu/siibra/'
-
-      SIIBRA_API_STABLE: 'https://siibra-api-stable.apps.hbp.eu/v3_0,https://siibra-api.apps.ebrains.eu/v3_0'
-      SIIBRA_API_RC: 'https://siibra-api-rc.apps.hbp.eu/v3_0'
-      SIIBRA_API_LATEST: 'https://siibra-api-latest.apps-dev.hbp.eu/v3_0'
-
-      REGISTRY: ghcr.io
-
-      # https://github.com/orgs/community/discussions/10553#discussioncomment-10538593
-      # IMAGE_NAME: ${{ github.repository }}
-      IMAGE_NAME: fzj-inm1-bda/siibra-explorer
-
     steps:
     - uses: actions/checkout@v4
-    - name: 'Set matomo env var'
-      run: |
-        echo "Using github.ref: $GITHUB_REF"
-
-        echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
-        
-        echo "MATOMO_URL=${{ env.MATOMO_URL_PROD }}" >> $GITHUB_ENV
-        echo "MATOMO_ID=${{ env.MATOMO_ID_PROD }}" >> $GITHUB_ENV
-
-        if [[ "$GITHUB_REF" == 'refs/heads/master' ]]
-        then
-          echo "Either master, using prod env..."
-          echo "SIIBRA_API_ENDPOINTS=${{ env.SIIBRA_API_STABLE }}" >> $GITHUB_ENV
-        elif [[ "$GITHUB_REF" == 'refs/heads/staging' ]]
-        then
-          echo "Either staging, using staging env..."
-          echo "SIIBRA_API_ENDPOINTS=${{ env.SIIBRA_API_RC }}" >> $GITHUB_ENV
-        elif [[ "$GITHUB_REF" == 'refs/heads/dev' ]]
-        then
-          echo "Either dev, ..."
-          echo "SIIBRA_API_ENDPOINTS=${{ env.SIIBRA_API_RC }}" >> $GITHUB_ENV
-        else
-          echo "Currently, only master, staging, dev are built"
-          exit 1
-        fi
-
-    - name: 'Set version variable & expmt feature flag'
-      run: |
-        if [[ "$GITHUB_REF" == 'refs/heads/master' ]] || [[ "$GITHUB_REF" == 'refs/heads/staging' ]]
-        then
-          echo "prod/staging build, do not enable experimental features"
-        else
-          echo "dev bulid, enable experimental features"
-          echo "EXPERIMENTAL_FEATURE_FLAG=true" >> $GITHUB_ENV
-        fi
-
     - name: Log in to the Container registry
       uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
       with:
@@ -135,25 +108,50 @@ jobs:
           BUILD_HASH=${{ env.GIT_DIGEST }}
           MATOMO_URL=${{ env.MATOMO_URL }}
           MATOMO_ID=${{ env.MATOMO_ID }}
-          SIIBRA_API_ENDPOINTS=${{ env.SIIBRA_API_ENDPOINTS }}
+          SIIBRA_API_ENDPOINTS=${{ env.SIIBRA_API_STABLE }}
           EXPERIMENTAL_FEATURE_FLAG=${{ env.EXPERIMENTAL_FEATURE_FLAG }}
 
+  
+  build-docker-img-ebrains:
+  
+    permissions:
+      contents: read
+      packages: write
+      # attestations: write
+      id-token: write
+
+    runs-on: ubuntu-latest
+    needs:
+    - set-vars
+    env:
+      MATOMO_ID: '12'
+      MATOMO_URL: 'https://stats.humanbrainproject.eu/'
+      PRODUCTION: 'true'
+      DOCKER_REGISTRY: 'docker-registry.ebrains.eu/siibra/'
+
+      SIIBRA_API_STABLE: 'https://siibra-api-stable.apps.hbp.eu/v3_0,https://siibra-api.apps.ebrains.eu/v3_0'
+      SIIBRA_API_RC: 'https://siibra-api-rc.apps.hbp.eu/v3_0'
+      SIIBRA_API_LATEST: 'https://siibra-api-latest.apps-dev.hbp.eu/v3_0'
+      GIT_DIGEST: ${{ needs.set-vars.outputs.GIT_DIGEST }}
+      BRANCH_NAME: ${{ needs.set-vars.outputs.BRANCH_NAME }}
+      EXPERIMENTAL_FEATURE_FLAG: ${{ needs.set-vars.outputs.EXPERIMENTAL_FEATURE_FLAG }}
+
+    steps:
+    - uses: actions/checkout@v4
     - id: 'build-docker-image'
       name: 'Build docker image'
       run: |
-        echo "${{ steps.push.outputs.imageid }} || ${{ steps.push.outputs.digest }}"
 
-        GIT_DIGEST=${{ needs.set-vars.outputs.GIT_DIGEST }}
-        echo "Git digest: $GIT_DIGEST"
+        echo "Git digest: ${{ env.GIT_DIGEST}} "
 
         DOCKER_BUILT_TAG=${{ env.DOCKER_REGISTRY }}siibra-explorer:$BRANCH_NAME
         echo "Building $DOCKER_BUILT_TAG"
         docker build \
-          --build-arg BUILD_HASH=$GIT_DIGEST \
-          --build-arg MATOMO_URL=$MATOMO_URL \
-          --build-arg MATOMO_ID=$MATOMO_ID \
-          --build-arg SIIBRA_API_ENDPOINTS=$SIIBRA_API_ENDPOINTS \
-          --build-arg EXPERIMENTAL_FEATURE_FLAG=$EXPERIMENTAL_FEATURE_FLAG \
+          --build-arg BUILD_HASH=${{ env.GIT_DIGEST }} \
+          --build-arg MATOMO_URL=${{ env.MATOMO_URL }} \
+          --build-arg MATOMO_ID=${{ env.MATOMO_ID }} \
+          --build-arg SIIBRA_API_ENDPOINTS=${{ env.SIIBRA_API_STABLE }} \
+          --build-arg EXPERIMENTAL_FEATURE_FLAG=${{ env.EXPERIMENTAL_FEATURE_FLAG }} \
           -t $DOCKER_BUILT_TAG \
           .
         echo "Successfully built $DOCKER_BUILT_TAG"
@@ -182,7 +180,7 @@ jobs:
   trigger-deploy-rc-rancher:
     if: ${{ needs.set-vars.outputs.BRANCH_NAME == 'staging' && success() }}
     needs:
-      - build-docker-img
+      - build-docker-img-ebrains
       - set-vars
     uses: ./.github/workflows/deploy-helm.yml
     with:
@@ -255,7 +253,7 @@ jobs:
   trigger-deploy-master-rancher:
     if: ${{ needs.set-vars.outputs.BRANCH_NAME == 'master' && success() }}
     needs:
-      - build-docker-img
+      - build-docker-img-ebrains
       - set-vars
     uses: ./.github/workflows/deploy-helm.yml
     with:
