@@ -180,12 +180,15 @@ jobs:
   trigger-deploy-rc-rancher:
     if: ${{ needs.set-vars.outputs.BRANCH_NAME == 'staging' && success() }}
     needs:
-      - build-docker-img-ebrains
+      - build-docker-img-ghcr
       - set-vars
     uses: ./.github/workflows/deploy-helm.yml
     with:
       DEPLOYMENT_NAME: rc
       IMAGE_TAG: staging
+
+      # temporarily use ghcr, as ebrains harbor cannot be auth'ed
+      IMAGE_REPO: ghcr.io/fzj-inm1-bda/siibra-explorer
 
       # GIT_DIGEST may (sometimes) be all numbers. prepend 'h' to cast to str
       IMAGE_DIGEST: h${{ needs.set-vars.outputs.GIT_DIGEST }}
