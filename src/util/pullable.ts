@@ -1,5 +1,5 @@
 import { CollectionViewer, DataSource } from "@angular/cdk/collections"
-import { BehaviorSubject, Observable, Subscription, combineLatest, concat, from } from "rxjs"
+import { BehaviorSubject, Observable, Subscription, combineLatest, from } from "rxjs"
 import { map, shareReplay, switchMap, take } from "rxjs/operators"
 import { waitFor } from "./fn"
 
@@ -7,6 +7,7 @@ interface NPaginatedArg<T> {
   getPage: (pageNo: number) => Promise<T[]>
   perPage: number
   init: () => Promise<void>
+  annotations?: Record<string, string>
 }
 
 export class CustomDataSource<T> extends DataSource<T> {
@@ -30,12 +31,14 @@ export class CustomDataSource<T> extends DataSource<T> {
     this.#fetchedPages.clear()
   }
 
+  annotations: Record<string, string> = {}
+
   #getPage: (page: number) => Promise<T[]>
   #perPage = 50
   #subscription = new Subscription()
   constructor(arg?: NPaginatedArg<T>){
     super()
-    const { getPage, perPage, init } = arg || { init: async () => null }
+    const { getPage, perPage, init, annotations } = arg || { init: async () => null }
     let missingParam = true
     if (getPage && perPage) {
       this.#getPage = getPage
@@ -47,6 +50,7 @@ export class CustomDataSource<T> extends DataSource<T> {
       this.initFlag = true
       this.isBusy$.next(false)
     })
+    this.annotations = annotations || {}
 
     if (missingParam) {
       throw new Error(`getRange or (getPage && perPage) method must be provided for PulledDataSource`)
@@ -101,12 +105,20 @@ export class CustomDataSource<T> extends DataSource<T> {
     this.isBusy$.next(false)
   }
 
-  pullAll(){
-    const totalPagae = Math.ceil(this.total / this.#perPage)
-    for (let i = 1; i <=totalPagae; i++ ){
-      this.#execGetPage(i)
+  /**
+   * @description Heavy operation. Eagerly gets all features, and emit once and once only.
+   */
+  async pullAll(){
+    await waitFor(() => this.initFlag)
+    const pr: Promise<void>[] = []
+    const totalPage = Math.ceil(this.total / this.#perPage)
+    for (let i = 1; i <=totalPage; i++ ){
+      pr.push(
+        this.#execGetPage(i)
+      )
     }
-    return this.#datastream
+    await Promise.all(pr)
+    return this.#cachedResult
   }
 
   async getRange(start: number, end: number){
@@ -180,7 +192,6 @@ export class ParentCustomDataSource<T> extends DataSource<T> {
             endIdx
           ).then(arr => {
             data.splice(insertIdx, deleteCount, ...arr)
-            console.log("emit", data)
             this.#datastream.next(data)
           })
 
@@ -200,10 +211,9 @@ export class ParentCustomDataSource<T> extends DataSource<T> {
   /**
    * @description Heavy operation. Eagerly gets all features
    */
-  pullAll(){
-    return concat(
-      ...this.children.map(c => c.pullAll())
-    )
+  async pullAll(){
+    const allFeatures = await Promise.all(this.children.map(c => c.pullAll()))
+    return allFeatures.flatMap(v => v)
   }
 
   async init(){

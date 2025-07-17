@@ -106,7 +106,11 @@ export class ListDirective extends FeatureBase implements OnDestroy{
             await getPage(1)
           },
           getPage,
-          perPage: PER_PAGE
+          perPage: PER_PAGE,
+          annotations: {
+            ...this.queryParams,
+            ...query,
+          }
         })
         this._datasource$.next(ds)
       })

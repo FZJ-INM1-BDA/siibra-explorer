@@ -6,7 +6,7 @@ import { Feature } from 'src/atlasComponents/sapi/sxplrTypes';
 import { FeatureBase } from '../base';
 import * as userInteraction from "src/state/userInteraction"
 import { CategoryAccDirective } from "../category-acc.directive"
-import { combineLatest, concat, forkJoin, merge, of, Subject } from 'rxjs';
+import { BehaviorSubject, combineLatest, concat, forkJoin, merge, of } from 'rxjs';
 import { TranslatedFeature } from '../list/list.directive';
 import { MatDialog } from 'src/sharedModules/angularMaterial.exports';
 import { DestroyDirective } from 'src/util/directives/destroy.directive';
@@ -96,7 +96,7 @@ export class EntryComponent extends FeatureBase implements AfterViewInit {
   }
   #tprb: TPRB
 
-  #catAccDirs = new Subject<CategoryAccDirective[]>()
+  #catAccDirs = new BehaviorSubject<CategoryAccDirective[]>([])
   features$ = this.#catAccDirs.pipe(
     switchMap(dirs => concat(
       of([] as TranslatedFeature[]),
