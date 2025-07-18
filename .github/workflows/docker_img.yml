@@ -164,8 +164,13 @@ jobs:
         inspect_str=$(docker image inspect --format='json' $DOCKER_BUILT_TAG)
         echo "Inspected tag: $inspect_str"
 
+    - name: Debug TLS
+      run: |
+        curl -v https://docker-registry.ebrains.eu/v2/
     - name: 'Push to docker registry'
       run: |
+        echo "Try again just for good measure"
+        curl -v https://docker-registry.ebrains.eu/v2/
         echo "Login to docker registry"
         docker login \
           -u '${{ secrets.EBRAINS_DOCKER_REG_USER }}' \
