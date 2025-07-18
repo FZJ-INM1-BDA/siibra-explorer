@@ -65,7 +65,7 @@ export class ListDirective extends FeatureBase implements OnDestroy{
         if (region) query['region_id'] = region.name
         if (bbox) query['bbox'] = JSON.stringify(bbox)
 
-        const getPage = async (page: number) => {
+        const getGetPage = <T>(_ds: CustomDataSource<T>) => async (page: number) => {
           if (!route) {
             this.#total.next(0)
             return []
@@ -85,7 +85,7 @@ export class ListDirective extends FeatureBase implements OnDestroy{
                 if (resp.items.length === 0) {
                   return of([] as TranslatedFeature[])
                 }
-                ds.total = resp.total
+                _ds.total = resp.total
                 return forkJoin(
                   resp.items.map(feature => translateV3Entities.translateFeature(feature))
                 )
@@ -101,11 +101,11 @@ export class ListDirective extends FeatureBase implements OnDestroy{
           }
         }
         const ds = new CustomDataSource({
-          init: async () => {
+          init: async _ds => {
             // populate the total
-            await getPage(1)
+            await getGetPage(_ds)(1)
           },
-          getPage,
+          getPage: p => getGetPage(ds)(p),
           perPage: PER_PAGE,
           annotations: {
             ...this.queryParams,

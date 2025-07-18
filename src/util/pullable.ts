@@ -6,7 +6,7 @@ import { waitFor } from "./fn"
 interface NPaginatedArg<T> {
   getPage: (pageNo: number) => Promise<T[]>
   perPage: number
-  init: () => Promise<void>
+  init: (ds: CustomDataSource<T>) => Promise<void>
   annotations?: Record<string, string>
 }
 
@@ -46,7 +46,7 @@ export class CustomDataSource<T> extends DataSource<T> {
       missingParam = false
     }
     this.isBusy$.next(true)
-    init().then(() => {
+    init(this).then(() => {
       this.initFlag = true
       this.isBusy$.next(false)
     })
