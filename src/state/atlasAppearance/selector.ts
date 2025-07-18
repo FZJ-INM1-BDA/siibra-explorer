@@ -28,3 +28,7 @@ export const useViewer = createSelector(
   selectStore,
   state => state.useViewer
 )
+export const showAllSegMeshes = createSelector(
+  selectStore,
+  state => state.showAllSegMeshes
+)

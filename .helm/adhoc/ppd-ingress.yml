@@ -1,0 +1,49 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: main-cert
+spec:
+  secretName: sxplr-ppd-secret
+  renewBefore: 120h 
+  commonName: siibra-explorer.apps.rke2-3-adacloud.tc.humanbrainproject.eu
+  isCA: false
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS1
+    size: 2048
+  usages:
+  - server auth
+  dnsNames:
+  # (CHANGE ME! same as `commonName`)
+  - siibra-explorer.apps.rke2-3-adacloud.tc.humanbrainproject.eu
+  issuerRef:
+    name: letsencrypt-production-issuer-1
+    kind: ClusterIssuer 
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: siibra-explorer-main-ingress
+  labels:
+    name: siibra-explorer-main-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/app-root: "/viewer"
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: siibra-explorer.apps.rke2-3-adacloud.tc.humanbrainproject.eu
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/viewer"
+        backend:
+          service:
+            name: prod-siibra-explorer
+            port: 
+              number: 8080
+  tls:
+  - secretName: sxplr-ppd-secret
+    hosts:
+    - siibra-explorer.apps.rke2-3-adacloud.tc.humanbrainproject.eu

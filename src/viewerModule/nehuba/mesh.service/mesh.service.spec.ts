@@ -2,7 +2,7 @@ import { TestBed } from "@angular/core/testing"
 import { MockStore, provideMockStore } from "@ngrx/store/testing"
 import { hot } from "jasmine-marbles"
 import { NehubaMeshService } from "./mesh.service"
-import { atlasSelection } from "src/state"
+import { atlasAppearance, atlasSelection } from "src/state"
 import { SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes"
 import { LayerCtrlEffects } from "../layerCtrl.service/layerCtrl.effects"
 import { NEVER, of, pipe } from "rxjs"
@@ -111,6 +111,7 @@ describe('> mesh.service.ts', () => {
         
         mockStore.overrideSelector(atlasSelection.selectors.selectedTemplate, {} as any)
         mockStore.overrideSelector(atlasSelection.selectors.selectedParcellation, {} as any)
+        mockStore.overrideSelector(atlasAppearance.selectors.showAllSegMeshes, false)
       })
 
       describe("> auxMesh defined", () => {

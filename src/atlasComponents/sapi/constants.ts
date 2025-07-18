@@ -19,6 +19,8 @@ export const IDS = {
     WAXHOLMV4: "minds/core/parcellationatlas/v1.0.0/ebb923ba-b4d5-4b82-8088-fa9215c2e1fe-v4",
     CORTICAL_LAYERS: "juelich/iav/atlas/v1.0.0/3",
     MEBRAINS: "minds/core/parcellationatlas/v1.0.0/e3235c039c6f54c3ba151568c829f117",
+    JBABBV2: "jba-bb-v2",
+    SULCI: "atlas-humansulci",
   }
 }
 

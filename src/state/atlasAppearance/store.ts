@@ -8,6 +8,7 @@ export type AtlasAppearanceStore = {
   meshTransparency: number
   showDelineation: boolean
   customLayers: CustomLayer[]
+  showAllSegMeshes: boolean
 }
 
 export const defaultState: AtlasAppearanceStore = {
@@ -15,7 +16,8 @@ export const defaultState: AtlasAppearanceStore = {
   octantRemoval: true,
   showDelineation: true,
   customLayers: [],
-  meshTransparency: 1.0
+  meshTransparency: 1.0,
+  showAllSegMeshes: false,
 }
 
 export const reducer = createReducer(
@@ -107,5 +109,14 @@ export const reducer = createReducer(
         useViewer: viewer
       }
     }
-  )
+  ),
+  on(
+    actions.setShowAllSegMeshes,
+    (state, { flag }) => {
+      return {
+        ...state,
+        showAllSegMeshes: flag
+      }
+    }
+  ),
 )
