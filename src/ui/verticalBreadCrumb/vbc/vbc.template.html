@@ -351,7 +351,6 @@
                 <!-- spatial search util directives -->
                 <div iav-switch #switchdir="iavSwitch"></div>
                 <div sxplr-sapiviews-core-space-boundingbox
-                    (sxplr-sapiviews-core-space-boundingbox-changed)="voiFeatureEntryCmp?.pullAll()"
                     [sxplr-sapiviews-core-space-boundingbox-atlas]="view.selectedATP.atlas"
                     [sxplr-sapiviews-core-space-boundingbox-space]="view.selectedATP.template"
                     [sxplr-sapiviews-core-space-boundingbox-spec]="view.currentViewport && [view.currentViewport.minpoint, view.currentViewport.maxpoint]"
@@ -1293,7 +1292,6 @@
     
             <div iav-switch #switchdir="iavSwitch"></div>
             <div sxplr-sapiviews-core-space-boundingbox
-                (sxplr-sapiviews-core-space-boundingbox-changed)="voiFeatureEntryCmp?.pullAll()"
                 [sxplr-sapiviews-core-space-boundingbox-atlas]="view.selectedATP.atlas"
                 [sxplr-sapiviews-core-space-boundingbox-space]="view.selectedATP.template"
                 [sxplr-sapiviews-core-space-boundingbox-spec]="view.currentViewport && [view.currentViewport.minpoint, view.currentViewport.maxpoint]"
@@ -1690,7 +1688,6 @@
         <ng-template [ngIf]="(regFeatures.totals$ | async) > 0">
             <mat-divider [vertical]="true"></mat-divider>
             <button mat-icon-button
-                (click)="regFeatures.pullAll()"
                 [matTooltip]="view.labels.RELATED_DATASETS"
                 [sxplr-dialog]="dumbFeatureDialogTmpl"
                 [sxplr-dialog-config]="{

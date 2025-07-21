@@ -43,12 +43,10 @@ export class SimpleAnnotationList extends AnnotationListDirective{
       next: ([ show, annots ]) => {
         const layer = AnnotationLayer.Get(LAYER_NAME, LAYER_COLOR)
         const ngAnnot = annots.map(v => v.toNgAnnotation()).flatMap(v => v)
-        console.log("new annots", annots)
         layer.updateAnnotation(ngAnnot)
         layer.setVisible(show)
       },
       complete: () => {
-        console.log("dispose!")
         const layer = AnnotationLayer.Get(LAYER_NAME, LAYER_COLOR)
         layer.dispose()
       }
