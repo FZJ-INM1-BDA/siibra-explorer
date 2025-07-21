@@ -9,7 +9,7 @@ import { ContextMenuService, TContextMenuReg } from "src/contextMenuModule";
 import { DialogService } from "src/services/dialogService.service";
 import { SAPI } from "src/atlasComponents/sapi";
 import { Feature, SxplrAtlas, SxplrParcellation, SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes"
-import { atlasAppearance, atlasSelection, userInteraction } from "src/state";
+import { atlasAppearance, atlasSelection, userInteraction, userPreference } from "src/state";
 import { SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { EntryComponent } from "src/features/entry/entry.component";
 import { TFace, TSandsPoint, getCoord } from "src/util/types";
@@ -19,9 +19,10 @@ import { generalActionError } from "src/state/actions";
 import { enLabels } from "src/uiLabels";
 import { UserLayerService } from "../nehuba/userLayers/service";
 import { TFileInputEvent } from "src/getFileInput/type";
-import { MatDialog, MatSnackBar } from "src/sharedModules";
+import { MatDialog, MatDialogRef, MatSnackBar } from "src/sharedModules";
 import { ModularUserAnnotationToolService } from "src/atlasComponents/userAnnotations/tools/service";
 import { PointAssignmentFull } from "src/atlasComponents/sapiViews/volumes/point-assignment-full/point-assignment-full.component";
+import { Point } from "src/atlasComponents/userAnnotations/tools/point";
 
 interface HasName {
   name: string
@@ -49,6 +50,9 @@ export class ViewerCmp {
 
   @ViewChild('voiFeatureEntryCmp', { read: EntryComponent })
   voiCmp: EntryComponent
+
+  @ViewChild('focusFeatureDialogTmpl')
+  private focusFeatureDialog: TemplateRef<any>
 
   public CONST = CONST
   public ARIA_LABELS = ARIA_LABELS
@@ -414,6 +418,48 @@ export class ViewerCmp {
       this.ctxMenuSvc.deregister(cb)
     })
 
+    let openFeatureDialog: () => MatDialogRef<any> = null
+
+    combineLatest([
+      this.store$.pipe(
+        select(userInteraction.selectors.selectedFeature),
+        distinctUntilChanged((o, n) => o?.id === n?.id),
+      ),
+      this.store$.pipe(
+        select(userPreference.selectors.showExperimental),
+        distinctUntilChanged(),
+      )
+    ]).pipe(
+      
+    ).subscribe(([feature, experimentalFlag]) => {
+      if (!!openFeatureDialog) {
+        this.dialogSvc.deregisterAndCloseRestorableDialog(openFeatureDialog)
+        openFeatureDialog = null
+      }
+      
+      if (!!feature && experimentalFlag){
+        this.dialogSvc.registerAndOpenRestorableDialog(
+          () => this.dialog.open(this.focusFeatureDialog, {
+            data: {
+              feature
+            },
+            width: '75vw',
+            height: '75vh'
+          }),
+          () => this.clearShownFeature()
+        )
+      }
+    })
+
+    this.store$.pipe(
+      select(atlasSelection.selectors.viewerMode)
+    ).subscribe(mode => {
+      if (mode === "focusview:voi") {
+        this.dialogSvc.closeRestorableDialogs()
+      } else {
+        this.dialogSvc.openRestorableDialogs()
+      }
+    })
   }
 
   public clearRoi(): void{
@@ -479,6 +525,30 @@ export class ViewerCmp {
       )
     }
   }
+
+  public bookmarkPoint(pointSpec: {point?: number[], face?: number, vertices?: number[]}, template: SxplrTemplate){
+    const toolInstance = this.userAnnotSvc.getTool("Point")
+    if (!toolInstance) {
+      return
+    }
+    const { point } = pointSpec
+    if (!point) {
+      return
+    }
+    
+    const pt = new Point({
+      '@type': 'siibra-ex/annotation/point',
+      space: {
+        id: template.id
+      },
+      x: point[0],
+      y: point[1],
+      z: point[2],
+    })
+    toolInstance.addAnnotation(pt)
+    this.snackbar.open(`Annotation added`)
+  }
+
   #lastSelectedPoint: { point?: number[], face?: number, vertices?: number[], template: SxplrTemplate }
 
   public clearPoint(){
@@ -498,12 +568,10 @@ export class ViewerCmp {
     this.ctxMenuSvc.dismissCtxMenu()
   }
 
-  showDataset(feat: Feature): void {
+  clearShownFeature(): void {
     
     this.store$.dispatch(
-      userInteraction.actions.showFeature({
-        feature: feat
-      })
+      userInteraction.actions.clearShownFeature()
     )
   }
 

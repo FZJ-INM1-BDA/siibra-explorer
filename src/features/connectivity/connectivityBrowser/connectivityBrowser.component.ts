@@ -88,7 +88,9 @@ export class ConnectivityBrowserComponent implements OnChanges {
      */
     combineLatest([
       this.#accordionExpanded$,
-      this.types$,
+      this.types$.pipe(
+        filter(t => t && t.length > 0)
+      ),
       concat(
         of(null as PathParam),
         this.formValue$.pipe(

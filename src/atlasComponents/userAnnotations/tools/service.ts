@@ -144,7 +144,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
   private registeredTools: {
     name: string
     iconClass: string
-    toolInstance: AbsToolClass<any>
+    toolInstance: AbsToolClass<IAnnotationGeometry>
     target?: Type<IAnnotationGeometry>
     editCmp?: Type<unknown>
     onDestoryCallBack: () => void
@@ -827,6 +827,19 @@ export class ModularUserAnnotationToolService implements OnDestroy{
         viewerMode: payload
       })
     )
+  }
+
+  /**
+   * @param {string} name name of the tool
+   * @returns {null|AbsToolClass<IAnnotationGeometry>}
+   */
+  getTool(name: string /* t: Type<IAnnotationGeometry> */): null|AbsToolClass<IAnnotationGeometry> {
+    for (const { toolInstance, name: _name } of this.registeredTools){
+      if (name === _name) {
+        return toolInstance
+      }
+    }
+    return null
   }
 }
 

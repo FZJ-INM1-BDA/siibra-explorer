@@ -26,7 +26,7 @@
   <iav-layout-fourcorners class="sxplr-pe-none">
 
     <!-- top left -->
-    <div iavLayoutFourCornersTopLeft class="align-items-start d-inline-flex">
+    <div iavLayoutFourCornersTopLeft class="align-items-stretch d-inline-flex">
 
       <!-- special mode -->
       <ng-template [ngIf]="view.viewerMode" let-mode [ngIfElse]="defaultTopLeftTmpl">
@@ -133,7 +133,86 @@
       </annotation-list>
       <key-frame-controller class="pe-all" *ngSwitchCase="ARIA_LABELS.VIEWER_MODE_KEYFRAME">
       </key-frame-controller>
-      <span *ngSwitchDefault>View mode {{ mode }} does not have side nav registered.</span>
+      <ng-template [ngSwitchCase]="ARIA_LABELS.VIEWER_MODE_FOCUSVIEW_VOI">
+        <ng-template [ngIf]="view.selectedFeature" let-feature>
+          <div class="sxplr-pe-all"
+            feature-view-base
+            [feature]="feature"
+            #fvb="featureViewBase">
+            
+            <ng-template [ngIf]="fvb.view$ | async" let-view>
+              <ng-template [ngIf]="view.voi" let-voi>
+                <mat-card>
+                  <mat-card-header>
+                    <mat-card-title>
+                      Previewing overlay volume
+                    </mat-card-title>
+                  </mat-card-header>
+                  <mat-card-content>
+                    <ng-layer-ctl
+                      [ng-layer-ctl-name]="voi.ngVolume.url"
+                      [ng-layer-ctl-format]="voi.ngVolume.format"
+                      [ng-layer-ctl-src]="voi.ngVolume.url"
+                      [ng-layer-ctl-transform]="voi.ngVolume.transform"
+                      [ng-layer-ctl-info]="voi.ngVolume.info"
+                      [ng-layer-ctl-opacity]="1.0"
+                      [ng-layer-ctl-meta]="voi.ngVolume.meta"
+                      [ng-layer-ctl-show]="true">
+                    </ng-layer-ctl>
+                  </mat-card-content>
+                </mat-card>
+              </ng-template>
+            </ng-template>
+          </div>
+        </ng-template>
+      </ng-template>
+      <ng-template [ngSwitchCase]="ARIA_LABELS.VIEWER_MODE_FOCUSVIEW_REG_CONN">
+        <mat-card>
+          <mat-card-header>
+            <mat-card-title>
+              Regional Connectivity
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <ng-template #noParcTmpl>
+              Parcellation must be selected to show regional connectivity
+            </ng-template>
+            <ng-template #noRegTmpl>
+              Region must be selected to show regional connectivity
+            </ng-template>
+            <ng-template [ngIf]="view.selectedParcellation" let-parcellation [ngIfElse]="noParcTmpl">
+              <ng-template [ngIf]="(view.selectedRegions || [])[0]" let-region [ngIfElse]="noRegTmpl">
+
+                <tpbr-viewer
+                  [tpbr-concept]="{
+                    parcellation: parcellation,
+                    region: region
+                  }"
+                  [parcellation]="parcellation"
+                  [region]="region"
+                  tpbr-category
+                  #tpbrCategory="tpbrCategory"
+                  >
+                </tpbr-viewer>
+                <ng-template [ngIf]="tpbrCategory.cateogryCollections$ | async | keyvalue | filterCategory : ['connectivity']" let-connectivity>
+                  <ng-template ngFor [ngForOf]="connectivity" let-conn>
+                    <ng-template [ngIf]="conn.value" let-connType>
+                      <sxplr-features-connectivity-browser
+                        [sxplr-features-connectivity-browser-parcellation]="parcellation"
+                        [region]="region"
+                        [accordionExpanded]="true"
+                        [types]="connType"
+                        >
+                      </sxplr-features-connectivity-browser>
+                    </ng-template>
+                  </ng-template>
+                </ng-template>
+              </ng-template>
+            </ng-template>
+          </mat-card-content>
+        </mat-card>
+      </ng-template>
+      <span class="pe-all" *ngSwitchDefault>View mode {{ mode }} does not have side nav registered.</span>
     </ng-container>
 
   </mat-card>
@@ -145,6 +224,7 @@
         <!-- annotating top left -->
         <ng-template [ngSwitchCase]="ARIA_LABELS.VIEWER_MODE_ANNOTATING">
           <sxplr-tab
+            [matTooltip]="ARIA_LABELS.TOGGLE_SIDE_PANEL"
             sxplr-tab-icon="fas fa-list"
             sxplr-tab-color="primary"
             (sxplr-tab-click)="controlHalfNav(!view.halfSidenavExpanded)"
@@ -157,13 +237,34 @@
         </ng-template>
   
         <ng-template [ngSwitchCase]="ARIA_LABELS.VIEWER_MODE_KEYFRAME">
-          <sxplr-tab
-            sxplr-tab-icon="fas fa-play"
-            sxplr-tab-color="primary"
-            (sxplr-tab-click)="controlHalfNav(!view.halfSidenavExpanded)">
-          </sxplr-tab>
+          <ng-template [ngTemplateOutlet]="defaultToggle"></ng-template>
+        </ng-template>
+
+        <ng-template [ngSwitchCase]="ARIA_LABELS.VIEWER_MODE_FOCUSVIEW_VOI">
+          <ng-template [ngTemplateOutlet]="defaultToggle"></ng-template>
+        </ng-template>
+        
+        <ng-template [ngSwitchCase]="ARIA_LABELS.VIEWER_MODE_FOCUSVIEW_REG_CONN">
+          <ng-template [ngTemplateOutlet]="defaultToggle"></ng-template>
         </ng-template>
       </ng-container>
+
+      <!-- default toggle button -->
+      <ng-template #defaultToggle>
+        <sxplr-tab
+          [matTooltip]="ARIA_LABELS.TOGGLE_SIDE_PANEL"
+          [sxplr-tab-mat-icon]="view.halfSidenavExpanded ? 'chevron_left' : 'chevron_right'"
+          sxplr-tab-color="primary"
+          (sxplr-tab-click)="controlHalfNav(!view.halfSidenavExpanded)">
+        </sxplr-tab>
+      </ng-template>
+      
+      <sxplr-tab
+        [matTooltip]="ARIA_LABELS.EXIT_MODE"
+        sxplr-tab-icon="fas fa-times"
+        sxplr-tab-color="warn"
+        (sxplr-tab-click)="exitSpecialViewMode()">
+      </sxplr-tab>
     </div>
   </ng-template>
 </ng-template>
@@ -184,6 +285,7 @@
 
 <!-- special mode top right -->
 <ng-template #specialTopRightTmpl let-mode="mode">
+  <ng-template sxplrExperimentalFlag [deprecated]="true">
   <mat-card class="mat-card-sm pe-all m-4">
     <mat-card-header>
       <mat-card-subtitle>
@@ -202,6 +304,7 @@
       
     </mat-card-content>
   </mat-card>
+  </ng-template>
 </ng-template>
 
 <!-- viewer tmpl -->
@@ -325,7 +428,8 @@
               (click)="selectPoint({ point: context.payload.mouse.real }, data.metadata.template)">
               <mat-icon>search</mat-icon>
             </button>
-            <button mat-icon-button>
+            <button mat-icon-button
+              (click)="bookmarkPoint({ point: context.payload.mouse.real }, data.metadata.template)">
               <mat-icon>bookmark</mat-icon>
             </button>
           </mat-card-actions>
@@ -478,4 +582,15 @@
     [parcellation]="view.selectedParcellation"
     (clickOnRegionName)="handleClickOnRegionName($event.target, $event.event)">
   </sxplr-point-assignment>
+</ng-template>
+
+<!-- template for single feature modal -->
+<ng-template #focusFeatureDialogTmpl let-context>
+    <sxplr-feature-view [feature]="context.feature">
+    </sxplr-feature-view>
+    <div mat-dialog-actions>
+        <button mat-button mat-dialog-close #closeBtn="matDialogClose">
+            Close
+        </button>
+    </div>
 </ng-template>

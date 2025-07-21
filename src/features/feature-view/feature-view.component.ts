@@ -52,4 +52,11 @@ export class FeatureViewComponent extends FeatureViewBase{
     )
   }
 
+  focusOnViewer(){
+    this.store.dispatch(
+      atlasSelection.actions.setViewerMode({
+        viewerMode: "focusview:voi"
+      })
+    )
+  }
 }

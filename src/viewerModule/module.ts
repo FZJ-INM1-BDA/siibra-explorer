@@ -47,6 +47,7 @@ import { VerticalBreadCrumbModule } from "src/ui/verticalBreadCrumb";
 import { SxplrAnimationModule } from "src/ux";
 import { NgLayerCtrlCmp } from "./nehuba/nehubaViewerInterface/ngLayerCtl/ngLayerCtrl.component";
 import { FileInputModule } from "src/getFileInput/module";
+import { SapiViewsFeatureConnectivityModule } from "src/features/connectivity";
 
 @NgModule({
   imports: [
@@ -83,6 +84,7 @@ import { FileInputModule } from "src/getFileInput/module";
     ExperimentalFlagDirective,
     TPBRViewCmp,
     FileInputModule,
+    SapiViewsFeatureConnectivityModule,
     
     ...(environment.ENABLE_LEAP_MOTION ? [LeapModule] : [])
   ],

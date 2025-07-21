@@ -87,7 +87,7 @@ export class FeatureViewBase {
         map(params => params?.regions)
       )
     ),
-    map(([ isConnnectivity, selectedRegions ]) => isConnnectivity
+    map(([ isConnectivity, selectedRegions ]) => isConnectivity
     ? {"regions": selectedRegions.map(r => r.name).join(" ")}
     : {} )
   )
@@ -272,13 +272,14 @@ export class FeatureViewBase {
   view$ = combineLatest([
     this.#baseView$,
     this.#specialView$,
+    this.expmtalSvc.showExperimentalFlag$
   ]).pipe(
-    map(([baseview, specialview]) => {
+    map(([baseview, specialview, showExperimentalFlag]) => {
       
       return {
         ...baseview,
         ...specialview,
-        
+        showExperimentalFlag
       }
     })
   )

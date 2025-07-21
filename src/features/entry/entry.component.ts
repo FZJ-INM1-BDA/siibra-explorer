@@ -3,7 +3,6 @@ import { select, Store } from '@ngrx/store';
 import { debounceTime, distinctUntilChanged, map, scan, shareReplay, switchMap, take, takeUntil, withLatestFrom } from 'rxjs/operators';
 import { IDS, SAPI } from 'src/atlasComponents/sapi';
 import { Feature } from 'src/atlasComponents/sapi/sxplrTypes';
-import { FeatureBase } from '../base';
 import * as userInteraction from "src/state/userInteraction"
 import { CategoryAccDirective } from "../category-acc.directive"
 import { combineLatest, concat, EMPTY, forkJoin, from, merge, of, Subject } from 'rxjs';
@@ -12,57 +11,10 @@ import { TranslatedFeature } from '../list/list.directive';
 import { MatDialog, MatSnackBar } from 'src/sharedModules/angularMaterial.exports';
 import { DestroyDirective } from 'src/util/directives/destroy.directive';
 import { FEATURE_CONCEPT_TOKEN, FeatureConcept, TPRB } from '../util';
-import { SPECIES_ENUM } from 'src/util/constants';
 import { atlasSelection, userPreference } from 'src/state';
 import { ExperimentalService } from 'src/experimental/experimental.service';
-
-const categoryAcc = <T extends Record<string, unknown>>(categories: T[]) => {
-  const returnVal: Record<string, T[]> = {}
-  for (const item of categories) {
-    const { category } = item
-    if (!category) continue
-    if (typeof category !== "string") continue
-    if (!returnVal[category]) {
-      returnVal[category] = []
-    }
-    returnVal[category].push(item)
-  }
-  return returnVal
-}
-type ConnectiivtyFilter = {
-  SPECIES: string[]
-  PARCELLATION: string[]
-  SPACE: string[]
-}
-
-const WHITELIST_CONNECTIVITY: ConnectiivtyFilter = {
-  SPECIES: [
-    SPECIES_ENUM.RATTUS_NORVEGICUS,
-    SPECIES_ENUM.HOMO_SAPIENS
-  ],
-  PARCELLATION: [
-    IDS.PARCELLATION.JBA29,
-    IDS.PARCELLATION.JBA30,
-    IDS.PARCELLATION.WAXHOLMV4
-  ],
-  SPACE: [],
-}
-
-const EXPERIMENTAL_CONNECTIVITY: ConnectiivtyFilter = {
-  SPECIES: [],
-  PARCELLATION: [
-    IDS.PARCELLATION.JBA31,
-  ],
-  SPACE: [],
-}
-
-const BANLIST_CONNECTIVITY: ConnectiivtyFilter = {
-  SPECIES: [],
-  PARCELLATION: [],
-  SPACE: [
-    IDS.TEMPLATES.BIG_BRAIN
-  ]
-}
+import { BANLIST_CONNECTIVITY, EXPERIMENTAL_CONNECTIVITY, WHITELIST_CONNECTIVITY } from '../connectivity';
+import { TPBRCategoryDirective } from '../tpbrCategory.directive';
 
 @Component({
   selector: 'sxplr-feature-entry',
@@ -73,7 +25,7 @@ const BANLIST_CONNECTIVITY: ConnectiivtyFilter = {
     DestroyDirective
   ]
 })
-export class EntryComponent extends FeatureBase implements AfterViewInit {
+export class EntryComponent extends TPBRCategoryDirective implements AfterViewInit {
 
   ondestroy$ = inject(DestroyDirective).destroyed$
 
@@ -81,7 +33,7 @@ export class EntryComponent extends FeatureBase implements AfterViewInit {
   catAccDirs: QueryList<CategoryAccDirective>
 
   constructor(
-    private sapi: SAPI,
+    sapi: SAPI,
     private store: Store,
     private dialog: MatDialog,
     private snackbar: MatSnackBar,
@@ -89,7 +41,7 @@ export class EntryComponent extends FeatureBase implements AfterViewInit {
     private expmtSvc: ExperimentalService,
     @Inject(FEATURE_CONCEPT_TOKEN) private featConcept: FeatureConcept,
   ) {
-    super()
+    super(sapi)
 
     this.TPRBbox$.pipe(
       takeUntil(this.ondestroy$)
@@ -291,46 +243,6 @@ export class EntryComponent extends FeatureBase implements AfterViewInit {
     map(([ total, showConnectivityFlag ]) => {
       return total + (showConnectivityFlag ? 1 : 0)
     })
-  )
-
-  private featureTypes$ = this.sapi.v3Get("/feature/_types", {}).pipe(
-    switchMap(resp => 
-      this.sapi.iteratePages(
-        resp,
-        page => this.sapi.v3Get(
-          "/feature/_types",
-          { query: { page } }
-        )
-      )
-    ),
-  )
-
-  public cateogryCollections$ = this.TPRBbox$.pipe(
-    switchMap(({ template, parcellation, region, bbox }) => this.featureTypes$.pipe(
-      map(features => {
-        const filteredFeatures = features.filter(v => {
-          const { path_params, required_query_params } = v
-          
-          const requiredParams = [
-            ...(path_params || []),
-            ...(required_query_params || []),
-          ]
-          const paramMapped = {
-            space_id: !!template,
-            parcellation_id: !!parcellation,
-            region_id: !!region,
-            bbox: !!bbox
-          }
-          for (const pParam in paramMapped){
-            if (requiredParams.includes(pParam) && !paramMapped[pParam]) {
-              return false
-            }
-          }
-          return true
-        })
-        return categoryAcc(filteredFeatures)
-      }),
-    )),
   )
 
   onClickFeature(feature: Feature) {

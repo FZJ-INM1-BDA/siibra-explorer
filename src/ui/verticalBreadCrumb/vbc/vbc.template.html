@@ -1,7 +1,7 @@
 <ng-template [ngIf]="view$ | async" let-view>
 
     <!-- super duper view -->
-    <mat-accordion>
+    <mat-accordion *ngIf="view.showExperimental">
         <mat-expansion-panel [expanded]="true">
             <mat-expansion-panel-header>
                 Navigate
@@ -91,7 +91,10 @@
                                                 (mm)
                                             </ng-template>
                                         </mat-label>
-                                        <input matInput [formControlName]="axis" vbc-on-focus-select>
+                                        <input matInput
+                                            [formControlName]="axis"
+                                            (paste)="onPaste($event)"
+                                            vbc-on-focus-select>
                                     </mat-form-field>
                                     
                                     <span class="vbc-row-fixed">
@@ -108,27 +111,6 @@
                                         </button>
                                     </span>
                                 </div>
-
-                                <!-- view port no longer needed here -->
-                                <!-- <mat-divider></mat-divider>
-                                <div class="vbc-row">
-
-                                    <div class="sxplr-d-flex sxplr-align-items-center sxplr-m-2">
-                                        <span>
-                                            Viewport
-                                        </span>
-                                    </div>
-                                    <div class="sxplr-d-inline-flex sxplr-m-2 vbc-row-fixed">
-                                        
-                                        <button
-                                            [matTooltip]="view.labels.COPY_CURRENT_POSITION"
-                                            mat-icon-button
-                                            [iav-clipboard-copy]="vp | viewportToText">
-                                            <i class="fas fa-copy"></i>
-                                        </button>
-
-                                    </div>
-                                </div> -->
                             </ng-template>
                         </ng-template>
                     </form>
@@ -331,11 +313,20 @@
             </ng-template>
         </mat-expansion-panel>
 
-        <mat-expansion-panel>
+        <mat-expansion-panel #annotPanel="matExpansionPanel"
+            [expanded]="false">
             <mat-expansion-panel-header>
                 Annotate
             </mat-expansion-panel-header>
-            annotate foo
+            <button mat-raised-button color="primary"
+                annotation-switch
+                annotation-switch-mode="on">
+                <mat-icon>edit</mat-icon>
+                <span>Annotation Mode</span>
+            </button>
+            <simple-annotation-list [show]="annotPanel.expanded">
+            </simple-annotation-list>
+            
         </mat-expansion-panel>
 
         <mat-expansion-panel>
@@ -347,9 +338,10 @@
                 
                 <!-- point assignment -->
                 <button mat-list-item
+                    *ngIf="view.isVolumetric"
                     (click)="assignPoint(view.currentViewport.center, view.selectedATP.template)">
                     <span mat-list-item-title>
-                        Brain areas assessed at crosshair
+                        Assess brain areas at crosshair
                     </span>
                     <!-- <mat-icon matListItemIcon>my_location</mat-icon> -->
                     <!-- <mat-icon matListItemIcon>map</mat-icon> -->
@@ -403,6 +395,7 @@
                 <button mat-list-item
                     [matTooltip]="view.labels.RELATED_DATASETS"
                     [sxplr-dialog]="dumbFeatureDialogTmpl"
+                    [sxplr-dialog-restorable]="true"
                     [sxplr-dialog-config]="{
                         autoFocus: true
                     }"
@@ -587,6 +580,16 @@
                     </div>
                 </ng-template>
                 
+                <!-- connectivity -->
+                <ng-template [ngIf]="view.enableRegionalConnectivity">
+                    <button mat-list-item
+                        (click)="goToViewerMode('focusview:regionalconnectivity')"
+                        >
+                        <span mat-list-item-title>
+                            Regional connectivity connected to selected region
+                        </span>
+                    </button>
+                </ng-template>
             </mat-action-list>
 
             
@@ -607,7 +610,7 @@
     </mat-accordion>
 
     <!-- main view -->
-    <mat-accordion *ngIf="false">
+    <mat-accordion *ngIf="!view.showExperimental">
         
         <!-- atlas -->
         <mat-expansion-panel *ngIf="view.selectedATP.atlas; let atlas"
@@ -1843,7 +1846,7 @@
             iav-media-query
             [compact]="(media.mediaBreakPoint$ | async) > 3"
             [features]="context.features$ | async"
-            (feature-clicked)="selectFeature($event); closeBtn.dialogRef.close()"
+            (feature-clicked)="selectFeature($event)"
             #media="iavMediaQuery">
         </sxplr-dumb-feature-list>
     </mat-dialog-content>

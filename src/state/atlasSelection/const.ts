@@ -2,7 +2,7 @@ import { SxplrAtlas, SxplrTemplate, SxplrParcellation, SxplrRegion, BoundingBox 
 import { TSandsPoint, TFace } from "src/util/types"
 
 export const nameSpace = `[state.atlasSelection]`
-export type ViewerMode = 'annotating' | 'key frame'
+export type ViewerMode = 'annotating' | 'key frame' | 'focusview:voi' | 'focusview:regionalconnectivity'
 export type BreadCrumb = {
   id: string
   name: string

@@ -84,6 +84,14 @@
           <mat-icon matListItemIcon fontSet="fas" fontIcon="fa-download"></mat-icon>
           <div matListItemTitle>Download</div>
         </a>
+
+        <ng-template [ngIf]="view.voi && view.showExperimentalFlag">
+          <button mat-list-item
+            (click)="focusOnViewer()">
+            <mat-icon matListItemIcon>preview</mat-icon>
+            <span mat-list-item-title>Preview in Viewer</span>
+          </button>
+        </ng-template>
         
       </mat-action-list>
       
@@ -103,7 +111,7 @@
     </ng-template>
 
     <!-- voi special view -->
-    <ng-template [ngIf]="view.voi" let-voi>
+    <ng-template [ngIf]="!view.showExperimentalFlag && view.voi" let-voi>
       <mat-tab label="Volume Control">
         <ng-layer-ctl
           [ng-layer-ctl-name]="voi.ngVolume.url"

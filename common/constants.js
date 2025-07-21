@@ -63,6 +63,9 @@
     //Viewer mode
     VIEWER_MODE_ANNOTATING: 'annotating',
     VIEWER_MODE_KEYFRAME: 'key frame',
+    VIEWER_MODE_FOCUSVIEW_VOI: 'focusview:voi',
+    VIEWER_MODE_FOCUSVIEW_REG_CONN: 'focusview:regionalconnectivity',
+
 
     // Annotations
     USER_ANNOTATION_LIST: 'user annotations footer',
@@ -72,7 +75,8 @@
     USER_ANNOTATION_HIDE: 'user annotations hide',
     USER_ANNOTATION_DELETE: 'Delete annotation',
     GOTO_ANNOTATION_ROI: 'Navigate to annotation location of interest',
-    EXIT_ANNOTATION_MODE: 'Exit annotation mode',
+
+    EXIT_MODE: "Exit special mode",
 
     // volume tuning specific
     VOLUME_TUNING_EXPAND: 'Expand volume tuning widget',

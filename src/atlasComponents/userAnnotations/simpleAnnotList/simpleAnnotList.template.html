@@ -1,0 +1,18 @@
+<mat-list role="list">
+    <ng-template ngFor [ngForOf]="managedAnnotations$ | async " let-annot>
+        <mat-list-item role="listitem">
+            <ng-template [ngIf]="annot.name" [ngIfElse]="untitledtmpl" let-name>
+                {{ annot.name }}                        
+            </ng-template>
+            <ng-template #untitledtmpl>
+                <span class="text-muted">Untitled</span>
+            </ng-template>
+        </mat-list-item>
+    </ng-template>
+</mat-list>
+
+<ng-template [ngIf]="((managedAnnotations$ | async) || []).length === 0">
+    <span class="text-muted">
+        No annotations saved. Save annotations by right click on the viewer and "bookmark".
+    </span>
+</ng-template>

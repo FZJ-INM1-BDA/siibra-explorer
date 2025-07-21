@@ -13,6 +13,7 @@ import { unzip } from "src/zipFilesOutput/zipFilesOutput.directive";
 import { DialogService } from "src/services/dialogService.service";
 import { MatDialog } from "src/sharedModules/angularMaterial.exports";
 import { userAnnotationRouteKey } from "../constants";
+import { AnnotationListDirective } from "../directives/annotation.directive";
 
 const README = `{id}.sands.json file contains the data of annotations. {id}.desc.json contains the metadata of annotations.`
 
@@ -25,7 +26,7 @@ const README = `{id}.sands.json file contains the data of annotations. {id}.desc
   ],
   exportAs: 'annotationListCmp'
 })
-export class AnnotationList {
+export class AnnotationList extends AnnotationListDirective {
 
   public userAnnRoute = {}
 
@@ -36,8 +37,6 @@ export class AnnotationList {
 
   private subs: Subscription[] = []
   private managedAnnotations: IAnnotationGeometry[] = []
-  public managedAnnotations$ = this.annotSvc.spaceFilteredManagedAnnotations$
-  public annotationInOtherSpaces$ = this.annotSvc.otherSpaceManagedAnnotations$
 
   public descText$ = combineLatest([
     this.managedAnnotations$,
@@ -90,12 +89,13 @@ export class AnnotationList {
     shareReplay(1),
   )
   constructor(
-    private annotSvc: ModularUserAnnotationToolService,
+    annotSvc: ModularUserAnnotationToolService,
     private snackbar: MatSnackBar,
     private dialog: MatDialog,
     cStore: ComponentStore<{ useFormat: TExportFormats }>,
     @Optional() private dialogSvc: DialogService,
   ) {
+    super(annotSvc)
     cStore.setState({
       useFormat: 'sands'
     })

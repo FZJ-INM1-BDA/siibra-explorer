@@ -22,6 +22,9 @@ import { Router } from "@angular/router";
 import { DECODE_ENCODE, DecodeEncode } from "src/routerModule/util";
 import { userAnnotationRouteKey } from "./constants";
 import { RecursivePartial } from "src/util/recursivePartial";
+import { ModularUserAnnotationToolService } from "./tools/service";
+import { AnnotationListDirective } from "./directives/annotation.directive";
+import { SimpleAnnotationList } from "./simpleAnnotList/simpleAnnotList.component";
 
 @NgModule({
   imports: [
@@ -47,22 +50,29 @@ import { RecursivePartial } from "src/util/recursivePartial";
     AnnotationVisiblePipe,
     FilterAnnotationsBySpace,
     AnnotationEventDirective,
+    AnnotationListDirective,
+    SimpleAnnotationList,
   ],
   exports: [
     AnnotationMode,
     AnnotationList,
     AnnotationSwitch,
-    AnnotationEventDirective
+    AnnotationEventDirective,
+    AnnotationListDirective,
+    SimpleAnnotationList,
   ],
   providers: [
     // initialize routerannotation service, so it will parse route and load annotations ...
     // ... in url correctly
     {
       provide: APP_INITIALIZER,
-      useFactory:(_svc: RoutedAnnotationService) => {
+      useFactory:(_svc: RoutedAnnotationService, annSvc: ModularUserAnnotationToolService) => {
+        annSvc.loadStoredAnnotations().catch(e => {
+          console.error(`Loading annotation error: ${e}`)
+        })
         return () => Promise.resolve()
       },
-      deps: [ RoutedAnnotationService ],
+      deps: [ RoutedAnnotationService, ModularUserAnnotationToolService ],
       multi: true
     },
     {

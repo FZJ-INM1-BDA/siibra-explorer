@@ -18,6 +18,10 @@ import { AngularMaterialModule } from "src/sharedModules";
 export class TabComponent{
   @Input("sxplr-tab-icon")
   icon: string = "fas fa-file"
+  
+  // see https://fonts.google.com/icons?icon.set=Material+Icons
+  @Input("sxplr-tab-mat-icon")
+  mat_icon: string
 
   @Input("sxplr-tab-badge")
   badge: number

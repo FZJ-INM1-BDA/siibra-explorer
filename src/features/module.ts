@@ -29,6 +29,7 @@ import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.di
 import { FeatureViewBase } from "./view/view-base.directive";
 import { NgLayerCtrlCmp } from "src/viewerModule/nehuba/nehubaViewerInterface/ngLayerCtl/ngLayerCtrl.component";
 import { ExperimentalService } from "src/experimental/experimental.service";
+import { TPBRCategoryDirective } from "./tpbrCategory.directive";
 
 @NgModule({
   imports: [
@@ -67,6 +68,7 @@ import { ExperimentalService } from "src/experimental/experimental.service";
     FeatureNamePipe,
     GroupFeaturesToName,
     GroupFeatureTallyPipe,
+    TPBRCategoryDirective,
   ],
   exports: [
     EntryComponent,
@@ -74,6 +76,8 @@ import { ExperimentalService } from "src/experimental/experimental.service";
     FeatureViewBase,
     VoiBboxDirective,
     ListDirective,
+    TPBRCategoryDirective,
+    FilterCategoriesPipe,
   ],
   providers: [
     {

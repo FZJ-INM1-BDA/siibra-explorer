@@ -3,16 +3,6 @@
     (iav-key-event)="deselectTools()">
 
     <button
-        mat-raised-button
-        class="leave-me-alone annotation-tool-btn"
-        annotation-switch
-        annotation-switch-mode="off"
-        [matTooltip]="ARIA_LABELS.EXIT_ANNOTATION_MODE"
-        color="warn">
-        <i class="fas fa-times"></i>
-    </button>
-    
-    <button
         *ngFor="let moduleAnnotType of moduleAnnotationTypes"
         mat-raised-button
         class="annotation-tool-btn"

@@ -25,11 +25,9 @@ import { NgAnnotationService } from "./annotation/service";
 import { NehubaViewerContainer } from "./nehubaViewerInterface/nehubaViewerContainer.component";
 import { NehubaUserLayerModule } from "./userLayers";
 import { DialogModule } from "src/ui/dialogInfo";
-import { CoordTextBox } from "src/components/coordTextBox";
 import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.directive";
 import { MediaQueryDirective } from "src/util/directives/mediaQuery.directive";
 import { SapiViewsUtilModule } from "src/atlasComponents/sapiViews";
-import { CoordinateText } from "src/components/coordTextBox/coordText.directive";
 
 @NgModule({
   imports: [
@@ -61,8 +59,6 @@ import { CoordinateText } from "src/components/coordTextBox/coordText.directive"
     NehubaLayoutOverlayModule,
     DialogModule,
 
-    CoordTextBox,
-    CoordinateText,
     ExperimentalFlagDirective,
     SapiViewsUtilModule,
   ],

@@ -19,6 +19,9 @@ import { arrayEqual } from "src/util/array";
 import { SXPLR_PREFIX } from "src/util/constants";
 import { ModularUserAnnotationToolService } from "src/atlasComponents/userAnnotations/tools/service";
 import { IAnnotationGeometry } from "src/atlasComponents/userAnnotations/tools/type";
+import { MatDialog } from "src/sharedModules";
+import { BANLIST_CONNECTIVITY, EXPERIMENTAL_CONNECTIVITY, WHITELIST_CONNECTIVITY } from "src/features/connectivity";
+import { ViewerMode } from "src/state/atlasSelection/const";
 
 const pipe = new FilterGroupedParcellationPipe()
 
@@ -311,7 +314,29 @@ export class VerticalBreadCrumbComponent {
       { inAnnot, outAnnot }]) => {
       
       const parentIds = new Set(allAvailableRegions.flatMap(v => v.parentIds))
-
+      const { atlas, template, parcellation } = selectedATP
+      const enableRegionalConnectivity = (
+        WHITELIST_CONNECTIVITY.SPECIES.includes(atlas?.species)
+        && !BANLIST_CONNECTIVITY.SPECIES.includes(atlas?.species)
+        && selectedRegions.length === 1
+        && (
+          (
+            WHITELIST_CONNECTIVITY.SPACE.includes(template?.id) && !BANLIST_CONNECTIVITY.SPACE.includes(template?.id)
+          ) || (
+            WHITELIST_CONNECTIVITY.PARCELLATION.includes(parcellation?.id) && !BANLIST_CONNECTIVITY.PARCELLATION.includes(parcellation?.id)
+          )
+        )
+        && (
+          (
+            WHITELIST_CONNECTIVITY.SPACE.includes(template?.id) && !BANLIST_CONNECTIVITY.SPACE.includes(template?.id)
+          ) || (
+            WHITELIST_CONNECTIVITY.PARCELLATION.includes(parcellation?.id) && !BANLIST_CONNECTIVITY.PARCELLATION.includes(parcellation?.id)
+          ) || (
+            showExperimental && EXPERIMENTAL_CONNECTIVITY.PARCELLATION.includes(parcellation?.id)
+          )
+        )
+      )
+      const isVolumetric = template && template.id !== IDS.TEMPLATES.FSAVERAGE
       return {
         selectedATP, selectedRegions, templates, parcellations, atlases, noGroupParcs, groupParcs, allAvailableRegions, labelMappedRegionNames, currentViewport, selectedFeature, selectedPoint, labels, minimizedCards, useViewer, parcellationVisible, showExperimental, customLayers,
         useAccordion: true, maximizedCard,
@@ -319,7 +344,9 @@ export class VerticalBreadCrumbComponent {
         branchRegions: allAvailableRegions.filter(r => parentIds.has(r.id)),
         debug: false,
         zoom,
-        inAnnot, outAnnot
+        inAnnot, outAnnot,
+        enableRegionalConnectivity,
+        isVolumetric,
       }
     })
   )
@@ -328,6 +355,7 @@ export class VerticalBreadCrumbComponent {
     private store$: Store,
     private sapi: SAPI,
     private annotSvc: ModularUserAnnotationToolService,
+    private dialog: MatDialog,
     @Inject(NEHUBA_CONFIG_SERVICE_TOKEN) private nehubaConfigSvc: NehubaConfigSvc,
   ){
     
@@ -695,5 +723,13 @@ export class VerticalBreadCrumbComponent {
 
   public nameEql(a: any, b: any){
     return a.name === b.name
+  }
+
+  public goToViewerMode(viewerMode: ViewerMode){
+    this.store$.dispatch(
+      atlasSelection.actions.setViewerMode({
+        viewerMode
+      })
+    )
   }
 }

@@ -2,6 +2,7 @@ import { Directive, EventEmitter, HostListener, Input, Output, TemplateRef } fro
 import { MatDialog, MatDialogConfig, MatDialogRef } from 'src/sharedModules/angularMaterial.exports'
 import { DialogFallbackCmp } from "./tmpl/tmpl.component"
 import { ComponentType } from "@angular/cdk/portal";
+import { DialogService } from "src/services/dialogService.service";
 
 type DialogSize = 's' | 'm' | 'l' | 'xl' | 'auto'
 
@@ -46,13 +47,16 @@ export class DialogDirective{
 
   @Input('sxplr-dialog-use-tmpl')
   useTemplate: string = "default"
+  
+  @Input('sxplr-dialog-restorable')
+  restorable: boolean = false
 
   @Output('sxplr-dialog-closed')
   closed = new EventEmitter()
 
   #dialogRef: MatDialogRef<unknown>
 
-  constructor(private matDialog: MatDialog){}
+  constructor(private matDialog: MatDialog, private dialogSvc: DialogService){}
 
   get template(){
     if (typeof this.templateRef === "string") {
@@ -63,12 +67,20 @@ export class DialogDirective{
 
   @HostListener('click')
   onClick(data: any={}){
-    this.#dialogRef = this.matDialog.open(this.template, {
+    const openDialog = () => this.matDialog.open(this.template, {
       autoFocus: null,
       data: {...this.data, ...data},
       ...(sizeDict[this.size] || {}),
       ...this.config
     })
+    if (this.restorable) {
+      this.dialogSvc.registerAndOpenRestorableDialog(
+        () => openDialog(),
+        () => this.closed.emit(null)
+      )
+      return
+    }
+    this.#dialogRef = openDialog()
 
     this.#dialogRef.afterClosed().subscribe(val => {
       this.closed.next(val)
