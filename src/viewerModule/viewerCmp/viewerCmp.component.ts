@@ -13,7 +13,6 @@ import { atlasAppearance, atlasSelection, userInteraction, userPreference } from
 import { SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { EntryComponent } from "src/features/entry/entry.component";
 import { TFace, TSandsPoint, getCoord } from "src/util/types";
-import { wait } from "src/util/fn";
 import { DestroyDirective } from "src/util/directives/destroy.directive";
 import { generalActionError } from "src/state/actions";
 import { enLabels } from "src/uiLabels";
@@ -592,13 +591,6 @@ export class ViewerCmp {
 
   @ViewChild('voiFeatureEntryCmp')
   voiFeatureEntryCmp: EntryComponent
-
-  async pullAllVoi(){
-    await wait(320)
-    if (this.voiFeatureEntryCmp){
-      this.voiFeatureEntryCmp.pullAll()
-    }
-  }
 
   selectATPR(regParc: {region: SxplrRegion, parcellation: SxplrParcellation}){
     this.store$.dispatch(

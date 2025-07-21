@@ -6,6 +6,9 @@ on:
       DEPLOYMENT_NAME:
         required: true
         type: string # prod, rc
+      IMAGE_REPO:
+        type: string
+        default: 'docker-registry.ebrains.eu/siibra/siibra-explorer'
       IMAGE_TAG:
         required: true
         type: string
@@ -34,11 +37,13 @@ jobs:
         && helm --kubeconfig=$kubecfg_path \
           upgrade \
           --history-max 3 \
+          --set image.repository=${{ inputs.IMAGE_REPO }} \
           --set image.tag=${{ inputs.IMAGE_TAG }} \
           --set podAnnotations.image-digest=${{ inputs.IMAGE_DIGEST }} \
           ${{ inputs.DEPLOYMENT_NAME }} .helm/siibra-explorer/ \
         || helm --kubeconfig=$kubecfg_path \
           install\
+          --set image.repository=${{ inputs.IMAGE_REPO }} \
           --set image.tag=${{ inputs.IMAGE_TAG }} \
           --set podAnnotations.image-digest=${{ inputs.IMAGE_DIGEST }} \
           ${{ inputs.DEPLOYMENT_NAME }} .helm/siibra-explorer/
@@ -60,12 +65,14 @@ jobs:
           upgrade \
           --history-max 3 \
           --reuse-values \
+          --set image.repository=${{ inputs.IMAGE_REPO }} \
           --set image.tag=${{ inputs.IMAGE_TAG }} \
           --set envObj.OVERWRITE_API_ENDPOINT="https://siibra-api-rc.apps.ebrains.eu/v3_0" \
           --set podAnnotations.image-digest=${{ inputs.IMAGE_DIGEST }} \
           ${{ inputs.DEPLOYMENT_NAME }} .helm/siibra-explorer/ \
         || helm --kubeconfig=$kubecfg_path \
           install\
+          --set image.repository=${{ inputs.IMAGE_REPO }} \
           --set image.tag=${{ inputs.IMAGE_TAG }} \
           --set podAnnotations.image-digest=${{ inputs.IMAGE_DIGEST }} \
           --set envObj.HOST_PATHNAME=/viewer-staging \

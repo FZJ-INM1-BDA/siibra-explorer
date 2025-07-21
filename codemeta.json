@@ -91,7 +91,7 @@
     ],
     "codeRepository": "git+https://github.com/fzj-inm1-bda/siibra-explorer.git",
     "dateCreated": "2024-08-28",
-    "dateModified": "2025-07-10",
+    "dateModified": "2025-07-15",
     "datePublished": "2019-04-26",
     "description": "`siibra-explorer` is a browser based 3D viewer for exploring brain atlases that cover different spatial resolutions and modalities. It is built around an interactive 3D view of the brain displaying a unique selection of detailed templates and parcellation maps for the human, macaque, rat or mouse brain, including BigBrain as a microscopic resolution human brain model at its full resolution of 20 micrometers. ",
     "license": "https://spdx.org/licenses/Apache-2.0",

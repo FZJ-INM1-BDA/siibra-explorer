@@ -1,12 +1,11 @@
-import { AfterViewInit, ChangeDetectorRef, Component, Inject, QueryList, TemplateRef, ViewChildren, inject } from '@angular/core';
+import { AfterViewInit, Component, Inject, QueryList, TemplateRef, ViewChildren, inject } from '@angular/core';
 import { select, Store } from '@ngrx/store';
-import { debounceTime, distinctUntilChanged, map, scan, shareReplay, switchMap, take, takeUntil, withLatestFrom } from 'rxjs/operators';
+import { distinctUntilChanged, map, scan, shareReplay, switchMap, take, takeUntil } from 'rxjs/operators';
 import { IDS, SAPI } from 'src/atlasComponents/sapi';
 import { Feature } from 'src/atlasComponents/sapi/sxplrTypes';
 import * as userInteraction from "src/state/userInteraction"
 import { CategoryAccDirective } from "../category-acc.directive"
-import { combineLatest, concat, EMPTY, forkJoin, from, merge, of, Subject } from 'rxjs';
-import { DsExhausted, IsAlreadyPulling, PulledDataSource } from 'src/util/pullable';
+import { BehaviorSubject, combineLatest, concat, EMPTY, forkJoin, from, merge, of } from 'rxjs';
 import { TranslatedFeature } from '../list/list.directive';
 import { MatDialog, MatSnackBar } from 'src/sharedModules/angularMaterial.exports';
 import { DestroyDirective } from 'src/util/directives/destroy.directive';
@@ -37,7 +36,6 @@ export class EntryComponent extends TPBRCategoryDirective implements AfterViewIn
     private store: Store,
     private dialog: MatDialog,
     private snackbar: MatSnackBar,
-    private cdr: ChangeDetectorRef,
     private expmtSvc: ExperimentalService,
     @Inject(FEATURE_CONCEPT_TOKEN) private featConcept: FeatureConcept,
   ) {
@@ -51,13 +49,13 @@ export class EntryComponent extends TPBRCategoryDirective implements AfterViewIn
   }
   #tprb: TPRB
 
-  #catAccDirs = new Subject<CategoryAccDirective[]>()
+  #catAccDirs = new BehaviorSubject<CategoryAccDirective[]>([])
   features$ = this.#catAccDirs.pipe(
     switchMap(dirs => concat(
       of([] as TranslatedFeature[]),
       merge(...dirs.map((dir, idx) =>
         dir.datasource$.pipe(
-          switchMap(ds =>  ds.data$),
+          switchMap(ds =>  ds.pullAll()),
           map(val => ({ val, idx }))
         ))
       ).pipe(
@@ -152,31 +150,6 @@ export class EntryComponent extends TPBRCategoryDirective implements AfterViewIn
       takeUntil(this.ondestroy$),
     ).subscribe(dirs => this.#catAccDirs.next(dirs))
 
-    this.#pullAll.pipe(
-      debounceTime(320),
-      withLatestFrom(this.#catAccDirs),
-      switchMap(([_, dirs]) => combineLatest(dirs.map(dir => dir.datasource$))),
-      takeUntil(this.ondestroy$),
-    ).subscribe(async dss => {
-      await Promise.all(
-        dss.map(async ds => {
-          // eslint-disable-next-line no-constant-condition
-          while (true) {
-            try {
-              await ds.pull()
-            } catch (e) {
-              if (e instanceof DsExhausted) {
-                break
-              }
-              if (e instanceof IsAlreadyPulling ) {
-                continue
-              }
-              throw e
-            }
-          }
-        })
-      )
-    })
   }
 
   public selectedAtlas$ = this.store.pipe(
@@ -258,25 +231,6 @@ export class EntryComponent extends TPBRCategoryDirective implements AfterViewIn
         feature
       })
     )
-  }
-
-  async onScroll(datasource: PulledDataSource<unknown>, scrollIndex: number){
-    if ((datasource.currentValue.length - scrollIndex) < 30) {
-      try {
-        await datasource.pull()
-        this.cdr.detectChanges()
-      } catch (e) {
-        if (e instanceof IsAlreadyPulling || e instanceof DsExhausted) {
-          return
-        }
-        throw e
-      }
-    }
-  }
-
-  #pullAll = new Subject()
-  pullAll(){
-    this.#pullAll.next(null)
   }
 
   openDialog(tmpl: TemplateRef<unknown>){

@@ -179,7 +179,6 @@
 
         <ng-template [ngIf]="categoryAcc.datasource$ | async" let-datasource>
             <cdk-virtual-scroll-viewport itemSize="36"
-                (scrolledIndexChange)="onScroll(datasource, $event)"
                 class="virtual-scroll-viewport">
 
                 <ng-template cdkVirtualFor
@@ -189,16 +188,28 @@
 
                     <!-- n.b. do not introduce mattooltip in scrollable container -->
                     <!-- it will override scrollability -->
-                    <button
-                        mat-button
-                        class="virtual-scroll-item sxplr-w-100"
-                        (click)="onClickFeature(feature)">
-                        <span class="ws-no-wrap"> {{ feature.name }} </span>
-                    </button>
+                    <ng-template [ngIf]="feature" [ngIfElse]="fallbackTmpl">
+                        <button
+                            mat-button
+                            class="virtual-scroll-item sxplr-w-100"
+                            (click)="onClickFeature(feature)">
+                            <span class="ws-no-wrap"> {{ feature.name }} </span>
+                        </button>
+                    </ng-template>
+                    <ng-template #fallbackTmpl>
+                        <button
+                            disabled
+                            mat-button
+                            class="virtual-scroll-item sxplr-w-100">
+                            <mat-spinner class="sxplr-d-inline-block" [diameter]="14"></mat-spinner> 
+                            <span class="ws-no-wrap"> Loading ... </span>
+                        </button>
+                    </ng-template>
 
-                    <div *ngIf="last && datasource.isPulling$ | async">
-                        <ng-template [ngTemplateOutlet]="loadingSpinnerTmpl">
-                        </ng-template>
+                </ng-template>
+                <ng-template [ngIf]="datasource.isBusy$ | async">
+                    <div class="center-a-div">
+                        <mat-spinner [diameter]="24"></mat-spinner>
                     </div>
 
 

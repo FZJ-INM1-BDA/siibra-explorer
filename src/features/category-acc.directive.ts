@@ -2,7 +2,7 @@ import { AfterContentInit, ContentChildren, Directive, Input, OnDestroy, QueryLi
 import { combineLatest, merge, of, Subject, Subscription } from 'rxjs';
 import { distinctUntilChanged, map, scan, shareReplay, switchMap } from 'rxjs/operators';
 import { ListDirective, TranslatedFeature } from './list/list.directive';
-import { ParentDatasource, PulledDataSource } from 'src/util/pullable';
+import { ParentCustomDataSource } from 'src/util/pullable';
 import { arrayEqual } from 'src/util/array';
 
 export type FeatureMetadata = {
@@ -94,7 +94,7 @@ export class CategoryAccDirective implements AfterContentInit, OnDestroy {
     this.#unchecked$.next(val)
   }
 
-  datasource: ParentDatasource<TranslatedFeature>
+  datasource: ParentCustomDataSource<TranslatedFeature>
   public datasource$ = combineLatest([
     this.unchecked$,
     this.#listCmps$,
@@ -105,17 +105,14 @@ export class CategoryAccDirective implements AfterContentInit, OnDestroy {
       
       if (filteredListCmps.length === 0) {
         return of(
-          new ParentDatasource({
-            children: [] as PulledDataSource<TranslatedFeature>[],
-            serialize: f => f.id
-          })
+          new ParentCustomDataSource<TranslatedFeature>([])
         )
       }
       return combineLatest(
         filteredListCmps.map(cmp => cmp.datasource$)
       ).pipe(
         map(dss => {
-          this.datasource = new ParentDatasource({ children: dss, serialize: f => f.id })
+          this.datasource = new ParentCustomDataSource(dss)
           return this.datasource
         }),
       )
@@ -123,42 +120,6 @@ export class CategoryAccDirective implements AfterContentInit, OnDestroy {
     shareReplay(1),
   )
 
-  constructor(){
-
-    /**
-     * On init, if current count is less than 50, and less than total, pull.
-     */
-    this.#subscriptions.push(
-      combineLatest([
-        this.total$,
-        this.datasource$
-      ]).pipe(
-        switchMap(([ total, ds ]) => 
-          ds.connect().pipe(
-            map(items => ({
-              total,
-              ds,
-              current: items.length
-            }))
-          )
-        )
-      ).subscribe(async ({ total, current, ds }) => {
-        if (total > current && current < 50) {
-          try {
-            /**
-             * TODO Interaction between ParentDataSource and ListDatadirective, which both pulls seems
-             * to weirdly interact with each other. 
-             * For now, pulling twice seems to solve the issue
-             */
-            await ds.pull()
-            await ds.pull()
-          } catch (e) {
-            // if already pulling, ignore
-          }
-        }
-      })
-    )
-  }
 
   #subscriptions: Subscription[] = []
   #changeSub: Subscription

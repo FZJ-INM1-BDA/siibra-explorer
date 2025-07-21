@@ -124,6 +124,8 @@ If you do not accept the Terms & Conditions you are not permitted to access or u
     CONNECTIVITY: 'Connectivity',
     NO_ADDIONTAL_INFO_AVAIL: `Currently, no additional information is linked to this region.`,
 
+    LOG_10_DISABLED: `log 10 is disabled if any of the connectivity profile value is less or equal to 1`,
+
     PINNED_DATASETS_BADGE_DESC: `Number of pinned datasets`,
 
     GDPR_TEXT: `This dataset is currently reviewed by the EBRAINS Data Protection Office regarding GDPR compliance. Therefore the atlas does not provide access to the underlying data files yet. The data will be available after this review.`,
