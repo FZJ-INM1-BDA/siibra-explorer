@@ -181,7 +181,7 @@ jobs:
   trigger-deploy-dev-rancher:
     if: ${{ needs.set-vars.outputs.BRANCH_NAME == 'dev' && success() }}
     needs:
-      - build-docker-img
+      - build-docker-img-ebrains
       - set-vars
     uses: ./.github/workflows/deploy-helm.yml
     with:
