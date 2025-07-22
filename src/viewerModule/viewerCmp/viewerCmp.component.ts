@@ -22,6 +22,7 @@ import { MatDialog, MatDialogRef, MatSnackBar } from "src/sharedModules";
 import { ModularUserAnnotationToolService } from "src/atlasComponents/userAnnotations/tools/service";
 import { PointAssignmentFull } from "src/atlasComponents/sapiViews/volumes/point-assignment-full/point-assignment-full.component";
 import { Point } from "src/atlasComponents/userAnnotations/tools/point";
+import { DoiTemplate } from "src/ui/doi/doi.component";
 
 interface HasName {
   name: string
@@ -44,6 +45,8 @@ interface HasName {
 })
 
 export class ViewerCmp {
+
+  DoiTemplate = DoiTemplate
 
   public readonly destroy$ = inject(DestroyDirective).destroyed$
 

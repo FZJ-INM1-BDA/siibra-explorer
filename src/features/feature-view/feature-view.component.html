@@ -1,4 +1,12 @@
-<ng-template [ngIf]="view$ | async" let-view>
+<ng-template #loadingTmpl>
+  <div class="loading-div">
+    <span>
+      Loading ...
+    </span>
+  </div>
+</ng-template>
+
+<ng-template [ngIf]="view$ | async" [ngIfElse]="loadingTmpl" let-view>
 
 
   <mat-card class="mat-elevation-z4 sxplr-z-4 header-card">

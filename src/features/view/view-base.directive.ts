@@ -248,12 +248,17 @@ export class FeatureViewBase {
       of(null as VoiFeature),
       this.#voi$
     ).pipe(
-      switchMap(async voi => {
+      switchMap(voi => {
         if (!voi) {
-          return { voi, additionalVois: [] as _Voi[] }
+          return of({ voi, additionalVois: [] as _Voi[] })
         }
-        return await this.#getAdditionalVois(voi)
-        
+        return concat(
+          of({
+            voi,
+            additionalVois: [] as _Voi[]
+          }),
+          this.#getAdditionalVois(voi),
+        )
       })
     ),
     concat(

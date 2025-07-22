@@ -31,3 +31,14 @@ readmore-component
         background-color: #433;
     }
 }
+
+.loading-div
+{
+    min-height: 65dvh;
+    display: grid;
+
+    > *
+    {
+        place-self: center;
+    }
+}

@@ -140,8 +140,8 @@
             [feature]="feature"
             #fvb="featureViewBase">
             
-            <ng-template [ngIf]="fvb.view$ | async" let-view>
-              <ng-template [ngIf]="view.voi" let-voi>
+            <ng-template [ngIf]="fvb.view$ | async" let-fView>
+              <ng-template [ngIf]="fView.voi" let-voi>
                 <mat-card>
                   <mat-card-header>
                     <mat-card-title>
@@ -159,6 +159,41 @@
                       [ng-layer-ctl-meta]="voi.ngVolume.meta"
                       [ng-layer-ctl-show]="true">
                     </ng-layer-ctl>
+                    <mat-form-field class="flex-grow-3">
+                        <mat-label>
+                            Visualize with a model
+                        </mat-label>
+                        <mat-select #vizSelect="matSelect">
+                            <mat-option disabled selected>Select a model</mat-option>
+                            <mat-option
+                                *ngFor="let aVoi of fView.additionalVois"
+                                [value]="aVoi.id">
+                                {{ aVoi.name }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    
+                    <ng-template ngFor [ngForOf]="fView.additionalVois" let-aVoi>
+                        <ng-template [ngIf]="aVoi.id === vizSelect.value">
+                            <button mat-icon-button
+                                [matTooltip]="view.labels.DETAILS"
+                                [sxplr-dialog]="DoiTemplate"
+                                [sxplr-dialog-size]="null"
+                                [sxplr-dialog-data]="{
+                                    title: aVoi.name,
+                                    desc: aVoi.desc,
+                                    contributors: aVoi.contributors | dedup, 
+                                    actions: aVoi.link | mapToProperty : 'href' | dedup
+                                }">
+                                <mat-icon>info</mat-icon>
+                            </button>
+                        </ng-template>
+                    </ng-template>
+                    <button mat-icon-button color="warn"
+                        (click)="vizSelect.value = null"
+                        [disabled]="!vizSelect.value">
+                        <mat-icon>clear</mat-icon>
+                    </button>
                   </mat-card-content>
                 </mat-card>
               </ng-template>
@@ -586,8 +621,10 @@
 
 <!-- template for single feature modal -->
 <ng-template #focusFeatureDialogTmpl let-context>
-    <sxplr-feature-view [feature]="context.feature">
-    </sxplr-feature-view>
+    <mat-dialog-content>
+      <sxplr-feature-view [feature]="context.feature">
+      </sxplr-feature-view>
+    </mat-dialog-content>
     <div mat-dialog-actions>
         <button mat-button mat-dialog-close #closeBtn="matDialogClose">
             Close
