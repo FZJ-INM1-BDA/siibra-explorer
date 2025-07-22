@@ -317,7 +317,7 @@ export class FeatureViewBase {
       const resp = await fetch(`${url}/meta.json`)
       const meta: MetaV1Schema = await resp.json()
       
-      meta.transform[1][3] -= 40e3 
+      meta.transform[1][3] -= 20e3
       additionalVois.push({
         bbox: {
           center: [0, realYDis, 0],
@@ -337,7 +337,7 @@ export class FeatureViewBase {
               type: "enclosed",
               points: BIGBRAIN_XZ.map(([x, z]) => ({
                 type: "point",
-                value: [x, realYDis - 1e-2, z]
+                value: [x, realYDis, z]
               }))
             }]
           },
@@ -370,7 +370,6 @@ export class FeatureViewBase {
           },
         ]
       })
-      voi.ngVolume.url = `https://zam12230.jsc.fz-juelich.de/mvp-tiamat/bb1micron/B20_${sectionId}.tif::pipelines/bb1mu.json`
     } catch (e) {
       console.warn("Parse voi error:", e)
     }

@@ -23,6 +23,7 @@ import { ModularUserAnnotationToolService } from "src/atlasComponents/userAnnota
 import { PointAssignmentFull } from "src/atlasComponents/sapiViews/volumes/point-assignment-full/point-assignment-full.component";
 import { Point } from "src/atlasComponents/userAnnotations/tools/point";
 import { DoiTemplate } from "src/ui/doi/doi.component";
+import { SXPLR_PREFIX } from "src/util/constants";
 
 interface HasName {
   name: string
@@ -47,6 +48,7 @@ interface HasName {
 export class ViewerCmp {
 
   DoiTemplate = DoiTemplate
+  SXPLR_PREFIX = SXPLR_PREFIX
 
   public readonly destroy$ = inject(DestroyDirective).destroyed$
 
@@ -156,13 +158,32 @@ export class ViewerCmp {
     }))
   )
 
+  atlasAppearanceState$ = combineLatest([
+    this.store$.pipe(
+      select(atlasAppearance.selectors.showDelineation)
+    )
+  ]).pipe(
+    map(([ showDelineation ]) => {
+      return {
+        showDelineation
+      }
+    })
+  )
+
+  toggleParcellationDelineation(){
+    this.store$.dispatch(
+      atlasAppearance.actions.toggleParcDelineation()
+    )
+  }
+
   public view$ = combineLatest([
     this.#view0$,
     this.#view1$,
+    this.atlasAppearanceState$,
     of(enLabels),
   ]).pipe(
-    map(([v0, v1, labels]) => ({ ...v0, ...v1, labels })),
-    map(({ selectedRegions, viewerMode, selectedFeature, selectedPoint, selectedTemplate, selectedParcellation, currentMap, allAvailableRegions, fullSidenavExpanded, halfSidenavExpanded, labels, useViewer }) => {
+    map(([v0, v1, atlasAppearanceState, labels]) => ({ ...v0, ...v1, ...atlasAppearanceState, labels })),
+    map(({ selectedRegions, viewerMode, selectedFeature, selectedPoint, selectedTemplate, selectedParcellation, currentMap, allAvailableRegions, fullSidenavExpanded, halfSidenavExpanded, labels, useViewer, showDelineation }) => {
       let spatialObjectTitle: string
       let spatialObjectSubtitle: string
       if (selectedPoint) {
@@ -211,6 +232,7 @@ export class ViewerCmp {
 
         labels,
         useViewer,
+        showDelineation,
       }
     }),
     shareReplay(1),

@@ -89,11 +89,12 @@ export class EntryComponent extends TPBRCategoryDirective implements AfterViewIn
         triplet.map((v, idx) => translateMm[idx] - v).join(",")
       ).reverse().join("/")
 
-      const tmpHost = `https://zam12230.jsc.fz-juelich.de/macaque-md/geometry/`
+      const tmpHost = `https://geom-svc.apps.ebrains.eu`
+      const filename = `SST42_cloud.csv`
       return concat(
         of([]),
         from(
-          fetch(`${tmpHost}/foo/0/${bboxStr}/stat`).then(res => res.json())
+          fetch(`${tmpHost}/${filename}/0/${bboxStr}/stat`).then(res => res.json())
         ).pipe(
           switchMap(result => {
             if ((result.count || 1e10) > 1e5) {
@@ -101,7 +102,7 @@ export class EntryComponent extends TPBRCategoryDirective implements AfterViewIn
               return EMPTY
             }
             return from(
-              fetch(`${tmpHost}/foo/0/${bboxStr}/geometry`).then(res => res.json())
+              fetch(`${tmpHost}/${filename}/0/${bboxStr}/geometry`).then(res => res.json())
             ).pipe(
               map(
                 (arr: number[][]) => arr.map(

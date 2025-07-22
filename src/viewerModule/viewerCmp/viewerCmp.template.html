@@ -149,6 +149,15 @@
                     </mat-card-title>
                   </mat-card-header>
                   <mat-card-content>
+
+                    <mat-slide-toggle [checked]="view.showDelineation"
+                      (change)="toggleParcellationDelineation()"
+                      [iav-key-listener]="[{'type': 'keydown', 'key': 'q', 'capture': true, 'target': 'document' }]"
+                      (iav-key-event)="toggleParcellationDelineation()"
+                      >
+                      Parcellation {{ view.showDelineation ? 'Shown' : 'Hidden' }}
+                    </mat-slide-toggle>
+                    <mat-divider></mat-divider>
                     <ng-layer-ctl
                       [ng-layer-ctl-name]="voi.ngVolume.url"
                       [ng-layer-ctl-format]="voi.ngVolume.format"
@@ -194,6 +203,20 @@
                         [disabled]="!vizSelect.value">
                         <mat-icon>clear</mat-icon>
                     </button>
+                    
+                    <ng-template ngFor [ngForOf]="fView.additionalVois" let-aVoi>
+                        <ng-template [ngIf]="aVoi.id === vizSelect.value">
+                            <mat-divider></mat-divider>
+                            <ng-layer-ctl
+                                [ng-layer-ctl-name]="SXPLR_PREFIX + aVoi.ngVolume.url"
+                                [ng-layer-ctl-src]="aVoi.ngVolume.url"
+                                [ng-layer-ctl-transform]="aVoi.ngVolume.transform"
+                                [ng-layer-ctl-meta]="aVoi.ngVolume.meta"
+                                [ng-layer-ctl-insert-index]="aVoi.ngVolume.insertIndex"
+                                [ng-layer-ctl-opacity]="1.0">
+                            </ng-layer-ctl>
+                        </ng-template>
+                    </ng-template>
                   </mat-card-content>
                 </mat-card>
               </ng-template>
