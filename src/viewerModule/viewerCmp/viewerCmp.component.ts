@@ -529,14 +529,16 @@ export class ViewerCmp {
   }
 
   public bookmarkPoint(pointSpec: {point?: number[], face?: number, vertices?: number[]}, template: SxplrTemplate){
-    const toolInstance = this.userAnnotSvc.getTool("Point")
-    if (!toolInstance) {
+    const _ = this.userAnnotSvc.getTool("Point")
+    if (!_) {
       return
     }
     const { point } = pointSpec
     if (!point) {
       return
     }
+
+    const { toolInstance } = _
     
     const pt = new Point({
       '@type': 'siibra-ex/annotation/point',

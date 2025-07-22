@@ -18,6 +18,7 @@ import { atlasSelection } from "src/state";
 import { AnnotationLayer, getViewer } from "src/atlasComponents/annotations";
 import { translateV3Entities } from "src/atlasComponents/sapi/translateV3";
 import { HOVER_INTERCEPTOR_INJECTOR, HoverInterceptor, THoverConfig } from "src/util/injectionTokens";
+import { ToolCmpBase } from "./toolCmp.base";
 
 
 const ANNOTATED_SYMBOL = Symbol("ANNOTATED_SYMBOL")
@@ -146,7 +147,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     iconClass: string
     toolInstance: AbsToolClass<IAnnotationGeometry>
     target?: Type<IAnnotationGeometry>
-    editCmp?: Type<unknown>
+    editCmp?: Type<ToolCmpBase>
     onDestoryCallBack: () => void
   }[] = []
   private mousePosReal: [number, number, number]
@@ -191,7 +192,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
   public registerTool<T extends AbsToolClass<any>>(arg: {
     toolCls: ClassInterface<T>
     target?: ClassInterface<IAnnotationGeometry>
-    editCmp?: ClassInterface<any>
+    editCmp?: ClassInterface<ToolCmpBase>
   }): AbsToolClass<any>{
     const { toolCls: Cls, target, editCmp } = arg
     const newTool = new Cls(this.annotnEvSubj, arg => this.handleToolCallback(arg)) as T & { ngOnDestroy?: () => void }
@@ -831,12 +832,12 @@ export class ModularUserAnnotationToolService implements OnDestroy{
 
   /**
    * @param {string} name name of the tool
-   * @returns {null|AbsToolClass<IAnnotationGeometry>}
    */
-  getTool(name: string /* t: Type<IAnnotationGeometry> */): null|AbsToolClass<IAnnotationGeometry> {
-    for (const { toolInstance, name: _name } of this.registeredTools){
+  getTool(name: string /* t: Type<IAnnotationGeometry> */) {
+    for (const _ of this.registeredTools){
+      const { name: _name } = _
       if (name === _name) {
-        return toolInstance
+        return _
       }
     }
     return null

@@ -1,10 +1,12 @@
-import { Component, inject, Input } from "@angular/core";
+import { Component, createComponent, EnvironmentInjector, inject, Injector, Input } from "@angular/core";
 import { AnnotationListDirective } from "../directives/annotation.directive";
 import { ModularUserAnnotationToolService } from "../tools/service";
 import { BehaviorSubject, combineLatest } from "rxjs";
 import { DestroyDirective } from "src/util/directives/destroy.directive";
 import { takeUntil } from "rxjs/operators";
 import { AnnotationLayer } from "src/atlasComponents/annotations";
+import { IAnnotationGeometry, UDPATE_ANNOTATION_TOKEN } from "../tools/type";
+import { ComponentStore } from "src/viewerModule/componentStore";
 
 const LAYER_NAME = `annotation-preview`
 const LAYER_COLOR = `#00ffff`
@@ -21,7 +23,7 @@ const LAYER_COLOR = `#00ffff`
 })
 
 export class SimpleAnnotationList extends AnnotationListDirective{
-  
+  #envInj = inject(EnvironmentInjector)
   #destroyed$ = inject(DestroyDirective).destroyed$
 
   #show$ = new BehaviorSubject(false)
@@ -31,7 +33,8 @@ export class SimpleAnnotationList extends AnnotationListDirective{
   }
 
   constructor(
-    annotSvc: ModularUserAnnotationToolService
+    annotSvc: ModularUserAnnotationToolService,
+    private injector: Injector,
   ){
     super(annotSvc)
     combineLatest([
@@ -51,5 +54,27 @@ export class SimpleAnnotationList extends AnnotationListDirective{
         layer.dispose()
       }
     })
+  }
+
+  gotoRoi(annot: IAnnotationGeometry){
+    const result = this.annotSvc.getTool(annot.annotationType)
+    if (!result) {
+      return
+    }
+    const { editCmp } = result
+    const inj = Injector.create({
+      providers: [
+        {
+          provide: UDPATE_ANNOTATION_TOKEN,
+          useValue: annot
+        },
+        ComponentStore
+      ],
+      parent: this.injector
+    })
+
+    const cmp = createComponent(editCmp, { environmentInjector: this.#envInj, elementInjector: inj })
+    cmp.instance.gotoRoi()
+    cmp.destroy()
   }
 }

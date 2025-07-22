@@ -7,6 +7,12 @@
             <ng-template #untitledtmpl>
                 <span class="text-muted">Untitled</span>
             </ng-template>
+
+            <button mat-icon-button
+                matListItemIcon
+                (click)="gotoRoi(annot)">
+                <mat-icon>location_on</mat-icon>
+            </button>
         </mat-list-item>
     </ng-template>
 </mat-list>
