@@ -707,7 +707,7 @@ class TranslateV3 {
             points: BIGBRAIN_XZ.map(([x, z]) => ({
               type: "point",
               // best view point === center of voxel, not on the grid
-              value: [x, realYDis - 1e-2, z]
+              value: [x, realYDis, z]
             }))
           }]
         }
