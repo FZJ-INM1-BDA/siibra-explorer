@@ -1,5 +1,5 @@
 import { CollectionViewer, DataSource } from "@angular/cdk/collections"
-import { BehaviorSubject, Observable, Subscription, combineLatest, from } from "rxjs"
+import { BehaviorSubject, Observable, Subscription, combineLatest, from, merge } from "rxjs"
 import { map, shareReplay, switchMap, take } from "rxjs/operators"
 import { waitFor } from "./fn"
 
@@ -108,17 +108,31 @@ export class CustomDataSource<T> extends DataSource<T> {
   /**
    * @description Heavy operation. Eagerly gets all features, and emit once and once only.
    */
-  async pullAll(){
-    await waitFor(() => this.initFlag)
-    const pr: Promise<void>[] = []
-    const totalPage = Math.ceil(this.total / this.#perPage)
-    for (let i = 1; i <=totalPage; i++ ){
-      pr.push(
-        this.#execGetPage(i)
-      )
-    }
-    await Promise.all(pr)
-    return this.#cachedResult
+  pullAll(){
+    const observable = new Observable<(T|null)[]>(obs => {
+      waitFor(() => this.initFlag)
+        .then(() => {
+          const pages: number[] = []
+          const totalPage = Math.ceil(this.total / this.#perPage)
+          for (let i = 1; i <= totalPage; i++ ){
+            pages.push(i)
+          }
+          if (pages.length === 0) {
+            obs.next([])
+            obs.complete()
+            return
+          }
+          merge(
+            ...pages.map(async page => await this.#execGetPage(page))
+          ).pipe(
+          ).subscribe({
+            next: () => obs.next(this.#cachedResult),
+            complete: () => obs.complete()
+          })
+        })
+    })
+
+    return observable
   }
 
   async getRange(start: number, end: number){
@@ -211,9 +225,13 @@ export class ParentCustomDataSource<T> extends DataSource<T> {
   /**
    * @description Heavy operation. Eagerly gets all features
    */
-  async pullAll(){
-    const allFeatures = await Promise.all(this.children.map(c => c.pullAll()))
-    return allFeatures.flatMap(v => v)
+  pullAll(){
+    return combineLatest(
+      this.children.map(c => c.pullAll().pipe(
+      ))
+    ).pipe(
+      map(arrofarr => arrofarr.flatMap(v => v)),
+    )
   }
 
   async init(){

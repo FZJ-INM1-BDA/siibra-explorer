@@ -362,7 +362,6 @@
                     class="sxplr-d-none"
                     [template]="view.selectedATP.template"
                     [bbox]="bbox.bbox$ | async | getProperty : 'bbox'"
-                    [attr.data-feature-length]="((voiFeatureEntryCmp.features$ | async) || []).length"
                     #voiFeatureEntryCmp="featureEntryCmp">
                 </sxplr-feature-entry>
                 
@@ -536,7 +535,6 @@
                         class="sxplr-d-none"
                         [parcellation]="view.selectedATP.parcellation"
                         [region]="view.selectedRegions[0]"
-                        [attr.data-feature-length]="((regFeatures.features$ | async) || []).length"
                         #regFeatures="featureEntryCmp">
                     </sxplr-feature-entry>
 
@@ -1303,7 +1301,6 @@
                 class="sxplr-d-none"
                 [template]="view.selectedATP.template"
                 [bbox]="bbox.bbox$ | async | getProperty : 'bbox'"
-                [attr.data-feature-length]="((voiFeatureEntryCmp.features$ | async) || []).length"
                 #voiFeatureEntryCmp="featureEntryCmp">
             </sxplr-feature-entry>
             
@@ -1516,7 +1513,6 @@
         <sxplr-feature-entry
             class="sxplr-d-none"
             [parcellation]="view.selectedATP.parcellation"
-            [attr.data-feature-length]="((parcFeature.features$ | async) || []).length"
             #parcFeature="featureEntryCmp">
         </sxplr-feature-entry>
 
@@ -1681,7 +1677,6 @@
             class="sxplr-d-none"
             [parcellation]="view.selectedATP.parcellation"
             [region]="view.selectedRegions[0]"
-            [attr.data-feature-length]="((regFeatures.features$ | async) || []).length"
             #regFeatures="featureEntryCmp">
         </sxplr-feature-entry>
 

@@ -53,15 +53,19 @@ export class EntryComponent extends TPBRCategoryDirective implements AfterViewIn
   features$ = this.#catAccDirs.pipe(
     switchMap(dirs => concat(
       of([] as TranslatedFeature[]),
-      merge(...dirs.map((dir, idx) =>
-        dir.datasource$.pipe(
-          switchMap(ds =>  ds.pullAll()),
-          map(val => ({ val, idx }))
-        ))
+      merge(
+        ...dirs.map(
+          (dir, idx) =>
+            dir.datasource$.pipe(
+              switchMap(ds => ds.pullAll().pipe(
+                map(val => ({ val, idx })),
+              )),
+            )
+        )
       ).pipe(
         map(({ idx, val }) => ({ [idx.toString()]: val })),
         scan((acc, curr) => ({ ...acc, ...curr })),
-        map(record => Object.values(record).flatMap(v => v))
+        map(record => Object.values(record).flatMap(v => v)),
       )
     )),
     shareReplay(1),
