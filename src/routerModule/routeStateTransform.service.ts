@@ -1,7 +1,7 @@
 import { Inject, Injectable } from "@angular/core";
 import { UrlSegment, UrlTree } from "@angular/router";
 import { map } from "rxjs/operators";
-import { SAPI } from "src/atlasComponents/sapi";
+import { IDS, SAPI } from "src/atlasComponents/sapi";
 import { translateV3Entities } from "src/atlasComponents/sapi/translateV3";
 import { SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes"
 import { atlasAppearance, atlasSelection, defaultState, MainState, plugins, userInteraction, userInterface } from "src/state";
@@ -146,12 +146,16 @@ export class RouteStateTransformSvc {
   private async getATPR(obj: TUrlPathObj<string[], TUrlAtlas<string[]>>){
     const selectedAtlasId = decodeId( RouteStateTransformSvc.GetOneAndOnlyOne(obj.a) )
     const selectedTemplateId = decodeId( RouteStateTransformSvc.GetOneAndOnlyOne(obj.t) )
-    const selectedParcellationId = decodeId( RouteStateTransformSvc.GetOneAndOnlyOne(obj.p) )
+    let selectedParcellationId = decodeId( RouteStateTransformSvc.GetOneAndOnlyOne(obj.p) )
     const selectedRegionIds = obj.r
     const selectedRegionNames = obj.rn
     
     if (!selectedAtlasId || !selectedTemplateId || !selectedParcellationId) {
       return {}
+    }
+
+    if (selectedTemplateId === IDS.TEMPLATES.BIG_BRAIN && selectedParcellationId === IDS.PARCELLATION.JBA29) {
+      selectedParcellationId = IDS.PARCELLATION.JBABB
     }
 
     const [

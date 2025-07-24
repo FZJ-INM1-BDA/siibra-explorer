@@ -177,7 +177,10 @@ export function getParcNgId(atlas: SxplrAtlas, tmpl: SxplrTemplate, parc: SxplrP
   /**
    * for JBA29 in big brain, there exist several volumes. (e.g. v1, v2, v5, interpolated, etc)
    */
-  if (tmpl.id === IDS.TEMPLATES.BIG_BRAIN && parc.id === IDS.PARCELLATION.JBA29) {
+  if (
+    tmpl.id === IDS.TEMPLATES.BIG_BRAIN
+    && (parc.id === IDS.PARCELLATION.JBA29 || parc.id === IDS.PARCELLATION.JBABB)
+  ) {
     const frag = translateV3Entities.mapTPRToFrag[tmpl.id][parc.id][region.name]
     return frag
       ? `_${MultiDimMap.GetKey(frag)}`

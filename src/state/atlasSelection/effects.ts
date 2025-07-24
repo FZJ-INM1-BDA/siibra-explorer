@@ -40,6 +40,36 @@ const prefParcId = [
   "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-290",
 ]
 
+function sortParc(parcs: SxplrParcellation[]) {
+  const hasPrev = parcs.filter(p => !!p.prevId)
+  const hasNoPrev = parcs.filter(p => !p.prevId)
+  
+  const returnHasPrev: SxplrParcellation[] = []
+  let FUSE = 10
+
+  while (hasPrev.length > 0){
+    FUSE -= 1
+    if (FUSE < 0) {
+      console.error(`fuse broke`)
+      break
+    }
+    const prevIds = new Set(hasPrev.map(p => p.prevId))
+    const idx = hasPrev.findIndex(p => !prevIds.has(p.id))
+    if (idx < 0) {
+      // reaches the end usually
+      break
+    }
+    returnHasPrev.push(
+      ...hasPrev.splice(idx, 1)
+    )
+  }
+  return [
+    ...returnHasPrev,
+    ...hasPrev,
+    ...hasNoPrev,
+  ]
+}
+
 @Injectable()
 export class Effect {
 
@@ -215,6 +245,7 @@ export class Effect {
           const errorMessages = DecisionCollapse.Verify(result)
           if (errorMessages.length > 0) {
             const errMessage = `Cannot process selectATP with parameter ${atlasId}, ${parcellationId}, ${templateId} and ${regionId}. ${errorMessages.join(" ")}`
+            console.log(`Error: ${errMessage}`)
             return throwError(errMessage)
           }
 
@@ -226,47 +257,13 @@ export class Effect {
           const foundParc = parcellation && result.parcellations.find(a => a.id === parcellation.id)
           const foundSpace = template && result.spaces.find(a => a.id === template.id)
 
-          const prevNextParcs = (() => {
-            if (!parcellation) {
-              return []
-            }
-            const FUSE = 10
-            let prevParcId = parcellation.prevId
-            let currentParcId = parcellation.id
-            let breakPrev = false
-            let breakNext = false
-            let iter = 0
-            const returnArr = []
-            // eslint-disable-next-line no-constant-condition
-            while (true) {
-              if (iter > FUSE || (breakPrev && breakNext)) {
-                break
-              }
-              iter ++
-              if (!breakPrev) {
-                const prevParc = result.parcellations.find(p => p.id === prevParcId)
-                if (prevParc) {
-                  returnArr.push(prevParc)
-                  prevParcId = prevParc.prevId
-                } else {
-                  breakPrev = true
-                }
-              }
-              if (!breakNext) {
-                const nextParc = result.parcellations.find(p => p.prevId === currentParcId)
-                if (nextParc) {
-                  returnArr.splice(0, 0, nextParc)
-                  currentParcId = nextParc.id
-                } else {
-                  breakNext = true
-                }
-              }
-            }
-            return returnArr
-          })()
+          const parcInSameColl = !!parcellation.collection
+          ? result.parcellations.filter(p => p.collection === parcellation.collection)
+          : []
+          const sortedParcInSameColl = sortParc(parcInSameColl)
           
           result.atlases = foundAtlas && [foundAtlas] || result.atlases
-          result.parcellations = foundParc && [foundParc] || prevNextParcs[0] && [prevNextParcs[0]] || result.parcellations
+          result.parcellations = foundParc && [foundParc] || sortedParcInSameColl[0] && [sortedParcInSameColl[0]] || result.parcellations
           result.spaces = foundSpace && [foundSpace] || result.spaces
 
           /**
