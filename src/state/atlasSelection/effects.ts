@@ -13,7 +13,7 @@ import { InterSpaceCoordXformSvc } from "src/atlasComponents/sapi/core/space/int
 import { SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { DecisionCollapse } from "src/atlasComponents/sapi/decisionCollapse.service";
 import { DialogFallbackCmp } from "src/ui/dialogInfo";
-import { MatDialog } from 'src/sharedModules/angularMaterial.exports'
+import { MatDialog, MatSnackBar } from 'src/sharedModules/angularMaterial.exports'
 import { ResizeObserverService } from "src/util/windowResize/windowResize.service";
 import { TViewerEvtCtxData } from "src/viewerModule/viewer.interface";
 import { ContextMenuService } from "src/contextMenuModule";
@@ -257,7 +257,7 @@ export class Effect {
           const foundParc = parcellation && result.parcellations.find(a => a.id === parcellation.id)
           const foundSpace = template && result.spaces.find(a => a.id === template.id)
 
-          const parcInSameColl = !!parcellation.collection
+          const parcInSameColl = !!parcellation?.collection
           ? result.parcellations.filter(p => p.collection === parcellation.collection)
           : []
           const sortedParcInSameColl = sortParc(parcInSameColl)
@@ -361,6 +361,9 @@ export class Effect {
                   state.selectedRegions = []
                   if (!!regionId) {
                     const selectedRegions = (state.selectedParcellationAllRegions || []).filter(r => r.name === regionId)
+                    if (selectedRegions.length === 0) {
+                      this.snackbar.open(`Region ${regionId} not found in new parcellation ${state.selectedParcellation?.name}. Resetting selected region.`, `Dismiss`)
+                    }
                     state.selectedRegions = selectedRegions
                   }
                   
@@ -503,6 +506,7 @@ export class Effect {
     private collapser: DecisionCollapse,
     private dialog: MatDialog,
     private resize: ResizeObserverService,
+    private snackbar: MatSnackBar,
     /** potential issue with circular import. generic should not import specific */
     private ctxMenuSvc: ContextMenuService<TViewerEvtCtxData<'threeSurfer' | 'nehuba'>>,
   ){

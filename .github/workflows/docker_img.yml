@@ -159,9 +159,10 @@ jobs:
         echo "curl first otherwise docker login result in tls handshake timeout"
         curl -v https://docker-registry.ebrains.eu/v2/
         echo "Login to docker registry"
+        echo '${{ secrets.EBRAINS_DOCKER_REG_TOKEN }}' | \
         docker login \
           -u '${{ secrets.EBRAINS_DOCKER_REG_USER }}' \
-          -p '${{ secrets.EBRAINS_DOCKER_REG_TOKEN }}' \
+          --password-stdin \
           docker-registry.ebrains.eu
         echo "Pushing $DOCKER_BUILT_TAG"
         docker push $DOCKER_BUILT_TAG

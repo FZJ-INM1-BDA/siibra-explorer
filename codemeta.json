@@ -100,7 +100,7 @@
         "python 3",
         "typescript"
     ],
-    "schema:releaseNotes": "# v2.14.23\n\n## Behind the scene\n\n- disentangle maps",
+    "schema:releaseNotes": "# v2.14.23\n\n## Behind the scene\n\n- disentangle maps, propagate selected region when change parcellations\n",
     "runtimePlatform": "docker",
     "version": "2.14.23",
     "contIntegration": "https://github.com/FZJ-INM1-BDA/siibra-explorer/actions",
