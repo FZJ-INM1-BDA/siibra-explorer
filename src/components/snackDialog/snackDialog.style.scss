@@ -1,0 +1,18 @@
+:host
+{
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    
+}
+
+i,mat-icon
+{
+    flex: 0 0 auto;
+    margin: 0 1rem;
+}
+
+markdown-dom,span
+{
+    flex: 1 1 auto;
+}

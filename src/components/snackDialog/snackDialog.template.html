@@ -1,0 +1,84 @@
+
+<ng-template [ngIf]="!useObs">
+    <ng-template [ngTemplateOutlet]="messageTmpl"
+        [ngTemplateOutletContext]="{
+            $implicit: {
+                message: message,
+                useMarkdown: useMarkdown,
+                icon: icon,
+                maticon: maticon,
+            }
+        }">
+    </ng-template>
+    <ng-template [ngTemplateOutlet]="dismissTmpl"></ng-template>
+</ng-template>
+
+<ng-template [ngIf]="useObs">
+    <ng-template [ngIf]="dataView$ | async" let-dataView>
+        <ng-template #allCaughtUpTmpl>
+            You are all caught up...
+        </ng-template>
+        <ng-template [ngIf]="dataView.data[dataView.idx]"
+            let-datum
+            [ngIfElse]="allCaughtUpTmpl">
+            <ng-template [ngTemplateOutlet]="messageTmpl"
+                [ngTemplateOutletContext]="{
+                    $implicit: {
+                        message: datum.message,
+                        useMarkdown: datum.useMarkdown,
+                        icon: datum.icon,
+                        maticon: datum.maticon,
+                    }
+                }">
+            </ng-template>
+        </ng-template>
+        
+        <div *ngIf="dataView.idx + 1 < dataView.data.length; else dismissTmpl" matSnackBarActions>
+            <!-- on click conditional technically should not happen, but left in as a just-in-case -->
+            <button mat-icon-button
+                matSnackBarAction
+                color="accent"
+                [matBadge]="dataView.dismissBadge"
+                (click)="dataView.idx + 1 >= dataView.data.length
+                ? dismissWithAction()
+                : setIndex(dataView.idx + 1)">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <button mat-button
+                matSnackBarAction
+                color="warn"
+                (click)="dismissWithAction()">
+                Dismiss All
+            </button>
+        </div>
+    </ng-template>
+    
+</ng-template>
+
+
+<ng-template #messageTmpl let-data>
+    <ng-template [ngIf]="data.icon">
+        <i [class]="data.icon"></i>
+    </ng-template>
+    <ng-template [ngIf]="data.maticon">
+        <mat-icon>{{ data.maticon }}</mat-icon>
+    </ng-template>
+
+    <ng-template [ngIf]="data.useMarkdown">
+        <markdown-dom [markdown]="data.message"></markdown-dom>
+    </ng-template>
+    <ng-template [ngIf]="!data.useMarkdown">
+        <span>{{ data.message }}</span>
+    </ng-template>
+</ng-template>
+
+<ng-template #dismissTmpl>
+    <div matSnackBarActions>
+        <button mat-button
+            matSnackBarAction
+            color="warn"
+            (click)="dismissWithAction()">
+            Dismiss
+        </button>
+    </div>
+</ng-template>

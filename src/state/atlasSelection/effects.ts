@@ -13,11 +13,12 @@ import { InterSpaceCoordXformSvc } from "src/atlasComponents/sapi/core/space/int
 import { SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { DecisionCollapse } from "src/atlasComponents/sapi/decisionCollapse.service";
 import { DialogFallbackCmp } from "src/ui/dialogInfo";
-import { MatDialog, MatSnackBar } from 'src/sharedModules/angularMaterial.exports'
+import { MatDialog } from 'src/sharedModules/angularMaterial.exports'
 import { ResizeObserverService } from "src/util/windowResize/windowResize.service";
 import { TViewerEvtCtxData } from "src/viewerModule/viewer.interface";
 import { ContextMenuService } from "src/contextMenuModule";
 import { NehubaVCtxToBbox } from "src/viewerModule/pipes/nehubaVCtxToBbox.pipe";
+import { SxplrSnackBarSvc } from "src/components";
 
 const NEHUBA_CTX_BBOX = new NehubaVCtxToBbox()
 
@@ -131,7 +132,14 @@ export class Effect {
           : this.interSpaceCoordXformSvc.transform(prevSpcName, currSpcName, navigation.position as [number, number, number]).pipe(
             map(value => {
               if (value.status === "error") {
-                return {}
+                this.sxplrSnackBarSvc.open({
+                  message: `spatial transformation failed: ${value.statusText}. Using default navigation`,
+                  
+                  // TODO switch to maticon when material icon css is added
+                  // maticon: "warning"
+                  icon: "fas fa-exclamation-triangle",
+                })
+                return { navigation: null }
               }
               return {
                 navigation: {
@@ -362,7 +370,14 @@ export class Effect {
                   if (!!regionId) {
                     const selectedRegions = (state.selectedParcellationAllRegions || []).filter(r => r.name === regionId)
                     if (selectedRegions.length === 0) {
-                      this.snackbar.open(`Region ${regionId} not found in new parcellation ${state.selectedParcellation?.name}. Resetting selected region.`, `Dismiss`)
+                      
+                      this.sxplrSnackBarSvc.open({
+                        message: `Previously selected region \`${regionId}\` not found in the currently selected parcellation \`${state.selectedParcellation?.name}\`. Region selections were cleared.`,
+                        useMarkdown: true,
+                        // TODO switch to maticon when material icon css is added
+                        // maticon: "warning"
+                        icon: "fas fa-exclamation-triangle",
+                      })
                     }
                     state.selectedRegions = selectedRegions
                   }
@@ -506,7 +521,7 @@ export class Effect {
     private collapser: DecisionCollapse,
     private dialog: MatDialog,
     private resize: ResizeObserverService,
-    private snackbar: MatSnackBar,
+    private sxplrSnackBarSvc: SxplrSnackBarSvc,
     /** potential issue with circular import. generic should not import specific */
     private ctxMenuSvc: ContextMenuService<TViewerEvtCtxData<'threeSurfer' | 'nehuba'>>,
   ){

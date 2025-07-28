@@ -69,6 +69,7 @@ jobs:
           --set image.tag=${{ inputs.IMAGE_TAG }} \
           --set envObj.OVERWRITE_API_ENDPOINT="https://siibra-api-rc.apps.ebrains.eu/v3_0" \
           --set podAnnotations.image-digest=${{ inputs.IMAGE_DIGEST }} \
+          --set replicaCount=1 \
           ${{ inputs.DEPLOYMENT_NAME }} .helm/siibra-explorer/ \
         || helm --kubeconfig=$kubecfg_path \
           install\
@@ -77,6 +78,7 @@ jobs:
           --set podAnnotations.image-digest=${{ inputs.IMAGE_DIGEST }} \
           --set envObj.HOST_PATHNAME=/viewer-staging \
           --set envObj.OVERWRITE_API_ENDPOINT="https://siibra-api-rc.apps.ebrains.eu/v3_0" \
+          --set replicaCount=1 \
           ${{ inputs.DEPLOYMENT_NAME }} .helm/siibra-explorer/
 
         rm $kubecfg_path
