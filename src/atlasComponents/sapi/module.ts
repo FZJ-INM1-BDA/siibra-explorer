@@ -1,7 +1,7 @@
 import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http";
-import { PriorityHttpInterceptor } from "src/util/priority";
+import { DebugHttpInterceptor as _DebugHttpInterceptor, PriorityHttpInterceptor } from "src/util/priority";
 import { AngularMaterialModule } from "src/sharedModules";
 import { DARKTHEME } from "src/util/injectionTokens";
 import { select, Store } from "@ngrx/store";
@@ -23,6 +23,11 @@ import { of } from "rxjs";
   exports: [
   ],
   providers: [
+    // {
+    //   provide: HTTP_INTERCEPTORS,
+    //   useClass: _DebugHttpInterceptor,
+    //   multi: true
+    // },
     {
       provide: HTTP_INTERCEPTORS,
       useClass: PriorityHttpInterceptor,

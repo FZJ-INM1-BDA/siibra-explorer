@@ -1,13 +1,13 @@
-import { Injectable } from "@angular/core";
+import { Component, Inject, Injectable, InjectionToken, Injector } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
-import { combineLatest, concat, forkJoin, from, NEVER, Observable, of, throwError } from "rxjs";
-import { catchError, debounceTime, distinctUntilChanged, filter, map, mapTo, switchMap, take, withLatestFrom } from "rxjs/operators";
+import { combineLatest, concat, EMPTY, forkJoin, from, NEVER, Observable, of, throwError, TimeoutError } from "rxjs";
+import { catchError, debounceTime, distinctUntilChanged, filter, map, mapTo, switchMap, take, timeout, withLatestFrom } from "rxjs/operators";
 import { IDS, SAPI } from "src/atlasComponents/sapi";
 import * as mainActions from "../actions"
 import { select, Store } from "@ngrx/store";
 import { selectors, actions, fromRootStore } from '.'
 import { AtlasSelectionState } from "./const"
-import { atlasAppearance, atlasSelection, generalActions } from "..";
+import { atlasAppearance, atlasSelection, generalActions, userPreference } from "..";
 
 import { InterSpaceCoordXformSvc } from "src/atlasComponents/sapi/core/space/interSpaceCoordXform.service";
 import { SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
@@ -19,6 +19,10 @@ import { TViewerEvtCtxData } from "src/viewerModule/viewer.interface";
 import { ContextMenuService } from "src/contextMenuModule";
 import { NehubaVCtxToBbox } from "src/viewerModule/pipes/nehubaVCtxToBbox.pipe";
 import { SxplrSnackBarSvc } from "src/components";
+import { SxplrOverlaySvc } from "src/components/overlay";
+import { CommonModule } from "@angular/common";
+import { AngularMaterialModule } from "src/sharedModules";
+import { ComponentPortal } from "@angular/cdk/portal";
 
 const NEHUBA_CTX_BBOX = new NehubaVCtxToBbox()
 
@@ -151,6 +155,19 @@ export class Effect {
           )
         )
       )
+    },
+    ({ current, previous }) => {
+      const prevParcId = previous?.parcellation?.id
+      const currentParcId = current?.parcellation?.id
+      if (currentParcId !== prevParcId && currentParcId === IDS.PARCELLATION.CORTICAL_LAYERS) {
+        this.sxplrSnackBarSvc.open({
+          message: `Regional inaccuracies in the automated computation of cortical layers may occur due to limitations in the available training data and algorithm. Regions that deviate from the expected canonical isocortical structure should be examined with caution.`,
+          // TODO switch to maticon when material icon css is added
+          // maticon: "warning"
+          icon: "fas fa-exclamation-triangle",
+        })
+      }
+      return of({})
     }
   ]
 
@@ -425,7 +442,7 @@ export class Effect {
         select(selectors.selectedParcellation)
       )
     ),
-    switchMap(([{ region: _region }, selectedTemplate, selectedAtlas, selectedParcellation]) => {
+    switchMap(([{ region: _region, timeout: _timeout }, selectedTemplate, selectedAtlas, selectedParcellation]) => {
       if (!selectedAtlas || !selectedTemplate || !selectedParcellation || !_region)  {
         return of(
           mainActions.generalActionError({
@@ -448,11 +465,21 @@ export class Effect {
             position: reg.hasAnnotation.bestViewPoint.coordinates.map(v => v.value * 1e6)
           }
         })),
-        catchError(() => of(
-          mainActions.generalActionError({
-            message: `getting region detail error! cannot get coordinates`
-          })
-        )),
+        timeout(!!_timeout ?  _timeout : Number.MAX_SAFE_INTEGER),
+        catchError(err => {
+          if (err instanceof TimeoutError) {
+            return of(
+              mainActions.generalActionError({
+                message: `Took longer than ${_timeout}ms. Stopping early.`
+              })
+            )
+          }
+          return of(
+            mainActions.generalActionError({
+              message: `getting region detail error! cannot get coordinates`
+            })
+          )
+        }),
       )
     })
   ))
@@ -513,6 +540,42 @@ export class Effect {
     })
   ))
 
+  onRegionSelection = createEffect(() => this.store.pipe(
+    select(userPreference.selectors.showExperimental),
+    switchMap(flag => {
+      if (!flag) {
+        return EMPTY
+      }
+      return this.action.pipe(
+        ofType(actions.selectRegion),
+        map(({ region }) => {
+          
+          if (region) {
+            this.onNavigateToRegion.pipe(
+              take(1)
+            ).subscribe(() => {
+              this.sxplrOverlaySvc.close()
+            })
+
+            const injector = Injector.create({
+              providers: [
+                {
+                  provide: REGION_LOADING_TOKEN,
+                  useValue: { region } as RegionLoadingCfg
+                }
+              ]
+            })
+            const portal = new ComponentPortal(LoadingRegionCmp, null, injector)
+            this.sxplrOverlaySvc.openPortal(portal)
+            this.store.dispatch(
+              actions.navigateToRegion({ region, timeout: REGION_LOADING_TIMEOUT })
+            )
+          }
+        })
+      )
+    })
+  ), { dispatch: false })
+
   constructor(
     private action: Actions,
     private sapiSvc: SAPI,
@@ -522,8 +585,46 @@ export class Effect {
     private dialog: MatDialog,
     private resize: ResizeObserverService,
     private sxplrSnackBarSvc: SxplrSnackBarSvc,
+    private sxplrOverlaySvc: SxplrOverlaySvc,
     /** potential issue with circular import. generic should not import specific */
     private ctxMenuSvc: ContextMenuService<TViewerEvtCtxData<'threeSurfer' | 'nehuba'>>,
   ){
+  }
+}
+
+const REGION_LOADING_TIMEOUT = 3000 // 3sec timeout
+
+type RegionLoadingCfg = { region: SxplrRegion }
+
+const REGION_LOADING_TOKEN = new InjectionToken<RegionLoadingCfg>("REGION_LOADING_TOKEN", {
+  factory: () => ({ region: null })
+})
+
+@Component({
+  selector: 'sxplr-apple',
+  template: `
+<div class="sxplr-custom-cmp text">
+  <mat-spinner></mat-spinner>
+  <ng-template [ngIf]="regionLoadingCfg?.region" let-region>
+    Loading region {{ region.name }}
+  </ng-template>
+</div>
+`,
+  styles: [
+    `:host > div{ display: flex; flex-direction: column; align-items: center; }`
+  ],
+  standalone: true,
+  imports: [
+    CommonModule,
+    AngularMaterialModule
+  ]
+})
+
+class LoadingRegionCmp {
+  constructor(
+    @Inject(REGION_LOADING_TOKEN)
+    public regionLoadingCfg: RegionLoadingCfg
+  ){
+
   }
 }

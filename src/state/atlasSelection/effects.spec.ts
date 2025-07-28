@@ -17,6 +17,7 @@ import { PathReturn } from "src/atlasComponents/sapi/typeV3"
 import { MatDialog } from 'src/sharedModules/angularMaterial.exports'
 import { InterSpaceCoordXformSvc } from "src/atlasComponents/sapi/core/space/interSpaceCoordXform.service"
 import { SxplrSnackBarSvc } from "src/components"
+import { SxplrOverlaySvc } from "src/components/overlay"
 
 describe("> effects.ts", () => {
   describe("> Effect", () => {
@@ -119,6 +120,13 @@ describe("> effects.ts", () => {
             provide: SxplrSnackBarSvc,
             useValue: {
               open: sxplrSnackBarSvcOpen
+            }
+          },
+          {
+            provide: SxplrOverlaySvc,
+            useValue: {
+              close: () => {},
+              openPortal: (...args) => {}
             }
           }
         ]
