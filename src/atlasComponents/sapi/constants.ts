@@ -22,6 +22,7 @@ export const IDS = {
     MEBRAINS: "minds/core/parcellationatlas/v1.0.0/e3235c039c6f54c3ba151568c829f117",
     JBABBV2: "jba-bb-v2",
     SULCI: "atlas-humansulci",
+    VON_ECONOMO: "minds/core/parcellationatlas/v1.0.0/f2b1ac621421708c1bef422bb5058456",
   }
 }
 

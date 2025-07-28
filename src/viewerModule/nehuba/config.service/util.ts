@@ -173,6 +173,7 @@ export function getParcNgId(atlas: SxplrAtlas, tmpl: SxplrTemplate, parc: SxplrP
   if (region.name.indexOf("left") >= 0) laterality = "left hemisphere"
   if (region.name.indexOf("right") >= 0) laterality = "right hemisphere"
   if (parc.id === IDS.PARCELLATION.SULCI) laterality = "whole brain"
+  if (parc.id === IDS.PARCELLATION.VON_ECONOMO) laterality = "whole brain"
 
   /**
    * for JBA29 in big brain, there exist several volumes. (e.g. v1, v2, v5, interpolated, etc)
