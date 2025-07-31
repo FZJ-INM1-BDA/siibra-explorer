@@ -15,7 +15,7 @@ def geolocation(request: Request):
     host_ip = request.client.host
     print(request.client.host)
     with ip_db.Reader(PATH_TO_IP_DB) as reader:
-        c = reader.country("134.94.9.118")
+        c = reader.country(host_ip)
     _dict = c.to_dict()
     _dict.pop("traits", None)
     return _dict
