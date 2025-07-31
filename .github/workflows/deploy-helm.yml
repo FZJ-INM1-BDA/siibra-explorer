@@ -66,8 +66,9 @@ jobs:
           --history-max 3 \
           --set image.repository=${{ inputs.IMAGE_REPO }} \
           --set image.tag=${{ inputs.IMAGE_TAG }} \
-          --set envObj.OVERWRITE_API_ENDPOINT="https://siibra-api-rc.apps.ebrains.eu/v3_0" \
           --set podAnnotations.image-digest=${{ inputs.IMAGE_DIGEST }} \
+          --set envObj.HOST_PATHNAME=/viewer-staging \
+          --set envObj.OVERWRITE_API_ENDPOINT="https://siibra-api-rc.apps.ebrains.eu/v3_0" \
           --set replicaCount=1 \
           ${{ inputs.DEPLOYMENT_NAME }} .helm/siibra-explorer/ \
         || helm --kubeconfig=$kubecfg_path \
