@@ -64,7 +64,6 @@ jobs:
         && helm --kubeconfig=$kubecfg_path \
           upgrade \
           --history-max 3 \
-          --reuse-values \
           --set image.repository=${{ inputs.IMAGE_REPO }} \
           --set image.tag=${{ inputs.IMAGE_TAG }} \
           --set envObj.OVERWRITE_API_ENDPOINT="https://siibra-api-rc.apps.ebrains.eu/v3_0" \
