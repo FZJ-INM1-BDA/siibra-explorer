@@ -382,27 +382,39 @@ export class ApiService implements BoothResponder<ApiBoothEvents>{
       break
     }
     case 'selectParcellation': {
+      const params = event.params as ApiBoothEvents['selectParcellation']['request']
+      this.store.dispatch(
+        atlasSelection.actions.selectATPById({
+          parcellationId: params["@id"],
+          config: {
+            autoSelect: true,
+          }
+        })
+      )
       if (!!event.id) {
         return {
           jsonrpc: '2.0',
           id: event.id,
-          error: {
-            code: -32601,
-            message: `NYI`
-          }
+          result: null,
         }
       }
       break
     }
     case 'selectTemplate': {
+      const params = event.params as ApiBoothEvents['selectTemplate']['request']
+      this.store.dispatch(
+        atlasSelection.actions.selectATPById({
+          templateId: params["@id"],
+          config: {
+            autoSelect: true,
+          }
+        })
+      )
       if (!!event.id) {
         return {
           jsonrpc: '2.0',
           id: event.id,
-          error: {
-            code: -32601,
-            message: `NYI`
-          }
+          result: null,
         }
       }
       break

@@ -14,6 +14,7 @@ export const IDS = {
   },
   PARCELLATION: {
     JBA29: "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-290",
+    JBABB: "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-bb",
     JBA30: "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-300",
     JBA31: "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579-310",
     WAXHOLMV4: "minds/core/parcellationatlas/v1.0.0/ebb923ba-b4d5-4b82-8088-fa9215c2e1fe-v4",
@@ -21,6 +22,7 @@ export const IDS = {
     MEBRAINS: "minds/core/parcellationatlas/v1.0.0/e3235c039c6f54c3ba151568c829f117",
     JBABBV2: "jba-bb-v2",
     SULCI: "atlas-humansulci",
+    VON_ECONOMO: "minds/core/parcellationatlas/v1.0.0/f2b1ac621421708c1bef422bb5058456",
   }
 }
 

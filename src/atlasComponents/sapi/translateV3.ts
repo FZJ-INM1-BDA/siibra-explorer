@@ -263,6 +263,7 @@ class TranslateV3 {
     const ds = await Promise.all((parcellation.datasets || []).map(ds => this.translateDs(ds)))
     const { ...rest } = ds[0] || {}
     const { ['@id']: prevId } = parcellation.version?.prev || {}
+    const collection = parcellation.version?.collection
     return {
       ...rest,
       id: parcellation["@id"],
@@ -270,6 +271,7 @@ class TranslateV3 {
       modality: parcellation.modality,
       type: "SxplrParcellation",
       prevId,
+      collection,
       shortName: parcellation.shortname,
     }
   }

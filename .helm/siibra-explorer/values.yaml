@@ -74,11 +74,16 @@ volumes:
   - name: log-volume
     persistentVolumeClaim:
       claimName: log-volume-claim
+  - name: data-volume
+    persistentVolumeClaim:
+      claimName: data-volume-claim
 
 # Additional volumeMounts on the output Deployment definition.
 volumeMounts:
   - mountPath: /sxplr-log
     name: log-volume
+  - mountPath: /sxplr-data
+    name: data-volume
 
 nodeSelector: {}
 

@@ -176,7 +176,18 @@
       [iav-dynamic-mat-button-color]="matBtnColor"
       iav-dynamic-mat-button-aria-label="Show help dialog">
 
-      <i class="far fa-question-circle"></i>
+      <ng-template [ngIf]="warnings.warnings$ | async" let-warnings
+        [ngIfElse]="noWarningTmpl">
+        <ng-template [ngIf]="warnings.length > 0" [ngIfElse]="noWarningTmpl">
+          <i [matBadge]="warnings.length"
+            matBadgeColor="warn"
+            class="far fa-question-circle"></i>
+        </ng-template>
+      </ng-template>
+
+      <ng-template #noWarningTmpl>
+        <i class="far fa-question-circle"></i>
+      </ng-template>
     </iav-dynamic-mat-button>
   </div>
 </ng-template>
@@ -257,6 +268,19 @@
         <kgtos-component class="mat-tab-content">
         </kgtos-component>
       </mat-tab>
+      <mat-tab *ngIf="warnings.hasWarnings$ | async">
+        <ng-template mat-tab-label>
+          <span 
+            matBadgeColor="warn"
+            [matBadge]="(warnings.warnings$ | async).length">
+            Warnings
+          </span>
+        </ng-template>
+          <ng-template ngFor [ngForOf]="warnings.warnings$ | async" let-warning let-last="last">
+            <div class="sxplr-m-2">{{ warning }}</div>
+            <mat-divider *ngIf="!last"></mat-divider>
+          </ng-template>
+      </mat-tab>
     </mat-tab-group>
   </mat-dialog-content>
 
@@ -288,3 +312,5 @@
     </config-component>
   </mat-dialog-content>
 </ng-template>
+
+<div sxplr-warnings #warnings="sxplrWarnings"></div>

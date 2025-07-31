@@ -51,6 +51,8 @@ import { SAPI } from './atlasComponents/sapi';
 import { GET_ATTR_TOKEN, GetAttr } from './util/constants';
 import { KCodeModule } from "./experimental/experimental.module"
 import { FreeModeModule } from './freeModeModule';
+import { SxplrSnackBarSvc } from './components';
+import { SxplrOverlaySvc } from './components/overlay';
 
 @NgModule({
   imports: [
@@ -97,6 +99,8 @@ import { FreeModeModule } from './freeModeModule';
     UIService,
     InterSpaceCoordXformSvc,
     ClickInterceptorService,
+    SxplrSnackBarSvc,
+    SxplrOverlaySvc,
     {
       provide: CANCELLABLE_DIALOG,
       useFactory: (uiService: UIService) => {

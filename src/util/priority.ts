@@ -1,7 +1,7 @@
 import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpResponse, HttpErrorResponse } from "@angular/common/http"
 import { Injectable } from "@angular/core"
 import { interval, merge, Observable, of, Subject, throwError, timer } from "rxjs"
-import { catchError, filter, finalize, map, switchMapTo, take, takeWhile } from "rxjs/operators"
+import { catchError, filter, finalize, map, switchMap, switchMapTo, take, takeWhile } from "rxjs/operators"
 
 type ResultBase = {
   urlWithParams: string
@@ -25,6 +25,18 @@ type Queue = {
 class SxplrHttpError extends Error {
   constructor(message: string, public status: number){
     super(message)
+  }
+}
+
+@Injectable()
+export class DebugHttpInterceptor implements HttpInterceptor {
+  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    if (req.url.includes("regions/Area")) {
+      return timer(5000).pipe(
+        switchMap(() => next.handle(req))
+      )
+    }
+    return next.handle(req)
   }
 }
 

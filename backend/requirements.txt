@@ -6,3 +6,4 @@ itsdangerous # required for starlette session middleware
 httpx # required for async uvicorn
 redis
 ebrains-drive>=0.6.0
+geoip2==5.1.0

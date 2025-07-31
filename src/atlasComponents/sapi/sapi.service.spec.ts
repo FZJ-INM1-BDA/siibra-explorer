@@ -35,7 +35,7 @@ describe("> sapi.service.ts", () => {
       describe("> ill formed input", () => {
         describe("> nullish input", () => {
           it("throws", async () => {
-            await expectAsync(SAPI.VerifyEndpoint(endpt1)).toBeRejected()
+            await expectAsync(SAPI.VerifyEndpoint(null)).toBeRejected()
           })
         })
       })

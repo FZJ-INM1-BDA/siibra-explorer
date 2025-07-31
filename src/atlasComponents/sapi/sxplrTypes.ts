@@ -26,6 +26,7 @@ export type SxplrParcellation = {
   shortName: string
   modality?: string
   prevId?: string
+  collection?: string
 } & Partial<AdditionalInfo>
 
 export type SxplrTemplate = {

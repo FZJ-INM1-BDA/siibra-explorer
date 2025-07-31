@@ -67,4 +67,4 @@ RUN chown -R nonroot:nonroot /iv-app
 USER nonroot
 
 EXPOSE 8080
-ENTRYPOINT uvicorn app.app:app --host 0.0.0.0 --port 8080
+ENTRYPOINT uvicorn --proxy-headers app.app:app --host 0.0.0.0 --port 8080

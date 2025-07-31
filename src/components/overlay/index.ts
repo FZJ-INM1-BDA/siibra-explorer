@@ -1,0 +1,1 @@
+export { SxplrOverlaySvc } from "./overlay.service"

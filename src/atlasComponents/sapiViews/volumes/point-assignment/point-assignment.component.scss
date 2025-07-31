@@ -8,3 +8,27 @@ th[mat-header-cell]
 {
     margin: 2rem;
 }
+
+table.narrow-table
+{
+    tr.narrow-row
+    {
+        
+        td.cell-region
+        {
+            max-width: 20dvw;
+            button
+            {
+                width: 100%;
+
+                ::ng-deep .mdc-button__label
+                {
+                    white-space: nowrap;
+                    overflow-x: hidden;
+                    width: 100%;
+                    text-overflow: ellipsis;
+                }
+            }
+        }
+    }
+}

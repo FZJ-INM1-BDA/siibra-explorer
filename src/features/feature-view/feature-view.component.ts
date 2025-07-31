@@ -23,6 +23,10 @@ function isSimpleCompoundFeature(feat: unknown): feat is SimpleCompoundFeature{
   return !!(feat?.['indices'])
 }
 
+const passRegionIdFeatureIds = [
+  "1a19693d-d99f-4789-b1ae-8ab5f0bb6432",
+]
+
 @Component({
   selector: 'sxplr-feature-view',
   templateUrl: './feature-view.component.html',
@@ -99,15 +103,15 @@ export class FeatureViewComponent {
       )
     ))
   )
-  #isConnectivity$ = this.#feature$.pipe(
-    map(v => v.category === "connectivity")
+  #passRegionId$ = this.#feature$.pipe(
+    map(v => v.category === "connectivity" || passRegionIdFeatureIds.some(id => v.id.includes(id)))
   )
 
   #selectedRegion$ = this.store.pipe(
     select(atlasSelection.selectors.selectedRegions)
   )
 
-  #additionalParams$: Observable<Record<string, string>> = this.#isConnectivity$.pipe(
+  #additionalParams$: Observable<Record<string, string>> = this.#passRegionId$.pipe(
     withLatestFrom(this.#selectedRegion$),
     map(([ isConnnectivity, selectedRegions ]) => isConnnectivity
     ? {"regions": selectedRegions.map(r => r.name).join(" ")}

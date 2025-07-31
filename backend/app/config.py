@@ -37,3 +37,7 @@ PATH_TO_PUBLIC = os.getenv("PATH_TO_PUBLIC", "../dist/aot")
 BUILD_HASH = os.getenv("BUILD_HASH", "devbuild")
 
 ENABLE_PROXY = os.getenv("ENABLE_PROXY")
+
+ENABLE_CORS = os.getenv("ENABLE_CORS")
+
+PATH_TO_IP_DB = os.getenv("PATH_TO_IP_DB")

@@ -1219,7 +1219,7 @@
         "operationId": "get_download_bundle_atlas_download_get",
         "parameters": [
           {
-            "required": true,
+            "required": false,
             "schema": {
               "type": "string",
               "title": "Space Id"
@@ -1228,7 +1228,7 @@
             "in": "query"
           },
           {
-            "required": true,
+            "required": false,
             "schema": {
               "type": "string",
               "title": "Parcellation Id"
@@ -1239,6 +1239,7 @@
           {
             "required": false,
             "schema": {
+              "type": "string",
               "title": "Bbox"
             },
             "name": "bbox",
@@ -4783,6 +4784,10 @@
           "deprecated": {
             "type": "boolean",
             "title": "Deprecated"
+          },
+          "collection": {
+            "type": "string",
+            "title": "Collection"
           },
           "prev": {
             "$ref": "#/components/schemas/SiibraAtIdModel"

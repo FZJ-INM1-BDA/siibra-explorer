@@ -9,17 +9,20 @@ from starlette.middleware.sessions import SessionMiddleware
 from app.quickstart import router as quickstart_router
 from app.sane_url import router as saneurl_router, vip_routes
 from app.peek import router as peek_router
-from app.config import HOST_PATHNAME, SESSION_SECRET, PATH_TO_PUBLIC, ENABLE_PROXY
+from app.config import HOST_PATHNAME, SESSION_SECRET, PATH_TO_PUBLIC, ENABLE_PROXY, ENABLE_CORS
 from app.dev_banner import router as devbanner_router
 from app.index_html import router as index_router
 from app.plugin import router as plugin_router
 from app.auth import router as auth_router
 from app.user import router as user_router
 from app.proxy import router as proxy_router
+from app.live import router as live_router
+
 from app.config import HOST_PATHNAME
 from app.logger import logger
 from app.bkwdcompat import BkwdCompatMW
 from app.version_header import VersionHeaderMW
+from app.cors import CorsMW
 from app.const import DOCUMENTATION_URL, INPUT_FORMAT, OUTPUT_FORMAT
 
 app = FastAPI(docs_url=None, redoc_url=None)
@@ -66,6 +69,8 @@ def about():
 app.add_middleware(SessionMiddleware, secret_key=SESSION_SECRET)
 app.add_middleware(BkwdCompatMW)
 app.add_middleware(VersionHeaderMW)
+if ENABLE_CORS:
+    app.add_middleware(CorsMW)
 
 for vip_route in vip_routes:
     @app.get(f"/{vip_route}")
@@ -80,6 +85,7 @@ app.include_router(saneurl_router, prefix="/go")
 app.include_router(peek_router, prefix="/peek")
 app.include_router(plugin_router, prefix="/plugins")
 app.include_router(user_router, prefix="/user")
+app.include_router(live_router, prefix="/live")
 
 if ENABLE_PROXY:
     app.include_router(proxy_router, prefix="/proxy")
