@@ -274,5 +274,23 @@
   </mat-tab>
 
   </ng-template>
+
+  <ng-template sxplrExperimentalFlag [experimental]="true">
+  
+  <mat-tab label="Theme">
+    <mat-button-toggle-group name="useTheme" [formControl]="useThemeForm">
+      <mat-button-toggle [value]="'auto'">
+        Auto
+      </mat-button-toggle>
+      <mat-button-toggle [value]="'light'">
+        Light
+      </mat-button-toggle>
+      <mat-button-toggle [value]="'dark'">
+        Dark
+      </mat-button-toggle>
+    </mat-button-toggle-group>
+  </mat-tab>
+
+  </ng-template>
 </mat-tab-group>
 

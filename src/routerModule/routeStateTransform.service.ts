@@ -4,7 +4,7 @@ import { map } from "rxjs/operators";
 import { IDS, SAPI } from "src/atlasComponents/sapi";
 import { translateV3Entities } from "src/atlasComponents/sapi/translateV3";
 import { SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes"
-import { atlasAppearance, atlasSelection, defaultState, MainState, plugins, userInteraction, userInterface } from "src/state";
+import { atlasAppearance, atlasSelection, defaultState, MainState, plugins, userInteraction, userInterface, userPreference } from "src/state";
 import { decodeToNumber, encodeNumber, encodeURIFull, separator } from "./cipher";
 import { TUrlAtlas, TUrlPathObj, TUrlStandaloneVolume } from "./type";
 import { decodePath, encodeId, decodeId, encodePath } from "./util";
@@ -23,6 +23,7 @@ type ViewerConfigState = {
 type ViewerCfgStateV2 = {
   auxMeshAlpha: number
   showAllSegMeshes: boolean
+  useTheme: 'light' | 'dark' | null
 } & ViewerConfigState
 
 const PANEL_MODE_DICT: Record<userInterface.PanelMode, number> = {
@@ -51,6 +52,7 @@ const decodeMiscState = {
       showDelineation: true,
       auxMeshAlpha: 1.0,
       showAllSegMeshes: false,
+      useTheme: null,
     }
     if (!encodedVal) {
       return returnVal
@@ -112,6 +114,17 @@ const decodeMiscState = {
       // n.b. only store 2 bit increment
       panelOrderVal = panelOrderVal >> 2
     }
+
+    
+    const decodedBool = decodeBool(v1Arr[2])
+    const useAutoTheme = decodedBool[3]
+    const useDarkTheme = decodedBool[4]
+    let useTheme: 'dark' | 'light' | null = null
+    if (!useAutoTheme) {
+      useTheme = useDarkTheme ? 'dark' : 'light'
+    }
+    console.log("use theme")
+    
     
     const returnVal: ViewerCfgStateV2 = {
       ...v1State,
@@ -120,6 +133,7 @@ const decodeMiscState = {
       showDelineation: !v1State.showDelineation,
       auxMeshAlpha: meshAlpha,
       panelOrder: panelOrder.join(""),
+      useTheme,
     }
     return returnVal
   }
@@ -305,9 +319,9 @@ export class RouteStateTransformSvc {
     const viewerConfigState = returnObj['vs'] && returnObj['vs'][0]
     if (viewerConfigState) {
 
-      const { panelMode, panelOrder, showDelineation, octantRemoval, auxMeshAlpha, showAllSegMeshes } = !!viewerConfigState
+      const { panelMode, panelOrder, showDelineation, octantRemoval, auxMeshAlpha, showAllSegMeshes, useTheme } = !!viewerConfigState
       ? this.decodeMiscState(viewerConfigState)
-      : { panelMode: "FOUR_PANEL" as const, panelOrder: "0123", showDelineation: true, octantRemoval: true, auxMeshAlpha: 1.0, showAllSegMeshes: false }
+      : { panelMode: "FOUR_PANEL" as const, panelOrder: "0123", showDelineation: true, octantRemoval: true, auxMeshAlpha: 1.0, showAllSegMeshes: false, useTheme: null }
       returnState['[state.ui]'].panelMode = panelMode
       returnState['[state.ui]'].panelOrder = panelOrder
 
@@ -315,6 +329,7 @@ export class RouteStateTransformSvc {
       returnState["[state.atlasAppearance]"].octantRemoval = octantRemoval  
       returnState["[state.atlasAppearance]"].meshTransparency = auxMeshAlpha
       returnState["[state.atlasAppearance]"].showAllSegMeshes = showAllSegMeshes
+      returnState["[state.userPreference]"].useTheme = useTheme
   
     }
     // pluginState should always be defined, regardless if standalone volume or not
@@ -390,12 +405,12 @@ export class RouteStateTransformSvc {
 
   @CachedFunction({
     serialization: (config: ViewerCfgStateV2) => {
-      const { auxMeshAlpha, octantRemoval, panelMode, panelOrder, showDelineation, showAllSegMeshes } = config
-      return `${auxMeshAlpha}.${octantRemoval}.${panelMode}.${panelOrder}.${showDelineation}.${showAllSegMeshes}`
+      const { auxMeshAlpha, octantRemoval, panelMode, panelOrder, showDelineation, showAllSegMeshes, useTheme } = config
+      return `${auxMeshAlpha}.${octantRemoval}.${panelMode}.${panelOrder}.${showDelineation}.${showAllSegMeshes}.${useTheme || 'auto'}`
     }
   })
   encodeMiscState(config: ViewerCfgStateV2): string {
-    const { panelMode, panelOrder, octantRemoval, showDelineation, auxMeshAlpha, showAllSegMeshes } = config
+    const { panelMode, panelOrder, octantRemoval, showDelineation, auxMeshAlpha, showAllSegMeshes, useTheme } = config
     let panelModeVal = 1
     if (panelMode) {
       panelModeVal = PANEL_MODE_DICT[panelMode]
@@ -417,7 +432,7 @@ export class RouteStateTransformSvc {
       panelOrderVal += v
     }
     const meshAlpha = auxMeshAlpha * 255
-    const encodedBools = encodeBool(octantRemoval, showDelineation, showAllSegMeshes)
+    const encodedBools = encodeBool(octantRemoval, showDelineation, showAllSegMeshes, useTheme === null, useTheme === "dark")
     const array = new Uint8Array([
       meshAlpha,
       panelModeVal,
@@ -465,6 +480,7 @@ export class RouteStateTransformSvc {
     const showDelineation = atlasAppearance.selectors.showDelineation(state)
     const auxMeshAlpha = atlasAppearance.selectors.meshTransparency(state)
     const showAllSegMeshes = atlasAppearance.selectors.showAllSegMeshes(state)
+    const useTheme = userPreference.selectors.showTheme(state)
 
     const searchParam = new URLSearchParams()
   
@@ -506,7 +522,7 @@ export class RouteStateTransformSvc {
           )
         )
       })(),
-      vs: this.encodeMiscState({ octantRemoval, panelMode, panelOrder, showDelineation, auxMeshAlpha, showAllSegMeshes })
+      vs: this.encodeMiscState({ octantRemoval, panelMode, panelOrder, showDelineation, auxMeshAlpha, showAllSegMeshes, useTheme })
     }
   
     /**

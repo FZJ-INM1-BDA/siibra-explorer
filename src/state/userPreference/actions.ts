@@ -51,3 +51,10 @@ export const setZMultiplier = createAction(
     value: number
   }>()
 )
+
+export const setTheme = createAction(
+  `${nameSpace} setTheme`,
+  props<{
+    theme: 'light' | 'dark' | null
+  }>()
+)

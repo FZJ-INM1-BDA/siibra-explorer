@@ -1,4 +1,4 @@
-const VALID_XFORM_SRC = ["CCF_V2_5", "QUICKNII_ABA", "MNI152", "CYRIL_PTCLD"] as const
+const VALID_XFORM_SRC = ["CCF_V2_5", "QUICKNII_ABA", "MNI152", "CYRIL_PTCLD", "QUICKNII_WAXHOLM"] as const
 const VALID_XFORM_DST = ["NEHUBA"] as const
 
 export type TVALID_LINEAR_XFORM_SRC = typeof VALID_XFORM_SRC[number]
@@ -49,6 +49,15 @@ const _linearXformDict: Record<
         [2.5e4, 0, 0, -5737500], //
         [0, 2.5e4, 0,  -6637500], //
         [0, 0, 2.5e4, -4037500], //
+        [0, 0, 0, 1],
+      ]
+    },
+    // see https://www.nitrc.org/plugins/mwiki/index.php?title=quicknii:Coordinate_systems
+    QUICKNII_WAXHOLM: {
+      NEHUBA: [
+        [3.90625e4, 0, 0, -9550781], //
+        [0, 3.90625e4, 0,  -24355468], //
+        [0, 0, 3.90625e4, -9707031], //
         [0, 0, 0, 1],
       ]
     }

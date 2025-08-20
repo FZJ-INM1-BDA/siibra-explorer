@@ -152,6 +152,8 @@ export class NehubaViewerContainerDirective implements OnDestroy{
   @Output()
   public iavNehubaViewerContainerViewerLoading: EventEmitter<boolean> = new EventEmitter()
   
+
+  #defaultConfig: NehubaConfig
   private cr: ComponentRef<NehubaViewerUnit>
   private navigation: atlasSelection.AtlasSelectionState['navigation']
   constructor(
@@ -165,6 +167,15 @@ export class NehubaViewerContainerDirective implements OnDestroy{
     this.cdr.detach()
 
     this.subscriptions.push(
+      this.store$.pipe(
+        select(userPreference.selectors.showTheme),
+        switchMap(switchMapWaitFor({
+          condition: () => !!this.nehubaViewerInstance?.nehubaViewer,
+          leading: true
+        }))
+      ).subscribe(theme => {
+        this.handleThemeChange(theme)
+      }),
       this.store$.pipe(
         select(atlasAppearance.selectors.octantRemoval),
         distinctUntilChanged(),
@@ -239,6 +250,7 @@ export class NehubaViewerContainerDirective implements OnDestroy{
           )
         ),
       ).subscribe(async config => {
+        this.#defaultConfig = config
         const overwritingInitState = this.navigation
           ? cvtNavigationObjToNehubaConfig(this.navigation, config.dataset.initialNgState)
           : {}
@@ -397,5 +409,16 @@ export class NehubaViewerContainerDirective implements OnDestroy{
       }
     })
     this.mouseOverSegments.emit(payload)
+  }
+
+  handleThemeChange(theme: 'light' | 'dark' | null ){
+    const background: [number, number, number, number] = theme === 'light'
+    ? [1, 1, 1, 1]
+    : theme === "dark"
+      ? [0, 0, 0, 1]
+      : (this.#defaultConfig?.dataset?.imageBackground || [0, 0, 0, 1])
+    
+    this.nehubaViewerInstance.nehubaViewer.crossSectionBackground = background
+    this.nehubaViewerInstance.nehubaViewer.perspectiveViewBackground = background
   }
 }
