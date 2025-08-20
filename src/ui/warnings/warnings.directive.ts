@@ -2,6 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { Directive } from "@angular/core";
 import { merge, of } from "rxjs";
 import { catchError, map, scan, shareReplay } from "rxjs/operators";
+import { IncidentJson, Incident } from "src/atlasComponents/sapi/sxplrTypes";
 import { environment } from "src/environments/environment.common";
 
 @Directive({
@@ -35,8 +36,27 @@ IP lookup carried out on EBRAINS infrastructure with static data provided by www
     shareReplay(1),
   )
 
+  incidents$ = this.http.get<IncidentJson>(`${environment.BACKEND_URL || ''}live/messages`)
+
   hasWarnings$ = this.warnings$.pipe(
     map(val => val.length > 0)
+  )
+
+  messages$ = merge(
+    this.warnings$,
+    this.incidents$.pipe(
+      map(resp => resp.incidents.map(formatIncident)),
+      catchError((err) => {
+        console.log(`Error getting incidents: ${err}`)
+        return of([])
+      })
+    )
+  ).pipe(
+    scan((acc, curr) => acc.concat(...curr), [] as string[])
+  )
+
+  hasMessages$ = this.messages$.pipe(
+    map(messages => messages.length > 0)
   )
   
   constructor(
@@ -44,4 +64,14 @@ IP lookup carried out on EBRAINS infrastructure with static data provided by www
   ){
 
   }
+}
+
+function formatUpdate(update: Incident['updates'][number]){
+  return `${update.datetime}: ${update.message}`
+}
+
+function formatIncident(incident: Incident){
+  return `${incident.title}
+
+${incident.updates.map(formatUpdate).join("\n")}`
 }

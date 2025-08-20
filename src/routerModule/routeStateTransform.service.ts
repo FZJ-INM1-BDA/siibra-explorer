@@ -123,8 +123,6 @@ const decodeMiscState = {
     if (!useAutoTheme) {
       useTheme = useDarkTheme ? 'dark' : 'light'
     }
-    console.log("use theme")
-    
     
     const returnVal: ViewerCfgStateV2 = {
       ...v1State,

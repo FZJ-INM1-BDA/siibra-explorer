@@ -176,10 +176,10 @@
       [iav-dynamic-mat-button-color]="matBtnColor"
       iav-dynamic-mat-button-aria-label="Show help dialog">
 
-      <ng-template [ngIf]="warnings.warnings$ | async" let-warnings
+      <ng-template [ngIf]="warnings.messages$ | async" let-messages
         [ngIfElse]="noWarningTmpl">
-        <ng-template [ngIf]="warnings.length > 0" [ngIfElse]="noWarningTmpl">
-          <i [matBadge]="warnings.length"
+        <ng-template [ngIf]="messages.length > 0" [ngIfElse]="noWarningTmpl">
+          <i [matBadge]="messages.length"
             matBadgeColor="warn"
             class="far fa-question-circle"></i>
         </ng-template>
@@ -268,15 +268,15 @@
         <kgtos-component class="mat-tab-content">
         </kgtos-component>
       </mat-tab>
-      <mat-tab *ngIf="warnings.hasWarnings$ | async">
+      <mat-tab *ngIf="warnings.hasMessages$ | async">
         <ng-template mat-tab-label>
           <span 
             matBadgeColor="warn"
-            [matBadge]="(warnings.warnings$ | async).length">
-            Warnings
+            [matBadge]="(warnings.messages$ | async).length">
+            Server Messages
           </span>
         </ng-template>
-          <ng-template ngFor [ngForOf]="warnings.warnings$ | async" let-warning let-last="last">
+          <ng-template ngFor [ngForOf]="warnings.messages$ | async" let-warning let-last="last">
             <div class="sxplr-m-2">{{ warning }}</div>
             <mat-divider *ngIf="!last"></mat-divider>
           </ng-template>

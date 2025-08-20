@@ -1,6 +1,6 @@
-import { Component, inject, Inject, OnDestroy, OnInit, Optional } from '@angular/core'
+import { Component, inject, Inject, OnInit, Optional } from '@angular/core'
 import { select, Store } from '@ngrx/store';
-import { combineLatest, Observable, of, Subscription } from 'rxjs';
+import { combineLatest, Observable, of } from 'rxjs';
 import { debounceTime, distinctUntilChanged, map, startWith, takeUntil } from 'rxjs/operators';
 import { isIdentityQuat } from 'src/viewerModule/nehuba/util';
 import { MatSlideToggleChange } from 'src/sharedModules/angularMaterial.exports'
