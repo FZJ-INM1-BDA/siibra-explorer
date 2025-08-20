@@ -2,7 +2,7 @@ import { Directive, ViewContainerRef, ComponentRef, OnDestroy, Output, EventEmit
 import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
 import { Store, select } from "@ngrx/store";
 import { Subscription, Observable, combineLatest, forkJoin, EMPTY, of } from "rxjs";
-import { distinctUntilChanged, filter, scan, map, switchMap, take } from "rxjs/operators";
+import { distinctUntilChanged, filter, scan, map, switchMap, take, withLatestFrom } from "rxjs/operators";
 import { serializeSegment } from "../util";
 import { LoggingService } from "src/logging";
 import { arrayOfPrimitiveEqual, switchMapWaitFor } from 'src/util/fn'
@@ -249,8 +249,13 @@ export class NehubaViewerContainerDirective implements OnDestroy{
             })
           )
         ),
-      ).subscribe(async config => {
-        this.#defaultConfig = config
+        withLatestFrom(
+          this.store$.pipe(
+            select(userPreference.selectors.showTheme)
+          )
+        )
+      ).subscribe(async ([config, showTheme]) => {
+        this.#defaultConfig = structuredClone(config)
         const overwritingInitState = this.navigation
           ? cvtNavigationObjToNehubaConfig(this.navigation, config.dataset.initialNgState)
           : {}
@@ -268,6 +273,12 @@ export class NehubaViewerContainerDirective implements OnDestroy{
 
         if (this.gpuLimit) {
           config.dataset.initialNgState['gpuMemoryLimit'] = this.gpuLimit  
+        }
+        if (showTheme !== null) {
+          const background: [number, number, number, number] = showTheme === "light"
+          ? [1, 1, 1, 1]
+          : [0, 0, 0, 1]
+          config.dataset.imageBackground = background
         }
 
         await this.createNehubaInstance(config)
