@@ -43,3 +43,8 @@ export const showExperimental = createSelector(
   storeSelector,
   store => store.showExperimental
 )
+
+export const showTheme = createSelector(
+  storeSelector,
+  store => store.useTheme
+)

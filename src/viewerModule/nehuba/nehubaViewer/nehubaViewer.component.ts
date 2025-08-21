@@ -15,6 +15,7 @@ import { EXTERNAL_LAYER_CONTROL, IExternalLayerCtl, INgLayerCtrl, NG_LAYER_CONTR
 import { NgCoordinateSpace, Unit } from "../types";
 import { PeriodicSvc } from "src/util/periodic.service";
 import { ViewerInternalStateSvc, AUTO_ROTATE, TInteralStatePayload } from "src/viewerModule/viewerInternalState.service";
+import { NehubaConfig } from "../config.service";
 
 function translateUnit(unit: Unit) {
   if (unit === "m") {
@@ -99,7 +100,7 @@ export class NehubaViewerUnit implements OnDestroy {
   /* only used to set initial navigation state */
   public initNav: any
 
-  public config: any
+  public config: NehubaConfig
   public nehubaViewer: any
   private _dim: [number, number, number]
   get dim() {

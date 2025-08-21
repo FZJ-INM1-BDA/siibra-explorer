@@ -63,7 +63,7 @@
     <!-- simple table -->
     <table mat-table [dataSource]="df | dfToDs : simpleTblSort"
         matSort
-        class="sxplr-w-100"
+        class="narrow-table sxplr-w-100"
         #simpleTblSort="matSort"
         matSortActive="map_value"
         matSortDirection="desc">
@@ -73,10 +73,9 @@
                     region
                 </span>
             </th>
-            <td mat-cell *matCellDef="let element">
+            <td class="cell-region" mat-cell *matCellDef="let element">
                 <!-- {{ element | json }} -->
-                <button mat-button (click)="selectRegion(element['region'], $event)"
-                    class="ws-no-wrap">
+                <button mat-button (click)="selectRegion(element['region'], $event)">
                     {{ element['region'] }}
                 </button>
             </td>
@@ -85,13 +84,13 @@
             <th mat-header-cell *matHeaderCellDef mat-sort-header>
                 map value
             </th>
-            <td mat-cell *matCellDef="let element">
+            <td class="cell-value" mat-cell *matCellDef="let element">
                 {{ element['map_value'] | prettyPresent }}
             </td>
         </ng-container>
         
         <tr mat-header-row *matHeaderRowDef="SIMPLE_COLUMNS"></tr>
-        <tr mat-row *matRowDef="let row; columns: SIMPLE_COLUMNS;"></tr>
+        <tr class="narrow-row" mat-row *matRowDef="let row; columns: SIMPLE_COLUMNS;"></tr>
     </table>
 </ng-template>
 

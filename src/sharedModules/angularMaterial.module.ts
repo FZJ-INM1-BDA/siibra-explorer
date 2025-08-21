@@ -35,6 +35,7 @@ import { MatTableModule } from "@angular/material/table";
 import { MatSortModule } from "@angular/material/sort";
 import { A11yModule } from "@angular/cdk/a11y";
 import { MatPaginatorModule } from '@angular/material/paginator'
+import { MatButtonToggleModule } from "@angular/material/button-toggle"
 
 const defaultDialogOption: MatDialogConfig = new MatDialogConfig()
 
@@ -74,6 +75,7 @@ const defaultDialogOption: MatDialogConfig = new MatDialogConfig()
     MatSortModule,
     A11yModule,
     MatPaginatorModule,
+    MatButtonToggleModule,
   ],
   providers: [{
     provide: MAT_DIALOG_DEFAULT_OPTIONS,

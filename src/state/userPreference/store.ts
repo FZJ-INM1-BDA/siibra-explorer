@@ -18,6 +18,7 @@ export type UserPreference = {
   agreeKgTos: boolean
 
   showExperimental: boolean
+  useTheme: 'dark' | 'light' | null
 }
 
 export const defaultState: UserPreference = {
@@ -30,7 +31,8 @@ export const defaultState: UserPreference = {
 
   agreeCookie: localStorage.getItem(LOCAL_STORAGE_CONST.AGREE_COOKIE) === COOKIE_VERSION,
   agreeKgTos: localStorage.getItem(LOCAL_STORAGE_CONST.AGREE_KG_TOS) === KG_TOS_VERSION,
-  showExperimental: environment.EXPERIMENTAL_FEATURE_FLAG
+  showExperimental: environment.EXPERIMENTAL_FEATURE_FLAG,
+  useTheme: null,
 }
 
 export const reducer = createReducer(
@@ -110,6 +112,13 @@ export const reducer = createReducer(
     (state, { value }) => ({
       ...state,
       overrideZTraversalMultiplier: value
+    })
+  ),
+  on(
+    actions.setTheme,
+    (state, { theme }) => ({
+      ...state,
+      useTheme: theme
     })
   )
 )

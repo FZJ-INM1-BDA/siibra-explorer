@@ -26,6 +26,7 @@ export type SxplrParcellation = {
   shortName: string
   modality?: string
   prevId?: string
+  collection?: string
 } & Partial<AdditionalInfo>
 
 export type SxplrTemplate = {
@@ -138,3 +139,33 @@ export type CorticalFeature<T extends CorticalDataType, IndexType extends string
 export type GenericInfo = {
   name: string
 } & AdditionalInfo
+
+// generated from https://transform.tools/json-schema-to-typescript on 2025/08/20
+// with https://github.com/FZJ-INM1-BDA/siibra-infrastructure-incidents/blob/1b01110/schema/incident.schema.json
+
+export type Tag = TagBaseinfra | TagExternsvc
+export type TagBaseinfra =
+  | "baseinfra"
+  | "baseinfra/vm"
+  | "baseinfra/k8s"
+  | "baseinfra/routing"
+export type TagExternsvc =
+  | "externsvc"
+  | "externsvc/ebrains"
+  | "externsvc/ebrains/k8s"
+
+export interface Update {
+  datetime: string
+  message: string
+  memo?: string
+}
+
+export interface Incident {
+  id: string
+  title: string
+  updates: Update[]
+  tags: Tag[]
+}
+export interface IncidentJson {
+  incidents: Incident[]
+}

@@ -60,14 +60,20 @@ export class WrapperATPSelector implements OnDestroy{
   ){
     this.#subscription.push(
       this.selectLeaf$.pipe(
-        withLatestFrom(this.selectedATP$),
-      ).subscribe(([{ template, parcellation, atlas }, selectedATP]) => {
+        withLatestFrom(
+          this.selectedATP$,
+          this.store$.pipe(
+            select(atlasSelection.selectors.selectedRegions)
+          )
+        ),
+      ).subscribe(([{ template, parcellation, atlas }, selectedATP, selectedRegions]) => {
 
         this.store$.dispatch(
           atlasSelection.actions.selectATPById({
             templateId: template?.id,
             parcellationId: parcellation?.id,
             atlasId: atlas?.id,
+            regionId: selectedRegions.length === 1 ? selectedRegions[0].name : null,
             config: {
               autoSelect: !!atlas,
               messages: {
