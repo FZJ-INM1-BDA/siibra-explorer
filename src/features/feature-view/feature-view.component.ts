@@ -9,9 +9,9 @@ import { CFIndex } from '../compoundFeatureIndices';
 import { FeatureViewBase } from '../view/view-base.directive';
 import { ExperimentalService } from 'src/experimental/experimental.service';
 
-const passRegionIdFeatureIds = [
-  "1a19693d-d99f-4789-b1ae-8ab5f0bb6432",
-]
+// const passRegionIdFeatureIds = [
+//   "1a19693d-d99f-4789-b1ae-8ab5f0bb6432",
+// ]
 
 @Component({
   selector: 'sxplr-feature-view',
