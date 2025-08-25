@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, inject, Inject, Output, ViewChild } from "@angular/core";
+import { ChangeDetectionStrategy, Component, EventEmitter, inject, Inject, Input, Output, ViewChild } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { BehaviorSubject, combineLatest, merge, Observable, of, Subject } from "rxjs";
 import { debounceTime, distinctUntilChanged, filter, map, startWith, switchMap, take, takeUntil, withLatestFrom } from "rxjs/operators";
@@ -63,6 +63,9 @@ export class VerticalBreadCrumbComponent {
 
   @Output()
   show = new EventEmitter()
+
+  @Input()
+  viewerLoaded: boolean = false
 
   @ViewChild('parcExpPanel')
   private parcExpPanel: MatExpansionPanel

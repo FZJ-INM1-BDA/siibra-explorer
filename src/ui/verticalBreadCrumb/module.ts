@@ -31,6 +31,10 @@ import { MediaQueryDirective } from "src/util/directives/mediaQuery.directive";
 import { AnnotationDirective } from "src/atlasComponents/annotations/annotation.directive";
 import { CurrentViewportToTextPipe } from "./pipes/currentViewPort.pipe";
 import { UserAnnotationsModule } from "src/atlasComponents/userAnnotations";
+import { StateModule } from "src/state";
+import { ScreenshotModule } from "src/screenshot";
+import { KeyFrameModule } from "src/keyframesModule/module";
+import { PluginModule } from "src/plugin";
 
 @NgModule({
   imports: [
@@ -63,6 +67,10 @@ import { UserAnnotationsModule } from "src/atlasComponents/userAnnotations";
     MediaQueryDirective,
     AnnotationDirective,
     UserAnnotationsModule,
+    StateModule,
+    ScreenshotModule,
+    KeyFrameModule,
+    PluginModule,
   ],
   declarations: [
     VerticalBreadCrumbComponent,

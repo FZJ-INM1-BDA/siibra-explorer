@@ -9,7 +9,7 @@ import {
   translateV3Entities
 } from "src/atlasComponents/sapi/translateV3"
 
-export const PER_PAGE = 50
+export const PER_PAGE = 20
 export type TranslatedFeature = Awaited< ReturnType<(typeof translateV3Entities)['translateFeature']> >
 
 @Directive({

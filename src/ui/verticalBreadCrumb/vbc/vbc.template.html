@@ -475,7 +475,7 @@
                             <h2 mat-dialog-title>Related Regions</h2>
 
                             <!-- body -->
-                            <mat-dialog-content>
+                            <mat-dialog-content class="vbc-dialog-content">
 
                                 <!-- iterate over all related -->
                                 <table mat-table [dataSource]="relatedRegions">
@@ -596,13 +596,58 @@
             <mat-expansion-panel-header>
                 Share
             </mat-expansion-panel-header>
-            share foo
+            <mat-action-list>
+                <button mat-list-item
+                    [disabled]="!viewerLoaded"
+                    screenshot-switch>
+                    <mat-icon matListItemIcon>screenshot_monitor</mat-icon>
+                    <span matListItemTitle>Screenshot part/all of this view</span>
+                </button>
+                <button mat-list-item>
+                    <mat-icon matListItemIcon>download</mat-icon>
+                    <span matListItemTitle>Download this view</span>
+                </button>
+                <button mat-list-item
+                    iav-clipboard-copy>
+                    <mat-icon matListItemIcon>content_copy</mat-icon>
+                    <span matListItemTitle>Copy link to this view</span>
+                </button>
+                <button mat-list-item
+                    [sxplr-dialog]="saneUrlTmpl"
+                    iav-state-aggregator
+                    #stateAggregator="iavStateAggregator">
+                    <mat-icon matListItemIcon>link</mat-icon>
+                    <span matListItemTitle>Create shortlink of this view</span>
+                </button>
+                
+                <ng-template #saneUrlTmpl>
+                    <mat-dialog-content>
+                        <iav-sane-url [stateTobeSaved]="stateAggregator.jsonifiedState$ | async">
+                        </iav-sane-url>
+                    </mat-dialog-content>
+                </ng-template>
+            </mat-action-list>
+
         </mat-expansion-panel>
         <mat-expansion-panel>
             <mat-expansion-panel-header>
                 Tools
             </mat-expansion-panel-header>
-            tool foo
+            <mat-action-list>
+                <button mat-list-item
+                    [disabled]="!viewerLoaded"
+                    key-frame-play-now
+                    [matTooltip]="'Animate viewer state between keyframes'">
+                    <mat-icon matListItemIcon>play_arrow</mat-icon>
+                    <span matListItemTitle>
+                        KeyFrames
+                    </span>
+                </button>
+            </mat-action-list>
+
+            <mat-divider></mat-divider>
+
+            <plugin-banner></plugin-banner>
         </mat-expansion-panel>
     </mat-accordion>
 
@@ -981,7 +1026,7 @@
 
                 <ng-template #fullViewTmpl>
                     <h2 mat-dialog-title>Assignment</h2>
-                    <mat-dialog-content>
+                    <mat-dialog-content class="vbc-dialog-content">
                         <sxplr-assignment-view-full
                             (clickOnRegionName)="handleClickRegionName($event.target, $event.event.ctrlKey)"
                             [result]="ptAsgmt.df$ | async">
@@ -1613,7 +1658,7 @@
                 <h2 mat-dialog-title>Related Regions</h2>
 
                 <!-- body -->
-                <mat-dialog-content>
+                <mat-dialog-content class="vbc-dialog-content">
 
                     <!-- iterate over all related -->
                     <table mat-table [dataSource]="relatedRegions">
@@ -1821,7 +1866,7 @@
     <h1 mat-dialog-title>
         Features
     </h1>
-    <mat-dialog-content>
+    <mat-dialog-content class="vbc-dialog-content">
 
         <span>Anchored at:</span>
         <ng-template [ngTemplateOutlet]="context.anchorTmpl"></ng-template>

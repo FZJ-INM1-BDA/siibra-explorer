@@ -67,6 +67,12 @@ export class DialogDirective{
 
   @HostListener('click')
   onClick(data: any={}){
+    console.log({
+      autoFocus: null,
+      data: {...this.data, ...data},
+      ...(sizeDict[this.size] || {}),
+      ...this.config
+    })
     const openDialog = () => this.matDialog.open(this.template, {
       autoFocus: null,
       data: {...this.data, ...data},

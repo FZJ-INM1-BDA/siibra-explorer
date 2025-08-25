@@ -15,15 +15,19 @@
     </div>
 
     <!-- share -->
+    <ng-template sxplrExperimentalFlag [deprecated]="true">
     <div iav-fab-speed-dial-child>
       <ng-container *ngTemplateOutlet="shareBtnTmpl"></ng-container>
     </div>
+    </ng-template>
 
     <!-- plugin and tools -->
+    <ng-template sxplrExperimentalFlag [deprecated]="true">
     <div iav-fab-speed-dial-child>
       <ng-container *ngTemplateOutlet="pluginAndToolsTmpl">
       </ng-container>
     </div>
+    </ng-template>
 
     <!-- help one pager -->
     <div iav-fab-speed-dial-child>
@@ -54,12 +58,16 @@
     </ng-container>
 
     <!-- share -->
+    <ng-template sxplrExperimentalFlag [deprecated]="true">
     <ng-container *ngTemplateOutlet="shareBtnTmpl">
     </ng-container>
+    </ng-template>
 
     <!-- plugin and tools -->
+    <ng-template sxplrExperimentalFlag [deprecated]="true">
     <ng-container *ngTemplateOutlet="pluginAndToolsTmpl">
     </ng-container>
+    </ng-template>
 
     <!-- help one pager -->
     <ng-container *ngTemplateOutlet="helpBtnTmpl">
@@ -207,6 +215,7 @@
   <plugin-banner></plugin-banner>
 </mat-menu>
 
+<!-- nb when removed, also remove ShareDirective or [sxplr-share-view] -->
 <!-- share dropdown -->
 <mat-menu #shareMenu>
   <button mat-menu-item

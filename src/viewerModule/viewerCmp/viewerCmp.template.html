@@ -87,6 +87,7 @@
     }">
     
     <sxplr-vertical-bread-crumb class="sxplr-d-block sxplr-overflow-y-auto mat-elevation-z1"
+      [viewerLoaded]="viewerLoaded"
       *ngIf="view.useViewer"
       (show)="controlHalfNav(true)">
     </sxplr-vertical-bread-crumb>
@@ -488,6 +489,7 @@
               <mat-icon>search</mat-icon>
             </button>
             <button mat-icon-button
+              matTooltip="Bookmark this point"
               (click)="bookmarkPoint({ point: context.payload.mouse.real }, data.metadata.template)">
               <mat-icon>bookmark</mat-icon>
             </button>
