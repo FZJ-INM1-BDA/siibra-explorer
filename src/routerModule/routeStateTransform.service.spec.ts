@@ -3,7 +3,7 @@ import { of } from "rxjs"
 import { SAPI } from "src/atlasComponents/sapi"
 import { RouteStateTransformSvc } from "./routeStateTransform.service"
 import { DefaultUrlSerializer } from "@angular/router"
-import { atlasAppearance, atlasSelection, userInteraction, userInterface } from "src/state"
+import { atlasAppearance, atlasSelection, userInteraction, userInterface, userPreference } from "src/state"
 import { QuickHash } from "src/util/fn"
 import { NEHUBA_CONFIG_SERVICE_TOKEN } from "src/viewerModule/nehuba/config.service"
 import { MockStore, provideMockStore } from "@ngrx/store/testing"
@@ -141,6 +141,7 @@ describe("> routeStateTransform.service.ts", () => {
           store.overrideSelector(atlasAppearance.selectors.showDelineation, true)
           store.overrideSelector(atlasAppearance.selectors.meshTransparency, 1.0)
           store.overrideSelector(atlasAppearance.selectors.showAllSegMeshes, false)
+          store.overrideSelector(userPreference.selectors.showTheme, null)
         })
 
         afterEach(() => {

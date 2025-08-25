@@ -18,6 +18,7 @@ import { AngularMaterialModule } from "src/sharedModules";
 import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.directive";
 import { AtlasDownloadModule } from "src/atlas-download/atlas-download.module";
 import { ShareModule } from "src/share";
+import { SxplrWarningsDirective } from "../warnings/warnings.directive";
 
 
 @NgModule({
@@ -40,6 +41,7 @@ import { ShareModule } from "src/share";
     ExperimentalFlagDirective,
     AtlasDownloadModule,
     ShareModule,
+    SxplrWarningsDirective,
   ],
   declarations: [
     TopMenuCmp

@@ -37,3 +37,9 @@ PATH_TO_PUBLIC = os.getenv("PATH_TO_PUBLIC", "../dist/aot")
 BUILD_HASH = os.getenv("BUILD_HASH", "devbuild")
 
 ENABLE_PROXY = os.getenv("ENABLE_PROXY")
+
+ENABLE_CORS = os.getenv("ENABLE_CORS")
+
+PATH_TO_IP_DB = os.getenv("PATH_TO_IP_DB")
+
+INCIDENTS_ENDPOINT = os.getenv("INCIDENTS_ENDPOINT", "https://raw.githubusercontent.com/FZJ-INM1-BDA/siibra-infrastructure-incidents/refs/heads/main/incidents.json")

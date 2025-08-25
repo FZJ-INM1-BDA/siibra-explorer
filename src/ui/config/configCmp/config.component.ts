@@ -1,12 +1,13 @@
-import { Component, Inject, OnDestroy, OnInit, Optional } from '@angular/core'
+import { Component, inject, Inject, OnInit, Optional } from '@angular/core'
 import { select, Store } from '@ngrx/store';
 import { combineLatest, Observable, of, Subscription } from 'rxjs';
-import { debounceTime, distinctUntilChanged, map, shareReplay, startWith, take } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, map, shareReplay, startWith, take, takeUntil } from 'rxjs/operators';
 import { isIdentityQuat } from 'src/viewerModule/nehuba/util';
 import { MatSlideToggleChange } from 'src/sharedModules/angularMaterial.exports'
 import { atlasSelection, userPreference, userInterface } from 'src/state';
 import { Z_TRAVERSAL_MULTIPLIER } from 'src/viewerModule/nehuba/layerCtrl.service/layerCtrl.util';
 import { FormControl, FormGroup } from '@angular/forms';
+import { DestroyDirective } from 'src/util/directives/destroy.directive';
 
 
 const Z_TRAVERSAL_TOOLTIP = `Value to use when traversing z level. If toggled off, will use the voxel dimension of the template.`
@@ -22,9 +23,14 @@ const OBLIQUE_ROOT_TEXT_ORDER: [string, string, string, string] = ['Slice View 1
   styleUrls: [
     './config.style.css',
   ],
+  hostDirectives: [
+    DestroyDirective
+  ]
 })
 
-export class ConfigComponent implements OnInit, OnDestroy {
+export class ConfigComponent implements OnInit{
+
+  #destroy$ = inject(DestroyDirective).destroyed$
 
   customZFormGroup = new FormGroup({
     customZValue: new FormControl<number>({
@@ -99,6 +105,20 @@ export class ConfigComponent implements OnInit, OnDestroy {
     startWith(ROOT_TEXT_ORDER),
   )
 
+  public view$ = combineLatest([
+    this.store.pipe(
+      select(userPreference.selectors.showTheme)
+    )
+  ]).pipe(
+    map(([ showTheme ]) => {
+      return {
+        showTheme
+      }
+    })
+  )
+
+  public useThemeForm = new FormControl<'light' | 'dark' | 'auto'>('auto')
+
   constructor(
     private store: Store<any>,
     @Optional() @Inject(Z_TRAVERSAL_MULTIPLIER) private zTraversalMult$: Observable<number> = of(1)
@@ -154,10 +174,23 @@ export class ConfigComponent implements OnInit, OnDestroy {
         }
       })
     )
-  }
+    
 
-  public ngOnDestroy() {
-    this.subscriptions.forEach(s => s.unsubscribe())
+    this.view$.pipe(
+      takeUntil(this.#destroy$)
+    ).subscribe(({ showTheme }) => {
+      this.useThemeForm.setValue(showTheme || 'auto')
+    })
+
+    this.useThemeForm.valueChanges.pipe(
+      takeUntil(this.#destroy$)
+    ).subscribe(value => {
+      this.store.dispatch(
+        userPreference.actions.setTheme({
+          theme: value === "auto" ? null : value
+        })
+      )
+    })
   }
 
   public toggleMobileUI(ev: MatSlideToggleChange) {

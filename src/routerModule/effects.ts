@@ -13,6 +13,7 @@ import { STATE_DEBOUNCE_MS } from "./const"
 import { APP_BASE_HREF } from "@angular/common";
 import { GET_ATTR_TOKEN } from "src/util/constants";
 import { CONST } from 'common/constants'
+import { SxplrOverlaySvc } from "src/components/overlay";
 
 @Injectable()
 export class RouterEffects {
@@ -52,6 +53,10 @@ export class RouterEffects {
           generalActions.noop()
         )
       }
+      
+      this.sxplrOverlaySvc.open({
+        message: `Loading atlas data ...`,
+      })
       return combineLatest([
         from(
           this.routeToStateTransformSvc.cvtRouteToState(
@@ -85,6 +90,7 @@ export class RouterEffects {
             state
           })
         }),
+        tap(() => this.sxplrOverlaySvc.close()),
         switchMap(ac => from([
           ac,
           generalActions.initRouteParseComplete()
@@ -188,6 +194,7 @@ export class RouterEffects {
     private store: Store<MainState>,
     private zone: NgZone,
     private action: Actions,
+    private sxplrOverlaySvc: SxplrOverlaySvc,
     @Inject(APP_BASE_HREF) private baseHref: string,
     @Inject(GET_ATTR_TOKEN) private getattr: (attrName: string) => undefined|null|string
   ){

@@ -157,6 +157,7 @@ export const navigateToRegion = createAction(
   `${nameSpace} navigateToRegion`,
   props<{
     region: Pick<SxplrRegion, 'name'>
+    timeout?: number
   }>()
 )
 

@@ -93,8 +93,8 @@ interface Configuration {
   disableSegmentHighlighting?: boolean
   enableMeshLoadingControl?: boolean
   hideNeuroglancerUI?: boolean
-  crossSectionBackground?: X1Vector
-  perspectiveViewBackground?: X1Vector
+  crossSectionBackground?: X1Vector1
+  perspectiveViewBackground?: X1Vector1
   dataset?: {
     imageBackground?: X1Vector1
     initialNgState?: {

@@ -2,7 +2,7 @@ import { Directive, ViewContainerRef, ComponentRef, OnDestroy, Output, EventEmit
 import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
 import { Store, select } from "@ngrx/store";
 import { Subscription, Observable, combineLatest, forkJoin, EMPTY, of } from "rxjs";
-import { distinctUntilChanged, filter, scan, map, switchMap, take } from "rxjs/operators";
+import { distinctUntilChanged, filter, scan, map, switchMap, take, withLatestFrom } from "rxjs/operators";
 import { serializeSegment } from "../util";
 import { LoggingService } from "src/logging";
 import { arrayOfPrimitiveEqual, switchMapWaitFor } from 'src/util/fn'
@@ -152,6 +152,8 @@ export class NehubaViewerContainerDirective implements OnDestroy{
   @Output()
   public iavNehubaViewerContainerViewerLoading: EventEmitter<boolean> = new EventEmitter()
   
+
+  #defaultConfig: NehubaConfig
   private cr: ComponentRef<NehubaViewerUnit>
   private navigation: atlasSelection.AtlasSelectionState['navigation']
   constructor(
@@ -165,6 +167,15 @@ export class NehubaViewerContainerDirective implements OnDestroy{
     this.cdr.detach()
 
     this.subscriptions.push(
+      this.store$.pipe(
+        select(userPreference.selectors.showTheme),
+        switchMap(switchMapWaitFor({
+          condition: () => !!this.nehubaViewerInstance?.nehubaViewer,
+          leading: true
+        }))
+      ).subscribe(theme => {
+        this.handleThemeChange(theme)
+      }),
       this.store$.pipe(
         select(atlasAppearance.selectors.octantRemoval),
         distinctUntilChanged(),
@@ -238,7 +249,13 @@ export class NehubaViewerContainerDirective implements OnDestroy{
             })
           )
         ),
-      ).subscribe(async config => {
+        withLatestFrom(
+          this.store$.pipe(
+            select(userPreference.selectors.showTheme)
+          )
+        )
+      ).subscribe(async ([config, showTheme]) => {
+        this.#defaultConfig = structuredClone(config)
         const overwritingInitState = this.navigation
           ? cvtNavigationObjToNehubaConfig(this.navigation, config.dataset.initialNgState)
           : {}
@@ -256,6 +273,12 @@ export class NehubaViewerContainerDirective implements OnDestroy{
 
         if (this.gpuLimit) {
           config.dataset.initialNgState['gpuMemoryLimit'] = this.gpuLimit  
+        }
+        if (showTheme !== null) {
+          const background: [number, number, number, number] = showTheme === "light"
+          ? [1, 1, 1, 1]
+          : [0, 0, 0, 1]
+          config.dataset.imageBackground = background
         }
 
         await this.createNehubaInstance(config)
@@ -397,5 +420,16 @@ export class NehubaViewerContainerDirective implements OnDestroy{
       }
     })
     this.mouseOverSegments.emit(payload)
+  }
+
+  handleThemeChange(theme: 'light' | 'dark' | null ){
+    const background: [number, number, number, number] = theme === 'light'
+    ? [1, 1, 1, 1]
+    : theme === "dark"
+      ? [0, 0, 0, 1]
+      : (this.#defaultConfig?.dataset?.imageBackground || [0, 0, 0, 1])
+    
+    this.nehubaViewerInstance.nehubaViewer.crossSectionBackground = background
+    this.nehubaViewerInstance.nehubaViewer.perspectiveViewBackground = background
   }
 }

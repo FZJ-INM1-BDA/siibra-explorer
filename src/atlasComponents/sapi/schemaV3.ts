@@ -1437,6 +1437,8 @@ export interface components {
       name: string
       /** Deprecated */
       deprecated?: boolean
+      /** Collection */
+      collection?: string
       prev?: components["schemas"]["SiibraAtIdModel"]
       next?: components["schemas"]["SiibraAtIdModel"]
     }

@@ -13,6 +13,7 @@ import { take } from "rxjs/operators"
 import { GET_ATTR_TOKEN } from "src/util/constants"
 import { provideMockActions } from "@ngrx/effects/testing"
 import { generalActions } from "src/state"
+import { SxplrOverlaySvc } from "src/components/overlay"
 
 let mockRouter: any 
 
@@ -75,6 +76,13 @@ describe("> effects.ts", () => {
           {
             provide: GET_ATTR_TOKEN,
             useValue: (arg: string) => null
+          },
+          {
+            provide: SxplrOverlaySvc,
+            useValue: {
+              close(...arg){},
+              open(...arg){}
+            }
           }
         ]
       })

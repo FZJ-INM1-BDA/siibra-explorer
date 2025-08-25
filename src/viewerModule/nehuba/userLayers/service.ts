@@ -1,7 +1,7 @@
 import { Injectable, OnDestroy } from "@angular/core"
 import { select, Store } from "@ngrx/store"
 import { forkJoin, from, Subscription } from "rxjs"
-import { distinctUntilChanged, filter, map, pairwise } from "rxjs/operators"
+import { distinctUntilChanged, filter, map, take, pairwise } from "rxjs/operators"
 import {
   linearTransform,
   TVALID_LINEAR_XFORM_DST,
@@ -22,6 +22,7 @@ import { atlasSelection } from "src/state"
 import { Action } from "src/util/types"
 import { getPositionOrientation } from "../util"
 import { VOXEL_SIZE_MAP } from "../constants"
+import { IDS } from "src/atlasComponents/sapi"
 
 type LayerOption = Omit<atlasAppearance.const.OldNgLayerCustomLayer, "clType" | "id" | "source"> | Omit<atlasAppearance.const.NewNgLayerOption, "id" | "clType">
 
@@ -556,6 +557,20 @@ export class UserLayerService implements OnDestroy {
   async processPCJson(file: File): Promise<ProcessorOutput[]>{
     const arr = JSON.parse(await file.text())
     const layers: AnnotationLayer[] = []
+    const selectedTmpl = await this.store$.pipe(
+      select(atlasSelection.selectors.selectedTemplate),
+      take(1)
+    ).toPromise()
+    let src: TVALID_LINEAR_XFORM_SRC = null
+    if (selectedTmpl.id === IDS.TEMPLATES.AMBA_CCF_V3) {
+      src = "QUICKNII_ABA"
+    }
+    if (selectedTmpl.id === IDS.TEMPLATES.WAXHOLM) {
+      src = "QUICKNII_WAXHOLM"
+    }
+    if (src === null) {
+      throw new Error(`selected template is neither allen mouse nor waxholm rat. Cannot view pointcloud`)
+    }
     for (const item of arr) {
 
       const { r, g, b } = item
@@ -565,7 +580,6 @@ export class UserLayerService implements OnDestroy {
       : "#ff0000"
   
       const id = getUuid()
-      const src = "QUICKNII_ABA"
       const dst = "NEHUBA"
       const xform = await linearTransform(src, dst)
       const layer = new AnnotationLayer(id, rgbString, xform)
@@ -584,6 +598,7 @@ export class UserLayerService implements OnDestroy {
         type: 'point',
         point: triplet.map(v => v) as [number, number, number]
       })))
+      layers.push(layer)
     }
     // TODO also return a custom layer
     // so it can be shown in the overlay
