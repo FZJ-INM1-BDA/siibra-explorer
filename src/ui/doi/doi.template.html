@@ -25,24 +25,11 @@
     
             <!-- authors -->
             <ng-template [ngIf]="data.contributors">
-                <!-- if > 5 authors -->
                 <button mat-list-item [iav-clipboard-copy]="data.contributors | addUnitAndJoin : '' : ', '">
                     <mat-icon fontSet="fas" fontIcon="fa-users" matListItemIcon></mat-icon>
-                    <!-- if > 5 authors -->
-                    <ng-template [ngIf]="data.contributors.length > 5" [ngIfElse]="allContributorsTmpl">
-                        <span>
-                            {{ data.contributors[0] }}
-                        </span>
-                        <i>et al</i>
-                    </ng-template>
-                    
-                    <!-- else -->
-                    <ng-template #allContributorsTmpl>
-                        <span>
-                            {{ data.contributors | addUnitAndJoin : "" : ", "}}
-                        </span>
-                    </ng-template>
-                    
+                    <span>
+                        {{ data.contributors | addUnitAndJoin : "" : ", "}}
+                    </span>
                 </button>
 
             </ng-template>

@@ -20,10 +20,6 @@
     }
 }
 
-mat-divider.panel-divider
-{
-    margin: 0 -4rem;
-}
 
 .list-hover-icon-container
 {
@@ -336,4 +332,32 @@ mat-dialog-content.vbc-dialog-content
 {
     background-color: rgba(100,100,100,0.2);
     margin-bottom: 1rem;
+}
+
+mat-divider.panel-divider
+{
+    margin: 2rem -4rem 0.5rem -4rem;
+    &:first-child
+    {
+        margin-top: 0;
+    }
+}
+
+.tab-content-wrapper
+{
+    mat-card
+    {
+        margin: 0.5rem 0;
+        overflow-x: hidden;
+    }
+    .hoverable.mat-elevation-z1
+    {
+        margin-bottom: 0;
+    }
+}
+
+mat-accordion.panel-accordion
+{
+    margin: 0 -2rem;
+    display: block;
 }

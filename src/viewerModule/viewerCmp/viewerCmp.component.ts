@@ -158,6 +158,14 @@ export class ViewerCmp {
     }))
   )
 
+  #view2$ = combineLatest([
+    this.store$.pipe(
+      select(userPreference.selectors.showExperimental)
+    )
+  ]).pipe(
+    map(([ showExperimental ]) => ({ showExperimental }))
+  )
+
   atlasAppearanceState$ = combineLatest([
     this.store$.pipe(
       select(atlasAppearance.selectors.showDelineation)
@@ -181,9 +189,10 @@ export class ViewerCmp {
     this.#view1$,
     this.atlasAppearanceState$,
     of(enLabels),
+    this.#view2$,
   ]).pipe(
-    map(([v0, v1, atlasAppearanceState, labels]) => ({ ...v0, ...v1, ...atlasAppearanceState, labels })),
-    map(({ selectedRegions, viewerMode, selectedFeature, selectedPoint, selectedTemplate, selectedParcellation, currentMap, allAvailableRegions, fullSidenavExpanded, halfSidenavExpanded, labels, useViewer, showDelineation }) => {
+    map(([v0, v1, atlasAppearanceState, labels, v2]) => ({ ...v0, ...v1, ...atlasAppearanceState, labels, ...v2 })),
+    map(({ selectedRegions, viewerMode, selectedFeature, selectedPoint, selectedTemplate, selectedParcellation, currentMap, allAvailableRegions, fullSidenavExpanded, halfSidenavExpanded, labels, useViewer, showDelineation, showExperimental }) => {
       let spatialObjectTitle: string
       let spatialObjectSubtitle: string
       if (selectedPoint) {
@@ -233,6 +242,7 @@ export class ViewerCmp {
         labels,
         useViewer,
         showDelineation,
+        showExperimental,
       }
     }),
     shareReplay(1),

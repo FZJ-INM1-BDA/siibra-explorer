@@ -86,7 +86,10 @@
       'vw-col-10-nm vw-col-sm-10-nm vw-col-md-5-nm vw-col-lg-4-nm vw-col-xl-3-nm vw-col-xxl-2-nm': !view.halfSidenavExpanded
     }">
     
-    <sxplr-vertical-bread-crumb class="sxplr-d-block sxplr-overflow-y-auto mat-elevation-z1"
+    <sxplr-vertical-bread-crumb class="sxplr-d-block sxplr-overflow-y-auto"
+      [ngClass]="{
+        'mat-elevation-z1': view.showExperimental
+      }"
       [viewerLoaded]="viewerLoaded"
       *ngIf="view.useViewer"
       (show)="controlHalfNav(true)">
@@ -116,7 +119,7 @@
   <sxplr-tab *ngIf="!!view.selectedTemplate"
     [matTooltip]="view.labels.TOGGLE_SIDE_PANELS"
     [sxplr-tab-icon]="view.halfSidenavExpanded ? 'fas fa-chevron-left' : 'fas fa-chevron-right'"
-    sxplr-tab-color="primary"
+    [sxplr-tab-color]="view.showExperimental ? 'primary': null"
     (sxplr-tab-click)="controlHalfNav(!view.halfSidenavExpanded)">
   </sxplr-tab>
 

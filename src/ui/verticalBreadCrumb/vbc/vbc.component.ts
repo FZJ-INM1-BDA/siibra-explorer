@@ -3,7 +3,7 @@ import { select, Store } from "@ngrx/store";
 import { BehaviorSubject, combineLatest, merge, Observable, of, Subject } from "rxjs";
 import { debounceTime, distinctUntilChanged, filter, map, startWith, switchMap, take, takeUntil, withLatestFrom } from "rxjs/operators";
 import { SAPI, IDS } from "src/atlasComponents/sapi";
-import { Feature, SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
+import { Feature, SxplrParcellation, SxplrRegion, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { FilterGroupedParcellationPipe, GroupedParcellation } from "src/atlasComponents/sapiViews/core/parcellation";
 import { atlasAppearance, atlasSelection, userInteraction, userPreference } from "src/state";
 import { NEHUBA_CONFIG_SERVICE_TOKEN, NehubaConfigSvc } from "src/viewerModule/nehuba/config.service";
@@ -24,6 +24,11 @@ import { BANLIST_CONNECTIVITY, EXPERIMENTAL_CONNECTIVITY, WHITELIST_CONNECTIVITY
 import { ViewerMode } from "src/state/atlasSelection/const";
 
 const pipe = new FilterGroupedParcellationPipe()
+
+const FOCUS_ON = [
+  "selectedRegion",
+] as const
+type FOCUS_ON_TYPE = typeof FOCUS_ON[number]
 
 type PasteTarget = "pos"|"zoom"|"rot"
 type NavigationState = {
@@ -257,19 +262,15 @@ export class VerticalBreadCrumbComponent {
     this.store$.pipe(
       select(userPreference.selectors.showExperimental)
     ),
-    this.#minimizedCards$,
-    this.#maximizedCard$,
     this.store$.pipe(
       select(atlasAppearance.selectors.showDelineation)
     ),
   ]).pipe(
-    map(([ labels, showExperimental, minimizedCards, maximizedCard, parcellationVisible ]) => {
+    map(([ labels, showExperimental, parcellationVisible ]) => {
       return {
         labels,
         showExperimental,
-        minimizedCards,
         parcellationVisible,
-        maximizedCard,
       }
     })
   )
@@ -312,7 +313,7 @@ export class VerticalBreadCrumbComponent {
         customLayers,
       },
       { useViewer },
-      { labels, showExperimental, minimizedCards, parcellationVisible, maximizedCard, },
+      { labels, showExperimental, parcellationVisible, },
       { zoom },
       { inAnnot, outAnnot }]) => {
       
@@ -341,8 +342,8 @@ export class VerticalBreadCrumbComponent {
       )
       const isVolumetric = template && template.id !== IDS.TEMPLATES.FSAVERAGE
       return {
-        selectedATP, selectedRegions, templates, parcellations, atlases, noGroupParcs, groupParcs, allAvailableRegions, labelMappedRegionNames, currentViewport, selectedFeature, selectedPoint, labels, minimizedCards, useViewer, parcellationVisible, showExperimental, customLayers,
-        useAccordion: true, maximizedCard,
+        selectedATP, selectedRegions, templates, parcellations, atlases, noGroupParcs, groupParcs, allAvailableRegions, labelMappedRegionNames, currentViewport, selectedFeature, selectedPoint, labels, useViewer, parcellationVisible, showExperimental, customLayers,
+        useAccordion: true, 
         leafRegions: allAvailableRegions.filter(r => !parentIds.has(r.id)),
         branchRegions: allAvailableRegions.filter(r => parentIds.has(r.id)),
         debug: false,
@@ -427,6 +428,15 @@ export class VerticalBreadCrumbComponent {
         }
       }
       this.navigationCtlForm.patchValue(state)
+    })
+
+    this.#selectedRegions$.pipe(
+      takeUntil(this.#destroy$),
+      debounceTime(160),
+      map(regions => regions.map(r => r.name).join("")),
+      distinctUntilChanged(),
+    ).subscribe(() => {
+      this.focusOn("selectedRegion")
     })
     
     this.navigationCtlForm.valueChanges.pipe(
@@ -657,14 +667,8 @@ export class VerticalBreadCrumbComponent {
     )
   }
   
-  navigateToRegionByName(regionName: string){
-    this.store$.dispatch(
-      atlasSelection.actions.navigateToRegion({
-        region: {
-          name: regionName
-        }
-      })
-    )
+  public focusOn(_name: FOCUS_ON_TYPE){
+    // TODO add focus on logic
   }
 
   public assignPoint(position: number[], template: SxplrTemplate) {
@@ -690,25 +694,6 @@ export class VerticalBreadCrumbComponent {
     )
   }
 
-  public isActive<T extends SxplrAtlas|SxplrTemplate|SxplrParcellation>(current: T) {
-    return (name: string) => {
-      return name === current.name
-    }
-  }
-
-  public minimizeCard(cardname: string){
-    const s = new Set(this.#minimizedCards$.value)
-    s.add(cardname)
-    this.#minimizedCards$.next(Array.from(s))
-    this.#maximizedCard$.next(null)
-  }
-
-  public openCard(cardname: string){
-    const s = new Set(this.#minimizedCards$.value)
-    s.delete(cardname)
-    this.#minimizedCards$.next(Array.from(s))
-    this.#maximizedCard$.next(cardname)
-  }
 
   public selectFeature(feature: Feature){
     this.store$.dispatch(
@@ -722,10 +707,6 @@ export class VerticalBreadCrumbComponent {
     this.store$.dispatch(
       atlasAppearance.actions.toggleParcDelineation()
     )
-  }
-
-  public nameEql(a: any, b: any){
-    return a.name === b.name
   }
 
   public goToViewerMode(viewerMode: ViewerMode){
