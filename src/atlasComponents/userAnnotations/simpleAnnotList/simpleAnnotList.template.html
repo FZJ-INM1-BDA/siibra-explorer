@@ -1,21 +1,35 @@
-<mat-list role="list">
-    <ng-template ngFor [ngForOf]="managedAnnotations$ | async " let-annot>
-        <mat-list-item role="listitem">
-            <ng-template [ngIf]="annot.name" [ngIfElse]="untitledtmpl" let-name>
-                {{ annot.name }}                        
-            </ng-template>
-            <ng-template #untitledtmpl>
-                <span class="text-muted">Untitled</span>
-            </ng-template>
+<mat-accordion>
+    <mat-expansion-panel *ngFor="let managedAnnotation of managedAnnotations$ | async"
+        hideToggle>
 
-            <button mat-icon-button
-                matListItemIcon
-                (click)="gotoRoi(annot)">
-                <mat-icon>location_on</mat-icon>
-            </button>
-        </mat-list-item>
-    </ng-template>
-</mat-list>
+        <mat-expansion-panel-header [ngClass]="{'highlight': managedAnnotation.highlighted }">
+            <mat-panel-title class="d-flex align-items-center">
+
+                <!-- toggle visibility -->
+                <button
+                    mat-icon-button
+                    iav-stop="click"
+                    (click)="toggleManagedAnnotationVisibility(managedAnnotation.id)">
+                    <i [ngClass]="(hiddenAnnotations$ | async | annotationVisiblePipe : managedAnnotation) ?  'fa-eye' : 'fa-eye-slash'" class="fas"></i>
+                </button>
+                <span class="flex-shrink-1 flex-grow-1" [ngClass]="{ 'text-muted': !managedAnnotation.name }">
+                    {{ managedAnnotation | singleAnnotationNamePipe : managedAnnotation.name }}
+                </span>    
+                <i class="flex-shrink-0 flex-grow-0" [ngClass]="managedAnnotation | singleannotationClsIconPipe"></i>
+            </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <!-- single annotation edit body -->
+        <ng-template matExpansionPanelContent>
+            <div class="single-annotation-grid-container">
+                <!-- spacer for inset single-annotation-unit -->
+                <div></div>
+                <single-annotation-unit [single-annotation-unit-annotation]="managedAnnotation">
+                </single-annotation-unit>
+            </div>
+        </ng-template>
+    </mat-expansion-panel>
+</mat-accordion>
 
 <ng-template [ngIf]="((managedAnnotations$ | async) || []).length === 0">
     <span class="text-muted">

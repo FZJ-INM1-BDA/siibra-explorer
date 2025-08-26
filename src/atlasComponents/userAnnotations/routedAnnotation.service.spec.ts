@@ -15,9 +15,10 @@ describe('> routedannotation.service.ts', () => {
     }
     
     const spyAnnSvc = {
-      switchAnnotationMode: jasmine.createSpy('switchAnnotationMode'),
       parseAnnotationObject: jasmine.createSpy('parseAnnotationObject'),
-      importAnnotation: jasmine.createSpy('importAnnotation')
+      importAnnotation: jasmine.createSpy('importAnnotation'),
+      annotationTools$: of([]),
+      focus: jasmine.createSpy('focus'),
     }
     beforeEach(() => {
       TestBed.configureTestingModule({
@@ -43,9 +44,9 @@ describe('> routedannotation.service.ts', () => {
       })
     })
     afterEach(() => {
-      spyAnnSvc.switchAnnotationMode.calls.reset()
       spyAnnSvc.parseAnnotationObject.calls.reset()
       spyAnnSvc.importAnnotation.calls.reset()
+      spyAnnSvc.focus.calls.reset()
       spyRService.setCustomRoute.calls.reset()
     })
 
@@ -89,13 +90,13 @@ describe('> routedannotation.service.ts', () => {
         expect(spyRService.setCustomRoute).toHaveBeenCalledWith(userAnnotationRouteKey, null)
       }))
 
-      it('> switchannotation mode is called with "on"', fakeAsync(() => {
+      it('> focus called', fakeAsync(() => {
         customRouteSub.next({
           [userAnnotationRouteKey]: mockVal
         })
         const svc = TestBed.inject(RoutedAnnotationService)
         tick(200)
-        expect(spyAnnSvc.switchAnnotationMode).toHaveBeenCalledOnceWith('on')
+        expect(spyAnnSvc.focus).toHaveBeenCalledOnceWith()
       }))
 
       it('> parseAnnotationObject is called expected number of times', fakeAsync(() => {
@@ -118,10 +119,7 @@ describe('> routedannotation.service.ts', () => {
         })
         const svc = TestBed.inject(RoutedAnnotationService)
         tick(200)
-        expect(spyAnnSvc.importAnnotation).toHaveBeenCalledTimes(parseAnnObjReturn.length)
-        for (const obj of parseAnnObjReturn) {
-          expect(spyAnnSvc.importAnnotation).toHaveBeenCalledWith(obj)
-        }
+        expect(spyAnnSvc.parseAnnotationObject).toHaveBeenCalledTimes(parseAnnObjReturn.length)
       }))
     })
 
@@ -157,7 +155,7 @@ describe('> routedannotation.service.ts', () => {
       })
 
       describe('> getKeyVal returns invalid key', () => {
-        it('> does not call switchAnnotationMode', fakeAsync(() => {
+        it('> focus is not called', fakeAsync(() => {
           const spySaneUrlSvc = TestBed.inject(SaneUrlSvc) as any
           spySaneUrlSvc.getKeyVal.and.returnValue(
             of({
@@ -173,7 +171,7 @@ describe('> routedannotation.service.ts', () => {
           const svc = TestBed.inject(RoutedAnnotationService)
 
           tick(320)
-          expect(spyAnnSvc.switchAnnotationMode).not.toHaveBeenCalled()
+          expect(spyAnnSvc.focus).not.toHaveBeenCalled()
         }))
       })
     })

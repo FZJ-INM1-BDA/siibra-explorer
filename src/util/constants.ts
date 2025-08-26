@@ -61,7 +61,8 @@ export const getHttpHeader: () => HttpHeaders = () => {
 }
 
 export const COLORMAP_IS_JET = `// iav-colormap-is-jet`
-import { InjectionToken } from "@angular/core"
+import { Injectable, InjectionToken } from "@angular/core"
+import { BehaviorSubject } from "rxjs"
 
 export const CYCLE_PANEL_MESSAGE = `[spacebar] to cycle through views`
 
@@ -125,3 +126,11 @@ export const SXPLR_ANNOTATIONS_KEY = {
   TEMPLATE_ID: "sxplrAnnotation.template.id",
   PARCELLATION_ID: "sxplrAnnotation.parcellation.id",
 } as const
+
+
+export const LABEL_EVENT_TRIGGER = new InjectionToken<(labels: string[]) => void>("LABEL_EVENT_TRIGGER")
+
+@Injectable()
+export class LblEventSvc {
+  labels$ = new BehaviorSubject<string[]>([])
+}

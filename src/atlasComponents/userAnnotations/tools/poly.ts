@@ -227,7 +227,7 @@ export const POLY_ICON_CLASS = 'fas fa-draw-polygon'
 export class ToolPolygon extends AbsToolClass<Polygon> implements IAnnotationTools, OnDestroy {
   static PREVIEW_ID='tool_poly_preview'
 
-  public name = 'polygon'
+  public name = 'Polygon'
   public iconClass = POLY_ICON_CLASS
   public toolType: TToolType = 'drawing'
 

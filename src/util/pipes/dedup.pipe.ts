@@ -7,6 +7,9 @@ import { Pipe, PipeTransform } from "@angular/core";
 
 export class DedupPipe implements PipeTransform {
   public transform<T>(values: T[], comparison: ((a: T, b: T) => boolean) = (a, b) => a === b) {
+    if (!values) {
+      return values
+    }
     return values.reduce((acc, curr) => {
       if (acc.findIndex(v => comparison(v, curr)) >= 0) {
         return acc

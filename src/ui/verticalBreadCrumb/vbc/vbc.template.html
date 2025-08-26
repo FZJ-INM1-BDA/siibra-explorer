@@ -350,7 +350,10 @@
                     </mat-expansion-panel-header>
                     <ng-template [ngTemplateOutlet]="viewNavigateTmpl"></ng-template>
                 </mat-expansion-panel>
-                <mat-expansion-panel #viewNavigateAccordParc>
+                <mat-expansion-panel #viewNavigateAccordParc
+                    sxplr-label-event
+                    [labels]="['selectedRegion']"
+                    (triggered)="$event && viewNavigateAccordParc.open()">
                     <mat-expansion-panel-header>
                         <mat-panel-title>
                             Parcellation
@@ -624,16 +627,130 @@
     </ng-template>
 
     <ng-template #viewAnnot let-expanded="expanded">
-        FOO ANNOT VIEW {{ expanded }}
+        <mat-card sxplr-annot-tools
+            [sxplr-annot-visible]="expanded"
+            #annotToolDir="sxplrAnnotTools">
+            <ng-template [ngIf]="annotToolDir.tools$ | async" let-tools>
+
+                <div class="title-2-container sxplr-custom-cmp hoverable mat-elevation-z1"
+                    mat-ripple
+                    role="select"
+                    [matTooltip]="view.labels.ANNOTATION_SELECT_TOOL"
+                    [matMenuTriggerFor]="genericMenu"
+                    [matMenuTriggerData]="{
+                        current: annotToolDir.selectedTool$ | async, 
+                        options: tools,
+                        select: annotToolDir.selectTool
+                    }">
+                    <span class="text-muted">
+                        Tool
+                    </span>
+                    <ng-template #fallbackToolTmpl>
+                        <div class="title-1-container text-muted">
+                            <h4>
+                                Select a tool
+                            </h4>
+                            <mat-icon>expand_more</mat-icon>
+                        </div>
+                    </ng-template>
+                    <ng-template [ngIf]="annotToolDir.selectedToolName$ | async"
+                        [ngIfElse]="fallbackToolTmpl"
+                        let-toolname>
+
+                        <div class="title-1-container">
+                            <h4>
+                                {{ toolname }}
+                            </h4>
+                            <mat-icon>expand_more</mat-icon>
+                        </div>
+                    </ng-template>
+                </div>
+            </ng-template>
+            
+            <div class="vbc-row">
+                <div class="vbc-row-fixed">
+                    
+                    <!-- open annotation from file -->
+                    <ng-template #importMessageTmpl>
+                        Please select a annotation file to import.
+                    </ng-template>
+
+                    <button mat-icon-button
+                        (file-input-directive)="annotToolDir.handleImportEvent($event, annFileDrop)"
+                        [file-input-directive-title]="view.labels.USER_ANNOTATION_IMPORT"
+                        [file-input-directive-text]="true"
+                        [file-input-directive-file]="true"
+                        [file-input-directive-message]="importMessageTmpl"
+                        [matTooltip]="view.labels.USER_ANNOTATION_IMPORT"
+                        #annFileDrop="fileInputDirective">
+                        <mat-icon>file_open</mat-icon>
+                    </button>
+
+                    <!-- download all annotations -->
+                    <button mat-icon-button
+                        [matTooltip]="view.labels.USER_ANNOTATION_EXPORT"
+                        [zip-files-output]="annotToolDir.filesExport$"
+                        zip-files-output-zip-filename="exported_annotations.zip"
+                        [disabled]="!(annotToolDir.hasManagedAnnotations$ | async)">
+                        <mat-icon>download</mat-icon>
+                    </button>
+
+                    <!-- share via sane url -->
+                    <ng-template [ngIf]="annotToolDir.stateToMerge$ | async"
+                        [ngIfElse]="disabledShareBtnTmpl"
+                        let-stateToMerge>
+                        
+                        <ng-template #saneUrlTmpl>
+                            <h2 mat-dialog-title>
+                                Create custom URL
+                            </h2>
+                            <div mat-dialog-content>
+                                <span class="sxplr-text-muted">
+                                    {{ annotToolDir.descText$ | async }}
+                                </span>
+                                <mat-divider></mat-divider>
+                                <iav-sane-url [stateTobeSaved]="stateAggregator.jsonifiedState$ | async | mergeObj : stateToMerge">
+                                </iav-sane-url>
+                            </div>
+
+                            <div mat-dialog-actions
+                                class="d-flex justify-content-center">
+                                <button mat-button
+                                    mat-dialog-close>
+                                    close
+                                </button>
+                            </div>
+                        </ng-template>
+                        <button mat-icon-button
+                            [matTooltip]="view.labels.SHARE_CUSTOM_URL"
+                            [sxplr-dialog]="saneUrlTmpl"
+                            iav-state-aggregator
+                            #stateAggregator="iavStateAggregator"
+                            [disabled]="!(annotToolDir.hasManagedAnnotations$ | async)">
+                            <mat-icon>share</mat-icon>
+                        </button>
+                    </ng-template>
+                    <ng-template #disabledShareBtnTmpl>
+                        <button mat-icon-button
+                            disabled
+                            [matTooltip]="view.labels.SHARE_CUSTOM_URL">
+                            <mat-icon>share</mat-icon>
+                        </button>
+                    </ng-template>
+
+                    <!-- delete all annotations -->
+                    <button mat-icon-button color="warn"
+                        [matTooltip]="view.labels.BULK_DELETE_ANNOTATIONS"
+                        (click)="annotToolDir.deleteAllAnnotation()"
+                        [disabled]="!(annotToolDir.hasManagedAnnotations$ | async)">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </div>
+            </div>
+
+            <simple-annotation-list></simple-annotation-list>
+        </mat-card>
         
-            <!-- <button mat-raised-button color="primary"
-                annotation-switch
-                annotation-switch-mode="on">
-                <mat-icon>edit</mat-icon>
-                <span>Annotation Mode</span>
-            </button>
-            <simple-annotation-list [show]="annotPanel.expanded">
-            </simple-annotation-list> -->
     </ng-template>
 
     <ng-template #viewShare>
@@ -690,8 +807,11 @@
 
     <!-- expmt parent tabbed view -->
     <ng-template [ngIf]="!view.showExperimental">
-        <mat-tab-group backgroundColor="primary">
-            <mat-tab label="Navigate">
+        <mat-tab-group backgroundColor="primary" #mainNavTabGrp="matTabGroup">
+            <mat-tab label="Navigate"
+                sxplr-label-event
+                [labels]="['selectedRegion']"
+                (triggered)="$event && mainNavTabGrp.selectedIndex = 0">
                 <div class="tab-content-wrapper">
                     <ng-template [ngTemplateOutlet]="viewNavigate"></ng-template>
                 </div>
@@ -703,7 +823,11 @@
                     </mat-card>
                 </div>
             </mat-tab>
-            <mat-tab label="Annotate" #annotTab="matTab">
+            <mat-tab label="Annotate"
+                #annotTab="matTab"
+                sxplr-label-event
+                [labels]="['annotations']"
+                (triggered)="$event && mainNavTabGrp.selectedIndex = 2">
                 <div class="tab-content-wrapper">
                     <mat-card>
                         <ng-template [ngTemplateOutlet]="viewAnnot"
@@ -732,7 +856,11 @@
 
     <!-- parent accordion view -->
     <mat-accordion *ngIf="view.showExperimental">
-        <mat-expansion-panel [expanded]="true">
+        <mat-expansion-panel [expanded]="true"
+            sxplr-label-event
+            [labels]="['selectedRegion']"
+            (triggered)="$event && navExpPanel.open()"
+            #navExpPanel="matExpansionPanel">
             <mat-expansion-panel-header>
                 Navigate
             </mat-expansion-panel-header>
@@ -749,7 +877,9 @@
         </mat-expansion-panel>
         
         <mat-expansion-panel #annotPanel="matExpansionPanel"
-            [expanded]="false">
+            sxplr-label-event
+            [labels]="['annotations']"
+            (triggered)="$event && annotPanel.open()">
             <mat-expansion-panel-header>
                 Annotate
             </mat-expansion-panel-header>
@@ -868,6 +998,39 @@
     </ng-template>
 
 </ng-template>
+
+<mat-menu #genericMenu="matMenu">
+    <ng-template matMenuContent
+        let-current="current"
+        let-options="options"
+        let-optionTemplate="optionTemplate"
+        let-select="select"
+        >
+        
+        <button *ngFor="let opt of options"
+            mat-menu-item
+            [matTooltip]="opt.shortName || opt.name"
+            (click)="select && select(opt, $event)"
+            class="menu-button">
+            <mat-icon fontSet="fas" [fontIcon]="opt === current ? 'fa-circle' : 'fa-none'"></mat-icon>
+            
+            <ng-template [ngIf]="optionTemplate" [ngIfElse]="defaultOptionTemplate">
+                <ng-template
+                    [ngTemplateOutlet]="optionTemplate"
+                    [ngTemplateOutletContext]="{
+                        $implicit: opt
+                    }">
+                </ng-template>
+            </ng-template>
+            
+            <ng-template #defaultOptionTemplate>
+                <span>
+                    {{ opt.shortName || opt.name }}
+                </span>
+            </ng-template>
+        </button>
+    </ng-template>
+</mat-menu>
 
 <mat-menu #selectATPMenu="matMenu">
     <ng-template matMenuContent

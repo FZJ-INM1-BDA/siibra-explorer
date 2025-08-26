@@ -19,6 +19,9 @@ const LAYER_COLOR = `#00ffff`
   ],
   hostDirectives: [
     DestroyDirective
+  ],
+  providers: [
+    ComponentStore
   ]
 })
 
@@ -56,8 +59,8 @@ export class SimpleAnnotationList extends AnnotationListDirective{
     })
   }
 
-  gotoRoi(annot: IAnnotationGeometry){
-    const result = this.annotSvc.getTool(annot.annotationType)
+  async gotoRoi(annot: IAnnotationGeometry){
+    const result = await this.annotSvc.getTool(annot.annotationType)
     if (!result) {
       return
     }
@@ -77,4 +80,8 @@ export class SimpleAnnotationList extends AnnotationListDirective{
     cmp.instance.gotoRoi()
     cmp.destroy()
   }
+  async toggleManagedAnnotationVisibility(id: string) {
+    await this.annotSvc.toggleAnnotationVisibilityById(id)
+  }
+  public hiddenAnnotations$ = this.annotSvc.hiddenAnnotations$
 }

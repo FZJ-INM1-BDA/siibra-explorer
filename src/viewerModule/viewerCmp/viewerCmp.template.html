@@ -134,8 +134,9 @@
       'vw-col-10-nm vw-col-sm-10-nm vw-col-md-5-nm vw-col-lg-4-nm vw-col-xl-3-nm vw-col-xxl-2-nm': !view.halfSidenavExpanded
     }">
     <ng-container [ngSwitch]="mode">
-      <annotation-list class="pe-all" *ngSwitchCase="ARIA_LABELS.VIEWER_MODE_ANNOTATING">
-      </annotation-list>
+      <ng-template [ngSwitchCase]="ARIA_LABELS.VIEWER_MODE_ANNOTATING">
+        Annotation no longer has a special mode. Please contact us on how you reached here. We will try to fix the bug ASAP.
+      </ng-template>
       <key-frame-controller class="pe-all" *ngSwitchCase="ARIA_LABELS.VIEWER_MODE_KEYFRAME">
       </key-frame-controller>
       <ng-template [ngSwitchCase]="ARIA_LABELS.VIEWER_MODE_FOCUSVIEW_VOI">
@@ -291,12 +292,8 @@
             sxplr-tab-icon="fas fa-list"
             sxplr-tab-color="primary"
             (sxplr-tab-click)="controlHalfNav(!view.halfSidenavExpanded)"
-            [sxplr-tab-badge]="toolPanel?.annBadges$ | async">
+            >
           </sxplr-tab>
-    
-          <annotating-tools-panel class="leave-me-alone"
-            #toolPanel="annoToolsPanel">
-          </annotating-tools-panel>
         </ng-template>
   
         <ng-template [ngSwitchCase]="ARIA_LABELS.VIEWER_MODE_KEYFRAME">
@@ -475,7 +472,6 @@
 
       <!-- volumetric i.e. nehuba -->
       <ng-container *ngSwitchCase="'nehuba'">
-        <ng-template sxplrExperimentalFlag [experimental]="true">
         <mat-card>
           <mat-card-header>
             <mat-card-title>
@@ -498,29 +494,6 @@
             </button>
           </mat-card-actions>
         </mat-card>
-        </ng-template>
-
-        <ng-template sxplrExperimentalFlag [deprecated]="true">
-        <mat-action-list class="sxplr-p-0">
-          <button mat-list-item
-            (click)="selectPoint({ point: context.payload.mouse.real }, data.metadata.template)">
-            
-            <span matListItemIcon>
-              <i class="fas fa-map"></i>  
-            </span>
-            
-            <span matListItemLine>
-              {{ context.payload.mouse.real | nmToMm | numbers | addUnitAndJoin : '' }} (mm)
-            </span>
-            <span matListItemLine class="text-muted">
-              Point
-            </span>
-            <span matListItemLine class="text-muted">
-              {{ data.metadata.template.name }}
-            </span>
-          </button>
-        </mat-action-list>
-        </ng-template>
 
       </ng-container>
 

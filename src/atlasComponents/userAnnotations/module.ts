@@ -3,28 +3,23 @@ import { CommonModule } from "@angular/common";
 import { AngularMaterialModule } from "src/sharedModules";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-import { AnnotationMode } from "src/atlasComponents/userAnnotations/annotationMode/annotationMode.component";
-import { AnnotationList } from "src/atlasComponents/userAnnotations/annotationList/annotationList.component";
 import { UserAnnotationToolModule } from "./tools/module";
-import { AnnotationSwitch } from "src/atlasComponents/userAnnotations/directives/annotationSwitch.directive";
 import { UtilModule } from "src/util";
 import { SingleAnnotationClsIconPipe, SingleAnnotationNamePipe, SingleAnnotationUnit } from "./singleAnnotationUnit/singleAnnotationUnit.component";
 import { AnnotationVisiblePipe } from "./annotationVisible.pipe";
 import { FileInputModule } from "src/getFileInput/module";
 import { ZipFilesOutputModule } from "src/zipFilesOutput/module";
 import { FilterAnnotationsBySpace } from "./filterAnnotationBySpace.pipe";
-import { AnnotationEventDirective } from "./directives/annotationEv.directive";
 import { ShareModule } from "src/share";
-import { MainState, StateModule } from "src/state";
+import { StateModule } from "src/state";
 import { RoutedAnnotationService } from "./routedAnnotation.service";
 import { INIT_ROUTE_TO_STATE } from "src/util/injectionTokens";
 import { Router } from "@angular/router";
 import { DECODE_ENCODE, DecodeEncode } from "src/routerModule/util";
 import { userAnnotationRouteKey } from "./constants";
-import { RecursivePartial } from "src/util/recursivePartial";
 import { ModularUserAnnotationToolService } from "./tools/service";
-import { AnnotationListDirective } from "./directives/annotation.directive";
 import { SimpleAnnotationList } from "./simpleAnnotList/simpleAnnotList.component";
+import { SxplrAnnotToolsDirective } from "./directives/annotationTools.directive";
 
 @NgModule({
   imports: [
@@ -41,25 +36,17 @@ import { SimpleAnnotationList } from "./simpleAnnotList/simpleAnnotList.componen
     StateModule,
   ],
   declarations: [
-    AnnotationMode,
-    AnnotationList,
-    AnnotationSwitch,
     SingleAnnotationUnit,
     SingleAnnotationNamePipe,
     SingleAnnotationClsIconPipe,
     AnnotationVisiblePipe,
     FilterAnnotationsBySpace,
-    AnnotationEventDirective,
-    AnnotationListDirective,
     SimpleAnnotationList,
+    SxplrAnnotToolsDirective,
   ],
   exports: [
-    AnnotationMode,
-    AnnotationList,
-    AnnotationSwitch,
-    AnnotationEventDirective,
-    AnnotationListDirective,
     SimpleAnnotationList,
+    SxplrAnnotToolsDirective,
   ],
   providers: [
     // initialize routerannotation service, so it will parse route and load annotations ...
@@ -77,23 +64,18 @@ import { SimpleAnnotationList } from "./simpleAnnotList/simpleAnnotList.componen
     },
     {
       provide: INIT_ROUTE_TO_STATE,
-      useFactory: (router: Router, decodeCustomState: DecodeEncode) => {
+      useFactory: (router: Router, decodeCustomState: DecodeEncode, annSvc: ModularUserAnnotationToolService) => {
         return async (fullPath: string) => {
           const customState = decodeCustomState.decodeCustomState(
             router.parseUrl(fullPath)
           ) || {}
           if (userAnnotationRouteKey in customState) {
-            const partial: RecursivePartial<MainState> = {
-              "[state.atlasSelection]": {
-                viewerMode: "annotating"
-              }
-            }
-            return Promise.resolve(partial)
+            annSvc.focus()
           }
           return Promise.resolve({})
         }
       },
-      deps: [Router, DECODE_ENCODE],
+      deps: [Router, DECODE_ENCODE, ModularUserAnnotationToolService],
       multi: true
     }
   ]

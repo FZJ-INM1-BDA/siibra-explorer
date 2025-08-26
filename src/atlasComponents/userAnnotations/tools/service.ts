@@ -3,7 +3,7 @@ import { ARIA_LABELS } from 'common/constants'
 import { Inject, Optional } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { BehaviorSubject, combineLatest, fromEvent, merge, Observable, of, Subject, Subscription } from "rxjs";
-import {map, switchMap, filter, shareReplay, pairwise, distinctUntilChanged, take, withLatestFrom } from "rxjs/operators";
+import {map, switchMap, filter, shareReplay, pairwise, distinctUntilChanged, take, withLatestFrom, scan } from "rxjs/operators";
 import { NehubaViewerUnit } from "src/viewerModule/nehuba";
 import { NEHUBA_INSTANCE_INJTKN } from "src/viewerModule/nehuba/util";
 import { AbsToolClass, ANNOTATION_EVENT_INJ_TOKEN, IAnnotationEvents, IAnnotationGeometry, INgAnnotationTypes, INJ_ANNOT_TARGET, TAnnotationEvent, ClassInterface, TCallbackFunction, TSands, TGeometryJson, TCallback, DESC_TYPE } from "./type";
@@ -59,6 +59,16 @@ function scanCollapse<T>(){
   })
 }
 
+export type RegisteredTool = {
+  name: string
+  iconClass: string
+  toolInstance: AbsToolClass<IAnnotationGeometry>
+  target?: Type<IAnnotationGeometry>
+  editCmp?: Type<ToolCmpBase>
+  onDestoryCallBack: () => void
+  onClick: () => void
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -81,6 +91,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
 
   private previewNgAnnIds: string[] = []
 
+  #annotationLayerVisible = false
   private annotationLayer: AnnotationLayer
   private activeToolName: string
   private forcedAnnotationRefresh$ = new BehaviorSubject(null)
@@ -88,13 +99,17 @@ export class ModularUserAnnotationToolService implements OnDestroy{
   private selectedTmpl$ = this.store.pipe(
     select(atlasSelection.selectors.selectedTemplate),
   )
-  public moduleAnnotationTypes: {instance: {name: string, iconClass: string, toolSelected$: Observable<boolean>}, onClick: () => void}[] = []
+
+  #registerAnnotationTool$ = new Subject<RegisteredTool>()
+  annotationTools$ = this.#registerAnnotationTool$.pipe(
+    scan((acc, curr) => acc.concat(curr), [] as RegisteredTool[]),
+    shareReplay(1),
+  )
   private managedAnnotationsStream$ = new Subject<{
     tool: string
     annotations: IAnnotationGeometry[]
   }>()
 
-  private managedAnnotations: IAnnotationGeometry[] = []
   private filterAnnotationBySpacePipe = new FilterAnnotationsBySpace()
   public managedAnnotations$ = this.managedAnnotationsStream$.pipe(
     scanCollapse(),
@@ -132,24 +147,17 @@ export class ModularUserAnnotationToolService implements OnDestroy{
 
   public hoveringAnnotations$ = this.annotnEvSubj.pipe(
     filter<TAnnotationEvent<'hoverAnnotation'>>(ev => ev.type === 'hoverAnnotation'),
-    map(ev => {
+    withLatestFrom(this.managedAnnotations$),
+    map(([ev, managedAnnotations]) => {
       if (!(ev?.detail)) return null
       const { pickedAnnotationId } = ev.detail
       const annId = (pickedAnnotationId || '').split('_')[0]
-      const foundAnn = this.managedAnnotations.find(ann => ann.id === annId)
+      const foundAnn = managedAnnotations.find(ann => ann.id === annId)
       if (!foundAnn) return null
       return foundAnn
     })
   )
 
-  private registeredTools: {
-    name: string
-    iconClass: string
-    toolInstance: AbsToolClass<IAnnotationGeometry>
-    target?: Type<IAnnotationGeometry>
-    editCmp?: Type<ToolCmpBase>
-    onDestoryCallBack: () => void
-  }[] = []
   private mousePosReal: [number, number, number]
 
   public toolEvents = new Subject()
@@ -189,7 +197,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
    *   editCmp?: ClassInterface<any>
    * }} arg 
    */
-  public registerTool<T extends AbsToolClass<any>>(arg: {
+  public registerTool<T extends AbsToolClass<IAnnotationGeometry>>(arg: {
     toolCls: ClassInterface<T>
     target?: ClassInterface<IAnnotationGeometry>
     editCmp?: ClassInterface<ToolCmpBase>
@@ -198,8 +206,10 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     const newTool = new Cls(this.annotnEvSubj, arg => this.handleToolCallback(arg)) as T & { ngOnDestroy?: () => void }
     const { name, iconClass } = newTool
     
-    this.moduleAnnotationTypes.push({
-      instance: newTool,
+    const toolSubscriptions: Subscription[] = []
+
+    this.#registerAnnotationTool$.next({
+      toolInstance: newTool,
       onClick: () => {
         const tool = this.activeToolName === name
           ? null
@@ -209,10 +219,20 @@ export class ModularUserAnnotationToolService implements OnDestroy{
           type: 'toolSelect',
           detail: { name: tool }
         } as TAnnotationEvent<'toolSelect'>)
+      },
+      iconClass,
+      name,
+      target,
+      editCmp,
+      onDestoryCallBack: () => {
+        newTool.ngOnDestroy && newTool.ngOnDestroy()
+        this.managedAnnotationsStream$.next({
+          annotations: [],
+          tool: name
+        })
+        while(toolSubscriptions.length > 0) toolSubscriptions.pop().unsubscribe()
       }
     })
-
-    const toolSubscriptions: Subscription[] = []
 
     const { managedAnnotations$ } = newTool
 
@@ -226,58 +246,8 @@ export class ModularUserAnnotationToolService implements OnDestroy{
         })
       )
     }
-
-    this.registeredTools.push({
-      name,
-      iconClass,
-      target,
-      editCmp,
-      toolInstance: newTool,
-      onDestoryCallBack: () => {
-        newTool.ngOnDestroy && newTool.ngOnDestroy()
-        this.managedAnnotationsStream$.next({
-          annotations: [],
-          tool: name
-        })
-        while(toolSubscriptions.length > 0) toolSubscriptions.pop().unsubscribe()
-      }
-    })
-
     return newTool
   }
-
-  /**
-   *
-   * @description deregister tool. Calls any necessary clean up function
-   * @param name name of the tool to be deregistered
-   * @returns void
-   */
-  private deregisterTool(name: string) {
-    this.moduleAnnotationTypes = this.moduleAnnotationTypes.filter(tool => tool.instance.name !== name)
-    const foundIdx = this.registeredTools.findIndex(spec => spec.name === name)
-    if (foundIdx >= 0) {
-      const tool = this.registeredTools.splice(foundIdx, 1)[0]
-      tool.onDestoryCallBack()
-    }
-  }
-
-  #voxelSize = this.store.pipe(
-    select(atlasSelection.selectors.selectedTemplate),
-    filter(v => !!v),
-    switchMap(tmpl => translateV3Entities.translateSpaceToVolumeImage(tmpl)),
-    map(volImages => {
-      if (volImages.length === 0) {
-        return null
-      }
-      const volImage = volImages[0]
-      if (volImage.legacySpecFlag === "new") {
-        throw new Error(`voxel size new spec not yet supported`)
-      }
-      const { real, voxel } = volImage.info
-      return [0, 1, 2].map(idx => real[idx]/voxel[idx]) as [number, number, number]
-    }),
-    shareReplay(1)
-  )
 
   #hoverMsgs: THoverConfig[] = []
 
@@ -403,7 +373,10 @@ export class ModularUserAnnotationToolService implements OnDestroy{
           while (this.previewNgAnnIds.length > 0) {
             this.clearAllPreviewAnnotations()
           }
-          if (!toolSelEv.detail.name) return of(null)
+          if (!toolSelEv.detail.name) return of(null as {
+            selectedToolName: string
+            ngMouseEvent: {x: number, y: number, z: number}
+          })
           return this.annotnEvSubj.pipe(
             filter(v => v.type === 'mousemove'),
             map((ev: TAnnotationEvent<'mousemove'>) => {
@@ -413,17 +386,15 @@ export class ModularUserAnnotationToolService implements OnDestroy{
               }
             })
           )
-        })
-      ).subscribe((ev: {
-        selectedToolName: string
-        ngMouseEvent: {x: number, y: number, z: number}
-      }) => {
+        }),
+        withLatestFrom(this.annotationTools$)
+      ).subscribe(([ev, tools]) => {
         if (!ev) {
           this.clearAllPreviewAnnotations()
           return
         }
         const { selectedToolName, ngMouseEvent } = ev
-        const selectedTool = this.registeredTools.find(tool => tool.name === selectedToolName)
+        const selectedTool = tools.find(tool => tool.name === selectedToolName)
         if (!selectedTool) {
           console.warn(`cannot find tool ${selectedToolName}`)
           return
@@ -594,11 +565,9 @@ export class ModularUserAnnotationToolService implements OnDestroy{
           ANNOTATION_LAYER_NAME,
           ModularUserAnnotationToolService.USER_ANNOTATION_LAYER_SPEC.annotationColor
         )
-        const mode = await this.store.pipe(
-          select(atlasSelection.selectors.viewerMode),
-          take(1),
-        ).toPromise()
-        this.annotationLayer.setVisible(mode === ModularUserAnnotationToolService.VIEWER_MODE)
+
+        this.annotationLayer.setVisible(this.#annotationLayerVisible)
+        
         sub = this.annotationLayer.onHover.subscribe(val => {
           this.annotnEvSubj.next({
             type: 'hoverAnnotation',
@@ -612,13 +581,6 @@ export class ModularUserAnnotationToolService implements OnDestroy{
         })
         this.forcedAnnotationRefresh$.next(null)
       }),
-      store.pipe(
-        select(atlasSelection.selectors.viewerMode),
-      ).subscribe(mode => {
-        if (this.annotationLayer) {
-          this.annotationLayer.setVisible(mode === ModularUserAnnotationToolService.VIEWER_MODE)
-        }
-      })  
     )
     /**
      * on template select, update selectedtmpl
@@ -634,27 +596,18 @@ export class ModularUserAnnotationToolService implements OnDestroy{
         })
         this.forcedAnnotationRefresh$.next(null)
       }),
-      this.managedAnnotations$.subscribe(ann => {
-        this.managedAnnotations = ann
-      }),
     )
 
-    /**
-     * on window unload, save annotation
-     */
-
-    /**
-     * before unload, save annotations
-     */
-    window.addEventListener('beforeunload', () => {
-      this.storeAnnotation(this.managedAnnotations)
-    })
   }
 
   /**
    * ensure that loadStoredAnnotation only gets called once
    */
   private loadFlag = false
+
+  /**
+   * @deprecated No longer storing local annotations
+   */
   public async loadStoredAnnotations(){
     if (this.loadFlag) return
     this.loadFlag = true
@@ -662,6 +615,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     const encoded = window.localStorage.getItem(LOCAL_STORAGE_KEY)
     if (!encoded) return []
     const bin = atob(encoded)
+    window.localStorage.removeItem(LOCAL_STORAGE_KEY)
     
     const { pako } = await getExportNehuba()
     const decoded = pako.inflate(bin, { to: 'string' })
@@ -672,9 +626,21 @@ export class ModularUserAnnotationToolService implements OnDestroy{
       if (geometry) anns.push(geometry)
     }
     
-    for (const ann of anns) {
-      this.importAnnotation(ann)
-    }
+    this.annotationTools$.pipe(
+      take(1),
+    ).subscribe(tools => {
+      
+      for (const ann of anns) {
+        
+        for (const tool of tools) {
+          const { toolInstance, target } = tool
+          if (!!target && ann instanceof target) {
+            toolInstance.addAnnotation(ann)
+            return
+          }
+        }
+      }
+    })
   }
 
   /**
@@ -683,47 +649,26 @@ export class ModularUserAnnotationToolService implements OnDestroy{
    */
   private metadataMap = new Map<string, TAnnotationMetadata>()
 
-  private async storeAnnotation(anns: IAnnotationGeometry[]){
-    const arr = []
-    for (const ann of anns) {
-      const json = ann.toJSON()
-      arr.push(json)
-    }
-    const stringifiedJSON = JSON.stringify(arr)
-    const exportNehuba = await getExportNehuba()
-    if (!exportNehuba) return
-    const { pako } = exportNehuba
-    const compressed = pako.deflate(stringifiedJSON)
-    let out = ''
-    for (const num of compressed) {
-      out += String.fromCharCode(num)
-    }
-    const encoded = btoa(out)
-    window.localStorage.setItem(LOCAL_STORAGE_KEY, encoded)
-  }
-
   private hiddenAnnotationIds = new Set<string>()
 
   public hiddenAnnotations$ = new BehaviorSubject<IAnnotationGeometry[]>([])
   private hiddenAnnotations: IAnnotationGeometry[] = []
-  public toggleAnnotationVisibilityById(id: string){
+  public async toggleAnnotationVisibilityById(id: string){
     if (this.hiddenAnnotationIds.has(id)) this.hiddenAnnotationIds.delete(id)
     else this.hiddenAnnotationIds.add(id)
 
     this.hiddenAnnotations = []
+    const managedAnnotations = await this.managedAnnotations$.pipe(
+      take(1)
+    ).toPromise()
     for (const id of Array.from(this.hiddenAnnotationIds)) {
-      const found = this.managedAnnotations.find(managedAnn => managedAnn.id === id)
+      const found = managedAnnotations.find(managedAnn => managedAnn.id === id)
       if (found) {
         this.hiddenAnnotations.push(found)
       }
     }
     this.hiddenAnnotations$.next(this.hiddenAnnotations)
     this.forcedAnnotationRefresh$.next(null)
-  }
-
-  public getEditAnnotationCmp(annotation: IAnnotationGeometry): Type<unknown>{
-    const foundTool = this.registeredTools.find(t => t.target && annotation instanceof t.target)
-    return foundTool && foundTool.editCmp
   }
 
   private clearAllPreviewAnnotations(){
@@ -767,19 +712,9 @@ export class ModularUserAnnotationToolService implements OnDestroy{
       returnObj = Polygon.fromJSON(json)
     }
     if (json['@type'] === DESC_TYPE) {
-      const existingAnn = this.managedAnnotations.find(ann => json.id === ann.id)
-      if (existingAnn) {
-
-        // potentially overwriting existing name and desc...
-        // maybe should show warning?
-        existingAnn.name = json.name
-        existingAnn.desc = json.desc
-        return existingAnn
-      } else {
-        const { id, name, desc } = json
-        this.metadataMap.set(id, { id, name, desc })
-        return
-      }
+      const { id, name, desc } = json
+      this.metadataMap.set(id, { id, name, desc })
+      return
     } else {
       const metadata = this.metadataMap.get(returnObj.id)
       if (returnObj && metadata) {
@@ -792,20 +727,26 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     throw new Error(`cannot parse annotation object`)
   }
 
-  importAnnotation(annotationObj: IAnnotationGeometry){
-    for (const tool of this.registeredTools) {
-      const { toolInstance, target } = tool
-      if (!!target && annotationObj instanceof target) {
-        toolInstance.addAnnotation(annotationObj)
-        return
-      }
-    }
-  }
-
   ngOnDestroy(){
     while(this.subscription.length > 0) this.subscription.pop().unsubscribe()
   }
 
+  focus$ = new Subject()
+
+  /**
+   * @description focus annotation elements
+   * @TODO implement me
+   */
+  public focus(){
+    console.error(`todo implement me`)
+    this.focus$.next(null)
+  }
+
+  /**
+   * @deprecated
+   * @param mode 
+   * @returns 
+   */
   async switchAnnotationMode(mode: 'on' | 'off' | 'toggle' = 'toggle') {
     const currMode = await this.store.pipe(
       select(atlasSelection.selectors.viewerMode),
@@ -833,14 +774,25 @@ export class ModularUserAnnotationToolService implements OnDestroy{
   /**
    * @param {string} name name of the tool
    */
-  getTool(name: string /* t: Type<IAnnotationGeometry> */) {
-    for (const _ of this.registeredTools){
+  async getTool(name: string /* t: Type<IAnnotationGeometry> */) {
+    const tools = await this.annotationTools$.pipe(
+      take(1)
+    ).toPromise()
+    for (const _ of tools){
       const { name: _name } = _
       if (name === _name) {
         return _
       }
     }
     return null
+  }
+
+  setVisible(flag: boolean){
+    this.#annotationLayerVisible = flag
+    if (!this.annotationLayer) {
+      return
+    }
+    this.annotationLayer.setVisible(flag)
   }
 }
 

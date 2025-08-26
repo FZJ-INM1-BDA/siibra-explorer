@@ -9,7 +9,7 @@ import { ModularUserAnnotationToolService } from "../tools/service";
 import { MatSnackBar } from 'src/sharedModules/angularMaterial.exports'
 import { Line } from "../tools/line";
 import { atlasSelection } from "src/state";
-import { map } from "rxjs/operators";
+import { map, take } from "rxjs/operators";
 
 @Component({
   selector: 'single-annotation-unit',
@@ -67,9 +67,14 @@ export class SingleAnnotationUnit implements OnDestroy, AfterViewInit{
   }
 
   ngAfterViewInit(){
-    if (this.managedAnnotation && this.editAnnotationVCR) {
-      const editCmp = this.svc.getEditAnnotationCmp(this.managedAnnotation)
-      if (!editCmp) {
+    if (!this.managedAnnotation || !this.editAnnotationVCR) {
+      return
+    }
+    this.svc.annotationTools$.pipe(
+      map(tools => tools.find(t => t.target && this.managedAnnotation instanceof t.target)),
+      take(1)
+    ).subscribe(tool => {
+      if (!(tool?.editCmp)) {
         this.snackbar.open(`Update component not found!`, 'Dismiss', {
           duration: 3000
         })
@@ -83,8 +88,8 @@ export class SingleAnnotationUnit implements OnDestroy, AfterViewInit{
         }],
         parent: this.injector
       })
-      this.editAnnotationVCR.createComponent(editCmp as Type<unknown>, {injector})
-    }
+      this.editAnnotationVCR.createComponent(tool.editCmp as Type<unknown>, {injector})
+    })
   }
 
   ngOnDestroy(){

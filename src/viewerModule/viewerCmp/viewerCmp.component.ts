@@ -560,8 +560,8 @@ export class ViewerCmp {
     }
   }
 
-  public bookmarkPoint(pointSpec: {point?: number[], face?: number, vertices?: number[]}, template: SxplrTemplate){
-    const _ = this.userAnnotSvc.getTool("Point")
+  public async bookmarkPoint(pointSpec: {point?: number[], face?: number, vertices?: number[]}, template: SxplrTemplate){
+    const _ = await this.userAnnotSvc.getTool("Point")
     if (!_) {
       return
     }

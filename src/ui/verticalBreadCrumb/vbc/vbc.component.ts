@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, inject, Inject, Input, Output, ViewChild } from "@angular/core";
+import { ChangeDetectionStrategy, Component, EventEmitter, inject, Inject, Input, Optional, Output, ViewChild } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { BehaviorSubject, combineLatest, merge, Observable, of, Subject } from "rxjs";
+import { combineLatest, merge, Observable, of, Subject } from "rxjs";
 import { debounceTime, distinctUntilChanged, filter, map, startWith, switchMap, take, takeUntil, withLatestFrom } from "rxjs/operators";
 import { SAPI, IDS } from "src/atlasComponents/sapi";
 import { Feature, SxplrParcellation, SxplrRegion, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
@@ -16,10 +16,9 @@ import { translateRegionName } from "src/atlasComponents/sapi/translateV3";
 import { generalActionError } from "src/state/actions";
 import { MatExpansionPanel } from "@angular/material/expansion";
 import { arrayEqual } from "src/util/array";
-import { SXPLR_PREFIX } from "src/util/constants";
+import { LABEL_EVENT_TRIGGER, SXPLR_PREFIX } from "src/util/constants";
 import { ModularUserAnnotationToolService } from "src/atlasComponents/userAnnotations/tools/service";
 import { IAnnotationGeometry } from "src/atlasComponents/userAnnotations/tools/type";
-import { MatDialog } from "src/sharedModules";
 import { BANLIST_CONNECTIVITY, EXPERIMENTAL_CONNECTIVITY, WHITELIST_CONNECTIVITY } from "src/features/connectivity";
 import { ViewerMode } from "src/state/atlasSelection/const";
 
@@ -27,6 +26,7 @@ const pipe = new FilterGroupedParcellationPipe()
 
 const FOCUS_ON = [
   "selectedRegion",
+  "annotations",
 ] as const
 type FOCUS_ON_TYPE = typeof FOCUS_ON[number]
 
@@ -86,10 +86,6 @@ export class VerticalBreadCrumbComponent {
   #destroy$ = inject(DestroyDirective).destroyed$
   
   #pasted$ = new Subject<{target: PasteTarget, value: string}>()
-  #minimizedCards$ = new BehaviorSubject<string[]>([])
-
-  // accordion mode
-  #maximizedCard$ = new BehaviorSubject<string>(null)
   
   #parseString(input: string): number[]{
     return input
@@ -359,8 +355,9 @@ export class VerticalBreadCrumbComponent {
     private store$: Store,
     private sapi: SAPI,
     private annotSvc: ModularUserAnnotationToolService,
-    private dialog: MatDialog,
     @Inject(NEHUBA_CONFIG_SERVICE_TOKEN) private nehubaConfigSvc: NehubaConfigSvc,
+    @Optional()
+    @Inject(LABEL_EVENT_TRIGGER) private labelEventTrigger: (labels: string[]) => void
   ){
     
     const navStateFromState$: Observable<NavigationState> = this.store$.pipe(
@@ -557,25 +554,6 @@ export class VerticalBreadCrumbComponent {
     }
   }
 
-  public clearFeature(){
-    this.store$.dispatch(
-      userInteraction.actions.clearShownFeature()
-    )
-  }
-  public removeCustomLayer(id: string){
-    this.store$.dispatch(
-      atlasAppearance.actions.removeCustomLayers({
-        customLayers: [{ id }]
-      })
-    )
-  }
-
-  public clearPoint() {
-    this.store$.dispatch(
-      atlasSelection.actions.clearSelectedPoint()
-    )
-  }
-
   public clearRoi() {
     this.store$.dispatch(
       atlasSelection.actions.clearSelectedRegions()
@@ -667,8 +645,18 @@ export class VerticalBreadCrumbComponent {
     )
   }
   
-  public focusOn(_name: FOCUS_ON_TYPE){
-    // TODO add focus on logic
+  public focusOn(name: FOCUS_ON_TYPE){
+    if (!this.labelEventTrigger) {
+      return
+    }
+    if (name === "annotations") {
+      this.labelEventTrigger(["annotations"])
+      return
+    }
+    if (name === "selectedRegion") {
+      this.labelEventTrigger(["selectedRegion"])
+      return
+    }
   }
 
   public assignPoint(position: number[], template: SxplrTemplate) {

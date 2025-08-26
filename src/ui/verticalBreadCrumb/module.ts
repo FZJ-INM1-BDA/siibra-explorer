@@ -35,6 +35,9 @@ import { StateModule } from "src/state";
 import { ScreenshotModule } from "src/screenshot";
 import { KeyFrameModule } from "src/keyframesModule/module";
 import { PluginModule } from "src/plugin";
+import { LabelEventDirective } from "./labelEvent.directive";
+import { AtlasViewerRouterModule } from "src/routerModule";
+import { FileInputModule } from "src/getFileInput/module";
 
 @NgModule({
   imports: [
@@ -71,7 +74,10 @@ import { PluginModule } from "src/plugin";
     ScreenshotModule,
     KeyFrameModule,
     PluginModule,
-  ],
+    LabelEventDirective,
+    AtlasViewerRouterModule,
+    FileInputModule,
+],
   declarations: [
     VerticalBreadCrumbComponent,
     OnFocusSelectDirective,

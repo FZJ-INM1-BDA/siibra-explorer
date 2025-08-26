@@ -62,4 +62,19 @@ export const enLabels = {
   ADD_LOCAL_FILE_DESC: `Load a local file. It will stay on your computer. Supported extensions: .nii.gz, .nii.`,
 
   ADD_REMOTE_URL_PLACEHOLDER: `e.g. precomputed://https://neuroglancer.humanbrainproject.eu/precomputed/BigBrainRelease.2015/8bit`,
+
+  ANNOTATION_SELECT_TOOL: "Select a different tool",
+  
+  USER_ANNOTATION_LIST: 'user annotations footer',
+  USER_ANNOTATION_IMPORT: 'Import annotations',
+  USER_ANNOTATION_EXPORT: 'Export all of my annotations',
+  USER_ANNOTATION_EXPORT_SINGLE: 'Export annotation',
+  USER_ANNOTATION_HIDE: 'user annotations hide',
+  USER_ANNOTATION_DELETE: 'Delete annotation',
+  GOTO_ANNOTATION_ROI: 'Navigate to annotation location of interest',
+  BULK_DELETE_ANNOTATIONS: 'Delete all user annotations',
+  LOADING_ANNOTATION_MSG: `Loading annotations... Please wait...`,
+  DELETE_ALL_ANNOTATION_CONFIRMATION_MSG: `Are you sure you want to delete all annotations?`,
+
+  SHARE_CUSTOM_URL: 'Create a custom URL',
 }
