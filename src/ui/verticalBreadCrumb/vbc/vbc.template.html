@@ -7,6 +7,8 @@
             <!-- species -->
             <ng-template #viewNavigateSpecies>
                 <ng-template [ngIf]="atp.atlas" let-atlas>
+
+                    <ng-template sxplrExperimentalFlag [deprecated]="true">
                     <div class="title-2-container sxplr-custom-cmp hoverable mat-elevation-z1"
                         mat-ripple
                         role="select"
@@ -21,18 +23,20 @@
                             Species
                         </span>
                         <div class="title-1-container">
-                            <h4>
+                            <h5>
                                 {{ atlas.name }}
-                            </h4>
+                            </h5>
                             <mat-icon>expand_more</mat-icon>
                         </div>
                     </div>
+                    </ng-template>
                 </ng-template>
             </ng-template>
 
             <!-- template -->
             <ng-template #viewNavigateTmpl>
                 <ng-template [ngIf]="atp.template" let-template>
+                    <ng-template sxplrExperimentalFlag [deprecated]="true">
                     <div class="title-2-container sxplr-custom-cmp hoverable mat-elevation-z1"
                         mat-ripple
                         role="select"
@@ -47,12 +51,13 @@
                             Space
                         </span>
                         <div class="title-1-container">
-                            <h4>
+                            <h5>
                                 {{ template.shortName || template.name }}
-                            </h4>
+                            </h5>
                             <mat-icon>expand_more</mat-icon>
                         </div>
                     </div>
+                    </ng-template>
                     
                     <button mat-icon-button
                         class="vbc-row-fixed"
@@ -113,6 +118,9 @@
             <!-- parcellation -->
             <ng-template #viewNavigateParc>
                 <ng-template [ngIf]="atp.parcellation" let-parcellation>
+
+                    <ng-template sxplrExperimentalFlag [deprecated]="true">
+
                     <div class="vbc-row">
 
                         <div class="title-2-container sxplr-custom-cmp hoverable mat-elevation-z1"
@@ -132,14 +140,17 @@
                                 Reference Atlas
                             </span>
                             <div class="title-1-container">
-                                <h4>
+                                <h5>
                                     {{ parcellation.shortName || parcellation.name }}
-                                </h4>
+                                </h5>
                                 <mat-icon>expand_more</mat-icon>
                             </div>
                         </div>
 
                     </div>
+                    
+                    </ng-template>
+
                     <div class="vbc-row">                        
 
                         <!-- parc version button -->
@@ -226,14 +237,14 @@
                                         Brain Areas
                                     </span>
                                     <div class="title-1-container">
-                                        <h4>
+                                        <h5>
                                             <ng-template [ngIf]="selectedRegions.length === 1">
                                                 {{ selectedRegions[0].name }}
                                             </ng-template>
                                             <ng-template [ngIf]="selectedRegions.length > 1">
                                                 {{ selectedRegions.length }} areas
                                             </ng-template>
-                                        </h4>
+                                        </h5>
                                         <mat-icon fontSet="fas" fontIcon="fa-sitemap"></mat-icon>
                                     </div>
                                 </div>
@@ -334,7 +345,21 @@
                             Species
                         </mat-panel-title>
                         <mat-panel-description>
-                            {{ atp.atlas.name }}
+                            <span>
+                                {{ atp.atlas.name }}
+                            </span>
+                            <button mat-icon-button
+                                iav-stop="mousedown click"
+                                role="select"
+                                [matTooltip]="view.labels.SELECTED_DIFFERENT_ATLAS"
+                                [matMenuTriggerFor]="selectATPMenu"
+                                [matMenuTriggerData]="{
+                                    current: view.selectedATP.atlas, 
+                                    type: 'atlasId',
+                                    options: view.atlases
+                                }">
+                                <mat-icon>find_replace</mat-icon>
+                            </button>
                         </mat-panel-description>
                     </mat-expansion-panel-header>
                     <ng-template [ngTemplateOutlet]="viewNavigateSpecies"></ng-template>
@@ -345,7 +370,21 @@
                             Space
                         </mat-panel-title>
                         <mat-panel-description>
-                            {{ atp.template.shortName || atp.template.name }}
+                            <span>
+                                {{ atp.template.shortName || atp.template.name }}
+                            </span>
+                            <button mat-icon-button
+                                iav-stop="mousedown click"
+                                role="select"
+                                [matTooltip]="view.labels.SELECTED_DIFFERENT_TEMPLATE"
+                                [matMenuTriggerFor]="selectATPMenu"
+                                [matMenuTriggerData]="{
+                                    current: view.selectedATP.template, 
+                                    type: 'templateId',
+                                    options: view.templates
+                                }">
+                                <mat-icon>find_replace</mat-icon>
+                            </button>
                         </mat-panel-description>
                     </mat-expansion-panel-header>
                     <ng-template [ngTemplateOutlet]="viewNavigateTmpl"></ng-template>
@@ -359,7 +398,24 @@
                             Parcellation
                         </mat-panel-title>
                         <mat-panel-description>
-                            {{ atp.parcellation.shortName || atp.parcellation.name }}
+                            <span>
+                                {{ atp.parcellation.shortName || atp.parcellation.name }}
+                            </span>
+                            <button mat-icon-button
+                                iav-stop="mousedown click"
+                                role="select"
+                                [matTooltip]="view.labels.SELECTED_DIFFERENT_PARCELLATION"
+                                [matMenuTriggerFor]="selectATPMenu"
+                                [matMenuTriggerData]="{
+                                    current: view.selectedATP.parcellation, 
+                                    type: 'parcellationId',
+                                    options: view.noGroupParcs,
+                                    groupedOptions: view.groupParcs,
+                                    getSubMenu: getSubParcellation,
+                                    optionTemplate: parcellationOptTmpl
+                                }">
+                                <mat-icon>find_replace</mat-icon>
+                            </button>
                         </mat-panel-description>
                     </mat-expansion-panel-header>
                     <ng-template [ngTemplateOutlet]="viewNavigateParc"></ng-template>
@@ -636,7 +692,7 @@
                     [ngForOf]="tools | groupby : annotToolDir.getToolType | keyvalue"
                     let-keyval>
                     
-                    <div class="tool-container">
+                    <div class="tool-container vbc-row-fixed">
                         <mat-button-toggle-group
                             [value]="annotToolDir.selectedTool$ | async | getProperty : 'name'"
                             (valueChange)="annotToolDir.selectToolByName($event)">
@@ -690,6 +746,9 @@
         
         <mat-divider></mat-divider>
         
+        <simple-annotation-list></simple-annotation-list>
+        
+        <mat-divider></mat-divider>
         <div class="vbc-row">
             <div class="vbc-row-fixed">
                 
@@ -770,10 +829,6 @@
                 </button>
             </div>
         </div>
-
-
-        <simple-annotation-list></simple-annotation-list>
-        
     </ng-template>
 
     <ng-template #viewShare>
@@ -830,51 +885,70 @@
 
     <!-- expmt parent tabbed view -->
     <ng-template [ngIf]="!view.showExperimental">
-        <mat-tab-group color="primary" backgroundColor="primary" #mainNavTabGrp="matTabGroup">
-            <mat-tab label="Navigate"
-                sxplr-label-event
-                [labels]="['selectedRegion']"
-                (triggered)="$event && mainNavTabGrp.selectedIndex = 0">
-                <div class="tab-content-wrapper">
-                    <ng-template [ngTemplateOutlet]="viewNavigate"></ng-template>
-                </div>
-            </mat-tab>
-            <mat-tab label="Find">
-                <div class="tab-content-wrapper">
-                    <mat-card>
-                        <ng-template [ngTemplateOutlet]="viewFind"></ng-template>
-                    </mat-card>
-                </div>
-            </mat-tab>
-            <mat-tab label="Annotate"
-                #annotTab="matTab"
-                sxplr-label-event
-                [labels]="['annotations']"
-                (triggered)="$event && mainNavTabGrp.selectedIndex = 2">
-                <div class="tab-content-wrapper">
-                    <mat-card>
-                        <ng-template [ngTemplateOutlet]="viewAnnot"
-                            [ngTemplateOutletContext]="{
-                                expanded: annotTab.isActive
-                            }"></ng-template>
-                    </mat-card>
-                </div>
-            </mat-tab>
-            <mat-tab label="Share">
-                <div class="tab-content-wrapper">
-                    <mat-card>
-                        <ng-template [ngTemplateOutlet]="viewShare"></ng-template>
-                    </mat-card>
-                </div>
-            </mat-tab>
-            <mat-tab label="Tools">
-                <div class="tab-content-wrapper">
-                    <mat-card>
-                        <ng-template [ngTemplateOutlet]="viewTools"></ng-template>
-                    </mat-card>
-                </div>
-            </mat-tab>
-        </mat-tab-group>
+        <mat-card>
+            <mat-tab-group color="primary" #mainNavTabGrp="matTabGroup"
+                animationDuration="0">
+                <mat-tab
+                    sxplr-label-event
+                    [labels]="['selectedRegion']"
+                    (triggered)="$event && mainNavTabGrp.selectedIndex = 0">
+                    <ng-template mat-tab-label>
+                        <mat-icon>navigation</mat-icon>
+                    </ng-template>
+                    <div class="tab-content-wrapper">
+                        <ng-template [ngTemplateOutlet]="viewNavigate"></ng-template>
+                    </div>
+                </mat-tab>
+                <mat-tab>
+                    <ng-template mat-tab-label>
+                        <mat-icon>find_in_page</mat-icon>
+                    </ng-template>
+                    <div class="tab-content-wrapper">
+                        <mat-card>
+                            <ng-template [ngTemplateOutlet]="viewFind"></ng-template>
+                        </mat-card>
+                    </div>
+                </mat-tab>
+                <mat-tab
+                    #annotTab="matTab"
+                    sxplr-label-event
+                    [labels]="['annotations']"
+                    (triggered)="$event && mainNavTabGrp.selectedIndex = 2">
+                    
+                    <ng-template mat-tab-label>
+                        <mat-icon>draw</mat-icon>
+                    </ng-template>
+                    <div class="tab-content-wrapper">
+                        <mat-card>
+                            <ng-template [ngTemplateOutlet]="viewAnnot"
+                                [ngTemplateOutletContext]="{
+                                    expanded: annotTab.isActive
+                                }"></ng-template>
+                        </mat-card>
+                    </div>
+                </mat-tab>
+                <mat-tab>
+                    <ng-template mat-tab-label>
+                        <mat-icon>share</mat-icon>
+                    </ng-template>
+                    <div class="tab-content-wrapper">
+                        <mat-card>
+                            <ng-template [ngTemplateOutlet]="viewShare"></ng-template>
+                        </mat-card>
+                    </div>
+                </mat-tab>
+                <mat-tab>
+                    <ng-template mat-tab-label>
+                        <mat-icon>widgets</mat-icon>
+                    </ng-template>
+                    <div class="tab-content-wrapper">
+                        <mat-card>
+                            <ng-template [ngTemplateOutlet]="viewTools"></ng-template>
+                        </mat-card>
+                    </div>
+                </mat-tab>
+            </mat-tab-group>
+        </mat-card>
     </ng-template>
 
     <!-- parent accordion view -->
