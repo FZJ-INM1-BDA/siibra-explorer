@@ -1,7 +1,7 @@
 import { Component, ElementRef, Inject, Input, OnDestroy, Optional, ViewChild } from "@angular/core";
 import { MatSnackBar } from 'src/sharedModules/angularMaterial.exports'
 import { Store } from "@ngrx/store";
-import { Line, LINE_ICON_CLASS } from "../line";
+import { Line } from "../line";
 import { ToolCmpBase } from "../toolCmp.base";
 import { IAnnotationGeometry, TExportFormats, UDPATE_ANNOTATION_TOKEN } from "../type";
 import { Point } from "../point";
@@ -22,7 +22,6 @@ export class LineUpdateCmp extends ToolCmpBase implements OnDestroy{
   public updateAnnotation: Line
 
   public ARIA_LABELS = ARIA_LABELS
-  public LINE_ICON_CLASS = LINE_ICON_CLASS
 
   @ViewChild('copyTarget', { read: ElementRef, static: false })
   copyTarget: ElementRef

@@ -21,8 +21,9 @@ class TmpCls extends IAnnotationGeometry{
 }
 
 class TmpToolCls extends AbsToolClass<TmpCls> {
-  iconClass = ''
+  matIcon = ''
   name: 'tmplClsTool'
+  toolType = "drawing" as const
   subs = []
   onMouseMoveRenderPreview() {
     return []

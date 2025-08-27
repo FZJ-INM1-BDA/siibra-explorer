@@ -61,7 +61,7 @@ function scanCollapse<T>(){
 
 export type RegisteredTool = {
   name: string
-  iconClass: string
+  matIcon: string
   toolInstance: AbsToolClass<IAnnotationGeometry>
   target?: Type<IAnnotationGeometry>
   editCmp?: Type<ToolCmpBase>
@@ -204,7 +204,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
   }): AbsToolClass<any>{
     const { toolCls: Cls, target, editCmp } = arg
     const newTool = new Cls(this.annotnEvSubj, arg => this.handleToolCallback(arg)) as T & { ngOnDestroy?: () => void }
-    const { name, iconClass } = newTool
+    const { name, matIcon } = newTool
     
     const toolSubscriptions: Subscription[] = []
 
@@ -220,7 +220,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
           detail: { name: tool }
         } as TAnnotationEvent<'toolSelect'>)
       },
-      iconClass,
+      matIcon,
       name,
       target,
       editCmp,

@@ -361,3 +361,14 @@ mat-accordion.panel-accordion
     margin: 0 -2rem;
     display: block;
 }
+
+.tool-container
+{
+    display: inline-block;
+    margin: 0;
+    
+    &:not(:first-child)
+    {
+        margin: 0 1rem;
+    }
+}

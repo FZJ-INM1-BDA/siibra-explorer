@@ -1,6 +1,6 @@
 import { Component, ElementRef, Inject, Input, OnDestroy, Optional, ViewChild } from "@angular/core";
 import { MatSnackBar } from 'src/sharedModules/angularMaterial.exports'
-import { Polygon, POLY_ICON_CLASS } from "../poly";
+import { Polygon } from "../poly";
 import { ToolCmpBase } from "../toolCmp.base";
 import { IAnnotationGeometry, TExportFormats, UDPATE_ANNOTATION_TOKEN } from "../type";
 import { Store } from "@ngrx/store";
@@ -22,7 +22,6 @@ export class PolyUpdateCmp extends ToolCmpBase implements OnDestroy{
   public updateAnnotation: Polygon
 
   public ARIA_LABELS = ARIA_LABELS
-  public POLY_ICON_CLASS = POLY_ICON_CLASS
 
   @ViewChild('copyTarget', { read: ElementRef, static: false })
   copyTarget: ElementRef

@@ -96,7 +96,6 @@ export class SxplrAnnotToolsDirective {
     let selectedToolName: string = null
     this.svc.setVisible(this.#visible)
     const stopClick = () => {
-      console.log(selectedToolName)
       if (BLOCKING_TOOLNAMES.includes(selectedToolName)) {
         return !this.visible
       }
@@ -112,6 +111,20 @@ export class SxplrAnnotToolsDirective {
     ).subscribe(name => {
       selectedToolName = name
     })
+  }
+
+  async selectToolByName(name: string){
+    if (!name) {
+      return
+    }
+    const tools = await this.tools$.pipe(
+      take(1)
+    ).toPromise()
+    const foundTool = tools.find(t => t.name === name)
+    if (!foundTool) {
+      return
+    }
+    foundTool.onClick()
   }
 
   selectTool(tool: RegisteredTool){
@@ -283,5 +296,12 @@ export class SxplrAnnotToolsDirective {
     } catch (e) {
       // aborted
     }
+  }
+
+  public getToolType(tool: RegisteredTool){
+    if (tool.toolInstance.toolType === "drawing") {
+      return "drawing"
+    }
+    return "utility"
   }
 }

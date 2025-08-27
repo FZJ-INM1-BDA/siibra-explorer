@@ -2,14 +2,14 @@ import { Directive, OnDestroy } from "@angular/core";
 import { Observable, Subject, Subscription } from "rxjs";
 import { filter } from 'rxjs/operators'
 import { Point } from "./point";
-import { AbsToolClass, IAnnotationEvents, IAnnotationGeometry, IAnnotationTools, TAnnotationEvent, TCallbackFunction, TToolType } from "./type";
+import { AbsToolClass, IAnnotationEvents, IAnnotationGeometry, TAnnotationEvent, TCallbackFunction, TToolType } from "./type";
 
 @Directive()
-export class ToolSelect extends AbsToolClass<Point> implements IAnnotationTools, OnDestroy {
+export class ToolSelect extends AbsToolClass<Point> implements OnDestroy {
 
   public subs: Subscription[] = []
   toolType: TToolType = 'selecting'
-  iconClass = 'fas fa-mouse-pointer'
+  matIcon = 'control_camera'
   name = 'Select'
   protected managedAnnotations = []
 

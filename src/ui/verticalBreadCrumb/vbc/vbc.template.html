@@ -627,12 +627,31 @@
     </ng-template>
 
     <ng-template #viewAnnot let-expanded="expanded">
-        <mat-card sxplr-annot-tools
+        <div class="vbc-row"
+            sxplr-annot-tools
             [sxplr-annot-visible]="expanded"
             #annotToolDir="sxplrAnnotTools">
             <ng-template [ngIf]="annotToolDir.tools$ | async" let-tools>
+                <ng-template ngFor
+                    [ngForOf]="tools | groupby : annotToolDir.getToolType | keyvalue"
+                    let-keyval>
+                    
+                    <div class="tool-container">
+                        <mat-button-toggle-group
+                            [value]="annotToolDir.selectedTool$ | async | getProperty : 'name'"
+                            (valueChange)="annotToolDir.selectToolByName($event)">
+                            <ng-template ngFor [ngForOf]="keyval.value" let-tool>
+                                <mat-button-toggle
+                                    [matTooltip]="tool.name"
+                                    [value]="tool.name">
+                                    <mat-icon>{{ tool.matIcon }}</mat-icon>
+                                </mat-button-toggle>
+                            </ng-template>
+                        </mat-button-toggle-group>
+                    </div>
+                </ng-template>
 
-                <div class="title-2-container sxplr-custom-cmp hoverable mat-elevation-z1"
+                <!-- <div class="title-2-container sxplr-custom-cmp hoverable mat-elevation-z1"
                     mat-ripple
                     role="select"
                     [matTooltip]="view.labels.ANNOTATION_SELECT_TOOL"
@@ -664,92 +683,96 @@
                             <mat-icon>expand_more</mat-icon>
                         </div>
                     </ng-template>
-                </div>
+                </div> -->
             </ng-template>
             
-            <div class="vbc-row">
-                <div class="vbc-row-fixed">
+        </div>
+        
+        <mat-divider></mat-divider>
+        
+        <div class="vbc-row">
+            <div class="vbc-row-fixed">
+                
+                <!-- open annotation from file -->
+                <ng-template #importMessageTmpl>
+                    Please select a annotation file to import.
+                </ng-template>
+
+                <button mat-icon-button
+                    (file-input-directive)="annotToolDir.handleImportEvent($event, annFileDrop)"
+                    [file-input-directive-title]="view.labels.USER_ANNOTATION_IMPORT"
+                    [file-input-directive-text]="true"
+                    [file-input-directive-file]="true"
+                    [file-input-directive-message]="importMessageTmpl"
+                    [matTooltip]="view.labels.USER_ANNOTATION_IMPORT"
+                    #annFileDrop="fileInputDirective">
+                    <mat-icon>file_open</mat-icon>
+                </button>
+
+                <!-- download all annotations -->
+                <button mat-icon-button
+                    [matTooltip]="view.labels.USER_ANNOTATION_EXPORT"
+                    [zip-files-output]="annotToolDir.filesExport$"
+                    zip-files-output-zip-filename="exported_annotations.zip"
+                    [disabled]="!(annotToolDir.hasManagedAnnotations$ | async)">
+                    <mat-icon>download</mat-icon>
+                </button>
+
+                <!-- share via sane url -->
+                <ng-template [ngIf]="annotToolDir.stateToMerge$ | async"
+                    [ngIfElse]="disabledShareBtnTmpl"
+                    let-stateToMerge>
                     
-                    <!-- open annotation from file -->
-                    <ng-template #importMessageTmpl>
-                        Please select a annotation file to import.
-                    </ng-template>
+                    <ng-template #saneUrlTmpl>
+                        <h2 mat-dialog-title>
+                            Create custom URL
+                        </h2>
+                        <div mat-dialog-content>
+                            <span class="sxplr-text-muted">
+                                {{ annotToolDir.descText$ | async }}
+                            </span>
+                            <mat-divider></mat-divider>
+                            <iav-sane-url [stateTobeSaved]="stateAggregator.jsonifiedState$ | async | mergeObj : stateToMerge">
+                            </iav-sane-url>
+                        </div>
 
+                        <div mat-dialog-actions
+                            class="d-flex justify-content-center">
+                            <button mat-button
+                                mat-dialog-close>
+                                close
+                            </button>
+                        </div>
+                    </ng-template>
                     <button mat-icon-button
-                        (file-input-directive)="annotToolDir.handleImportEvent($event, annFileDrop)"
-                        [file-input-directive-title]="view.labels.USER_ANNOTATION_IMPORT"
-                        [file-input-directive-text]="true"
-                        [file-input-directive-file]="true"
-                        [file-input-directive-message]="importMessageTmpl"
-                        [matTooltip]="view.labels.USER_ANNOTATION_IMPORT"
-                        #annFileDrop="fileInputDirective">
-                        <mat-icon>file_open</mat-icon>
+                        [matTooltip]="view.labels.SHARE_CUSTOM_URL"
+                        [sxplr-dialog]="saneUrlTmpl"
+                        iav-state-aggregator
+                        #stateAggregator="iavStateAggregator"
+                        [disabled]="!(annotToolDir.hasManagedAnnotations$ | async)">
+                        <mat-icon>share</mat-icon>
                     </button>
-
-                    <!-- download all annotations -->
+                </ng-template>
+                <ng-template #disabledShareBtnTmpl>
                     <button mat-icon-button
-                        [matTooltip]="view.labels.USER_ANNOTATION_EXPORT"
-                        [zip-files-output]="annotToolDir.filesExport$"
-                        zip-files-output-zip-filename="exported_annotations.zip"
-                        [disabled]="!(annotToolDir.hasManagedAnnotations$ | async)">
-                        <mat-icon>download</mat-icon>
+                        disabled
+                        [matTooltip]="view.labels.SHARE_CUSTOM_URL">
+                        <mat-icon>share</mat-icon>
                     </button>
+                </ng-template>
 
-                    <!-- share via sane url -->
-                    <ng-template [ngIf]="annotToolDir.stateToMerge$ | async"
-                        [ngIfElse]="disabledShareBtnTmpl"
-                        let-stateToMerge>
-                        
-                        <ng-template #saneUrlTmpl>
-                            <h2 mat-dialog-title>
-                                Create custom URL
-                            </h2>
-                            <div mat-dialog-content>
-                                <span class="sxplr-text-muted">
-                                    {{ annotToolDir.descText$ | async }}
-                                </span>
-                                <mat-divider></mat-divider>
-                                <iav-sane-url [stateTobeSaved]="stateAggregator.jsonifiedState$ | async | mergeObj : stateToMerge">
-                                </iav-sane-url>
-                            </div>
-
-                            <div mat-dialog-actions
-                                class="d-flex justify-content-center">
-                                <button mat-button
-                                    mat-dialog-close>
-                                    close
-                                </button>
-                            </div>
-                        </ng-template>
-                        <button mat-icon-button
-                            [matTooltip]="view.labels.SHARE_CUSTOM_URL"
-                            [sxplr-dialog]="saneUrlTmpl"
-                            iav-state-aggregator
-                            #stateAggregator="iavStateAggregator"
-                            [disabled]="!(annotToolDir.hasManagedAnnotations$ | async)">
-                            <mat-icon>share</mat-icon>
-                        </button>
-                    </ng-template>
-                    <ng-template #disabledShareBtnTmpl>
-                        <button mat-icon-button
-                            disabled
-                            [matTooltip]="view.labels.SHARE_CUSTOM_URL">
-                            <mat-icon>share</mat-icon>
-                        </button>
-                    </ng-template>
-
-                    <!-- delete all annotations -->
-                    <button mat-icon-button color="warn"
-                        [matTooltip]="view.labels.BULK_DELETE_ANNOTATIONS"
-                        (click)="annotToolDir.deleteAllAnnotation()"
-                        [disabled]="!(annotToolDir.hasManagedAnnotations$ | async)">
-                        <mat-icon>delete</mat-icon>
-                    </button>
-                </div>
+                <!-- delete all annotations -->
+                <button mat-icon-button color="warn"
+                    [matTooltip]="view.labels.BULK_DELETE_ANNOTATIONS"
+                    (click)="annotToolDir.deleteAllAnnotation()"
+                    [disabled]="!(annotToolDir.hasManagedAnnotations$ | async)">
+                    <mat-icon>clear_all</mat-icon>
+                </button>
             </div>
+        </div>
 
-            <simple-annotation-list></simple-annotation-list>
-        </mat-card>
+
+        <simple-annotation-list></simple-annotation-list>
         
     </ng-template>
 
@@ -807,7 +830,7 @@
 
     <!-- expmt parent tabbed view -->
     <ng-template [ngIf]="!view.showExperimental">
-        <mat-tab-group backgroundColor="primary" #mainNavTabGrp="matTabGroup">
+        <mat-tab-group color="primary" backgroundColor="primary" #mainNavTabGrp="matTabGroup">
             <mat-tab label="Navigate"
                 sxplr-label-event
                 [labels]="['selectedRegion']"

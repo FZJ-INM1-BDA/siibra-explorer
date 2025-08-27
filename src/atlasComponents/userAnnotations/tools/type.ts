@@ -21,7 +21,8 @@ type TRecord = Record<string, unknown>
 export abstract class AbsToolClass<T extends IAnnotationGeometry> {
 
   public abstract name: string
-  public abstract iconClass: string
+  public abstract matIcon: string
+  public abstract toolType: TToolType
 
   public abstract managedAnnotations$: Subject<T[]>
   protected managedAnnotations: T[] = []
@@ -345,12 +346,6 @@ export abstract class IAnnotationGeometry extends Highlightable {
     this.name = spec?.name
     this.desc = spec?.desc
   }
-}
-
-export interface IAnnotationTools {
-  name: string
-  iconClass: string
-  toolType: TToolType
 }
 
 export type TNgAnnotationEv = {

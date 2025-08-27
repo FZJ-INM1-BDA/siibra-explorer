@@ -2,15 +2,15 @@ import { Directive, OnDestroy } from "@angular/core";
 import { Observable, Subject, Subscription } from "rxjs";
 import { filter, switchMapTo, takeUntil, withLatestFrom } from "rxjs/operators";
 import { Point } from "./point";
-import { AbsToolClass, IAnnotationEvents, IAnnotationGeometry, IAnnotationTools, TAnnotationEvent, TCallbackFunction, TToolType } from "./type";
+import { AbsToolClass, IAnnotationEvents, IAnnotationGeometry, TAnnotationEvent, TCallbackFunction, TToolType } from "./type";
 
 @Directive()
-export class ToolDelete extends AbsToolClass<Point> implements IAnnotationTools, OnDestroy {
+export class ToolDelete extends AbsToolClass<Point> implements OnDestroy {
 
   public subs: Subscription[] = []
   protected managedAnnotations = []
   toolType: TToolType = 'deletion'
-  iconClass = 'fas fa-trash'
+  matIcon = 'delete'
   name = 'Delete'
 
   onMouseMoveRenderPreview(){

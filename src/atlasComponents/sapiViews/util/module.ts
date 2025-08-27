@@ -4,6 +4,7 @@ import { EqualityPipe } from "./equality.pipe";
 import { NumbersPipe } from "./numbers.pipe";
 import { ParseDoiPipe } from "./parseDoi.pipe";
 import { BBoxToAABBPipe } from "./bboxToAABB.pipe";
+import { GroupByPipe } from "src/util/pipes/groupBy.pipe";
 
 @NgModule({
   declarations: [
@@ -12,6 +13,7 @@ import { BBoxToAABBPipe } from "./bboxToAABB.pipe";
     NumbersPipe,
     AddUnitAndJoin,
     BBoxToAABBPipe,
+    GroupByPipe,
   ],
   exports: [
     EqualityPipe,
@@ -19,6 +21,7 @@ import { BBoxToAABBPipe } from "./bboxToAABB.pipe";
     NumbersPipe,
     AddUnitAndJoin,
     BBoxToAABBPipe,
+    GroupByPipe,
   ]
 })
 

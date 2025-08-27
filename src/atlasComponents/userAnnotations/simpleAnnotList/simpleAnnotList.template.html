@@ -32,7 +32,7 @@
 </mat-accordion>
 
 <ng-template [ngIf]="((managedAnnotations$ | async) || []).length === 0">
-    <span class="text-muted">
+    <span class="placeholder-text">
         No annotations saved. Save annotations by right click on the viewer and "bookmark".
     </span>
 </ng-template>

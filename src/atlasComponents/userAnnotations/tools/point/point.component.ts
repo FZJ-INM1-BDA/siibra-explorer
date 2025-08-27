@@ -1,5 +1,5 @@
 import { Component, ElementRef, Inject, Input, OnDestroy, Optional, ViewChild } from "@angular/core";
-import { Point, POINT_ICON_CLASS } from "../point";
+import { Point } from "../point";
 import { IAnnotationGeometry, TExportFormats, UDPATE_ANNOTATION_TOKEN } from "../type";
 import { ToolCmpBase } from "../toolCmp.base";
 import { Store } from "@ngrx/store";
@@ -18,7 +18,6 @@ import { actions } from "src/state/atlasSelection";
 export class PointUpdateCmp extends ToolCmpBase implements OnDestroy{
 
   public ARIA_LABELS = ARIA_LABELS
-  public POINT_ICON_CLASS = POINT_ICON_CLASS
 
   @Input('update-annotation')
   updateAnnotation: Point

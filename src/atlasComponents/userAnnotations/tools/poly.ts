@@ -1,4 +1,4 @@
-import { IAnnotationTools, IAnnotationGeometry, TAnnotationEvent, IAnnotationEvents, AbsToolClass, INgAnnotationTypes, TToolType, TBaseAnnotationGeomtrySpec, TSandsPolyLine, getCoord, TCallbackFunction } from "./type";
+import { IAnnotationGeometry, TAnnotationEvent, IAnnotationEvents, AbsToolClass, INgAnnotationTypes, TToolType, TBaseAnnotationGeomtrySpec, TSandsPolyLine, getCoord, TCallbackFunction } from "./type";
 import { Point, TPointJsonSpec } from './point'
 import { Directive, OnDestroy } from "@angular/core";
 import { Observable, Subject, Subscription } from "rxjs";
@@ -221,14 +221,12 @@ export class Polygon extends IAnnotationGeometry{
   }
 }
 
-export const POLY_ICON_CLASS = 'fas fa-draw-polygon'
-
 @Directive()
-export class ToolPolygon extends AbsToolClass<Polygon> implements IAnnotationTools, OnDestroy {
+export class ToolPolygon extends AbsToolClass<Polygon> implements OnDestroy {
   static PREVIEW_ID='tool_poly_preview'
 
   public name = 'Polygon'
-  public iconClass = POLY_ICON_CLASS
+  public matIcon = "polyline"
   public toolType: TToolType = 'drawing'
 
   private selectedPoly: Polygon

@@ -1,5 +1,4 @@
 import {
-  IAnnotationTools,
   IAnnotationGeometry,
   TAnnotationEvent,
   IAnnotationEvents,
@@ -178,14 +177,12 @@ export class Line extends IAnnotationGeometry{
   }
 }
 
-export const LINE_ICON_CLASS = 'fas fa-slash'
-
 @Directive()
-export class ToolLine extends AbsToolClass<Line> implements IAnnotationTools, OnDestroy {
+export class ToolLine extends AbsToolClass<Line> implements OnDestroy {
   static PREVIEW_ID='tool_line_preview'
   public name = 'Line'
   public toolType: TToolType = 'drawing'
-  public iconClass = LINE_ICON_CLASS
+  public matIcon = "line_axis"
 
   private selectedLine: Line
   
