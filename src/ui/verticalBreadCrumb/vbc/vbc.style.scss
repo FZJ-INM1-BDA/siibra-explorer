@@ -256,25 +256,31 @@ mat-accordion
     }
 }
 
-.title-1-container
-{
-    display: flex;
-    align-items: center;
-
-    h4,h5
-    {
-        flex: 1 1 0;
-    }
-    mat-icon
-    {
-        flex: 0 0 auto;
-    }
-}
-
-.title-2-container
+.dropdown-selection
 {
     display: flex;
     flex-direction: column;
+
+    .dropdown-selection-category-label
+    {
+        opacity: 0.6;
+        font-size: 75%;
+    }
+    .dropdown-selection-text-label
+    {
+
+        display: flex;
+        align-items: center;
+
+        .dropdown-selection-text-label-title
+        {
+            flex: 1 1 0;
+        }
+        .dropdown-selection-text-label-icon
+        {
+            flex: 0 0 auto;
+        }
+    }
 }
 
 
@@ -345,10 +351,16 @@ mat-divider.panel-divider
 
 .tab-content-wrapper
 {
+    background-color: rgba(0, 0, 0, 0.2);
     mat-card
     {
-        margin: 0.5rem 0;
+        margin: 0.25rem 0 0 0;
         overflow-x: hidden;
+
+        &:first-child
+        {
+            margin: 0;
+        }
     }
     .hoverable.mat-elevation-z1
     {

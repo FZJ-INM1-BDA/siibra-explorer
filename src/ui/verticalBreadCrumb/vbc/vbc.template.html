@@ -9,7 +9,7 @@
                 <ng-template [ngIf]="atp.atlas" let-atlas>
 
                     <ng-template sxplrExperimentalFlag [deprecated]="true">
-                    <div class="title-2-container sxplr-custom-cmp hoverable mat-elevation-z1"
+                    <div class="dropdown-selection sxplr-custom-cmp hoverable mat-elevation-z1"
                         mat-ripple
                         role="select"
                         [matTooltip]="view.labels.SELECTED_DIFFERENT_ATLAS"
@@ -19,14 +19,14 @@
                             type: 'atlasId',
                             options: view.atlases
                         }">
-                        <span class="text-muted">
+                        <span class="dropdown-selection-category-label">
                             Species
                         </span>
-                        <div class="title-1-container">
-                            <h5>
+                        <div class="dropdown-selection-text-label">
+                            <div class="dropdown-selection-text-label-title">
                                 {{ atlas.name }}
-                            </h5>
-                            <mat-icon>expand_more</mat-icon>
+                            </div>
+                            <mat-icon class="dropdown-selection-text-label-icon">expand_more</mat-icon>
                         </div>
                     </div>
                     </ng-template>
@@ -37,7 +37,7 @@
             <ng-template #viewNavigateTmpl>
                 <ng-template [ngIf]="atp.template" let-template>
                     <ng-template sxplrExperimentalFlag [deprecated]="true">
-                    <div class="title-2-container sxplr-custom-cmp hoverable mat-elevation-z1"
+                    <div class="dropdown-selection sxplr-custom-cmp hoverable mat-elevation-z1"
                         mat-ripple
                         role="select"
                         [matTooltip]="view.labels.SELECTED_DIFFERENT_TEMPLATE"
@@ -47,14 +47,14 @@
                             type: 'templateId',
                             options: view.templates
                         }">
-                        <span class="text-muted">
+                        <span class="dropdown-selection-category-label">
                             Space
                         </span>
-                        <div class="title-1-container">
-                            <h5>
+                        <div class="dropdown-selection-text-label">
+                            <div class="dropdown-selection-text-label-title">
                                 {{ template.shortName || template.name }}
-                            </h5>
-                            <mat-icon>expand_more</mat-icon>
+                            </div>
+                            <mat-icon class="dropdown-selection-text-label-icon">expand_more</mat-icon>
                         </div>
                     </div>
                     </ng-template>
@@ -123,7 +123,7 @@
 
                     <div class="vbc-row">
 
-                        <div class="title-2-container sxplr-custom-cmp hoverable mat-elevation-z1"
+                        <div class="dropdown-selection sxplr-custom-cmp hoverable mat-elevation-z1"
                             mat-ripple
                             role="select"
                             [matTooltip]="view.labels.SELECTED_DIFFERENT_PARCELLATION"
@@ -136,14 +136,14 @@
                                 getSubMenu: getSubParcellation,
                                 optionTemplate: parcellationOptTmpl
                             }">
-                            <span class="text-muted">
+                            <span class="dropdown-selection-category-label">
                                 Reference Atlas
                             </span>
-                            <div class="title-1-container">
-                                <h5>
+                            <div class="dropdown-selection-text-label">
+                                <div class="dropdown-selection-text-label-title">
                                     {{ parcellation.shortName || parcellation.name }}
-                                </h5>
-                                <mat-icon>expand_more</mat-icon>
+                                </div>
+                                <mat-icon class="dropdown-selection-text-label-icon">expand_more</mat-icon>
                             </div>
                         </div>
 
@@ -226,26 +226,26 @@
 
                         <ng-template [ngIf]="selectedRegions.length > 0">
                             <div class="vbc-row">
-                                <div class="title-2-container sxplr-custom-cmp hoverable mat-elevation-z1"
+                                <div class="dropdown-selection sxplr-custom-cmp hoverable mat-elevation-z1"
                                     mat-ripple
                                     iav-stop="click"
                                     [sxplr-dialog]="regionHierarchyTmpl"
                                     [matTooltip]="view.labels.REGION_HIERARCHY"
                                     sxplr-dialog-size="xl">
                                     
-                                    <span class="text-muted">
+                                    <span class="dropdown-selection-category-label">
                                         Brain Areas
                                     </span>
-                                    <div class="title-1-container">
-                                        <h5>
+                                    <div class="dropdown-selection-text-label">
+                                        <div class="dropdown-selection-text-label-title">
                                             <ng-template [ngIf]="selectedRegions.length === 1">
                                                 {{ selectedRegions[0].name }}
                                             </ng-template>
                                             <ng-template [ngIf]="selectedRegions.length > 1">
                                                 {{ selectedRegions.length }} areas
                                             </ng-template>
-                                        </h5>
-                                        <mat-icon fontSet="fas" fontIcon="fa-sitemap"></mat-icon>
+                                        </div>
+                                        <mat-icon fontSet="fas" fontIcon="fa-sitemap" class="dropdown-selection-text-label-icon"></mat-icon>
                                     </div>
                                 </div>
 
@@ -323,15 +323,15 @@
 
             <ng-template sxplrExperimentalFlag [deprecated]="true">
 
-            <mat-card>
+            <mat-card class="tabbed-view-card">
                 <ng-template [ngTemplateOutlet]="viewNavigateSpecies"></ng-template>
             </mat-card>
             
-            <mat-card>
+            <mat-card class="tabbed-view-card">
                 <ng-template [ngTemplateOutlet]="viewNavigateTmpl"></ng-template>
             </mat-card>
             
-            <mat-card>
+            <mat-card class="tabbed-view-card">
                 <ng-template [ngTemplateOutlet]="viewNavigateParc"></ng-template>
             </mat-card>
 
@@ -345,9 +345,6 @@
                             Species
                         </mat-panel-title>
                         <mat-panel-description>
-                            <span>
-                                {{ atp.atlas.name }}
-                            </span>
                             <button mat-icon-button
                                 iav-stop="mousedown click"
                                 role="select"
@@ -360,6 +357,9 @@
                                 }">
                                 <mat-icon>find_replace</mat-icon>
                             </button>
+                            <span>
+                                {{ atp.atlas.name }}
+                            </span>
                         </mat-panel-description>
                     </mat-expansion-panel-header>
                     <ng-template [ngTemplateOutlet]="viewNavigateSpecies"></ng-template>
@@ -370,9 +370,6 @@
                             Space
                         </mat-panel-title>
                         <mat-panel-description>
-                            <span>
-                                {{ atp.template.shortName || atp.template.name }}
-                            </span>
                             <button mat-icon-button
                                 iav-stop="mousedown click"
                                 role="select"
@@ -385,6 +382,9 @@
                                 }">
                                 <mat-icon>find_replace</mat-icon>
                             </button>
+                            <span>
+                                {{ atp.template.shortName || atp.template.name }}
+                            </span>
                         </mat-panel-description>
                     </mat-expansion-panel-header>
                     <ng-template [ngTemplateOutlet]="viewNavigateTmpl"></ng-template>
@@ -398,9 +398,6 @@
                             Parcellation
                         </mat-panel-title>
                         <mat-panel-description>
-                            <span>
-                                {{ atp.parcellation.shortName || atp.parcellation.name }}
-                            </span>
                             <button mat-icon-button
                                 iav-stop="mousedown click"
                                 role="select"
@@ -416,6 +413,9 @@
                                 }">
                                 <mat-icon>find_replace</mat-icon>
                             </button>
+                            <span>
+                                {{ atp.parcellation.shortName || atp.parcellation.name }}
+                            </span>
                         </mat-panel-description>
                     </mat-expansion-panel-header>
                     <ng-template [ngTemplateOutlet]="viewNavigateParc"></ng-template>
@@ -706,40 +706,6 @@
                         </mat-button-toggle-group>
                     </div>
                 </ng-template>
-
-                <!-- <div class="title-2-container sxplr-custom-cmp hoverable mat-elevation-z1"
-                    mat-ripple
-                    role="select"
-                    [matTooltip]="view.labels.ANNOTATION_SELECT_TOOL"
-                    [matMenuTriggerFor]="genericMenu"
-                    [matMenuTriggerData]="{
-                        current: annotToolDir.selectedTool$ | async, 
-                        options: tools,
-                        select: annotToolDir.selectTool
-                    }">
-                    <span class="text-muted">
-                        Tool
-                    </span>
-                    <ng-template #fallbackToolTmpl>
-                        <div class="title-1-container text-muted">
-                            <h4>
-                                Select a tool
-                            </h4>
-                            <mat-icon>expand_more</mat-icon>
-                        </div>
-                    </ng-template>
-                    <ng-template [ngIf]="annotToolDir.selectedToolName$ | async"
-                        [ngIfElse]="fallbackToolTmpl"
-                        let-toolname>
-
-                        <div class="title-1-container">
-                            <h4>
-                                {{ toolname }}
-                            </h4>
-                            <mat-icon>expand_more</mat-icon>
-                        </div>
-                    </ng-template>
-                </div> -->
             </ng-template>
             
         </div>
