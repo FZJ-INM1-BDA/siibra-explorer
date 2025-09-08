@@ -7,7 +7,7 @@ import * as mainActions from "../actions"
 import { select, Store } from "@ngrx/store";
 import { selectors, actions, fromRootStore } from '.'
 import { AtlasSelectionState } from "./const"
-import { atlasAppearance, atlasSelection, generalActions, userPreference } from "..";
+import { atlasAppearance, atlasSelection, generalActions } from "..";
 
 import { InterSpaceCoordXformSvc } from "src/atlasComponents/sapi/core/space/interSpaceCoordXform.service";
 import { SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
@@ -540,39 +540,31 @@ export class Effect {
     })
   ))
 
-  onRegionSelection = createEffect(() => this.store.pipe(
-    select(userPreference.selectors.showExperimental),
-    switchMap(flag => {
-      if (!flag) {
-        return EMPTY
-      }
-      return this.action.pipe(
-        ofType(actions.selectRegion),
-        map(({ region }) => {
-          
-          if (region) {
-            this.onNavigateToRegion.pipe(
-              take(1)
-            ).subscribe(() => {
-              this.sxplrOverlaySvc.close()
-            })
-
-            const injector = Injector.create({
-              providers: [
-                {
-                  provide: REGION_LOADING_TOKEN,
-                  useValue: { region } as RegionLoadingCfg
-                }
-              ]
-            })
-            const portal = new ComponentPortal(LoadingRegionCmp, null, injector)
-            this.sxplrOverlaySvc.openPortal(portal)
-            this.store.dispatch(
-              actions.navigateToRegion({ region, timeout: REGION_LOADING_TIMEOUT })
-            )
-          }
+  onRegionSelectionNavigateToCentroid = createEffect(() => this.action.pipe(
+    ofType(actions.selectRegion),
+    map(({ region }) => {
+      
+      if (region) {
+        this.onNavigateToRegion.pipe(
+          take(1)
+        ).subscribe(() => {
+          this.sxplrOverlaySvc.close()
         })
-      )
+
+        const injector = Injector.create({
+          providers: [
+            {
+              provide: REGION_LOADING_TOKEN,
+              useValue: { region } as RegionLoadingCfg
+            }
+          ]
+        })
+        const portal = new ComponentPortal(LoadingRegionCmp, null, injector)
+        this.sxplrOverlaySvc.openPortal(portal)
+        this.store.dispatch(
+          actions.navigateToRegion({ region, timeout: REGION_LOADING_TIMEOUT })
+        )
+      }
     })
   ), { dispatch: false })
 
