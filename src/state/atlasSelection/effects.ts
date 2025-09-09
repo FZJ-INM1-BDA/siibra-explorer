@@ -421,11 +421,13 @@ export class Effect {
                   if (talliedOptions[REGION_DESELECTED_WARNING]) {
                     warningMarkdowns.push(`Due to the change of reference parcellation, previously selected region \`${talliedOptions[REGION_DESELECTED_WARNING]}\` is not available. Therefore, region selection has been reset.`)
                   }
-                  this.sxplrSnackBarSvc.open({
-                    message: warningMarkdowns.join(`\n\n---\n\n`),
-                    useMarkdown: true,
-                    icon: "fas fa-info"
-                  })
+                  if (warningMarkdowns.length > 0) {
+                    this.sxplrSnackBarSvc.open({
+                      message: warningMarkdowns.join(`\n\n---\n\n`),
+                      useMarkdown: true,
+                      icon: "fas fa-info"
+                    })
+                  }
                   return actions.setAtlasSelectionState(state)
                 })
               )
