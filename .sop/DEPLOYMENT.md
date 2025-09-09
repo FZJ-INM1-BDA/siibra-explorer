@@ -9,7 +9,7 @@ node v20+
 Go to https://docker-registry.ebrains.eu/harbor/projects/28/summary , and ensure sufficient disk space (> 1GB). If insufficient:
 
 - `siibra/siibra-explorer` namespace: `2.*.*` that is not the latest can be deleted
-- `siibra/siibra-api` namespace: `3.*.*[-worker|-worker-v4|server]` that is not the latest can be deleted
+- `siibra/siibra-api` namespace: `0.3.*[-worker|-worker-v4|server]` that is not the latest can be deleted
 - above, any untagged image can be deleted
 - if unsure, ask Xiao 
 
