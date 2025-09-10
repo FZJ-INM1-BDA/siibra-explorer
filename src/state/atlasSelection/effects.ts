@@ -1,13 +1,13 @@
 import { Component, Inject, Injectable, InjectionToken, Injector } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
-import { combineLatest, concat, EMPTY, forkJoin, from, NEVER, Observable, of, throwError, TimeoutError } from "rxjs";
+import { combineLatest, concat, forkJoin, from, NEVER, Observable, of, throwError, TimeoutError } from "rxjs";
 import { catchError, debounceTime, distinctUntilChanged, filter, map, mapTo, switchMap, take, timeout, withLatestFrom } from "rxjs/operators";
 import { IDS, SAPI } from "src/atlasComponents/sapi";
 import * as mainActions from "../actions"
 import { select, Store } from "@ngrx/store";
 import { selectors, actions, fromRootStore } from '.'
 import { AtlasSelectionState } from "./const"
-import { atlasAppearance, atlasSelection, generalActions, userPreference } from "..";
+import { atlasAppearance, atlasSelection, generalActions } from "..";
 
 import { InterSpaceCoordXformSvc } from "src/atlasComponents/sapi/core/space/interSpaceCoordXform.service";
 import { SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
@@ -75,6 +75,20 @@ function sortParc(parcs: SxplrParcellation[]) {
   ]
 }
 
+const SPATIAL_TRANSFORM_SRC = "SPATIAL_TRANSFORM_SRC"
+const SPATIAL_TRANSFORM_RESULT = "SPATIAL_TRANSFORM_RESULT"
+const CORTICAL_LAYERS_WARNING = "CORTICAL_LAYERS_WARNING"
+const REGION_DESELECTED_WARNING = "REGION_DESELECTED_WARNING"
+
+type TPSelectPostHookOptions = {
+  [SPATIAL_TRANSFORM_SRC]?: number[]
+  [SPATIAL_TRANSFORM_RESULT]?: "failed" | "succeeded"
+  [CORTICAL_LAYERS_WARNING]?: string
+  [REGION_DESELECTED_WARNING]?: string
+}
+
+type TPSelectPostHook = Partial<AtlasSelectionState> & { options?: TPSelectPostHookOptions }
+
 @Injectable()
 export class Effect {
 
@@ -96,7 +110,7 @@ export class Effect {
     )
   }
 
-  onTemplateParcSelectionPostHook: ((arg: OnTmplParcHookArg) => Observable<Partial<AtlasSelectionState>>)[] = [
+  onTemplateParcSelectionPostHook: ((arg: OnTmplParcHookArg) => Observable<TPSelectPostHook>)[] = [
     /**
      * This hook gets the region associated with the selected parcellation and template,
      * and then set selectedParcellationAllRegions to it
@@ -130,27 +144,34 @@ export class Effect {
         switchMap(navigation => 
           /**
            * if either space name is undefined, return default state for navigation
+           * else if space name is the same, skip trying to transform
            */
-          !prevSpcName || !currSpcName
+          !prevSpcName || !currSpcName || prevSpcName === currSpcName
           ? of({ navigation })
           : this.interSpaceCoordXformSvc.transform(prevSpcName, currSpcName, navigation.position as [number, number, number]).pipe(
             map(value => {
+              const common: TPSelectPostHookOptions = {
+                [SPATIAL_TRANSFORM_SRC]: navigation.position
+              }
               if (value.status === "error") {
-                this.sxplrSnackBarSvc.open({
-                  message: `spatial transformation failed: ${value.statusText}. Using default navigation`,
-                  
-                  // TODO switch to maticon when material icon css is added
-                  // maticon: "warning"
-                  icon: "fas fa-exclamation-triangle",
-                })
-                return { navigation: null }
+                return {
+                  navigation: null,
+                  options: {
+                    [SPATIAL_TRANSFORM_RESULT]: 'failed',
+                    ...common,
+                  }
+                } as TPSelectPostHook
               }
               return {
                 navigation: {
                   ...navigation,
                   position: value.result,
+                },
+                options: {
+                  SPATIAL_TRANSFORM_RESULT: 'succeeded',
+                  ...common,
                 }
-              } as Partial<AtlasSelectionState>
+              } as TPSelectPostHook
             })
           )
         )
@@ -159,15 +180,11 @@ export class Effect {
     ({ current, previous }) => {
       const prevParcId = previous?.parcellation?.id
       const currentParcId = current?.parcellation?.id
+      const options: Record<string, string> = {}
       if (currentParcId !== prevParcId && currentParcId === IDS.PARCELLATION.CORTICAL_LAYERS) {
-        this.sxplrSnackBarSvc.open({
-          message: `Regional inaccuracies in the automated computation of cortical layers may occur due to limitations in the available training data and algorithm. Regions that deviate from the expected canonical isocortical structure should be examined with caution.`,
-          // TODO switch to maticon when material icon css is added
-          // maticon: "warning"
-          icon: "fas fa-exclamation-triangle",
-        })
+        options[CORTICAL_LAYERS_WARNING] = "Regional inaccuracies in the automated computation of cortical layers may occur due to limitations in the available training data and algorithm. Regions that deviate from the expected canonical isocortical structure should be examined with caution."
       }
-      return of({})
+      return of({ options })
     }
   ]
 
@@ -349,16 +366,6 @@ export class Effect {
             }
           }
           return from(prAskUser()).pipe(
-            switchMap(val => {
-              /** user cancelled */
-              if (!val) {
-                return of(null)
-              }
-              const { atlas, parcellation, template } = val
-              return of({
-                atlas, parcellation, template
-              })
-            }),
             switchMap(current => {
               if (!current) {
                 return of(
@@ -376,10 +383,16 @@ export class Effect {
                     selectedParcellation: current.parcellation,
                     selectedTemplate: current.template
                   }
+                  let talliedOptions: TPSelectPostHookOptions = {}
                   for (const partial of partialState){
+                    const { options, ...rest } = partial
                     state = {
                       ...state,
-                      ...partial,
+                      ...rest,
+                    }
+                    talliedOptions = {
+                      ...talliedOptions,
+                      ...options,
                     }
                   }
 
@@ -387,18 +400,34 @@ export class Effect {
                   if (!!regionId) {
                     const selectedRegions = (state.selectedParcellationAllRegions || []).filter(r => r.name === regionId)
                     if (selectedRegions.length === 0) {
-                      
-                      this.sxplrSnackBarSvc.open({
-                        message: `Previously selected region \`${regionId}\` not found in the currently selected parcellation \`${state.selectedParcellation?.name}\`. Region selections were cleared.`,
-                        useMarkdown: true,
-                        // TODO switch to maticon when material icon css is added
-                        // maticon: "warning"
-                        icon: "fas fa-exclamation-triangle",
-                      })
+                      talliedOptions[REGION_DESELECTED_WARNING] = regionId
                     }
                     state.selectedRegions = selectedRegions
                   }
-                  
+
+                  const warningMarkdowns = []
+                  if (talliedOptions[SPATIAL_TRANSFORM_SRC] && talliedOptions[SPATIAL_TRANSFORM_RESULT]) {
+                    let text = `Due to the change of reference space, previous navigation location \`${talliedOptions[SPATIAL_TRANSFORM_SRC].map(v => (v/1e6).toFixed(2) + "mm").join(", ")}\` in \`${template.name}\` `
+                    if (talliedOptions[SPATIAL_TRANSFORM_RESULT] === "succeeded") {
+                      text += `was warped to \`${(state?.navigation?.position || [0, 0, 0]).map(v => (v/1e6).toFixed(2) + "mm").join(", ")}\` in \`${state?.selectedTemplate?.name}\``
+                    } else {
+                      text += `was attempted to be warped to \`${state?.selectedTemplate?.name}\`, but was unsuccessful. The navigation was reset to \`0, 0, 0\``
+                    }
+                    warningMarkdowns.push(text)
+                  }
+                  if (talliedOptions[CORTICAL_LAYERS_WARNING]) {
+                    warningMarkdowns.push(talliedOptions[CORTICAL_LAYERS_WARNING])
+                  }
+                  if (talliedOptions[REGION_DESELECTED_WARNING]) {
+                    warningMarkdowns.push(`Due to the change of reference parcellation, previously selected region \`${talliedOptions[REGION_DESELECTED_WARNING]}\` is not available. Therefore, region selection has been reset.`)
+                  }
+                  if (warningMarkdowns.length > 0) {
+                    this.sxplrSnackBarSvc.open({
+                      message: warningMarkdowns.join(`\n\n---\n\n`),
+                      useMarkdown: true,
+                      icon: "fas fa-info"
+                    })
+                  }
                   return actions.setAtlasSelectionState(state)
                 })
               )
@@ -540,39 +569,31 @@ export class Effect {
     })
   ))
 
-  onRegionSelection = createEffect(() => this.store.pipe(
-    select(userPreference.selectors.showExperimental),
-    switchMap(flag => {
-      if (!flag) {
-        return EMPTY
-      }
-      return this.action.pipe(
-        ofType(actions.selectRegion),
-        map(({ region }) => {
-          
-          if (region) {
-            this.onNavigateToRegion.pipe(
-              take(1)
-            ).subscribe(() => {
-              this.sxplrOverlaySvc.close()
-            })
-
-            const injector = Injector.create({
-              providers: [
-                {
-                  provide: REGION_LOADING_TOKEN,
-                  useValue: { region } as RegionLoadingCfg
-                }
-              ]
-            })
-            const portal = new ComponentPortal(LoadingRegionCmp, null, injector)
-            this.sxplrOverlaySvc.openPortal(portal)
-            this.store.dispatch(
-              actions.navigateToRegion({ region, timeout: REGION_LOADING_TIMEOUT })
-            )
-          }
+  onRegionSelectionNavigateToCentroid = createEffect(() => this.action.pipe(
+    ofType(actions.selectRegion),
+    map(({ region }) => {
+      
+      if (region) {
+        this.onNavigateToRegion.pipe(
+          take(1)
+        ).subscribe(() => {
+          this.sxplrOverlaySvc.close()
         })
-      )
+
+        const injector = Injector.create({
+          providers: [
+            {
+              provide: REGION_LOADING_TOKEN,
+              useValue: { region } as RegionLoadingCfg
+            }
+          ]
+        })
+        const portal = new ComponentPortal(LoadingRegionCmp, null, injector)
+        this.sxplrOverlaySvc.openPortal(portal)
+        this.store.dispatch(
+          actions.navigateToRegion({ region, timeout: REGION_LOADING_TIMEOUT })
+        )
+      }
     })
   ), { dispatch: false })
 

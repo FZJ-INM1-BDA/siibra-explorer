@@ -96,7 +96,7 @@ async function updateCodemeta(version){
   // getMonth returns index 0 month...
   // see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getMonth
   const MM = (date.getMonth() + 1).toString().padStart(2, "0")
-  const DD = date.getDate().toString()
+  const DD = date.getDate().toString().padStart(2, "0")
 
   codemetaContent["dateModified"] = `${YYYY}-${MM}-${DD}`
   await writeFile(pathToCodemeta, JSON.stringify(codemetaContent, null, 4), "utf-8")
