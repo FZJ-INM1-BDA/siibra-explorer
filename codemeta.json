@@ -100,7 +100,7 @@
         "python 3",
         "typescript"
     ],
-    "schema:releaseNotes": "# v2.14.26\n\n## Behind the scene\n\n- Fix deadlines in docs",
+    "schema:releaseNotes": "# v2.14.26\n\n## Behind the scene\n\n- Fix deadlinks in docs, added CI pipeline to catch deadlinks in docs\n",
     "runtimePlatform": "docker",
     "version": "2.14.26",
     "contIntegration": "https://github.com/FZJ-INM1-BDA/siibra-explorer/actions",
