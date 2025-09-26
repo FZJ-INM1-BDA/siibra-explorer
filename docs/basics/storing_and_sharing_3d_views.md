@@ -11,7 +11,7 @@ Any views in `siibra-explorer` can be shared via their URLs. You can use any nat
 
 Whilst `siibra-explorer` encodes the current view directly in the URL, such full URLs are quite long and not easily recitable or memorable. You can create short URLs for the current view directly in `siibra-explorer`. To do so,
 
-1. click the *view navigation panel* on the top left (see [main UI elements](../getstarted/ui.md#tools-and-plugins)), 
+1. click the *view navigation panel* on the top left (see [main UI elements](../getstarted/ui.md#view-navigation-panel-coordinate-lookups)), 
 2. click the "share icon", then 
 3. select `Create custom URL`.
 
