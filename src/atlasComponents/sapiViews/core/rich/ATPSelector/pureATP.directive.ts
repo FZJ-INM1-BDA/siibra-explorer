@@ -48,9 +48,6 @@ export class PureATPSelectorDirective implements AfterViewInit{
   @Input('sxplr-pure-atp-selector-color-palette')
   colorPalette: string[] = darkThemePalette
 
-  @Input("sxplr-pure-atp-selector-minimized")
-  minimized = true
-
   #selectedATP$ = new BehaviorSubject<ATP>(null)
   @Input(`sxplr-pure-atp-selector-selected-atp`)
   set selectedATP(val: ATP){
@@ -112,9 +109,8 @@ export class PureATPSelectorDirective implements AfterViewInit{
       const parcAndGroup = [ ...groupParcs, ...noGroupParcs ]
       const selectedIds = [atlas?.id, parcellation?.id, template?.id].filter(v => !!v)
 
-      const hideParcChip = this.minimized && parcAndGroup.length <= 1
-      const hideTmplChip = this.minimized && availableTemplates?.length <= 1
-      
+      const hideParcChip = parcAndGroup.length <= 1
+      const hideTmplChip = availableTemplates?.length <= 1
       return {
         atlas,
         parcellation,

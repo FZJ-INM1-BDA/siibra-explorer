@@ -18,9 +18,6 @@ import { darkThemePalette, lightThemePalette, ATP } from "../pureATP.directive"
 
 export class WrapperATPSelector implements OnDestroy{
 
-  @Input("sxplr-wrapper-atp-selector-use-ui")
-  useUI: "chip" | "dropdown" = "chip"
-
   @Input('sxplr-wrapper-atp-selector-minimized')
   minimized = true
 
