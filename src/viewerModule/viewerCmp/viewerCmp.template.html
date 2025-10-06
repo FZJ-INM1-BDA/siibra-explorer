@@ -86,40 +86,17 @@
       'vw-col-10-nm vw-col-sm-10-nm vw-col-md-5-nm vw-col-lg-4-nm vw-col-xl-3-nm vw-col-xxl-2-nm': !view.halfSidenavExpanded
     }">
     
-    <sxplr-vertical-bread-crumb class="sxplr-d-block sxplr-overflow-y-auto"
-      [ngClass]="{
-        'mat-elevation-z1': view.showExperimental
-      }"
+    <sxplr-vertical-bread-crumb class="sxplr-d-block sxplr-overflow-y-auto mat-elevation-z1"
       [viewerLoaded]="viewerLoaded"
       *ngIf="view.useViewer"
       (show)="controlHalfNav(true)">
     </sxplr-vertical-bread-crumb>
 
-    <ng-template sxplrExperimentalFlag [experimental]="true">
-    <div *ngIf="view.useViewer === 'NEHUBA'" class="add-layer-container">
-      <ng-template #inputUserLayerTmpl>
-        <markdown-dom [markdown]="view.labels.ADD_LAYER_DESC"></markdown-dom>
-      </ng-template>
-      <button mat-mini-fab color="primary"
-        [matTooltip]="view.labels.ADD_LAYER"
-        (file-input-directive)="loadUserLayer($event); fileinput.dismiss()"
-        [file-input-directive-file]="view.labels.ADD_LOCAL_FILE_DESC"
-        file-input-directive-file-ext=".nii,.nii.gz"
-        [file-input-directive-text]="false"
-        [file-input-directive-url]="view.labels.ADD_REMOTE_URL_PLACEHOLDER"
-        [file-input-directive-message]="inputUserLayerTmpl"
-        [file-input-directive-title]="view.labels.ADD_LAYER_TITLE"
-        #fileinput="fileInputDirective">
-        <mat-icon>add</mat-icon>
-      </button>
-    </div>
-    </ng-template>
   </div>
   
-  <sxplr-tab *ngIf="!!view.selectedTemplate"
+  <sxplr-tab *ngIf="!view.showExperimental"
     [matTooltip]="view.labels.TOGGLE_SIDE_PANELS"
     [sxplr-tab-icon]="view.halfSidenavExpanded ? 'fas fa-chevron-left' : 'fas fa-chevron-right'"
-    [sxplr-tab-color]="view.showExperimental ? 'primary': null"
     (sxplr-tab-click)="controlHalfNav(!view.halfSidenavExpanded)">
   </sxplr-tab>
 

@@ -239,7 +239,7 @@ class TranslateV3 {
     return {
       id: atlas["@id"],
       type: "SxplrAtlas",
-      name: atlas.name,
+      name: atlas.species,
       species: atlas.species
     }
   }

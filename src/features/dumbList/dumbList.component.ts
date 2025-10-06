@@ -44,11 +44,11 @@ export class SxplrDumbFeatureList {
   featureClicked = new EventEmitter<TFeature>()
 
   categories$ = this.features$.pipe(
-    map(features => dedupPipe.transform(features.map(f => f.category)))
+    map(features => dedupPipe.transform(features.filter(f => f?.category).map(f => f.category)))
   )
   
   modalities$ = this.features$.pipe(
-    map(features => dedupPipe.transform(features.map(f => f.modality)))
+    map(features => dedupPipe.transform(features.filter(f => f?.modality).map(f => f.modality)))
   )
 
   filteredFeatures(type: 'mod'|'cat', checked: string[]){

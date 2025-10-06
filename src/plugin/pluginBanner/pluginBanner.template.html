@@ -1,46 +1,73 @@
-<mat-action-list>
-  <button mat-menu-item
-    *ngFor="let plugin of availablePlugins$ | async"
-    (click)="launchPlugin(plugin)">
-    <span>
-      {{ plugin.name }}
-    </span>
-  </button>
+<ng-template [ngIf]="view$ | async" let-view>
 
-  <button mat-menu-item *ngIf="experimentalFlag$ | async"
-    (click)="showTmpl(thirdPartyPluginTmpl)">
-    <span>
-      Add third party plugin
-    </span>
-  </button>
-</mat-action-list>
+    <mat-action-list>
+        <button mat-menu-item
+            *ngFor="let plugin of view.plugins"
+            (click)="launchPlugin(plugin)">
+            <span>
+                {{ plugin.name }}
+            </span>
+        </button>
+
+        <ng-template sxplrExperimentalFlag [experimental]="true">
+
+        <ng-template #inputUserLayerTmpl>
+            <markdown-dom [markdown]="view.labels.ADD_LAYER_DESC"></markdown-dom>
+        </ng-template>
+        <button mat-menu-item
+            [matTooltip]="view.labels.ADD_LAYER"
+            (file-input-directive)="loadUserLayer($event); fileinput.dismiss()"
+            [file-input-directive-file]="view.labels.ADD_LOCAL_FILE_DESC"
+            file-input-directive-file-ext=".nii,.nii.gz"
+            [file-input-directive-text]="false"
+            [file-input-directive-url]="view.labels.ADD_REMOTE_URL_PLACEHOLDER"
+            [file-input-directive-message]="inputUserLayerTmpl"
+            [file-input-directive-title]="view.labels.ADD_LAYER_TITLE"
+            #fileinput="fileInputDirective">
+            <span>
+                Add a new layer
+            </span>
+        </button>
+        
+        <button mat-menu-item
+            [sxplr-dialog]="thirdPartyPluginTmpl"
+            [sxplr-dialog-config]="{
+                'width': '90vw'
+            }">
+            <span>
+                Add third party plugin
+            </span>
+        </button>
+        </ng-template>
+    </mat-action-list>
+</ng-template>
+
 
 <ng-template #thirdPartyPluginTmpl>
-  <h2 mat-dialog-title>
-    Add thirdparty plugin
-  </h2>
+    <h2 mat-dialog-title>
+        Add thirdparty plugin
+    </h2>
 
-  <mat-dialog-content>
+    <mat-dialog-content>
     <form>
-      <mat-form-field class="d-block">
+        <mat-form-field class="d-block">
         <mat-label>
-          iframe index.html URL
+            iframe index.html URL
         </mat-label>
         <input type="text" matInput placeholder="https://example.com/index.html" #urlInput>
-      </mat-form-field>
+        </mat-form-field>
     </form>
-  </mat-dialog-content>
+    </mat-dialog-content>
 
-  <mat-dialog-actions align="end">
+    <mat-dialog-actions align="end">
     <button (click)="addThirdPartyPlugin(urlInput.value)"
-      mat-raised-button
-      color="primary">
-      Load
+        mat-raised-button
+        color="primary">
+        Load
     </button>
-    <button mat-dialog-close
-      mat-button>
-      cancel
+    <button mat-dialog-close mat-button>
+        cancel
     </button>
-  </mat-dialog-actions>
+    </mat-dialog-actions>
 
 </ng-template>

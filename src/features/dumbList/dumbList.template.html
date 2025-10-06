@@ -76,6 +76,7 @@
                     (
                         {{ (
                             view.features
+                            | filterArray
                             | filterArray : filteredFeatures("cat", [cat])
                         ).length
                         }}

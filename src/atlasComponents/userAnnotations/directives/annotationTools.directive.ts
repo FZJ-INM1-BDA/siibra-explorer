@@ -111,6 +111,10 @@ export class SxplrAnnotToolsDirective {
     ).subscribe(name => {
       selectedToolName = name
     })
+
+    this.#destroy$.subscribe(() => {
+      this.svc.setVisible(false)
+    })
   }
 
   async selectToolByName(name: string){
