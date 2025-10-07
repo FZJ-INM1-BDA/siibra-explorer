@@ -14,7 +14,6 @@ import { SapiViewsCoreSpaceModule } from "src/atlasComponents/sapiViews/core/spa
 import { ReactiveFormsModule } from "@angular/forms";
 import { AtlasDownloadModule } from "src/atlas-download/atlas-download.module";
 import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.directive";
-import { SxplrAnimationModule } from "src/ux";
 import { DoiTemplate } from "../doi/doi.component";
 import { OnFocusSelectDirective } from "./focusSelect.directive";
 import { SxplrDumbFeatureList } from "src/features/dumbList/dumbList.component";
@@ -55,7 +54,6 @@ import { FileInputModule } from "src/getFileInput/module";
     FeatureModule,
     SapiViewsCoreSpaceModule,
     ReactiveFormsModule,
-    SxplrAnimationModule,
     DoiTemplate,
     SxplrDumbFeatureList,
     TPBRViewCmp,

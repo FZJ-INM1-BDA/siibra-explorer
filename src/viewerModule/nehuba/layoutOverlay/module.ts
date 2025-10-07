@@ -9,7 +9,6 @@ import { WindowResizeModule } from "src/util/windowResize";
 import { LayoutModule } from "src/layouts/layout.module";
 import { AngularMaterialModule } from 'src/sharedModules/angularMaterial.module'
 import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.directive";
-import { SxplrAnimationModule } from "src/ux";
 
 @NgModule({
   imports: [
@@ -22,7 +21,6 @@ import { SxplrAnimationModule } from "src/ux";
     WindowResizeModule,
     AngularMaterialModule,
     ExperimentalFlagDirective,
-    SxplrAnimationModule,
   ],
   declarations: [
     NehubaLayoutOverlay,

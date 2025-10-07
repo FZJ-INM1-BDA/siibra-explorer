@@ -384,3 +384,13 @@ mat-accordion.panel-accordion
         margin: 0 1rem;
     }
 }
+
+mat-button-toggle-group
+{
+    display: flex;
+
+    mat-button-toggle
+    {
+        flex: 1 1 auto;
+    }
+}

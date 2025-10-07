@@ -44,10 +44,10 @@ import { MediaQueryDirective } from "src/util/directives/mediaQuery.directive";
 import { TPBRViewCmp } from "src/features/TPBRView/TPBRView.component";
 import { AtlasViewerRouterModule } from "src/routerModule";
 import { VerticalBreadCrumbModule } from "src/ui/verticalBreadCrumb";
-import { SxplrAnimationModule } from "src/ux";
 import { NgLayerCtrlCmp } from "./nehuba/nehubaViewerInterface/ngLayerCtl/ngLayerCtrl.component";
 import { FileInputModule } from "src/getFileInput/module";
 import { SapiViewsFeatureConnectivityModule } from "src/features/connectivity";
+import { LabelEventDirective } from "src/ui/verticalBreadCrumb/labelEvent.directive";
 
 @NgModule({
   imports: [
@@ -76,7 +76,6 @@ import { SapiViewsFeatureConnectivityModule } from "src/features/connectivity";
     ReactiveFormsModule,
     TabComponent,
     AtlasViewerRouterModule,
-    SxplrAnimationModule,
     
     MouseOver,
     MediaQueryDirective,
@@ -85,6 +84,7 @@ import { SapiViewsFeatureConnectivityModule } from "src/features/connectivity";
     TPBRViewCmp,
     FileInputModule,
     SapiViewsFeatureConnectivityModule,
+    LabelEventDirective,
     
     ...(environment.ENABLE_LEAP_MOTION ? [LeapModule] : [])
   ],

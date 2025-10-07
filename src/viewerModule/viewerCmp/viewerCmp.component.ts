@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, TemplateRef, ViewChild, inject } from "@angular/core";
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, Optional, TemplateRef, ViewChild, inject } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { BehaviorSubject, combineLatest, Observable, of } from "rxjs";
 import { debounceTime, distinctUntilChanged, filter, map, shareReplay, switchMap, take, takeUntil, withLatestFrom } from "rxjs/operators";
@@ -16,13 +16,12 @@ import { TFace, TSandsPoint, getCoord } from "src/util/types";
 import { DestroyDirective } from "src/util/directives/destroy.directive";
 import { generalActionError } from "src/state/actions";
 import { enLabels } from "src/uiLabels";
-import { UserLayerService } from "../nehuba/userLayers/service";
 import { MatDialog, MatDialogRef, MatSnackBar } from "src/sharedModules";
 import { ModularUserAnnotationToolService } from "src/atlasComponents/userAnnotations/tools/service";
 import { PointAssignmentFull } from "src/atlasComponents/sapiViews/volumes/point-assignment-full/point-assignment-full.component";
 import { Point } from "src/atlasComponents/userAnnotations/tools/point";
 import { DoiTemplate } from "src/ui/doi/doi.component";
-import { SXPLR_PREFIX } from "src/util/constants";
+import { LABEL_EVENT_TRIGGER, SXPLR_PREFIX } from "src/util/constants";
 
 interface HasName {
   name: string
@@ -137,11 +136,10 @@ export class ViewerCmp {
     this.#viewerMode$,
     this.#selectedFeature$,
     this.#selectedPoint$,
-    this.#templateSelected$,
-    this.#parcellationSelected$,
+    this.selectedATP,
   ]).pipe(
-    map(([ selectedRegions, viewerMode, selectedFeature, selectedPoint, selectedTemplate, selectedParcellation ]) => ({
-      selectedRegions, viewerMode, selectedFeature, selectedPoint, selectedTemplate, selectedParcellation
+    map(([ selectedRegions, viewerMode, selectedFeature, selectedPoint, { template: selectedTemplate, parcellation: selectedParcellation, atlas: selectedAtlas } ]) => ({
+      selectedRegions, viewerMode, selectedFeature, selectedPoint, selectedTemplate, selectedParcellation, selectedAtlas
     }))
   )
 
@@ -191,7 +189,7 @@ export class ViewerCmp {
     this.#view2$,
   ]).pipe(
     map(([v0, v1, atlasAppearanceState, labels, v2]) => ({ ...v0, ...v1, ...atlasAppearanceState, labels, ...v2 })),
-    map(({ selectedRegions, viewerMode, selectedFeature, selectedPoint, selectedTemplate, selectedParcellation, currentMap, allAvailableRegions, fullSidenavExpanded, halfSidenavExpanded, labels, useViewer, showDelineation, showExperimental }) => {
+    map(({ selectedAtlas, selectedRegions, viewerMode, selectedFeature, selectedPoint, selectedTemplate, selectedParcellation, currentMap, allAvailableRegions, fullSidenavExpanded, halfSidenavExpanded, labels, useViewer, showDelineation, showExperimental }) => {
       let spatialObjectTitle: string
       let spatialObjectSubtitle: string
       if (selectedPoint) {
@@ -215,6 +213,7 @@ export class ViewerCmp {
         selectedRegions,
         selectedFeature,
         selectedPoint,
+        selectedAtlas,
         selectedTemplate,
         selectedParcellation,
         labelMappedRegionNames,
@@ -265,9 +264,10 @@ export class ViewerCmp {
     private cdr: ChangeDetectorRef,
     private sapi: SAPI,
     private snackbar: MatSnackBar,
-    private userLayerSvc: UserLayerService,
     private userAnnotSvc: ModularUserAnnotationToolService,
     private dialog: MatDialog,
+    @Optional()
+    @Inject(LABEL_EVENT_TRIGGER) private labelEventTrigger: (labels: string[]) => void
   ){
 
     this.view$.pipe(
@@ -690,6 +690,12 @@ export class ViewerCmp {
     }
     if (event.type === EnumViewerEvt.VIEWER_CTX) {
       this.ctxMenuSvc.deepMerge(event.data)
+    }
+  }
+
+  triggerLabel(label: string){
+    if (this.labelEventTrigger) {
+      this.labelEventTrigger([label])
     }
   }
 }

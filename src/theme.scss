@@ -37,6 +37,7 @@ $typographic-config: mat.define-typography-config();
     
     &.hoverable
     {
+      pointer-events: all;
       padding: 0.5rem 1rem;
       &:hover
       {

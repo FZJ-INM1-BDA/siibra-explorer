@@ -760,7 +760,11 @@
         <ng-template sxplrExperimentalFlag [experimental]="true">
 
         <mat-button-toggle-group #toggleGroup="matButtonToggleGroup" (change)="toggleGroup.value = toggleGroup.value.slice(-1)" multiple>
-            <mat-button-toggle matTooltip="navigation" value="navigation">
+            <mat-button-toggle matTooltip="navigation" value="navigation"
+                sxplr-label-event
+                [labels]="['atlasSelection']"
+                (triggered)="$event && toggleGroup.value = ['navigation']"
+                #navBtnTog="matButtonToggle">
                 <mat-icon>navigation</mat-icon>
             </mat-button-toggle>
             <mat-button-toggle matTooltip="find" value="find">
@@ -816,7 +820,7 @@
             animationDuration="0">
             <mat-tab
                 sxplr-label-event
-                [labels]="['selectedRegion']"
+                [labels]="['atlasSelection', 'selectedRegion']"
                 (triggered)="$event && mainNavTabGrp.selectedIndex = 0">
                 <ng-template mat-tab-label>
                     <mat-icon>navigation</mat-icon>

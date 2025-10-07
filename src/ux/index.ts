@@ -1,1 +1,0 @@
-export { SxplrAnimationModule } from "./module"

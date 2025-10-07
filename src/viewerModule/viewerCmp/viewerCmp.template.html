@@ -64,6 +64,20 @@
       </ng-template>
     </div>
 
+    <div iavLayoutFourCornersBottomLeft>
+      <mat-card class="sxplr-m-1 sxplr-muted hoverable sxplr-custom-cmp"
+        mat-ripple
+        (click)="triggerLabel('atlasSelection')">
+        <markdown-dom
+          [markdown]="{
+            atlas: view.selectedAtlas,
+            template: view.selectedTemplate,
+            parcellation: view.selectedParcellation
+          } | atprToMd">
+        </markdown-dom>
+      </mat-card>
+    </div>
+
     <!-- buttom right -->
     <div iavLayoutFourCornersBottomRight>
       <div class="leap-control-wrapper">
@@ -95,6 +109,9 @@
   </div>
   
   <sxplr-tab *ngIf="!view.showExperimental"
+    sxplr-label-event
+    [labels]="['atlasSelection']"
+    (triggered)="$event && controlHalfNav(true)"
     [matTooltip]="view.labels.TOGGLE_SIDE_PANELS"
     [sxplr-tab-icon]="view.halfSidenavExpanded ? 'fas fa-chevron-left' : 'fas fa-chevron-right'"
     (sxplr-tab-click)="controlHalfNav(!view.halfSidenavExpanded)">
@@ -533,69 +550,6 @@
     </mat-action-list>
 
   </ng-template>
-</ng-template>
-
-<!-- general point tmpl -->
-<ng-template let-view="view" #selectedPointTmpl>
-  <sxplr-side-panel>
-    <div class="sxplr-custom-cmp lighttheme" header>
-      
-      <!-- back btn -->
-      <button mat-button
-        (click)="clearPoint()"
-        [attr.aria-label]="ARIA_LABELS.CLOSE"
-        class="sxplr-mb-2"
-        >
-        <span class="ml-1">
-          Dismiss
-        </span>
-        <i class="fas fa-times"></i>
-      </button>
-    </div>
-    <div title>
-      {{ view.spatialObjectTitle }}
-    </div>
-    <div subtitle>
-      {{ view.spatialObjectSubtitle }}
-    </div>
-  </sxplr-side-panel>
-  <mat-action-list class="overview-container">
-    <ng-template [ngIf]="view.selectedPoint" let-point>
-      <ng-template [ngIf]="point | sandsToNum" let-coordinates>
-        <button mat-list-item
-          (click)="navigateTo(coordinates.coords)"
-          matTooltip="Go to coordinate">
-          <mat-icon matListItemIcon
-            fontSet="fas"
-            fontIcon="fa-map-marker">
-          </mat-icon>
-          <div matListItemTitle>
-            {{ coordinates.coords | numbers : 2 | addUnitAndJoin : 'mm' }}
-          </div>
-        </button>
-
-        <button mat-list-item
-          [iav-clipboard-copy]="coordinates.coords | numbers : 2 | addUnitAndJoin : 'mm'"
-          matTooltip="Copy coordinate to clipboard">
-          <mat-icon matListItemIcon fontSet="fas" fontIcon="fa-copy">
-          </mat-icon>
-          <div matListItemTitle>
-              Copy Coordinates
-          </div>
-        </button>
-      </ng-template>
-    </ng-template>
-    
-  </mat-action-list>
-
-  <mat-divider></mat-divider>
-
-  <sxplr-point-assignment
-    [point]="view.selectedPoint"
-    [template]="view.selectedTemplate"
-    [parcellation]="view.selectedParcellation"
-    (clickOnRegionName)="handleClickOnRegionName($event.target, $event.event)">
-  </sxplr-point-assignment>
 </ng-template>
 
 <!-- template for single feature modal -->
