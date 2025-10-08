@@ -107,32 +107,6 @@
       </markdown-dom>
     </mat-tab>
 
-    <ng-template [ngIf]="view.cmpFeatElmts" let-cmpFeatElmts>
-      <mat-tab label="Elements">
-        <ng-template matTabContent>
-          <compound-feature-indices [indices]="cmpFeatElmts"
-            [selected-template]="view.selectedTemplate"
-            (on-click-index)="showSubfeature($event)">
-          </compound-feature-indices>
-        </ng-template>
-      </mat-tab>
-    </ng-template>
-
-    <!-- voi special view -->
-    <ng-template [ngIf]="!view.showExperimentalFlag && view.voi" let-voi>
-      <mat-tab label="Volume Control">
-        <ng-layer-ctl
-          [ng-layer-ctl-name]="voi.ngVolume.url"
-          [ng-layer-ctl-format]="voi.ngVolume.format"
-          [ng-layer-ctl-src]="voi.ngVolume.url"
-          [ng-layer-ctl-transform]="voi.ngVolume.transform"
-          [ng-layer-ctl-info]="voi.ngVolume.info"
-          [ng-layer-ctl-opacity]="1.0"
-          [ng-layer-ctl-meta]="voi.ngVolume.meta"
-          [ng-layer-ctl-show]="true">
-        </ng-layer-ctl>
-      </mat-tab>
-    </ng-template>
 
     <!-- plotly view -->
     <ng-template [ngIf]="view.plotly" let-plotly>

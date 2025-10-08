@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, Optional, TemplateRef, ViewChild, inject } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { BehaviorSubject, combineLatest, Observable, of } from "rxjs";
+import { BehaviorSubject, combineLatest, concat, EMPTY, Observable, of } from "rxjs";
 import { debounceTime, distinctUntilChanged, filter, map, shareReplay, switchMap, take, takeUntil, withLatestFrom } from "rxjs/operators";
 import { CONST, ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
 import { IQuickTourData } from "src/ui/quickTour";
@@ -140,7 +140,25 @@ export class ViewerCmp {
   ]).pipe(
     map(([ selectedRegions, viewerMode, selectedFeature, selectedPoint, { template: selectedTemplate, parcellation: selectedParcellation, atlas: selectedAtlas } ]) => ({
       selectedRegions, viewerMode, selectedFeature, selectedPoint, selectedTemplate, selectedParcellation, selectedAtlas
-    }))
+    })),
+    switchMap(val => {
+      return concat(
+        of({
+          ...val,
+          parcsInCurrSpace: [] as SxplrParcellation[],
+        }),
+        val.selectedAtlas && val.selectedTemplate
+        ? this.sapi.getSupportedParcellations(val.selectedAtlas, val.selectedTemplate).pipe(
+            map(parcsInCurrSpace => {
+              return {
+                ...val,
+                parcsInCurrSpace,
+              }
+            })
+          )
+        : EMPTY
+      )
+    })
   )
 
   #view1$ = combineLatest([
@@ -158,7 +176,7 @@ export class ViewerCmp {
   #view2$ = combineLatest([
     this.store$.pipe(
       select(userPreference.selectors.showExperimental)
-    )
+    ),
   ]).pipe(
     map(([ showExperimental ]) => ({ showExperimental }))
   )
@@ -189,7 +207,7 @@ export class ViewerCmp {
     this.#view2$,
   ]).pipe(
     map(([v0, v1, atlasAppearanceState, labels, v2]) => ({ ...v0, ...v1, ...atlasAppearanceState, labels, ...v2 })),
-    map(({ selectedAtlas, selectedRegions, viewerMode, selectedFeature, selectedPoint, selectedTemplate, selectedParcellation, currentMap, allAvailableRegions, fullSidenavExpanded, halfSidenavExpanded, labels, useViewer, showDelineation, showExperimental }) => {
+    map(({ selectedAtlas, selectedRegions, viewerMode, selectedFeature, selectedPoint, selectedTemplate, selectedParcellation, currentMap, allAvailableRegions, fullSidenavExpanded, halfSidenavExpanded, labels, useViewer, showDelineation, showExperimental, parcsInCurrSpace }) => {
       let spatialObjectTitle: string
       let spatialObjectSubtitle: string
       if (selectedPoint) {
@@ -220,6 +238,7 @@ export class ViewerCmp {
         allAvailableRegions,
         leafRegions: allAvailableRegions.filter(r => !parentIds.has(r.id)),
         branchRegions: allAvailableRegions.filter(r => parentIds.has(r.id)),
+        parcsInCurrSpace,
 
         /**
          * Selected Spatial Object
@@ -477,7 +496,6 @@ export class ViewerCmp {
               feature
             },
             width: '75vw',
-            height: '75vh'
           }),
           () => this.clearShownFeature()
         )
@@ -628,11 +646,10 @@ export class ViewerCmp {
   @ViewChild('voiFeatureEntryCmp')
   voiFeatureEntryCmp: EntryComponent
 
-  selectATPR(regParc: {region: SxplrRegion, parcellation: SxplrParcellation}){
+  selectParcellationById(parcellationId: string){
     this.store$.dispatch(
       atlasSelection.actions.selectATPById({
-        parcellationId: regParc?.parcellation.id,
-        regionId: regParc?.region?.name
+        parcellationId
       })
     )
   }

@@ -53,10 +53,10 @@ export class SxplrDumbFeatureList {
 
   filteredFeatures(type: 'mod'|'cat', checked: string[]){
     if (type === 'mod') {
-      return (f: TFeature, ..._args: any[]) => checked.includes(f.modality)
+      return (f: TFeature, ..._args: any[]) => !!f && checked.includes(f.modality)
     }
     if (type === 'cat') {
-      return (f: TFeature, ..._args: any[]) => checked.includes(f.category)
+      return (f: TFeature, ..._args: any[]) => !!f && checked.includes(f.category)
     }
     return (..._args: any[]) => false
   }

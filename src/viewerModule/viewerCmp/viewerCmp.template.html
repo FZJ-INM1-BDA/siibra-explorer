@@ -72,7 +72,8 @@
           [markdown]="{
             atlas: view.selectedAtlas,
             template: view.selectedTemplate,
-            parcellation: view.selectedParcellation
+            parcellation: view.selectedParcellation,
+            regions: view.selectedRegions
           } | atprToMd">
         </markdown-dom>
       </mat-card>
@@ -141,7 +142,9 @@
             #fvb="featureViewBase">
             
             <ng-template [ngIf]="fvb.view$ | async" let-fView>
-              <ng-template [ngIf]="fView.voi" let-voi>
+              <!-- n.b viewerLoaded conditional ensures that this component is rerendered -->
+              <!-- thereby loads the VOI -->
+              <ng-template [ngIf]="viewerLoaded && fView.voi" let-voi>
                 <mat-card>
                   <mat-card-header>
                     <mat-card-title>
@@ -149,6 +152,18 @@
                     </mat-card-title>
                   </mat-card-header>
                   <mat-card-content>
+
+                    <mat-form-field>
+                      <mat-label>Reference Parcellation</mat-label>
+                      <mat-select [value]="view.selectedParcellation.id"
+                        (selectionChange)="selectParcellationById($event.value)">
+                        <ng-template ngFor [ngForOf]="view.parcsInCurrSpace" let-parc>
+                          <mat-option [value]="parc.id">{{ parc.shortName || parc.name }}</mat-option>
+                        </ng-template>
+                      </mat-select>
+                    </mat-form-field>
+
+                    <mat-divider></mat-divider>
 
                     <mat-slide-toggle [checked]="view.showDelineation"
                       (change)="toggleParcellationDelineation()"
@@ -554,10 +569,8 @@
 
 <!-- template for single feature modal -->
 <ng-template #focusFeatureDialogTmpl let-context>
-    <mat-dialog-content>
-      <sxplr-feature-view [feature]="context.feature">
-      </sxplr-feature-view>
-    </mat-dialog-content>
+    <sxplr-feature-view [feature]="context.feature">
+    </sxplr-feature-view>
     <div mat-dialog-actions>
         <button mat-button mat-dialog-close #closeBtn="matDialogClose">
             Close

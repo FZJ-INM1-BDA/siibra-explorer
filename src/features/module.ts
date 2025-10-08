@@ -27,7 +27,6 @@ import { DialogModule } from "src/ui/dialogInfo";
 import { CodeSnippet } from "src/atlasComponents/sapi/codeSnippets/codeSnippet.directive";
 import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.directive";
 import { FeatureViewBase } from "./view/view-base.directive";
-import { NgLayerCtrlCmp } from "src/viewerModule/nehuba/nehubaViewerInterface/ngLayerCtl/ngLayerCtrl.component";
 import { ExperimentalService } from "src/experimental/experimental.service";
 import { TPBRCategoryDirective } from "./tpbrCategory.directive";
 
@@ -39,7 +38,6 @@ import { TPBRCategoryDirective } from "./tpbrCategory.directive";
     SapiViewsFeatureConnectivityModule,
     ScrollingModule,
     MarkdownModule,
-    NgLayerCtrlCmp,
     ReadmoreModule,
     AngularMaterialModule,
     CompoundFeatureIndicesModule,

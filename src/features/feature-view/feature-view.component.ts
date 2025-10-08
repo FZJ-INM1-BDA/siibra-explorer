@@ -40,16 +40,6 @@ export class FeatureViewComponent extends FeatureViewBase{
     )
   }
 
-  
-  showSubfeature(_item: CFIndex|Feature){
-    // Not used. Commented out for the addition of contributors in features
-    // this.store.dispatch(
-    //   userInteraction.actions.showFeature({
-    //     feature: item
-    //   })
-    // )
-  }
-  
   clearSelectedFeature(): void{
     this.store.dispatch(
       userInteraction.actions.clearShownFeature()

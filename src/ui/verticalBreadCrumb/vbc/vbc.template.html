@@ -393,14 +393,14 @@
                 [sxplr-dialog]="dumbFeatureDialogTmpl"
                 [sxplr-dialog-restorable]="true"
                 [sxplr-dialog-config]="{
-                    autoFocus: true
+                    autoFocus: true,
+                    width: '90vw'
                 }"
                 [sxplr-dialog-data]="{
                     busy$: voiFeatureEntryCmp.busy$,
                     features$: voiFeatureEntryCmp.features$,
                     anchorTmpl: anchorTmpl
-                }"
-                sxplr-dialog-size="xl">
+                }">
                 <span mat-list-item-title>
                     <span>
                         Features in this view
