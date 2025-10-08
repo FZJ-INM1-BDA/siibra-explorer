@@ -312,8 +312,9 @@ export class FeatureViewBase {
     try {
       
       const sectionId = parseInt(found[1])
+      const sectionIdStr = sectionId.toString().padStart(4, '0')
       const realYDis = (sectionId * 2e4 - 70010000) / 1e6
-      const url = `https://zam12230.jsc.fz-juelich.de/gpuvm-deploy/cuda/bb1micron/B20_${sectionId}.tif::pipelines/cpn.json`
+      const url = `https://zam12230.jsc.fz-juelich.de/gpuvm-deploy/cuda/bb1micron/B20_${sectionIdStr}.tif::pipelines/cpn.json`
       const resp = await fetch(`${url}/meta.json`)
       const meta: MetaV1Schema = await resp.json()
       
@@ -329,7 +330,7 @@ export class FeatureViewBase {
           info: null,
           transform: meta.transform,
           // replace with /cpn later
-          url: `https://zam12230.jsc.fz-juelich.de/gpuvm-deploy/cuda/bb1micron/B20_${sectionId}.tif::pipelines/cpn.json`,
+          url: `https://zam12230.jsc.fz-juelich.de/gpuvm-deploy/cuda/bb1micron/B20_${sectionIdStr}.tif::pipelines/cpn.json`,
           meta: {
             preferredColormap: ["rgba (4 channel)"],
             version: 1,
