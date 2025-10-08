@@ -1,11 +1,9 @@
 import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { SAPI } from 'src/atlasComponents/sapi/sapi.service';
-import { Feature } from 'src/atlasComponents/sapi/sxplrTypes';
 import { DARKTHEME } from 'src/util/injectionTokens';
 import { Store } from '@ngrx/store';
 import { atlasSelection, userInteraction } from 'src/state';
-import { CFIndex } from '../compoundFeatureIndices';
 import { FeatureViewBase } from '../view/view-base.directive';
 import { ExperimentalService } from 'src/experimental/experimental.service';
 

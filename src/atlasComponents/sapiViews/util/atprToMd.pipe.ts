@@ -19,7 +19,7 @@ export class ATPRToMarkdown implements PipeTransform {
     if (!atlas || !template || !parcellation) {
       return ``
     }
-    let msg = `${atlas.name} / ${template.shortName || template.name}`
+    const msg = `${atlas.name} / ${template.shortName || template.name}`
     const parcName = parcellation.shortName || parcellation.name
     if (regions.length === 0) {
       return `${msg} / ${parcName}`
