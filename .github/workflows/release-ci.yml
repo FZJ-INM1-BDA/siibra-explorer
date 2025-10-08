@@ -55,8 +55,19 @@ jobs:
         then
           exit 1
         fi
-        
   
+  check_docs_build:
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    - run: |
+        pip install -r docs/requirements.txt
+        mkdocs build -s
+
   check_code_meta:
     if: always()
     runs-on: ubuntu-latest
