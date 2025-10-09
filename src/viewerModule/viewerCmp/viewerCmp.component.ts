@@ -472,30 +472,23 @@ export class ViewerCmp {
 
     let openFeatureDialog: () => MatDialogRef<any> = null
 
-    combineLatest([
-      this.store$.pipe(
-        select(userInteraction.selectors.selectedFeature),
-        distinctUntilChanged((o, n) => o?.id === n?.id),
-      ),
-      this.store$.pipe(
-        select(userPreference.selectors.showExperimental),
-        distinctUntilChanged(),
-      )
-    ]).pipe(
-      
-    ).subscribe(([feature, experimentalFlag]) => {
+    this.store$.pipe(
+      select(userInteraction.selectors.selectedFeature),
+      distinctUntilChanged((o, n) => o?.id === n?.id),
+    ).subscribe(feature => {
       if (!!openFeatureDialog) {
         this.dialogSvc.deregisterAndCloseRestorableDialog(openFeatureDialog)
         openFeatureDialog = null
       }
       
-      if (!!feature && experimentalFlag){
+      if (!!feature){
         this.dialogSvc.registerAndOpenRestorableDialog(
           () => this.dialog.open(this.focusFeatureDialog, {
             data: {
               feature
             },
             width: '75vw',
+            maxHeight: '90vh',
           }),
           () => this.clearShownFeature()
         )
