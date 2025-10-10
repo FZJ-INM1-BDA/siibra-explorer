@@ -347,6 +347,10 @@
             "type": "boolean",
             "title": "Deprecated"
           },
+          "collection": {
+            "type": "string",
+            "title": "Collection"
+          },
           "prev": {
             "$ref": "#/components/schemas/SiibraAtIdModel"
           },

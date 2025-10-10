@@ -100,7 +100,7 @@
         "python 3",
         "typescript"
     ],
-    "schema:releaseNotes": "# v2.14.26\n\n## Bugfixes\n\n- Fixed a bug where parcellation toggle was not visible for atlases with a single parcellation (#1502). Thanks @PolarBean for reporting the issue.\n\n## Behind the scene\n\n- Fix deadlinks in docs, added CI pipeline to catch deadlinks in docs\n\n- Removed unused parameters\n\n- Selected features will no longer be cleared when changing parcellation\n\n- Allow showing vanilla neuroglancer ui (with `window.sxplr.showNgUi()`)\n",
+    "schema:releaseNotes": "# v2.14.26\n\n## Bugfixes\n\n- Fixed a bug where parcellation toggle was not visible for atlases with a single parcellation (#1502). Thanks @PolarBean for reporting the issue.\n\n- Fixed documentation in plugin API of required params.\n\n## Behind the scene\n\n- Fix deadlinks in docs, added CI pipeline to catch deadlinks in docs\n\n- Removed unused parameters\n\n- Selected features will no longer be cleared when changing parcellation\n\n- Allow showing vanilla neuroglancer ui (with `window.sxplr.showNgUi()`)\n",
     "runtimePlatform": "docker",
     "version": "2.14.26",
     "contIntegration": "https://github.com/FZJ-INM1-BDA/siibra-explorer/actions",
