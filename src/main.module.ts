@@ -188,6 +188,10 @@ import { SxplrOverlaySvc } from './components/overlay';
               styleEl.href = href
               document.body.appendChild(styleEl)
             }
+            const viewer = window['viewer']
+            if (viewer) {
+              viewer.uiConfiguration.showUIControls.value = true
+            }
           }
         }
         return () => Promise.resolve()
