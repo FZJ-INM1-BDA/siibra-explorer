@@ -111,7 +111,6 @@ jobs:
           SIIBRA_API_ENDPOINTS=${{ env.SIIBRA_API_STABLE }}
           EXPERIMENTAL_FEATURE_FLAG=${{ env.EXPERIMENTAL_FEATURE_FLAG }}
 
-  
   build-docker-img-ebrains:
   
     runs-on: ubuntu-latest
@@ -122,6 +121,7 @@ jobs:
       MATOMO_URL: 'https://stats.humanbrainproject.eu/'
       PRODUCTION: 'true'
       DOCKER_REGISTRY: 'docker-registry.ebrains.eu/siibra/'
+      K8S_DOCKER_REGISTRY: 'docker-registry-dev.ebrains.eu/siibra/'
 
       SIIBRA_API_STABLE: 'https://siibra-api-stable.apps.hbp.eu/v3_0,https://siibra-api.apps.ebrains.eu/v3_0'
       SIIBRA_API_RC: 'https://siibra-api-rc.apps.hbp.eu/v3_0'
@@ -135,10 +135,10 @@ jobs:
     - id: 'build-docker-image'
       name: 'Build docker image'
       run: |
-
         echo "Git digest: ${{ env.GIT_DIGEST}} "
 
         DOCKER_BUILT_TAG=${{ env.DOCKER_REGISTRY }}siibra-explorer:$BRANCH_NAME
+        K8S_DOCKER_BUILT_TAG=${{ env.K8S_DOCKER_REGISTRY }}siibra-explorer:$BRANCH_NAME
         echo "Building $DOCKER_BUILT_TAG"
         docker build \
           --build-arg BUILD_HASH=${{ env.GIT_DIGEST }} \
@@ -150,6 +150,10 @@ jobs:
           .
         echo "Successfully built $DOCKER_BUILT_TAG"
         echo "DOCKER_BUILT_TAG=$DOCKER_BUILT_TAG" >> $GITHUB_ENV
+
+        echo "Tagging $DOCKER_BUILT_TAG as $K8S_DOCKER_BUILT_TAG"
+        docker tag $DOCKER_BUILT_TAG $K8S_DOCKER_BUILT_TAG
+        echo "K8S_DOCKER_BUILT_TAG=$K8S_DOCKER_BUILT_TAG" >> $GITHUB_ENV
 
         inspect_str=$(docker image inspect --format='json' $DOCKER_BUILT_TAG)
         echo "Inspected tag: $inspect_str"
@@ -166,6 +170,20 @@ jobs:
           docker-registry.ebrains.eu
         echo "Pushing $DOCKER_BUILT_TAG"
         docker push $DOCKER_BUILT_TAG
+
+    - name: '(experimental) Push to k8s docker registry'
+      run: |
+        echo "curl first otherwise docker login result in tls handshake timeout"
+        curl -v https://docker-registry-dev.ebrains.eu/v2/
+        echo "Login to docker registry"
+        echo '${{ secrets.EBRAINS_K8S_DOCKER_REG_USER }}' | \
+        docker login \
+          -u '${{ secrets.EBRAINS_K8S_DOCKER_REG_TOKEN }}' \
+          --password-stdin \
+          docker-registry.ebrains.eu
+        echo "Pushing $K8S_DOCKER_BUILT_TAG"
+        docker push $K8S_DOCKER_BUILT_TAG
+
     - name: 'If master, also tag as per package.json'
       if: ${{ github.ref == 'refs/heads/master' }}
       run: |
@@ -177,7 +195,7 @@ jobs:
   trigger-deploy-rc-rancher:
     if: ${{ needs.set-vars.outputs.BRANCH_NAME == 'staging' && success() }}
     needs:
-      - build-docker-img-ghcr
+      - build-docker-img-ebrains
       - set-vars
     uses: ./.github/workflows/deploy-helm.yml
     with:
@@ -185,7 +203,7 @@ jobs:
       IMAGE_TAG: staging
 
       # temporarily use ghcr, as ebrains harbor cannot be auth'ed
-      IMAGE_REPO: ghcr.io/fzj-inm1-bda/siibra-explorer
+      IMAGE_REPO: docker-registry-dev.ebrains.eu/siibra/siibra-explorer
 
       # GIT_DIGEST may (sometimes) be all numbers. prepend 'h' to cast to str
       IMAGE_DIGEST: h${{ needs.set-vars.outputs.GIT_DIGEST }}
