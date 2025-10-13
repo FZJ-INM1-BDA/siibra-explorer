@@ -130,7 +130,7 @@ export class NehubaViewerUnit implements OnDestroy {
     @Optional() @Inject(SET_COLORMAP_OBS) private setColormap$: Observable<IColorMap>,
     @Optional() @Inject(SET_LAYER_VISIBILITY) private layerVis$: Observable<string[]>,
     @Optional() @Inject(SET_SEGMENT_VISIBILITY) private segVis$: Observable<string[]>,
-    @Optional() @Inject(NG_LAYER_CONTROL) private layerCtrlCb: (callback: (arg: TNgLayerCtrl<keyof INgLayerCtrl>) => void) => () => void,
+    @Optional() @Inject(NG_LAYER_CONTROL) layerCtrlCb: (callback: (arg: TNgLayerCtrl<keyof INgLayerCtrl>) => void) => () => void,
     @Optional() @Inject(Z_TRAVERSAL_MULTIPLIER) multiplier$: Observable<number>,
     @Optional() @Inject(EXTERNAL_LAYER_CONTROL) private externalLayerCtrl: IExternalLayerCtl,
     @Optional() intViewerStateSvc: ViewerInternalStateSvc,

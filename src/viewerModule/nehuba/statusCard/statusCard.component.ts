@@ -25,6 +25,7 @@ import { getUuid } from "src/util/fn";
 import { Render, TAffine, isAffine, ID_AFFINE } from "src/components/coordTextBox"
 import { IDS } from "src/atlasComponents/sapi";
 import { InterSpaceCoordXformSvc, ITemplateCoordXformResp } from "src/atlasComponents/sapi/core/space/interSpaceCoordXform.service"
+import { MM_ID, QV_T, SANDS_TYPE } from "src/util/types";
 
 type TSpace = {
   label: string
@@ -317,16 +318,16 @@ export class StatusCardComponent {
     this.store$.dispatch(
       atlasSelection.actions.selectPoint({
         point: {
-          "@type": "https://openminds.ebrains.eu/sands/CoordinatePoint",
+          "@type": SANDS_TYPE,
           "@id": getUuid(),
           coordinateSpace: {
             "@id": this.selectedTemplate.id
           },
           coordinates: posNm.map(v => ({
             "@id": getUuid(),
-            "@type": "https://openminds.ebrains.eu/core/QuantitativeValue",
+            "@type": QV_T,
             unit: {
-              "@id": "id.link/mm"
+              "@id": MM_ID
             },
             value: v,
             uncertainty: [0, 0]

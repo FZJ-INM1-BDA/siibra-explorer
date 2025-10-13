@@ -16,6 +16,7 @@ import { Directive, OnDestroy } from "@angular/core";
 import { Observable, Subject, Subscription } from "rxjs";
 import { filter, switchMapTo, takeUntil } from "rxjs/operators";
 import { getUuid } from "src/util/fn";
+import { MM_IDS } from "src/util/types";
 
 export type TLineJsonSpec = {
   '@type': 'siibra-ex/annotation/line'
@@ -86,6 +87,7 @@ export class Line extends IAnnotationGeometry{
       },
       coordinatesFrom: [getCoord(x0/1e6), getCoord(y0/1e6), getCoord(z0/1e6)],
       coordinatesTo: [getCoord(x1/1e6), getCoord(y1/1e6), getCoord(z1/1e6)],
+      ...this.sxplrProp(),
     }
   }
 
@@ -130,11 +132,11 @@ export class Line extends IAnnotationGeometry{
     const { ['@id']: spaceId } = coordinateSpace
     if (type !== 'tmp/line') throw new Error(`cannot parse line from sands`)
     const fromPt = coordinatesFrom.map(c => {
-      if (c.unit["@id"] !== 'id.link/mm') throw new Error(`Cannot parse unit`)
+      if (!MM_IDS.includes(c.unit["@id"])) throw new Error(`Cannot parse unit`)
       return c.value * 1e6
     })
     const toPoint = coordinatesTo.map(c => {
-      if (c.unit["@id"] !== 'id.link/mm') throw new Error(`Cannot parse unit`)
+      if (!MM_IDS.includes(c.unit["@id"])) throw new Error(`Cannot parse unit`)
       return c.value * 1e6
     })
     const line = new Line({
@@ -158,6 +160,7 @@ export class Line extends IAnnotationGeometry{
       ],
       space: { id: spaceId }
     })
+    line.parseSxplrProp(json)
     return line
   }
 

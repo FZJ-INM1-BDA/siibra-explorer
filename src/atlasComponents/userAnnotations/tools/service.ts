@@ -18,6 +18,7 @@ import { atlasSelection } from "src/state";
 import { AnnotationLayer, getViewer } from "src/atlasComponents/annotations";
 import { translateV3Entities } from "src/atlasComponents/sapi/translateV3";
 import { HOVER_INTERCEPTOR_INJECTOR, HoverInterceptor, THoverConfig } from "src/util/injectionTokens";
+import { isSandsPoint } from "src/util/types";
 
 
 const ANNOTATED_SYMBOL = Symbol("ANNOTATED_SYMBOL")
@@ -702,7 +703,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     if (json['@type'] === 'tmp/line') {
       returnObj = Line.fromSANDS(json)
     }
-    if (json['@type'] === 'https://openminds.ebrains.eu/sands/CoordinatePoint') {
+    if (isSandsPoint(json)) {
       returnObj = Point.fromSANDS(json)
     }
     if (json['@type'] === 'siibra-ex/annotation/point') {
@@ -714,6 +715,9 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     if (json['@type'] === 'siibra-ex/annotation/polyline') {
       returnObj = Polygon.fromJSON(json)
     }
+
+    // deprecated
+    // "sands" now support name/desc *cough cough*
     if (json['@type'] === DESC_TYPE) {
       const existingAnn = this.managedAnnotations.find(ann => json.id === ann.id)
       if (existingAnn) {

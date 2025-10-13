@@ -79,13 +79,7 @@ export class AnnotationList {
           filecontent: JSON.stringify(ann.toSands(), null, 2),
         }
       })
-      const annotationDesc = manAnns.map(ann => {
-        return {
-          filename: `${ann.id}.desc.json`,
-          filecontent: JSON.stringify(ann.toMetadata(), null, 2)
-        }
-      })
-      return [ readme, ...annotationSands, ...annotationDesc ]
+      return [ readme, ...annotationSands ]
     }),
     shareReplay(1),
   )
