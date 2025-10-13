@@ -171,6 +171,14 @@ jobs:
         echo "Pushing $DOCKER_BUILT_TAG"
         docker push $DOCKER_BUILT_TAG
 
+    - name: 'If master, also tag as per package.json'
+      if: ${{ github.ref == 'refs/heads/master' }}
+      run: |
+        VERSION=$(jq -r '.version' package.json)
+        VERSIONED_DOCKER_BUILT_TAG=${{ env.DOCKER_REGISTRY }}siibra-explorer:$VERSION
+        docker tag $DOCKER_BUILT_TAG $VERSIONED_DOCKER_BUILT_TAG
+        docker push $VERSIONED_DOCKER_BUILT_TAG
+
     - name: '(experimental) Push to k8s docker registry'
       run: |
         echo "curl first otherwise docker login result in tls handshake timeout"
@@ -180,17 +188,9 @@ jobs:
         docker login \
           -u '${{ secrets.EBRAINS_K8S_DOCKER_REG_TOKEN }}' \
           --password-stdin \
-          docker-registry.ebrains.eu
+          docker-registry-dev.ebrains.eu
         echo "Pushing $K8S_DOCKER_BUILT_TAG"
         docker push $K8S_DOCKER_BUILT_TAG
-
-    - name: 'If master, also tag as per package.json'
-      if: ${{ github.ref == 'refs/heads/master' }}
-      run: |
-        VERSION=$(jq -r '.version' package.json)
-        VERSIONED_DOCKER_BUILT_TAG=${{ env.DOCKER_REGISTRY }}siibra-explorer:$VERSION
-        docker tag $DOCKER_BUILT_TAG $VERSIONED_DOCKER_BUILT_TAG
-        docker push $VERSIONED_DOCKER_BUILT_TAG
 
   trigger-deploy-rc-rancher:
     if: ${{ needs.set-vars.outputs.BRANCH_NAME == 'staging' && success() }}
