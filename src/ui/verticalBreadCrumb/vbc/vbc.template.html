@@ -25,7 +25,7 @@
                             <div class="dropdown-selection-text-label-title">
                                 {{ atlas.name }}
                             </div>
-                            <mat-icon class="dropdown-selection-text-label-icon">expand_more</mat-icon>
+                            <mat-icon class="dropdown-selection-text-label-icon">layers</mat-icon>
                         </div>
                     </div>
                 </ng-template>
@@ -51,7 +51,7 @@
                             <div class="dropdown-selection-text-label-title">
                                 {{ template.shortName || template.name }}
                             </div>
-                            <mat-icon class="dropdown-selection-text-label-icon">expand_more</mat-icon>
+                            <mat-icon class="dropdown-selection-text-label-icon">layers</mat-icon>
                         </div>
                     </div>
                     
@@ -71,7 +71,7 @@
 
                     <mat-divider></mat-divider>
 
-                    <form [formGroup]="navigationCtlForm">
+                    <form class="subsection" [formGroup]="navigationCtlForm">
                         <ng-template [ngIf]="view.useViewer === 'nehuba'">
                             <ng-template [ngIf]="view.currentViewport" let-vp>
 
@@ -137,7 +137,7 @@
                                 <div class="dropdown-selection-text-label-title">
                                     {{ parcellation.shortName || parcellation.name }}
                                 </div>
-                                <mat-icon class="dropdown-selection-text-label-icon">expand_more</mat-icon>
+                                <mat-icon class="dropdown-selection-text-label-icon">layers</mat-icon>
                             </div>
                         </div>
 
@@ -211,7 +211,7 @@
 
                     <mat-divider></mat-divider>
 
-                    <ng-template [ngIf]="view.selectedRegions" let-selectedRegions>
+                    <div class="subsection" *ngIf="view.selectedRegions; let selectedRegions">
                         <ng-template [ngIf]="selectedRegions.length === 0">
                             <ng-template [ngTemplateOutlet]="parcRegionQuickSearchTmpl"></ng-template>
                         </ng-template>
@@ -310,7 +310,7 @@
                                 </button>
                             </div>
                         </ng-template>
-                    </ng-template>
+                    </div>
                 </ng-template>
             </ng-template>
 
@@ -757,8 +757,6 @@
 
     <mat-card>
 
-        <ng-template sxplrExperimentalFlag [experimental]="true">
-
         <mat-button-toggle-group #toggleGroup="matButtonToggleGroup" (change)="toggleGroup.value = toggleGroup.value.slice(-1)" multiple>
             <mat-button-toggle matTooltip="navigation" value="navigation"
                 sxplr-label-event
@@ -768,7 +766,7 @@
                 <mat-icon>navigation</mat-icon>
             </mat-button-toggle>
             <mat-button-toggle matTooltip="find" value="find">
-                <mat-icon>find_in_page</mat-icon>
+                <mat-icon>search</mat-icon>
             </mat-button-toggle>
             <mat-button-toggle matTooltip="annotate" value="annotate">
                 <mat-icon>draw</mat-icon>
@@ -782,7 +780,13 @@
         </mat-button-toggle-group>
         
         <div *ngIf="toggleGroup.value.includes('navigation')"
-            class="tab-content-wrapper">
+            class="tab-content-wrapper"
+            sxplr-label-event
+            [labels]="['atlasSelection']"
+            (triggered)="$event && toggleGroup.value.includes('navigation') && navigationSpotlight.blink()"
+            sl-spotlight
+            #navigationSpotlight="slSpotlight"
+            >
             <ng-template [ngTemplateOutlet]="viewNavigate"></ng-template>
         </div>
         <div *ngIf="toggleGroup.value.includes('find')"
@@ -812,73 +816,7 @@
                 <ng-template [ngTemplateOutlet]="viewTools"></ng-template>
             </mat-card>
         </div>
-        </ng-template>
         
-        <ng-template sxplrExperimentalFlag [deprecated]="true">
-
-        <mat-tab-group color="primary" #mainNavTabGrp="matTabGroup"
-            animationDuration="0">
-            <mat-tab
-                sxplr-label-event
-                [labels]="['atlasSelection', 'selectedRegion']"
-                (triggered)="$event && mainNavTabGrp.selectedIndex = 0">
-                <ng-template mat-tab-label>
-                    <mat-icon>navigation</mat-icon>
-                </ng-template>
-                <div class="tab-content-wrapper">
-                    <ng-template [ngTemplateOutlet]="viewNavigate"></ng-template>
-                </div>
-            </mat-tab>
-            <mat-tab>
-                <ng-template mat-tab-label>
-                    <mat-icon>find_in_page</mat-icon>
-                </ng-template>
-                <div class="tab-content-wrapper">
-                    <mat-card>
-                        <ng-template [ngTemplateOutlet]="viewFind"></ng-template>
-                    </mat-card>
-                </div>
-            </mat-tab>
-            <mat-tab
-                #annotTab="matTab"
-                sxplr-label-event
-                [labels]="['annotations']"
-                (triggered)="$event && mainNavTabGrp.selectedIndex = 2">
-                
-                <ng-template mat-tab-label>
-                    <mat-icon>draw</mat-icon>
-                </ng-template>
-                <div class="tab-content-wrapper">
-                    <mat-card>
-                        <ng-template [ngTemplateOutlet]="viewAnnot"
-                            [ngTemplateOutletContext]="{
-                                expanded: annotTab.isActive
-                            }"></ng-template>
-                    </mat-card>
-                </div>
-            </mat-tab>
-            <mat-tab>
-                <ng-template mat-tab-label>
-                    <mat-icon>share</mat-icon>
-                </ng-template>
-                <div class="tab-content-wrapper">
-                    <mat-card>
-                        <ng-template [ngTemplateOutlet]="viewShare"></ng-template>
-                    </mat-card>
-                </div>
-            </mat-tab>
-            <mat-tab>
-                <ng-template mat-tab-label>
-                    <mat-icon>widgets</mat-icon>
-                </ng-template>
-                <div class="tab-content-wrapper">
-                    <mat-card>
-                        <ng-template [ngTemplateOutlet]="viewTools"></ng-template>
-                    </mat-card>
-                </div>
-            </mat-tab>
-        </mat-tab-group>
-        </ng-template>
     </mat-card>
 
 
@@ -890,13 +828,13 @@
             [sxplr-sapiviews-core-rich-regionshierarchy-regions]="view.allAvailableRegions"
             [sxplr-sapiviews-core-rich-regionshierarchy-label-mapped-region-names]="view.labelMappedRegionNames"
             [sxplr-sapiviews-core-rich-regionshierarchy-accent-regions]="view.selectedRegions"
-            (sxplr-sapiviews-core-rich-regionshierarchy-region-select)="selectRoi($event)"
+            (sxplr-sapiviews-core-rich-regionshierarchy-region-select)="selectRoi($event); closeBtn.dialogRef.close()"
             (sxplr-sapiviews-core-rich-regionshierarchy-region-toggle)="toggleRoi($event)"
             >
         </sxplr-sapiviews-core-rich-regionshierarchy>
 
         <mat-card-actions>
-            <button mat-button mat-dialog-close>close</button>
+            <button mat-button mat-dialog-close #closeBtn="matDialogClose">close</button>
         </mat-card-actions>
     </ng-template>
 

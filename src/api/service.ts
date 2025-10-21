@@ -27,7 +27,7 @@ type PTSpace = PathReturn<"/spaces/{space_id}">
 type PTParcellation = PathReturn<"/parcellations/{parcellation_id}">
 type PTRegion = PathReturn<"/regions/{region_id}">
 
-type AddableLayer = atlasAppearance.const.NgLayerCustomLayer
+type AddableLayer = atlasAppearance.const.NgLayerCustomLayer & { clType: "customlayer/nglayer" }
 
 type AtId = {
   "@id": string
@@ -539,22 +539,18 @@ export class ApiService implements BoothResponder<ApiBoothEvents>{
     case 'loadLayers':
     case 'updateLayers': {
       const { layers } = event.params as ApiBoothEvents['loadLayers']['request'] | ApiBoothEvents['updateLayers']['request']
-      for (const layer of layers) {
-        this.store.dispatch(
-          atlasAppearance.actions.addCustomLayers({
-            customLayers: [layer]
-          })
-        )
-      }
+      this.store.dispatch(
+        atlasAppearance.actions.addCustomLayers({
+          customLayers: layers
+        })
+      )
       break
     }
     case 'removeLayers': {
       const { layers } = event.params as ApiBoothEvents['removeLayers']['request']
-      for (const layer of layers) {
-        this.store.dispatch(
-          atlasAppearance.actions.removeCustomLayers({customLayers: [layer]})
-        )
-      }
+      this.store.dispatch(
+        atlasAppearance.actions.removeCustomLayers({customLayers: layers})
+      )
       break
     }
     case 'exit': {

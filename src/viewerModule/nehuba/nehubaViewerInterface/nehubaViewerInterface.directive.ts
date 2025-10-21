@@ -241,6 +241,13 @@ export class NehubaViewerContainerDirective implements OnDestroy{
                 }
               }
               config ||= getNehubaConfig(template)
+
+              // TODO temporary fix
+              // in future update the config in meta.json
+              const drawSubstrates = config?.layout?.useNehubaPerspective?.drawSubstrates
+              if (drawSubstrates) {
+                drawSubstrates.color = [0, 0, 0, 0]
+              }
               config.dataset.initialNgState.layers = {}
               for (const baseLayer of ngBaseLayers) {
                 config.dataset.initialNgState.layers[baseLayer.id] = baseLayer

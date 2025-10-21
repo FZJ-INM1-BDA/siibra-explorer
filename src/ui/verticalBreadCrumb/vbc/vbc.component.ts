@@ -188,7 +188,7 @@ export class VerticalBreadCrumbComponent {
     ),
     this.store$.pipe(
       select(atlasAppearance.selectors.customLayers),
-      map(layers => layers.filter(l => l.clType === "customlayer/nglayer" && !l.id.startsWith(SXPLR_PREFIX)) as atlasAppearance.const.NgLayerCustomLayer[]),
+      map(layers => layers.filter(l => l.clType === "customlayer/nglayer" && !l.id?.startsWith(SXPLR_PREFIX)) as atlasAppearance.const.NgLayerCustomLayer[]),
       distinctUntilChanged(arrayEqual((o, n) => o.id === n.id)),
     )
   ]).pipe(

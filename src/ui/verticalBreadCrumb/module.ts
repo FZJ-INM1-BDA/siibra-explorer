@@ -37,6 +37,7 @@ import { PluginModule } from "src/plugin";
 import { LabelEventDirective } from "./labelEvent.directive";
 import { AtlasViewerRouterModule } from "src/routerModule";
 import { FileInputModule } from "src/getFileInput/module";
+import { SpotLightModule } from "src/spotlight/spot-light.module";
 
 @NgModule({
   imports: [
@@ -75,6 +76,7 @@ import { FileInputModule } from "src/getFileInput/module";
     LabelEventDirective,
     AtlasViewerRouterModule,
     FileInputModule,
+    SpotLightModule,
 ],
   declarations: [
     VerticalBreadCrumbComponent,
