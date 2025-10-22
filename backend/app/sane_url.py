@@ -22,7 +22,8 @@ vip_routes = [
     "human",
     "monkey",
     "rat",
-    "mouse"
+    "mouse",
+    "marmoset",
 ]
 
 

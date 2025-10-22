@@ -28,7 +28,7 @@ async def get_index_html(request: Request):
     error = None
     attributes_to_append: Dict[str, str] = {}
     if ERROR_KEY in request.session:
-        error = request.session.pop(ERROR_KEY)
+        error = request.session.get(ERROR_KEY)
         attributes_to_append[DATA_ERROR_ATTR] = error
     
     if OVERWRITE_API_ENDPOINT:

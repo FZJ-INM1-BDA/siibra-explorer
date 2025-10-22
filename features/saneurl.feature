@@ -38,6 +38,16 @@ Feature: SaneURL a.k.a. URL shortener
         When User enters the said saneURL to a browser
         Then They should be taken to where the shortlink is generated
     
+    Scenario: missing ShortCode should show error
+        Given User navigated to an invalid SaneURL <https://atlases.ebrains.eu/viewer-staging/go/this-sane-url-does-not-exist>
+        Then User should see error
+    
+    Scenario: Error should clear after first visit
+        Given above scenario passed
+        When User when visit the page again <https://atlases.ebrains.eu/viewer-staging/>
+        Then User should _not_ see error
+
+    
     Scenario: Permalink works (Big Brain)
         Given <https://atlases.ebrains.eu/viewer-staging/saneUrl/bigbrainGreyWhite>
         Then Works
@@ -89,4 +99,8 @@ Feature: SaneURL a.k.a. URL shortener
 
     Scenario: VIP link works (mouse)
         Given <https://atlases.ebrains.eu/viewer-staging/mouse>
+        Then Works
+
+    Scenario: VIP link works (marmoset)
+        Given <https://atlases.ebrains.eu/viewer-staging/marmoset>
         Then Works
