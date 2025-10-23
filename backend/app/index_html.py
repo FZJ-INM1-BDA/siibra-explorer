@@ -25,10 +25,14 @@ async def get_index_html(request: Request):
             index_html = fp.read()
     
     # TODO: LOCAL_CDN not yet ported over
-    error = None
+    error = ""
     attributes_to_append: Dict[str, str] = {}
     if ERROR_KEY in request.session:
-        error = request.session.get(ERROR_KEY)
+        error += request.session.get(ERROR_KEY)
+    if ERROR_KEY in request.cookies:
+        error += request.cookies.get(ERROR_KEY)
+
+    if error != "":
         attributes_to_append[DATA_ERROR_ATTR] = error
     
     if OVERWRITE_API_ENDPOINT:
@@ -47,6 +51,8 @@ async def get_index_html(request: Request):
     resp = Response(resp_string, headers={
         "content-type": "text/html; charset=utf-8"
     })
-    if ERROR_KEY in request.session:
+    if ERROR_KEY in request.cookies:
         resp.delete_cookie(ERROR_KEY, **COOKIE_KWARGS)
+    if ERROR_KEY in request.session:
+        del request.session[ERROR_KEY]
     return resp
