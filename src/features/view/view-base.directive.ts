@@ -318,7 +318,7 @@ export class FeatureViewBase {
       const resp = await fetch(`${url}/meta.json`)
       const meta: MetaV1Schema = await resp.json()
       
-      meta.transform[1][3] -= 20e3
+      meta.transform[1][3] -= 40e3
       additionalVois.push({
         bbox: {
           center: [0, realYDis, 0],
