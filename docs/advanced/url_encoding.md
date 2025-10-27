@@ -40,12 +40,15 @@ Here is a comprehensive list of the state encoded in the URL:
 | parcellation | `p:` | id property | |
 | space | `t:` | id property | |
 | region | `rn:` | Quick hash of region name[^1] | |
+| geometry | `g:` | Serialized selected geometry of interest[^geometry_hash] | `/g:v1.0.3CfEFg.1AgkO0` |
 | navigation | `@:` | navigation state hash[^2] | |
 | feature | `f:` | id property + additional escaping[^3] | |
 | misc viewer state | `vs:` | misc viewer state serialization[^4] | | 
 | auto launch plugin | `pl` (query param) | stringified JSON representing `string[]` | `?pl=%5B%22http%3A%2F%2Flocalhost%3A1234%2Fmanifest.json%22%5D` . Modern browsers also accept `?pl=["http://localhost:1234/manifest.json"]` |
 
 [^1]: Quick hash. [[source]](https://github.com/FZJ-INM1-BDA/siibra-explorer/blob/v2.14.4/src/util/fn.ts#L146-L154) Quick one way hash. It will likely be deprecated in favor of [crypto.digest](https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest) in the near future.
+
+[^geometry_hash]: Encoding geometry of interest. Only selected point is supported. Each coordinate is base64 encoded The number is base64 encodded [[source]](https://github.com/FZJ-INM1-BDA/siibra-explorer/blob/v2.14.4/common/util.js#L242-L313). The final value is in the form of `v1.{encoded_x}.{encoded_y}.{encoded_z}`. 
 
 [^2]: Encoding navigation state. [[source]](https://github.com/FZJ-INM1-BDA/siibra-explorer/blob/v2.14.4/src/routerModule/routeStateTransform.service.ts#L366-L372) Each of the following state are encoded: `orientation`, `perspectiveOrientation`, `perspectiveZoom`, `position`, `zoom`. They are cast into `[f32, f32, f32, f32]`, `[f32, f32, f32, f32]`, `int`, `[int, int, int]` and `int` respective. Each of the number is base64 encoded [[source]](https://github.com/FZJ-INM1-BDA/siibra-explorer/blob/v2.14.4/common/util.js#L242-L313) with the following cipher: `0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-`. Negation is denoted using `~` as the beginning of encoded value. If the state consists of a tuple of values, they are joined by a single separator (i.e. `:`). The encoded state is then joined with two separators (i.e. `::`)
 

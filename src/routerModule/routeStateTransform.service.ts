@@ -8,10 +8,11 @@ import { atlasAppearance, atlasSelection, defaultState, MainState, plugins, user
 import { decodeToNumber, encodeNumber, encodeURIFull, separator } from "./cipher";
 import { TUrlAtlas, TUrlPathObj, TUrlStandaloneVolume } from "./type";
 import { decodePath, encodeId, decodeId, encodePath } from "./util";
-import { CachedFunction, QuickHash, decodeBool, encodeBool, mutateDeepMerge } from "src/util/fn";
+import { CachedFunction, QuickHash, decodeBool, encodeBool, getUuid, mutateDeepMerge } from "src/util/fn";
 import { NEHUBA_CONFIG_SERVICE_TOKEN, NehubaConfigSvc } from "src/viewerModule/nehuba/config.service";
 import { INIT_ROUTE_TO_STATE } from "src/util/injectionTokens";
 import { RecursivePartial } from "src/util/recursivePartial";
+import { isSandsPoint, MM_ID, QV_T, SANDS_TYPE } from "src/util/types";
 
 type ViewerConfigState = {
   panelMode: userInterface.PanelMode
@@ -391,6 +392,36 @@ export class RouteStateTransformSvc {
       console.error(`parse template, parc, region error`, e)
     }
 
+    // decode selected geometry
+    if (returnObj["g"]?.length === 1 && !!returnState["[state.atlasSelection]"].selectedTemplate) {
+      const goi = returnObj["g"][0]
+      const [version, _x, _y, _z] = goi.split(separator)
+      if (version === "v1") {
+        const x = decodeToNumber(_x, { float: true })
+        const y = decodeToNumber(_y, { float: true })
+        const z = decodeToNumber(_z, { float: true })
+        returnState["[state.atlasSelection]"].selectedPoint = {
+          "@type": SANDS_TYPE,
+          "@id": getUuid(),
+          coordinateSpace: {
+            "@id": returnState["[state.atlasSelection]"].selectedTemplate.id
+          },
+          coordinates: [x, y, z].map(v => ({
+            "@id": getUuid(),
+            "@type": QV_T,
+            unit: {
+              "@id": MM_ID
+            },
+            value: v,
+            uncertainty: [0, 0]
+          }))
+        }
+      } else {
+        console.error(`Decoding geometry of interest error: does not support ${version}`)
+      }
+    }
+    
+
     for (const fn of this.otherRouteToState){
       const partial = await fn(fullPath.toString())
       mutateDeepMerge(returnState, partial)
@@ -468,6 +499,7 @@ export class RouteStateTransformSvc {
     const selectedTemplate = atlasSelection.selectors.selectedTemplate(state)
     
     const selectedRegions = atlasSelection.selectors.selectedRegions(state)
+    const selectedPoint = atlasSelection.selectors.selectedPoint(state)
     const standaloneVolumes = atlasSelection.selectors.standaloneVolumes(state)
     const navigation = atlasSelection.selectors.navigation(state)
     const selectedFeature = userInteraction.selectors.selectedFeature(state)
@@ -508,6 +540,20 @@ export class RouteStateTransformSvc {
       // for regions
       // r: selectedRegionsString && encodeURIFull(selectedRegionsString),
       rn: selectedRegions[0] && selectedRegions.map(r => QuickHash.GetHash(r.name)),
+      // for selected point 
+      g: (() => {
+        if (!isSandsPoint(selectedPoint)) return null
+        if (selectedPoint.coordinateSpace?.["@id"] !== selectedTemplate?.id) {
+          // how does this even happen?
+          console.error(`Selected point and seleced template have different coordinate space! Will not encode selected point!`)
+          return null
+        }
+        const encodedStr = selectedPoint.coordinates.map(
+          c => encodeNumber(c.value, { float: true })
+        ).join(separator)
+        
+        return `v1${separator}${encodedStr}`
+      })(),
       // nav
       ['@']: cNavString,
       // showing dataset
