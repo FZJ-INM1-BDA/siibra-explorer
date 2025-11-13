@@ -203,7 +203,7 @@ jobs:
       IMAGE_TAG: staging
 
       # temporarily use ghcr, as ebrains harbor cannot be auth'ed
-      IMAGE_REPO: docker-registry-dev.ebrains.eu/siibra/siibra-explorer
+      IMAGE_REPO: docker-registry.ebrains.eu/siibra/siibra-explorer
 
       # GIT_DIGEST may (sometimes) be all numbers. prepend 'h' to cast to str
       IMAGE_DIGEST: h${{ needs.set-vars.outputs.GIT_DIGEST }}
