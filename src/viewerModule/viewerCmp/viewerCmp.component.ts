@@ -21,7 +21,7 @@ import { ModularUserAnnotationToolService } from "src/atlasComponents/userAnnota
 import { PointAssignmentFull } from "src/atlasComponents/sapiViews/volumes/point-assignment-full/point-assignment-full.component";
 import { Point } from "src/atlasComponents/userAnnotations/tools/point";
 import { DoiTemplate } from "src/ui/doi/doi.component";
-import { LABEL_EVENT_TRIGGER, SXPLR_PREFIX } from "src/util/constants";
+import { LABEL_EVENT_TRIGGER, SXPLR_PREFIX, LABEL_EVENT } from "src/util/constants";
 
 interface HasName {
   name: string
@@ -260,6 +260,7 @@ export class ViewerCmp {
         useViewer,
         showDelineation,
         showExperimental,
+        eventLabels: LABEL_EVENT
       }
     }),
     shareReplay(1),
@@ -592,7 +593,12 @@ export class ViewerCmp {
       z: point[2],
     })
     toolInstance.addAnnotation(pt)
-    this.snackbar.open(`Annotation added`)
+    const snackbarRef = this.snackbar.open(`Annotation added`, 'Show')
+    snackbarRef.afterDismissed().subscribe(value => {
+      if (value.dismissedByAction) {
+        this.triggerLabel(LABEL_EVENT.annotate)
+      }
+    })
   }
 
   #lastSelectedPoint: { point?: number[], face?: number, vertices?: number[], template: SxplrTemplate }
@@ -703,7 +709,7 @@ export class ViewerCmp {
     }
   }
 
-  triggerLabel(label: string){
+  triggerLabel(label: keyof typeof LABEL_EVENT){
     if (this.labelEventTrigger) {
       this.labelEventTrigger([label])
     }

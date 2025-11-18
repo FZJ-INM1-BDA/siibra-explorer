@@ -16,7 +16,7 @@ import { translateRegionName } from "src/atlasComponents/sapi/translateV3";
 import { generalActionError } from "src/state/actions";
 import { MatExpansionPanel } from "@angular/material/expansion";
 import { arrayEqual } from "src/util/array";
-import { LABEL_EVENT_TRIGGER, SXPLR_PREFIX } from "src/util/constants";
+import { LABEL_EVENT_TRIGGER, SXPLR_PREFIX, LABEL_EVENT } from "src/util/constants";
 import { ModularUserAnnotationToolService } from "src/atlasComponents/userAnnotations/tools/service";
 import { IAnnotationGeometry } from "src/atlasComponents/userAnnotations/tools/type";
 import { BANLIST_CONNECTIVITY, EXPERIMENTAL_CONNECTIVITY, WHITELIST_CONNECTIVITY } from "src/features/connectivity";
@@ -24,11 +24,6 @@ import { ViewerMode } from "src/state/atlasSelection/const";
 
 const pipe = new FilterGroupedParcellationPipe()
 
-const FOCUS_ON = [
-  "selectedRegion",
-  "annotations",
-] as const
-type FOCUS_ON_TYPE = typeof FOCUS_ON[number]
 
 type PasteTarget = "pos"|"zoom"|"rot"
 type NavigationState = {
@@ -347,6 +342,7 @@ export class VerticalBreadCrumbComponent {
         inAnnot, outAnnot,
         enableRegionalConnectivity,
         isVolumetric,
+        eventLabels: LABEL_EVENT,
       }
     })
   )
@@ -433,7 +429,9 @@ export class VerticalBreadCrumbComponent {
       map(regions => regions.map(r => r.name).join("")),
       distinctUntilChanged(),
     ).subscribe(() => {
-      this.focusOn("selectedRegion")
+      if (this.labelEventTrigger) {
+        this.labelEventTrigger([LABEL_EVENT.atlasSelection])
+      }
     })
     
     this.navigationCtlForm.valueChanges.pipe(
@@ -643,20 +641,6 @@ export class VerticalBreadCrumbComponent {
         physical: true
       })
     )
-  }
-  
-  public focusOn(name: FOCUS_ON_TYPE){
-    if (!this.labelEventTrigger) {
-      return
-    }
-    if (name === "annotations") {
-      this.labelEventTrigger(["annotations"])
-      return
-    }
-    if (name === "selectedRegion") {
-      this.labelEventTrigger(["selectedRegion"])
-      return
-    }
   }
 
   public assignPoint(position: number[], template: SxplrTemplate) {

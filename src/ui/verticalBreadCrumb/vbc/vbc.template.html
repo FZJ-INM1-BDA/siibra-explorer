@@ -760,7 +760,7 @@
         <mat-button-toggle-group #toggleGroup="matButtonToggleGroup" (change)="toggleGroup.value = toggleGroup.value.slice(-1)" multiple>
             <mat-button-toggle matTooltip="navigation" value="navigation"
                 sxplr-label-event
-                [labels]="['atlasSelection']"
+                [labels]="[view.eventLabels.atlasSelection]"
                 (triggered)="$event && toggleGroup.value = ['navigation']"
                 #navBtnTog="matButtonToggle">
                 <mat-icon>navigation</mat-icon>
@@ -768,7 +768,11 @@
             <mat-button-toggle matTooltip="find" value="find">
                 <mat-icon>search</mat-icon>
             </mat-button-toggle>
-            <mat-button-toggle matTooltip="annotate" value="annotate">
+            <mat-button-toggle matTooltip="annotate" value="annotate"
+                sxplr-label-event
+                [labels]="[view.eventLabels.annotate]"
+                (triggered)="$event && toggleGroup.value = ['annotate']"
+                #navBtnTog="matButtonToggle" >
                 <mat-icon>draw</mat-icon>
             </mat-button-toggle>
             <mat-button-toggle matTooltip="share" value="share">

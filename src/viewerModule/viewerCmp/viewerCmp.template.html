@@ -67,7 +67,7 @@
     <div iavLayoutFourCornersBottomLeft>
       <mat-card class="sxplr-m-1 sxplr-muted hoverable sxplr-custom-cmp"
         mat-ripple
-        (click)="triggerLabel('atlasSelection')">
+        (click)="triggerLabel(view.eventLabels.atlasSelection)">
         <markdown-dom
           [markdown]="{
             atlas: view.selectedAtlas,

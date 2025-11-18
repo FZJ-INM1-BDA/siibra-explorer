@@ -134,3 +134,8 @@ export const LABEL_EVENT_TRIGGER = new InjectionToken<(labels: string[]) => void
 export class LblEventSvc {
   labels$ = new BehaviorSubject<string[]>([])
 }
+
+export const LABEL_EVENT = {
+  atlasSelection: "atlasSelection",
+  annotate: "annotate",
+} as const
