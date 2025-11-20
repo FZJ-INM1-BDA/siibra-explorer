@@ -1,5 +1,5 @@
 import { Directive, EventEmitter, Inject, Input, OnDestroy, OnInit, Optional, Output } from "@angular/core";
-import { catchError, debounceTime, filter, map, shareReplay, switchMap, tap, throttleTime } from "rxjs/operators";
+import { catchError, debounceTime, filter, map, shareReplay, switchMap, tap } from "rxjs/operators";
 import { SandsToNumPipe } from "./sandsToNum.pipe"
 import { BehaviorSubject, combineLatest, concat, EMPTY, Observable, of, Subject, Subscription } from "rxjs";
 import { TFace, TSandsPoint } from "src/util/types";
