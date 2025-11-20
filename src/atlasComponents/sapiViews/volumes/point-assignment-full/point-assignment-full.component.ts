@@ -31,7 +31,6 @@ export class PointAssignmentFull extends PointAssignmentDirective {
   ) {
     super(sapi, hoverInterceptor, clickInterceptor)
 
-    console.log("constructor", dialogData, dialogData.point)
     if (!!dialogData) {
       this.point = dialogData.point
       this.template = dialogData.template

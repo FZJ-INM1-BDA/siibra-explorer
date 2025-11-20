@@ -172,9 +172,10 @@
                             </ng-template>
                         </ng-template>
 
-                        
                         <button mat-icon-button
+                            *ngIf="view.selectedRegions.length === 0; else disabledVisTmpl"
                             class="vbc-row-fixed"
+                            [disabled]="view.selectedRegions.length > 0"
                             [matTooltip]="view.labels.TOGGLE_DELINEATION"
                             (click)="toggleParcellationVisibility()"
                             (iav-key-event)="toggleParcellationVisibility()"
@@ -192,6 +193,16 @@
                                 <i class="fas fa-eye-slash"></i>
                             </ng-template>
                         </button>
+
+                        <ng-template #disabledVisTmpl>
+                            <div class="vbc-row-fixed"
+                                matTooltip="toggle delineation disabled because area(s) selected">
+                                <button mat-icon-button disabled>
+                                    <mat-icon>do_not_disturb</mat-icon>
+                                </button>
+                            </div>
+                        </ng-template>
+                        
 
                         <!-- parc info button -->
                         <button mat-icon-button
@@ -226,7 +237,7 @@
                                     sxplr-dialog-size="xl">
                                     
                                     <span class="dropdown-selection-category-label">
-                                        Brain Areas
+                                        Brain Area
                                     </span>
                                     <div class="dropdown-selection-text-label">
                                         <div class="dropdown-selection-text-label-title">
@@ -261,7 +272,7 @@
 
                                     <!-- centroid -->
                                     <ng-template [ngIf]="regionDirective.regionPosition$ | async" let-position>
-                                        <button mat-icon-button [matTooltip]="position | numbers | addUnitAndJoin : 'mm'"
+                                        <button mat-icon-button [matTooltip]="'centroid: ' + (position | numbers | addUnitAndJoin : 'mm')"
                                             class="vbc-row-fixed"
                                             (click)="navigateTo(position)">
                                             <mat-icon>place</mat-icon>
@@ -338,11 +349,10 @@
             <button mat-list-item
                 *ngIf="view.isVolumetric"
                 (click)="assignPoint(view.currentViewport.center, view.selectedATP.template)">
+                <mat-icon matListItemIcon>assessment</mat-icon>
                 <span mat-list-item-title>
-                    Areas at the crosshair
+                    Areas at crosshair ({{ view.currentViewport.center | numbers | addUnitAndJoin }} mm)
                 </span>
-                <!-- <mat-icon matListItemIcon>my_location</mat-icon> -->
-                <!-- <mat-icon matListItemIcon>map</mat-icon> -->
             </button>
 
             
@@ -389,7 +399,6 @@
 
             <!-- spatial features -->
             <button mat-list-item
-                [matTooltip]="view.labels.RELATED_DATASETS"
                 [sxplr-dialog]="dumbFeatureDialogTmpl"
                 [sxplr-dialog-restorable]="true"
                 [sxplr-dialog-config]="{
@@ -401,6 +410,7 @@
                     features$: voiFeatureEntryCmp.features$,
                     anchorTmpl: anchorTmpl
                 }">
+                <mat-icon matListItemIcon>image</mat-icon>
                 <span mat-list-item-title>
                     <span>
                         Features in this view
@@ -449,15 +459,15 @@
                 <ng-template [ngIf]="regionDirective.relatedRegions$ | async | dedupRelatedRegionPipe" let-relatedRegions>
                     <ng-template [ngIf]="relatedRegions.length > 0">
                         <button mat-list-item
-                            [matTooltip]="view.labels.RELATED_REGIONS"
                             [sxplr-dialog]="relatedRegionsTmpl"
                             [sxplr-dialog-data]="{
                                 relatedRegions: relatedRegions,
                                 region: view.selectedRegions[0]
                             }">
+                            <mat-icon matListItemIcon>link</mat-icon>
                             <span mat-list-item-title>
                                 <span>
-                                    Areas related to selected area
+                                    Areas related to {{ view.selectedRegions[0].name }}
                                 </span>
                                 <span class="text-muted">
                                     ({{ relatedRegions.length }})
@@ -472,8 +482,19 @@
                         <!-- header -->
                         <h2 mat-dialog-title>Related Areas</h2>
 
+
                         <!-- body -->
                         <mat-dialog-content class="vbc-dialog-content">
+
+                            <ng-template [ngIf]="view?.selectedATP?.parcellation" let-parcellation>
+                                
+                                <span>source region:</span>
+                                <tpbr-viewer [tpbr-concept]="{
+                                    parcellation: parcellation,
+                                    region: view.selectedRegions[0]
+                                }">
+                                </tpbr-viewer>
+                            </ng-template>
 
                             <!-- iterate over all related -->
                             <table mat-table [dataSource]="relatedRegions">
@@ -543,7 +564,6 @@
 
                 <!-- related features -->
                 <button mat-list-item
-                    [matTooltip]="view.labels.RELATED_DATASETS"
                     [sxplr-dialog]="dumbFeatureDialogTmpl"
                     [sxplr-dialog-config]="{
                         autoFocus: true
@@ -554,9 +574,10 @@
                         anchorTmpl: anchorTmpl
                     }"
                     sxplr-dialog-size="xl">
+                    <mat-icon matListItemIcon>area_chart</mat-icon>
                     <span mat-list-item-title>
                         <span>
-                            Features related to selected area
+                            Features related to {{ view.selectedRegions[0].name }}
                         </span>
                         <ng-template [ngIf]="regFeatures.totals$ | async" let-total>
                             <ng-template [ngIf]="total > 0">
@@ -580,6 +601,7 @@
                 <button mat-list-item
                     (click)="goToViewerMode('focusview:regionalconnectivity')"
                     >
+                    <mat-icon matListItemIcon>view_compact</mat-icon>
                     <span mat-list-item-title>
                         Regional connectivity connected to selected region
                     </span>
@@ -783,14 +805,7 @@
             </mat-button-toggle>
         </mat-button-toggle-group>
         
-        <div *ngIf="toggleGroup.value.includes('navigation')"
-            class="tab-content-wrapper"
-            sxplr-label-event
-            [labels]="['atlasSelection']"
-            (triggered)="$event && toggleGroup.value.includes('navigation') && navigationSpotlight.blink()"
-            sl-spotlight
-            #navigationSpotlight="slSpotlight"
-            >
+        <div *ngIf="toggleGroup.value.includes('navigation')" class="tab-content-wrapper">
             <ng-template [ngTemplateOutlet]="viewNavigate"></ng-template>
         </div>
         <div *ngIf="toggleGroup.value.includes('find')"

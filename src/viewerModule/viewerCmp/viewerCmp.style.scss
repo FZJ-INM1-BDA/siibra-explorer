@@ -144,28 +144,12 @@ sxplr-vertical-bread-crumb
   pointer-events: all;
 }
 
-.add-layer-container
+.express-atlas-selection
 {
-  display: flex;
-  justify-content: center;
-  margin-top: 0.25rem;
+  margin: 0.5rem 0.5rem 2.5rem 0.5rem;
 
-  &> button
+  markdown-dom
   {
-    pointer-events: all;
-  }
-}
-
-.add-layer-card
-{
-  & .add-layer-radio-group
-  {
-    display: flex;
-    flex-direction: column;
-
-    & > :not(mat-radio-button)
-    {
-      margin-left: 3rem;
-    }
+    white-space: nowrap;
   }
 }

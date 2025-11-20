@@ -147,3 +147,9 @@ current-layout
     transform: translateY(-0%);
   }
 }
+
+.overlay-btn-container
+{
+  display: inline-flex;
+  flex-direction: row;
+}

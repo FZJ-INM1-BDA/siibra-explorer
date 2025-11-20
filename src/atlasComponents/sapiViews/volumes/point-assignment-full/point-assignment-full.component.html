@@ -8,8 +8,22 @@
     }">
 </tpbr-viewer>
 
-<ng-template [ngIf]="busy$ | async">
+<ng-template [ngIf]="busy$ | async" [ngIfElse]="notBusyTmpl">
     <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+</ng-template>
+
+<ng-template #notBusyTmpl>
+    <div class="contentcontainer">
+        <ng-template [ngIf]="error$ | async" let-error [ngIfElse]="typeTmpl">
+            Error: Unable to assign this point in this reference atlas.
+        </ng-template>
+        <ng-template #typeTmpl>
+            Assignment type: 
+            <ng-template [ngIf]="assignmentType$ | async" let-asmttype>
+                {{ asmttype }}
+            </ng-template>
+        </ng-template>
+    </div>
 </ng-template>
 
 <mat-dialog-content>
@@ -19,13 +33,15 @@
     </sxplr-assignment-view-full>
 </mat-dialog-content>
 <mat-dialog-actions align="center">
-    <button mat-raised-button color="primary"
-        [zip-files-output]="zipfileConfig$ | async"
-        zip-files-output-zip-filename="pointassignment.zip">
-        <i class="fas fa-download"></i>
-        <span>
-            Download CSV
-        </span>
-    </button>
+    <ng-template [ngIf]="!(busy$ | async) && !(error$ | async)">
+        <button mat-raised-button color="primary"
+            [zip-files-output]="zipfileConfig$ | async"
+            zip-files-output-zip-filename="pointassignment.zip">
+            <i class="fas fa-download"></i>
+            <span>
+                Download CSV
+            </span>
+        </button>
+    </ng-template>
     <button mat-button mat-dialog-close>Close</button>
 </mat-dialog-actions>

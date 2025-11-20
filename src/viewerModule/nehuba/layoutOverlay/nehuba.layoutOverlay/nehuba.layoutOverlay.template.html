@@ -31,7 +31,7 @@
   </div>
 </current-layout>
 
-<div *ngIf="obliqueRotated$ | async"
+<div *ngIf="showResetRot$ | async"
   class="reset-rotation-container">
   
   <button mat-mini-fab class="reset-rotation-btn sxplr-pe-all"
@@ -98,7 +98,7 @@
   #panelCtrlTmpl
   let-panelIndex="panelIndex"
   let-visible="visible">
-  <div class="ws-no-wrap opacity-crossfade always-show-touchdevice pe-all overlay-btn-container"
+  <mat-card class="ws-no-wrap opacity-crossfade always-show-touchdevice pe-all overlay-btn-container"
     [ngClass]="{ onHover: visible }"
     [attr.data-viewer-controller-visible]="visible"
     [attr.data-viewer-controller-index]="panelIndex">
@@ -128,8 +128,8 @@
       <mat-icon>zoom_in</mat-icon>
     </button>
 
-    <button (click)="resetZoom(panelIndex)" mat-icon-button color="default">
-      <mat-icon>crop_free</mat-icon>
+    <button (click)="resetZoom(panelIndex)" mat-icon-button color="warn">
+      <mat-icon>restart_alt</mat-icon>
     </button>
 
     <!-- factor > 1.0 === zoom out -->
@@ -143,7 +143,7 @@
       [ngTemplateOutlet]="maxBtnTmpl"
       [ngTemplateOutletContext]="{ $implicit: panelIndex }">
     </ng-template>
-  </div>
+  </mat-card>
 </ng-template>
 
 <ng-template #maxBtnTmpl let-panelIndex>
@@ -154,11 +154,11 @@
     <ng-template
       [ngIf]="currentPanelMode === 'SINGLE_PANEL' || currentPanelMode === 'PIP_PANEL'"
       [ngIfElse]="expandTmpl">
-      <mat-icon>close_fullscreen</mat-icon>
+      <mat-icon>unfold_less</mat-icon>
     </ng-template>
 
     <ng-template #expandTmpl>
-      <mat-icon>open_in_full</mat-icon>
+      <mat-icon>crop_free</mat-icon>
     </ng-template>
   </button>
 </ng-template>

@@ -25,6 +25,8 @@ type AxisLabel = Partial<{
   I: number
 }>
 
+const EXPECTED_FLATTENED_AXES: (keyof AxisLabel)[] = ['S', 'R', 'I', 'L', 'S', 'A', 'I', 'P', 'A', 'R', 'P', 'L']
+
 function convertToAxesLabel(array: number[]): AxisLabel {
   if (array[0] > REV_THRESHOLD) {
     return { R: array[0] }
@@ -168,7 +170,6 @@ export class NehubaLayoutOverlay implements OnDestroy{
         )
       : EMPTY),
     distinctUntilChanged(arrayEqual(null, true)),
-    // only show if orientation is length 4
     filter(arr => arr.length === 4),
     withLatestFrom(this.#exportNehuba),
     map(([orientation, export_nehuba]) => {
@@ -190,11 +191,11 @@ export class NehubaLayoutOverlay implements OnDestroy{
 
 
       return slicesOrientations.map(q => {
-        
+
         // origin **might** be at top left, rather than bottom left
         const xpt = vec3.transformQuat(vec3.create(), xp, q)
         const xnt = vec3.transformQuat(vec3.create(), xn, q)
-        
+
         const ypt = vec3.transformQuat(vec3.create(), yp, q)
         const ynt = vec3.transformQuat(vec3.create(), yn, q)
 
@@ -209,14 +210,24 @@ export class NehubaLayoutOverlay implements OnDestroy{
     shareReplay(1),
   )
 
-  obliqueRotated$ = this.axesLabels$.pipe(
-    map(axisLabels =>
-      axisLabels.some(
+  showResetRot$ = this.axesLabels$.pipe(
+    map(axisLabels => {
+      const obliqueRotated = axisLabels.some(
         axisLabel => axisLabel.some(
           label => Object.keys(label).length === 0
         )
       )
-    )
+      if (obliqueRotated) {
+        return true
+      }
+
+      const flattened = axisLabels
+        .flatMap(l => l)
+        .map(v => Object.keys(v))
+        .flatMap(l => l)
+
+      return !arrayEqual(null, true)(flattened, EXPECTED_FLATTENED_AXES)
+    })
   )
 
   async turn90(axis: AxisLabel){

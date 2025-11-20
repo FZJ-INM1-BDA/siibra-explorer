@@ -1,7 +1,7 @@
 import { Directive, EventEmitter, Inject, Input, OnDestroy, OnInit, Optional, Output } from "@angular/core";
-import { catchError, filter, map, shareReplay, switchMap, tap } from "rxjs/operators";
+import { catchError, debounceTime, filter, map, shareReplay, switchMap, tap, throttleTime } from "rxjs/operators";
 import { SandsToNumPipe } from "./sandsToNum.pipe"
-import { BehaviorSubject, combineLatest, concat, EMPTY, Observable, of, Subscription } from "rxjs";
+import { BehaviorSubject, combineLatest, concat, EMPTY, Observable, of, Subject, Subscription } from "rxjs";
 import { TFace, TSandsPoint } from "src/util/types";
 import { SxplrParcellation, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { PathReturn } from "src/atlasComponents/sapi/typeV3";
@@ -101,6 +101,9 @@ export class PointAssignmentDirective implements OnDestroy, OnInit{
       })
     )
   }
+
+  #assignmentType: Subject<"labelled" | "statistical" | null> = new BehaviorSubject(null)
+  assignmentType$ = this.#assignmentType.asObservable()
   
   #busy$ = new BehaviorSubject<typeof DOING_PROB_ASGMT | typeof DOING_LABEL_ASGMT>(null)
   busy$ = this.#busy$.asObservable()
@@ -173,6 +176,7 @@ ${warningMsg}`
     this.parcellation$,
     this.template$,
   ]).pipe(
+    debounceTime(16),
     switchMap(([ point, parcellation, template ]) => {
 
       this.#error$.next(null)
@@ -196,6 +200,7 @@ ${warningMsg}`
             sigma_mm: 0
           }
         }).pipe(
+          tap(() => this.#assignmentType.next("statistical")),
           catchError(() => {
             this.#busy$.next(DOING_LABEL_ASGMT)
             return this.sapi.v3Get("/map/assign", {
@@ -206,7 +211,9 @@ ${warningMsg}`
                 sigma_mm: 0,
                 assignment_type: "labelled"
               }
-            })
+            }).pipe(
+              tap(() => this.#assignmentType.next("labelled"))
+            )
           }),
           catchError((err) => {
             this.#busy$.next(null)
