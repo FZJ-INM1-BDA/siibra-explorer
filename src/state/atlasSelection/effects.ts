@@ -407,11 +407,11 @@ export class Effect {
 
                   const warningMarkdowns = []
                   if (talliedOptions[SPATIAL_TRANSFORM_SRC] && talliedOptions[SPATIAL_TRANSFORM_RESULT]) {
-                    let text = `Due to the change of reference space, previous navigation location \`${talliedOptions[SPATIAL_TRANSFORM_SRC].map(v => (v/1e6).toFixed(2) + "mm").join(", ")}\` in \`${template.name}\` `
+                    let text = `Due to the change of reference space, previous navigation location ${talliedOptions[SPATIAL_TRANSFORM_SRC].map(v => (v/1e6).toFixed(2) + "mm").join(", ")} in ${template.name} `
                     if (talliedOptions[SPATIAL_TRANSFORM_RESULT] === "succeeded") {
-                      text += `was warped to \`${(state?.navigation?.position || [0, 0, 0]).map(v => (v/1e6).toFixed(2) + "mm").join(", ")}\` in \`${state?.selectedTemplate?.name}\``
+                      text += `was warped to ${(state?.navigation?.position || [0, 0, 0]).map(v => (v/1e6).toFixed(2) + "mm").join(", ")} in ${state?.selectedTemplate?.name}`
                     } else {
-                      text += `was attempted to be warped to \`${state?.selectedTemplate?.name}\`, but was unsuccessful. The navigation was reset to \`0, 0, 0\``
+                      text += `was attempted to be warped to ${state?.selectedTemplate?.name}, but was unsuccessful. The navigation was reset to 0, 0, 0`
                     }
                     warningMarkdowns.push(text)
                   }
@@ -419,7 +419,7 @@ export class Effect {
                     warningMarkdowns.push(talliedOptions[CORTICAL_LAYERS_WARNING])
                   }
                   if (talliedOptions[REGION_DESELECTED_WARNING]) {
-                    warningMarkdowns.push(`Due to the change of reference parcellation, previously selected region \`${talliedOptions[REGION_DESELECTED_WARNING]}\` is not available. Therefore, region selection has been reset.`)
+                    warningMarkdowns.push(`Due to the change of reference parcellation, previously selected region ${talliedOptions[REGION_DESELECTED_WARNING]} is not available. Therefore, region selection has been reset.`)
                   }
                   if (warningMarkdowns.length > 0) {
                     this.sxplrSnackBarSvc.open({

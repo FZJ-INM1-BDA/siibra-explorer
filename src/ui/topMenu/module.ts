@@ -17,6 +17,7 @@ import { KeyFrameModule } from "src/keyframesModule/module";
 import { AtlasDownloadModule } from "src/atlas-download/atlas-download.module";
 import { AngularMaterialModule } from "src/sharedModules";
 import { SxplrWarningsDirective } from "../warnings/warnings.directive";
+import { SxplrTriggers } from "src/util/directives/trigger.directive";
 
 
 @NgModule({
@@ -38,6 +39,7 @@ import { SxplrWarningsDirective } from "../warnings/warnings.directive";
     QuickTourModule,
     AtlasDownloadModule,
     SxplrWarningsDirective,
+    SxplrTriggers,
   ],
   declarations: [
     TopMenuCmp
