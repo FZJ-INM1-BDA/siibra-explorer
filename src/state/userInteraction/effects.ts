@@ -3,7 +3,7 @@ import { Actions, createEffect, ofType } from "@ngrx/effects";
 import * as userInterface from "../userInterface"
 import * as atlasSelection from "../atlasSelection"
 import * as actions from "./actions"
-import { filter, map, mapTo, skip } from "rxjs/operators";
+import { filter, map, mapTo, pairwise } from "rxjs/operators";
 import { Store } from "@ngrx/store";
 
 @Injectable()
@@ -23,7 +23,21 @@ export class Effect {
      * First non empty emit would be from selecting atlas.
      * So ignore it.
      */
-    skip(1),
+    pairwise(),
+
+    /**
+     * Per request, only clear feature if
+     * 
+     * - selected atlas (species) changes OR
+     * - selected template changes
+     * 
+     * This is to accommodate high res 1um slices, which SHOULD NOT be cleared when 
+     * a different parcellation is selected (but presumably SHOULD be cleared when atlas/species
+     * and/or template/space is changed)
+     * 
+     * This is a delicate issue. It should be clear from issues if it gets cleared when parameter changes
+     */
+    filter(([o, n]) => o.atlas.id !== n.atlas.id || o.template.id !== n.template.id),
     map(() => actions.clearShownFeature())
   ))
 

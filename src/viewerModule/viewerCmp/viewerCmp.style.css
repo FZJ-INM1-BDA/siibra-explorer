@@ -2,6 +2,10 @@
 {
   position: relative;
 }
+:host-context([show-ng-ui]) iav-layout-fourcorners
+{
+  visibility: hidden;
+}
 
 .region-text-search-autocomplete-position
 {

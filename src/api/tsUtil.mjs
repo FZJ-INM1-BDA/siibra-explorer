@@ -240,6 +240,12 @@ const defMap = {
       AddableLayer: {
         type: "object",
         properties: {
+          id: {
+            type: "string"
+          },
+          clType: {
+            const: "customlayer/nglayer"
+          },
           source: {
             type: "string"
           },

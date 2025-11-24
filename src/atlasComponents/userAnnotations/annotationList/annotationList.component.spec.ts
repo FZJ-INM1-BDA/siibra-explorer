@@ -95,9 +95,6 @@ describe("annotationList.component.ts", () => {
             }, {
               filename: `foo.sands.json`,
               filecontent: '{}'
-            }, {
-              filename: `foo.desc.json`,
-              filecontent: '{}'
             }],
           })
         )

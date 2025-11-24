@@ -176,10 +176,11 @@
       [iav-dynamic-mat-button-color]="matBtnColor"
       iav-dynamic-mat-button-aria-label="Show help dialog">
 
-      <ng-template [ngIf]="warnings.messages$ | async" let-messages
-        [ngIfElse]="noWarningTmpl">
-        <ng-template [ngIf]="messages.length > 0" [ngIfElse]="noWarningTmpl">
-          <i [matBadge]="messages.length"
+      <ng-template [ngIf]="warnings.newMessagesCount$ | async"
+        [ngIfElse]="noWarningTmpl"
+        let-newMessageCounter>
+        <ng-template [ngIf]="newMessageCounter > 0" [ngIfElse]="noWarningTmpl">
+          <i [matBadge]="newMessageCounter"
             matBadgeColor="warn"
             class="far fa-question-circle"></i>
         </ng-template>
@@ -268,18 +269,21 @@
         <kgtos-component class="mat-tab-content">
         </kgtos-component>
       </mat-tab>
-      <mat-tab *ngIf="warnings.hasMessages$ | async">
+      <mat-tab *ngIf="(warnings.messages$ | async).length > 0">
         <ng-template mat-tab-label>
-          <span 
-            matBadgeColor="warn"
-            [matBadge]="(warnings.messages$ | async).length">
-            Server Messages
-          </span>
+            <span 
+              matBadgeColor="warn"
+              [matBadge]="(warnings.newMessagesCount$ | async) || null">
+              Server Messages
+            </span>
         </ng-template>
+        <ng-template matTabContent>
+          <div sxplr-triggers (init)="warnings.markIncidentsSeen()"></div>
           <ng-template ngFor [ngForOf]="warnings.messages$ | async" let-warning let-last="last">
-            <div class="sxplr-m-2">{{ warning }}</div>
+            <markdown-dom class="sxplr-m-2" [markdown]="warning"></markdown-dom>
             <mat-divider *ngIf="!last"></mat-divider>
           </ng-template>
+        </ng-template>
       </mat-tab>
     </mat-tab-group>
   </mat-dialog-content>

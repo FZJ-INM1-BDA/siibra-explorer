@@ -41,11 +41,12 @@ def messages():
 
     resp = requests.get(INCIDENTS_ENDPOINT)
     resp.raise_for_status()
+    payload = resp.json()
     svmsg_str = json.dumps({
         "exp": currenttime.timestamp() + TTL,
-        "payload": resp.json()
+        "payload": payload
     })
     _store.set(STORAGE_KEY, svmsg_str)
-    return JSONResponse(svmsg_str.get("payload"), headers={
+    return JSONResponse(payload, headers={
         "cache-control": f"public, max-age={TTL}"
     })

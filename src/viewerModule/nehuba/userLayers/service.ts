@@ -186,7 +186,8 @@ export class UserLayerService implements OnDestroy {
   )
   async processOverlayPath(source: string) {
     const strippedSrc = source.replace(OVERLAY_LAYER_PROTOCOL, "")
-    const { cleanup, ...rest } = await this.#processInput(strippedSrc)
+    const escaped = strippedSrc.replace(/__dblcol__/g, "::")
+    const { cleanup, ...rest } = await this.#processInput(escaped)
     return {
       ...rest,
       cleanup: () => {
@@ -227,6 +228,30 @@ export class UserLayerService implements OnDestroy {
         .catch(_e => null as MetaV1Schema)  
       )
     }).toPromise()
+    const actions: Action[] = []
+
+    const _xform = meta?.transform || transform || [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]
+    const { mat4, vec3, quat } = await getExportNehuba()
+    const xform = mat4.fromValues(..._xform.flatMap(v => v))
+    mat4.transpose(xform, xform)
+    const rot = mat4.getRotation(quat.create(), xform)
+    const translate = mat4.getTranslation(vec3.create(), xform)
+    
+    actions.push({
+      set: 'iavic',
+      icon: 'iavic-rotation',
+      action: () => {
+        this.store$.dispatch(
+          atlasSelection.actions.navigateTo({
+            navigation: {
+              orientation: Array.from(rot),
+              position: Array.from(translate),
+            },
+            animation: true
+          })
+        )
+      }
+    })
     
     return {
       cleanup: noop,
@@ -240,7 +265,8 @@ export class UserLayerService implements OnDestroy {
         opacity: getOpacityFromMeta(meta),
       },
       protocol,
-      url
+      url,
+      actions
     }
   }
 
@@ -645,7 +671,10 @@ export class UserLayerService implements OnDestroy {
       ).pipe(
         distinctUntilChanged(),
         filter(url => !!url)
-      ).subscribe(url => this.handleUserInput(url))
+      ).subscribe(url => {
+        const escaped = url.replace(/__dblcol__/g, "::")
+        this.handleUserInput(escaped)
+      })
     )
   }
 

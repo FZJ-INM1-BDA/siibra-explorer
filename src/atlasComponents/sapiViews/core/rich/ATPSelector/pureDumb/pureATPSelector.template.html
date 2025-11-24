@@ -1,12 +1,19 @@
+<ng-template #parcChipSuffixTmpl>
+  <ng-content select="[parcellation-chip-suffix]">
+  </ng-content>
+</ng-template>
+
 <ng-template [ngIf]="view$ | async" let-view>
   
   <!-- fallback for parcellation info icon -->
-  <ng-template  [ngIf]="view.hideParcChip">
+  <ng-template [ngIf]="view.hideParcChip">
     <sxplr-smart-chip
       [items]="[]"
       [noMenu]="true"
       [color]="colorPalette[1]">
+
       <ng-template sxplrSmartChipContent></ng-template>
+
       <ng-template sxplrSmartChipAction>
         <button mat-icon-button
           sxplr-dialog
@@ -19,6 +26,11 @@
           <i class="fas fa-info"></i>
         </button>
       </ng-template>
+      
+      <ng-template sxplrSmartChipAction>
+        <ng-template [ngTemplateOutlet]="parcChipSuffixTmpl"></ng-template>
+      </ng-template>
+
     </sxplr-smart-chip>
   </ng-template>
 
@@ -58,8 +70,7 @@
     </ng-template>
     
     <ng-template sxplrSmartChipAction>
-      <ng-content select="[parcellation-chip-suffix]">
-      </ng-content>
+      <ng-template [ngTemplateOutlet]="parcChipSuffixTmpl"></ng-template>
     </ng-template>
 
     <ng-template sxplrSmartChipContent>
@@ -81,7 +92,6 @@
     </ng-template>
   </sxplr-smart-chip>
 
-  
   <!-- fallback for space info icon -->
   <ng-template  [ngIf]="view.hideTmplChip">
     <sxplr-smart-chip

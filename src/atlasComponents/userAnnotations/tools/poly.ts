@@ -4,6 +4,7 @@ import { Directive, OnDestroy } from "@angular/core";
 import { Observable, Subject, Subscription } from "rxjs";
 import { filter, switchMapTo, takeUntil, withLatestFrom } from "rxjs/operators";
 import { getUuid } from "src/util/fn";
+import { MM_IDS } from "src/util/types";
 
 export type TPolyJsonSpec = {
   points: (TPointJsonSpec|Point)[]
@@ -84,7 +85,7 @@ export class Polygon extends IAnnotationGeometry{
       space,
       name,
       desc,
-      '@type': 'siibra-ex/annotation/polyline'
+      '@type': 'siibra-ex/annotation/polyline',
     }
   }
 
@@ -104,7 +105,8 @@ export class Polygon extends IAnnotationGeometry{
         const { x, y, z } = p
         return [getCoord(x/1e6), getCoord(y/1e6), getCoord(z/1e6)]
       }),
-      closed: true
+      closed: true,
+      ...this.sxplrProp(),
     }
   }
 
@@ -172,7 +174,7 @@ export class Polygon extends IAnnotationGeometry{
       const edges: [number, number][] = []
       for (const coordinate of coordinates) {
         const parsedValue = coordinate.map(c => {
-          if (c.unit["@id"] !== 'id.link/mm') throw new Error(`Unit does not parse`)
+          if (!MM_IDS.includes(c.unit["@id"])) throw new Error(`Unit does not parse`)
           return c.value * 1e6
         })
         const p = new Point({
@@ -197,6 +199,7 @@ export class Polygon extends IAnnotationGeometry{
         points,
         edges
       })
+      poly.parseSxplrProp(sands)
       return poly
     }
 

@@ -1,25 +1,44 @@
 import { getUuid } from "./fn"
 
+const MM_ID_ALT = "id.link/mm" as const
+export const MM_ID = "https://openminds.om-i.org/instances/unitOfMeasurement/millimeter" as const
+export const MM_IDS = [ MM_ID_ALT, MM_ID ]
+export const QV_T = "https://openminds.om-i.org/types/QuantitativeValue" as const
 type TSandsQValue = {
   '@id': string
-  '@type': 'https://openminds.ebrains.eu/core/QuantitativeValue'
+  '@type': typeof QV_T
   uncertainty?: [number, number]
   value: number
-  unit: {
-    '@id': 'id.link/mm'
+  unit?: {
+    '@id': typeof MM_IDS[number]
   }
 }
 
 export type TSandsCoord = TSandsQValue[]
+
+
+const SANDS_TYPE_ALT = "https://openminds.ebrains.eu/sands/CoordinatePoint" as const
+export const SANDS_TYPE = "https://openminds.om-i.org/types/CoordinatePoint" as const
+export const SANDS_TYPES = [SANDS_TYPE, SANDS_TYPE_ALT]
+export function isSandsPoint(input: unknown): input is TSandsPoint {
+  return SANDS_TYPES.includes(input?.["@type"])
+}
+
+export type MayHaveNameDesc = {
+  'siibra:explorer'? : {
+    name?: string
+    desc?: string
+  }
+}
 
 export type TSandsPoint = {
   coordinates: TSandsCoord
   coordinateSpace: {
     '@id': string
   }
-  '@type': 'https://openminds.ebrains.eu/sands/CoordinatePoint'
+  '@type': typeof SANDS_TYPES[number]
   '@id': string
-}
+} & MayHaveNameDesc
 
 export type TFace = {
   face: number
@@ -34,10 +53,10 @@ export type TFace = {
 export function getCoord(value: number): TSandsQValue {
   return {
     '@id': getUuid(),
-    '@type': "https://openminds.ebrains.eu/core/QuantitativeValue",
+    '@type': QV_T,
     value,
     unit: {
-      "@id": 'id.link/mm'
+      "@id": MM_ID
     }
   }
 }

@@ -168,6 +168,37 @@ import { SxplrOverlaySvc } from './components/overlay';
       provide: WINDOW_MESSAGING_HANDLER_TOKEN,
       useClass: MessagingGlue
     },
+    /**
+     * globals
+     */
+    {
+      provide: APP_INITIALIZER,
+      useFactory: () => {
+        const flagSymbol = Symbol("show ui symbol")
+        window['sxplr'] = {
+          showNgUi() {
+            if (window[flagSymbol]) {
+              throw Error("Already showing ng ui")
+            }
+            window[flagSymbol] = true
+            document.body.setAttribute('show-ng-ui', 'foo')
+            for (const href of ["vanilla_styles.css", "vanillaMain.css"]) {
+              const styleEl = document.createElement('link')
+              styleEl.rel = "stylesheet"
+              styleEl.href = href
+              document.body.appendChild(styleEl)
+            }
+            const viewer = window['viewer']
+            if (viewer) {
+              viewer.uiConfiguration.showUIControls.value = true
+            }
+          }
+        }
+        return () => Promise.resolve()
+      },
+      multi: true,
+      deps: []
+    },
     {
       provide: APP_INITIALIZER,
       useFactory: (authSvc: AuthService, _darktheme$: Observable<boolean>) => {
