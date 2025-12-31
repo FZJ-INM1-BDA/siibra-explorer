@@ -215,11 +215,13 @@
     DOUBLE: 3,
     INT: 4,
     LONG: 5,
+    UNSIGNED_BYTE: 6
   }
 
   const BYTE_LENGTH = {
     [DTYPE.SHORT]: 2,
     [DTYPE.BYTE]: 1,
+    [DTYPE.UNSIGNED_BYTE]: 1,
     [DTYPE.FLOAT]: 4,
     [DTYPE.DOUBLE]: 8,
     [DTYPE.INT]: 4,
@@ -436,6 +438,7 @@
     if (type === DTYPE.FLOAT) return buf.getFloat32(offset, le)
     if (type === DTYPE.DOUBLE) return buf.getFloat64(offset, le)
     if (type === DTYPE.BYTE) return buf.getInt8(offset, le)
+    if (type === DTYPE.UNSIGNED_BYTE) return buf.getUint8(offset, le)
     if (type === DTYPE.LONG) {
       const ints = []
       let final = 0
@@ -593,8 +596,7 @@
       
       let type, increment = 0, min = null, max = null
       
-      // UINT8 technically dodgy
-      if (datatype === 2) type = DTYPE.BYTE, increment = 1
+      if (datatype === 2) type = DTYPE.UNSIGNED_BYTE, increment = 1
       // INT8
       if (datatype === 256) type = DTYPE.BYTE, increment = 1
       // INT16
