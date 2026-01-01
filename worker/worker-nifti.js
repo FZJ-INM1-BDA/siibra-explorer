@@ -633,7 +633,7 @@
 
       // shader will call toNormalized
       // so int/uint will need to return min/max normalized as well
-      if (type === DTYPE.BYTE) {
+      if (type === DTYPE.BYTE || type == DTYPE.UNSIGNED_BYTE) {
         max /= 254
         min /= 254
       }
