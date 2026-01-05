@@ -107,7 +107,9 @@ export class NehubaNavigationEffects implements OnDestroy{
         switchMap(nvUnit => nvUnit.viewerPositionChange)
       )
     ),
-    skipWhile(([nav, lock, _nvUnit, viewerNav]) => lock || navObjEqual(nav, viewerNav)),
+    filter(([nav, lock, _nvUnit, viewerNav]) => {
+      return !lock && !navObjEqual(nav, viewerNav)
+    }),
     tap(([nav, _lock, nvUnit, _viewerNav]) => {
       nvUnit.setNavigationState(nav)
     })
@@ -140,7 +142,7 @@ export class NehubaNavigationEffects implements OnDestroy{
           }
           return of(
             atlasSelection.actions.setNavigation({
-              navigation:roundedNav
+              navigation: roundedNav
             })
           )
         })
