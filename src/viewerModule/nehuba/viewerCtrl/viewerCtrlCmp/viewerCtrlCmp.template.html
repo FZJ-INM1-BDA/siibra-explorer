@@ -21,8 +21,6 @@
       </mat-slide-toggle>
 
 
-      <ng-template sxplrExperimentalFlag [experimental]="true">
-
       <mat-slide-toggle
         [checked]="view.auxTransparent"
         [disabled]="view.octantRemoved"
@@ -44,9 +42,13 @@
         <span class="text">
           Show All Meshes
         </span>
+        <i [matTooltip]="view.CONST.SHOW_ALL_MESH_WARN"
+          [ngClass]="{
+            'sxplr-custom-cmp text warn': view.showAllMeshes
+          }"
+          class="fas fa-exclamation-triangle">
+        </i>
       </mat-slide-toggle>
-      
-      </ng-template>
 
     </ng-template>
   </mat-card-content>
