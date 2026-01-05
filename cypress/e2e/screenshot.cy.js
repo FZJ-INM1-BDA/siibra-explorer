@@ -10,66 +10,68 @@ describe(`Visiting ${SCREENSHOT_URL}`, () => {
       return
     }
 
+    cy.visit(SCREENSHOT_URL)
+    cy.wait(10000)
+    cy.get('body').type('{esc}')
+    cy.wait(1000)
+    cy.get('body').type('{esc}')
+
+    if (!SCREENSHOT_PATH) {
+      console.error(`SCREENSHOT_PATH not defined. Exiting`)
+      return
+    }
+    cy.screenshot(SCREENSHOT_PATH)
+
     // monkey patck cypress issue (?) with resize observer
     // https://github.com/cypress-io/cypress/issues/27415#issuecomment-2169155274
-    cy.on('window:before:load', (win) => {
-      // store real observer
-      const RealResizeObserver = ResizeObserver;
+  //   cy.on('window:before:load', (win) => {
+  //     // store real observer
+  //     const RealResizeObserver = ResizeObserver;
 
-      let queueFlushTimeout;
-      let queue = [];
+  //     let queueFlushTimeout;
+  //     let queue = [];
 
-      /**
-       * ResizeObserver wrapper with "enforced batches"
-       */
-      class ResizeObserverPolyfill {
-        constructor(callback) {
-          this.callback = callback;
-          this.observer = new RealResizeObserver(this.check.bind(this));
-        }
+  //     /**
+  //      * ResizeObserver wrapper with "enforced batches"
+  //      */
+  //     class ResizeObserverPolyfill {
+  //       constructor(callback) {
+  //         this.callback = callback;
+  //         this.observer = new RealResizeObserver(this.check.bind(this));
+  //       }
 
-        observe(element) {
-          this.observer.observe(element);
-        }
+  //       observe(element) {
+  //         this.observer.observe(element);
+  //       }
 
-        unobserve(element) {
-          this.observer.unobserve(element);
-        }
+  //       unobserve(element) {
+  //         this.observer.unobserve(element);
+  //       }
 
-        disconnect() {
-          this.observer.disconnect();
-        }
+  //       disconnect() {
+  //         this.observer.disconnect();
+  //       }
 
-        check(entries) {
-          // remove previous invocations of "self"
-          queue = queue.filter((x) => x.cb !== this.callback);
-          // put a new one
-          queue.push({ cb: this.callback, args: entries });
-          // trigger update
-          if (!queueFlushTimeout) {
-            queueFlushTimeout = requestAnimationFrame(() => {
-              queueFlushTimeout = undefined;
-              const q = queue;
-              queue = [];
-              q.forEach(({ cb, args }) => cb(args));
-            }, 0);
-          }
-        }
-      }
-      win.ResizeObserver = ResizeObserverPolyfill
-      
-      cy.visit(SCREENSHOT_URL)
-      cy.wait(10000)
-      cy.get('body').type('{esc}')
-      cy.wait(1000)
-      cy.get('body').type('{esc}')
+  //       check(entries) {
+  //         // remove previous invocations of "self"
+  //         queue = queue.filter((x) => x.cb !== this.callback);
+  //         // put a new one
+  //         queue.push({ cb: this.callback, args: entries });
+  //         // trigger update
+  //         if (!queueFlushTimeout) {
+  //           queueFlushTimeout = requestAnimationFrame(() => {
+  //             queueFlushTimeout = undefined;
+  //             const q = queue;
+  //             queue = [];
+  //             q.forEach(({ cb, args }) => cb(args));
+  //           }, 0);
+  //         }
+  //       }
+  //     }
+  //     win.ResizeObserver = ResizeObserverPolyfill
+  // // move code here if necessary
 
-      if (!SCREENSHOT_PATH) {
-        console.error(`SCREENSHOT_PATH not defined. Exiting`)
-        return
-      }
-      cy.screenshot(SCREENSHOT_PATH)
-   })
+  //  })
 
   })
 })

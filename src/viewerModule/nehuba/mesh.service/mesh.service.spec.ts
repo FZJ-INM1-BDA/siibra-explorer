@@ -22,7 +22,7 @@ const auxMesh = {
   "@id": 'bla',
   labelIndicies: [1,2,3],
   name: 'bla',
-  ngId: 'bla',
+  ngId: 'bla' as const,
   rgb: [255, 255, 255] as [number, number, number],
   visible: true,
   displayName: 'bla'
@@ -132,7 +132,7 @@ describe('> mesh.service.ts', () => {
             expect(
               service.loadMeshes$
             ).toBeObservable(
-              hot('(abc)', {
+              hot('(cab)', {
                 a: {
                   layer: {
                     name: ngId
@@ -167,7 +167,7 @@ describe('> mesh.service.ts', () => {
             expect(
               service.loadMeshes$
             ).toBeObservable(
-              hot('(abc)', {
+              hot('(cab)', {
                 a: {
                   layer: {
                     name: ngId
