@@ -6,6 +6,7 @@ import { IMeshesToLoad, SET_MESHES_TO_LOAD } from "../constants"
 import { Subject } from "rxjs"
 import { IColorMap, SET_COLORMAP_OBS, SET_LAYER_VISIBILITY } from "../layerCtrl.service"
 import { rgbToHex } from 'common/util'
+import { NEHUBA_CONFIG } from "../util"
 
 describe('> nehubaViewer.component.ts', () => {
   describe('> #scanFn', () => {
@@ -90,6 +91,10 @@ describe('> nehubaViewer.component.ts', () => {
           NehubaViewerUnit
         ],
         providers:[
+          {
+            provide: NEHUBA_CONFIG,
+            useValue: {},
+          },
           {
             provide: SET_MESHES_TO_LOAD,
             useFactory: () => setMeshToLoadCtl$

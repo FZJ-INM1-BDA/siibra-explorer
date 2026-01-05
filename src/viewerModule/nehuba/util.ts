@@ -1,6 +1,6 @@
 import { InjectionToken } from '@angular/core'
-import { Observable, pipe } from 'rxjs'
-import { filter, scan, take } from 'rxjs/operators'
+import { Observable, of, pipe } from 'rxjs'
+import { filter, scan, shareReplay, take } from 'rxjs/operators'
 import { NehubaViewerUnit } from './nehubaViewer/nehubaViewer.component'
 import { userInterface } from 'src/state'
 
@@ -263,3 +263,21 @@ export function getPositionOrientation(mat4: any, vec3: any, quat: any, affine: 
     position,
   }
 }
+
+export type SxplrNehubaState = {
+  theme: 'light' | 'dark' | null,
+  octantRemoval: boolean | undefined,
+}
+
+export const SXPLR_STATE_TOKEN = new InjectionToken<
+  Observable<SxplrNehubaState>
+>("SXPLR_STATE_TOKEN", {
+  factory: () => of({
+    theme: null,
+    octantRemoval: false,
+  }).pipe(
+    shareReplay(1)
+  )
+})
+
+export const NEHUBA_CONFIG = new InjectionToken("NEHUBA_CONFIG")
