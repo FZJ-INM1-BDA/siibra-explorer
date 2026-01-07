@@ -11,6 +11,7 @@ import { mapTo } from "rxjs/operators"
 import { translateV3Entities } from "src/atlasComponents/sapi/translateV3"
 import { NEHUBA_CONFIG } from "../util"
 import { NehubaConfig } from "../config.service"
+import { provideMockActions } from "@ngrx/effects/testing"
 
 describe('> nehubaViewerInterface.directive.ts', () => {
   let distinctATPSpy: jasmine.Spy
@@ -33,6 +34,7 @@ describe('> nehubaViewerInterface.directive.ts', () => {
         ],
         providers: [
           provideMockStore(),
+          provideMockActions(() => NEVER),
           {
             provide: LayerCtrlEffects,
             useValue: {

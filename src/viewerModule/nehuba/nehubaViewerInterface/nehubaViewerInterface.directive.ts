@@ -1,7 +1,7 @@
 import { Directive, ViewContainerRef, ComponentRef, Output, EventEmitter, ChangeDetectorRef, Injector, Optional, Inject, inject } from "@angular/core";
 import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
 import { Store, select } from "@ngrx/store";
-import { Subscription, Observable, combineLatest, forkJoin, EMPTY, of, Subject } from "rxjs";
+import { Subscription, Observable, combineLatest, forkJoin, EMPTY, of, Subject, concat } from "rxjs";
 import { distinctUntilChanged, filter, scan, map, switchMap, take, withLatestFrom, takeUntil } from "rxjs/operators";
 import { NEHUBA_CONFIG, NEHUBA_INSTANCE_INJTKN, serializeSegment, SXPLR_STATE_TOKEN, SxplrNehubaState } from "../util";
 import { arrayOfPrimitiveEqual } from 'src/util/fn'
@@ -16,6 +16,7 @@ import { translateV3Entities } from "src/atlasComponents/sapi/translateV3";
 import { MetaV1Schema } from "src/atlasComponents/sapi/volumeMeta";
 import { SXPLR_ANNOTATIONS_KEY } from "src/util/constants";
 import { DestroyDirective } from "src/util/directives/destroy.directive";
+import { Actions, ofType } from "@ngrx/effects";
 
 
 const determineProtocol = (url: string) => {
@@ -166,6 +167,7 @@ export class NehubaViewerContainerDirective {
     private effect: LayerCtrlEffects,
     private cdr: ChangeDetectorRef,
     private injector: Injector,
+    private action$: Actions,
     @Optional() @Inject(NEHUBA_INSTANCE_INJTKN) private nv$: Subject<NehubaViewerUnit>,
   ){
     this.cdr.detach()
@@ -342,12 +344,20 @@ export class NehubaViewerContainerDirective {
             this.store$.pipe(
               select(atlasAppearance.selectors.octantRemoval),
               distinctUntilChanged(),
+            ),
+            concat(
+              of(false),
+              this.action$.pipe(
+                ofType(atlasAppearance.actions.clearSubstrate),
+                map(() => true),
+              )
             )
           ]).pipe(
-            map(([ theme, octantRemoval ]) => {
+            map(([ theme, octantRemoval, clearSubstrate ]) => {
               return {
                 octantRemoval,
                 theme,
+                clearSubstrate,
               } as SxplrNehubaState
             })
           )

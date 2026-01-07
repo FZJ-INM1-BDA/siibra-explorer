@@ -146,7 +146,8 @@ export class NehubaViewerUnit {
           filter(v => !!v),
         )),
         takeUntil(this.#ondestroy$)
-      ).subscribe(({ octantRemoval, theme }) => {
+      ).subscribe(({ octantRemoval, theme, clearSubstrate }) => {
+
         const background: [number, number, number, number] = theme === 'light'
         ? [1, 1, 1, 1]
         : theme === "dark"
@@ -162,6 +163,11 @@ export class NehubaViewerUnit {
             ? !ctrl.value
             : octantRemoval
           ctrl.restoreState(newVal)
+        }
+        
+        if (clearSubstrate) {
+          this.nehubaViewer.config.layout.useNehubaPerspective.drawSubstrates.color = [1, 1, 1, 0]
+          this.nehubaViewer.redraw()
         }
       })
     }

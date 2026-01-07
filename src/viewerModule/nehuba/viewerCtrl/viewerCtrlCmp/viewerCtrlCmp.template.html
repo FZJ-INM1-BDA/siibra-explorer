@@ -50,6 +50,12 @@
         </i>
       </mat-slide-toggle>
 
+      <ng-template sxplrExperimentalFlag [experimental]="true">
+      <button mat-button (click)="clearSubstrate()">
+        clear substrate
+      </button>
+      </ng-template>
+
     </ng-template>
   </mat-card-content>
 

@@ -267,6 +267,7 @@ export function getPositionOrientation(mat4: any, vec3: any, quat: any, affine: 
 export type SxplrNehubaState = {
   theme: 'light' | 'dark' | null
   octantRemoval: boolean | undefined
+  clearSubstrate: boolean
 }
 
 export const SXPLR_STATE_TOKEN = new InjectionToken<
@@ -275,6 +276,7 @@ export const SXPLR_STATE_TOKEN = new InjectionToken<
   factory: () => of({
     theme: null,
     octantRemoval: false,
+    clearSubstrate: false
   }).pipe(
     shareReplay(1)
   )
