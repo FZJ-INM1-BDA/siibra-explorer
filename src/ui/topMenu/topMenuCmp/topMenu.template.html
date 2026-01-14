@@ -29,8 +29,7 @@
 </ng-template>
 
 <ng-template #fullTmpl>
-
-  <div class="d-flex flex-row-reverse"
+  <mat-card class="d-flex flex-row-reverse"
     quick-tour
     [quick-tour-description]="quickTourData.description"
     [quick-tour-order]="quickTourData.order"
@@ -48,7 +47,7 @@
 
     <ng-container *ngTemplateOutlet="experimentalToggleBtnTmpl">
     </ng-container>
-  </div>
+  </mat-card>
 </ng-template>
 
 <!-- signin btn -->
