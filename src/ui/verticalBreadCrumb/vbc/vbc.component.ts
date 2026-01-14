@@ -21,6 +21,7 @@ import { ModularUserAnnotationToolService } from "src/atlasComponents/userAnnota
 import { IAnnotationGeometry } from "src/atlasComponents/userAnnotations/tools/type";
 import { BANLIST_CONNECTIVITY, EXPERIMENTAL_CONNECTIVITY, WHITELIST_CONNECTIVITY } from "src/features/connectivity";
 import { ViewerMode } from "src/state/atlasSelection/const";
+import { MM_ID, QV_T, SANDS_TYPE } from "src/util/types";
 
 const pipe = new FilterGroupedParcellationPipe()
 
@@ -647,16 +648,16 @@ export class VerticalBreadCrumbComponent {
     this.store$.dispatch(
       atlasSelection.actions.selectPoint({
         point: {
-          "@type": "https://openminds.ebrains.eu/sands/CoordinatePoint",
+          "@type": SANDS_TYPE,
           "@id": getUuid(),
           coordinateSpace: {
             "@id": template.id
           },
           coordinates: position.map(v => ({
             "@id": getUuid(),
-            "@type": "https://openminds.ebrains.eu/core/QuantitativeValue",
+            "@type": QV_T,
             unit: {
-              "@id": "id.link/mm"
+              "@id": MM_ID,
             },
             value: v * 1e6,
             uncertainty: [0, 0]

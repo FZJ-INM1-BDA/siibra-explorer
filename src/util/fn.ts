@@ -1,7 +1,7 @@
 import { interval, Observable, of } from 'rxjs'
 import { filter, mapTo, take } from 'rxjs/operators'
 import { MetaV1Schema } from 'src/atlasComponents/sapi/typeV3'
-import { TFace, TSandsPoint } from './types'
+import { isSandsPoint, TFace, TSandsPoint } from './types'
 
 
 // eslint-disable-next-line  @typescript-eslint/no-empty-function
@@ -546,10 +546,7 @@ export function geometryEqual(o: TFace|TSandsPoint, n: TFace|TSandsPoint): boole
   if (o?.['@type'] !== n?.['@type']) {
     return false
   }
-  if (
-    o?.['@type'] === "https://openminds.ebrains.eu/sands/CoordinatePoint" 
-    && n?.['@type'] === "https://openminds.ebrains.eu/sands/CoordinatePoint" 
-  ){
+  if (isSandsPoint(o) && isSandsPoint(n)){
     return [0, 1, 2].every(idx => 
       o.coordinates[idx].value === n.coordinates[idx].value
     )
