@@ -32,7 +32,7 @@
         [result]="df$ | async">
     </sxplr-assignment-view-full>
 </mat-dialog-content>
-<mat-dialog-actions align="center">
+<mat-dialog-actions align="end">
     <ng-template [ngIf]="!(busy$ | async) && !(error$ | async)">
         <button mat-raised-button color="primary"
             [zip-files-output]="zipfileConfig$ | async"

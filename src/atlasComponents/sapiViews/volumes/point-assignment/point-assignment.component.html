@@ -52,7 +52,7 @@
             (clickOnRegionName)="selectRegion($event.target, $event.event)"
             [result]="df">
         </sxplr-assignment-view-full>
-        <mat-dialog-actions align="center">
+        <mat-dialog-actions align="end">
             <button mat-raised-button color="primary"
                 [zip-files-output]="zipfileConfig$ | async"
                 zip-files-output-zip-filename="pointassignment.zip">
