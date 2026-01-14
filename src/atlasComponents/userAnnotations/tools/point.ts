@@ -2,6 +2,7 @@ import { AbsToolClass, getCoord, IAnnotationEvents, IAnnotationGeometry, INgAnno
 import { Observable, Subject, Subscription } from "rxjs";
 import { Directive, OnDestroy } from "@angular/core";
 import { filter, switchMapTo, takeUntil } from "rxjs/operators";
+import { MM_IDS, SANDS_TYPE, SANDS_TYPES } from "src/util/types";
 
 export type TPointJsonSpec = {
   x: number
@@ -56,10 +57,10 @@ export class Point extends IAnnotationGeometry {
       coordinates
     } = sands
     const { ['@id']: spaceId } = coordinateSpace
-    if (type === 'https://openminds.ebrains.eu/sands/CoordinatePoint') {
+    if (SANDS_TYPES.includes(type)) {
       const parsedCoordinate = coordinates.map(coord => {
         const { value, unit } = coord
-        if (unit["@id"] !== 'id.link/mm') throw new Error(`Unit does not parse`)
+        if (!MM_IDS.includes(unit["@id"])) throw new Error(`Unit does not parse`)
         return value * 1e6
       })
       const point = new Point({
@@ -70,6 +71,7 @@ export class Point extends IAnnotationGeometry {
         y: parsedCoordinate[1],
         z: parsedCoordinate[2],
       })
+      point.parseSxplrProp(sands)
       return point
     }
 
@@ -85,11 +87,12 @@ export class Point extends IAnnotationGeometry {
     const {x, y, z} = this
     return {
       '@id': this.id,
-      '@type': 'https://openminds.ebrains.eu/sands/CoordinatePoint',
+      '@type': SANDS_TYPE,
       coordinateSpace: {
         '@id': id
       },
-      coordinates:[ getCoord(x/1e6), getCoord(y/1e6), getCoord(z/1e6) ]
+      coordinates:[ getCoord(x/1e6), getCoord(y/1e6), getCoord(z/1e6) ],
+      ...this.sxplrProp(),
     }
   }
 

@@ -8,6 +8,11 @@ Feature: Point assignment
         When User right clicks on any voxel on the viewer, and clicks `x, y, z (mm) Point`
         Then User should see statistical assignment of the point, sorted by `map value`
     
+    Scenario: Point assignment is URL encoded
+        Given User performed point assignment on Julich Brain v3.0.3 in MNI152 space
+        When User copy paste the link to a new tab
+        Then User should see the same a statistical assignment
+
     Scenario: User inspects the full table of the point assignment
         Given User performed point assignment on Julich Brain v3.0.3 in MNI152 space
         When User clicks `Show full assignment` button

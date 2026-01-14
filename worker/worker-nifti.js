@@ -592,12 +592,19 @@
       const numBitsPerVoxel = readData(dataView, dict.numBitsPerVoxel, le)
       
       let type, increment = 0, min = null, max = null
+      
+      // UINT8 technically dodgy
+      if (datatype === 2) type = DTYPE.BYTE, increment = 1
       // INT8
       if (datatype === 256) type = DTYPE.BYTE, increment = 1
       // INT16
       if (datatype === 4) type = DTYPE.SHORT, increment = 2
+      // UINT16 technically dodgy
+      if (datatype === 512) type = DTYPE.SHORT, increment = 2
       // INT32
       if (datatype === 8) type = DTYPE.INT, increment = 4
+      // UINT32 # technically dodgy
+      if (datatype === 768) type = DTYPE.INT, increment = 4
       // FLOAT32
       if (datatype === 16) type = DTYPE.FLOAT, increment = 4
       if (type) {
@@ -622,6 +629,12 @@
         }
       }
 
+      // shader will call toNormalized
+      // so int/uint will need to return min/max normalized as well
+      if (type === DTYPE.BYTE) {
+        max /= 254
+        min /= 254
+      }
       return {
         meta: {
           min, max,

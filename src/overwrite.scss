@@ -409,3 +409,28 @@ a[mat-list-item]
   /* Support for IE. */
   font-feature-settings: 'liga';
 }
+body
+{
+  &:not([show-ng-ui])
+  {
+
+    .neuroglancer-position-widget-input-container,
+    .neuroglancer-viewer-top-row,
+    .neuroglancer-layer-panel
+    {
+      display:none;
+      visibility: hidden;
+    }
+
+    .neuroglancer-layer-side-panel
+    {
+      display: none;
+    }
+    
+    label.perspective-panel-show-slice-views
+    {
+      visibility: hidden;
+      position: absolute;
+    }
+  }
+}

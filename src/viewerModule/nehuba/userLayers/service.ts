@@ -39,7 +39,7 @@ const OVERLAY_LAYER_PROTOCOL = `${OVERLAY_LAYER_KEY}://`
 const SUPPORTED_PREFIX = ["nifti://", "precomputed://", "zarr://", "n5://", "swc://", "deepzoom://"] as const
 
 type ValidProtocol = typeof SUPPORTED_PREFIX[number]
-type ValidInputTypes = File|string
+type ValidInputTypes = File | string
 
 type ProcessorOutput = {
   option?: LayerOption
@@ -134,8 +134,8 @@ export class UserLayerService implements OnDestroy {
     const { buffer, meta } = result
     const url = URL.createObjectURL(new Blob([buffer]))
     const type = file.name.includes(".label.nii")
-    ? 'segmentation'
-    : 'image'
+      ? 'segmentation'
+      : 'image'
     return [{
       protocol: 'nifti://',
       url,
@@ -161,7 +161,7 @@ export class UserLayerService implements OnDestroy {
   @RegisterSource(
     async input => input instanceof File && input.name.endsWith(".nii")
   )
-  async processNifti(file: File){
+  async processNifti(file: File) {
     const buf = await file.arrayBuffer()
     return await this.#processUnpackedNiiBuf(buf, file)
   }
@@ -185,20 +185,20 @@ export class UserLayerService implements OnDestroy {
     async input => input instanceof File && input.name.endsWith(".csv")
   )
   async processCsv(file: File): Promise<ReturnType<ProcessResource['processor']>> {
-    
+
     const id = getUuid()
     const xform = await linearTransform("LENS_ABA", "NEHUBA")
     const layer = new AnnotationLayer(id, "#ffcccc", xform)
     const text = await file.text()
     const lines = text.split("\n")
-    const triplets: number[][] = lines.map(l =>{
+    const triplets: number[][] = lines.map(l => {
       const xyz = l.split(',').map(n => Number(n))
-      if (xyz.some(v => isNaN(v))){
+      if (xyz.some(v => isNaN(v))) {
         return null
       }
       return xyz
     }).filter(v => !!v)
-    
+
     layer.addAnnotation(triplets.map((triplet, idx) => ({
       id: `${id}-${idx}`,
       type: 'point',
@@ -222,7 +222,9 @@ export class UserLayerService implements OnDestroy {
   async processOverlayPath(source: string) {
     const strippedSrcs = source.replace(OVERLAY_LAYER_PROTOCOL, "")
     this.routerSvc.setCustomRoute(OVERLAY_LAYER_KEY, strippedSrcs)
-    const srcs = strippedSrcs.split(OVERLAY_LAYER_SEP)
+    const srcs = strippedSrcs
+      .split(OVERLAY_LAYER_SEP)
+      .map(src => src.replace(/__dblcol__/g, "::"))
     const clonedSrcs = [...srcs]
     const trimSrc = (src: string) => {
       const idx = clonedSrcs.indexOf(src)
@@ -233,7 +235,7 @@ export class UserLayerService implements OnDestroy {
       return clonedSrcs
     }
     const allOutputs: ProcessorOutput[] = []
-    for (const src of srcs){
+    for (const src of srcs) {
       const outputs = await this.#processInput(src)
       const fixedOutputs = outputs.map(({ cleanup, ...rest }) => {
         return {
@@ -253,7 +255,7 @@ export class UserLayerService implements OnDestroy {
   @RegisterSource(
     async input => typeof input === "string" && input.startsWith("nifti://")
   )
-  async processRemoteNii(source: string): Promise<ProcessorOutput[]>{
+  async processRemoteNii(source: string): Promise<ProcessorOutput[]> {
     const url = source.replace(/^nifti:\/\//, "")
     const defaultOpacity = 0.5
     return [{
@@ -286,10 +288,10 @@ export class UserLayerService implements OnDestroy {
       // as well as fetching the affine
       && !input.startsWith("deepzoom://")
   )
-  async processPrecomputed(source: string): Promise<ProcessorOutput[]>{
+  async processPrecomputed(source: string): Promise<ProcessorOutput[]> {
     let protocol: ValidProtocol
     let url: string
-    for (const proto of SUPPORTED_PREFIX){
+    for (const proto of SUPPORTED_PREFIX) {
       if (source.startsWith(proto)) {
         protocol = proto
         url = source.replace(proto, "")
@@ -306,7 +308,7 @@ export class UserLayerService implements OnDestroy {
       const text = await resp.text()
       return await this.processSwcText(text, url, url)
     }
-    
+
     const { info, transform, meta } = await forkJoin({
       info: translateV3Entities.cFetch(`${url}/info`).then(res => res.json()),
       transform: translateV3Entities.cFetch(`${url}/transform.json`)
@@ -314,12 +316,36 @@ export class UserLayerService implements OnDestroy {
         .catch(_e => null as MetaV1Schema["transform"]),
       meta: from(
         translateV3Entities.fetchMeta(url)
-        .catch(_e => null as MetaV1Schema)  
+          .catch(_e => null as MetaV1Schema)
       )
     }).toPromise()
 
     const isSeg = info?.type === "segmentation"
-    
+    const actions: Action[] = []
+
+    const _xform = meta?.transform || transform || [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]
+    const { mat4, vec3, quat } = await getExportNehuba()
+    const xform = mat4.fromValues(..._xform.flatMap(v => v))
+    mat4.transpose(xform, xform)
+    const rot = mat4.getRotation(quat.create(), xform)
+    const translate = mat4.getTranslation(vec3.create(), xform)
+
+    actions.push({
+      set: 'iavic',
+      icon: 'iavic-rotation',
+      action: () => {
+        this.store$.dispatch(
+          atlasSelection.actions.navigateTo({
+            navigation: {
+              orientation: Array.from(rot),
+              position: Array.from(translate),
+            },
+            animation: true
+          })
+        )
+      }
+    })
+
     return [{
       cleanup: noop,
       meta: {
@@ -333,7 +359,8 @@ export class UserLayerService implements OnDestroy {
         type: isSeg ? "segmentation" : "image"
       },
       protocol,
-      url
+      url,
+      actions,
     }]
   }
 
@@ -360,8 +387,8 @@ export class UserLayerService implements OnDestroy {
       const rootname = dziname.replace(/\.dzi$/, '')
       const jsonname = dziname.replace(/_s\d{3}\.dzi$/, '') + ".json"
       const jsonpath = `${root}/${jsonname}`
-  
-      const [ dzimetadata, jsonResp ] = await Promise.all([
+
+      const [dzimetadata, jsonResp] = await Promise.all([
         (async () => {
           const dziresp = await fetch(url)
           const dzimetadata = await dziresp.text()
@@ -372,12 +399,12 @@ export class UserLayerService implements OnDestroy {
           return await resp.json()
         })()
       ])
-  
+
       const foundSlice = ((jsonResp.slices || []) as Record<string, unknown>[]).find(
         slice => (slice.filename as string).includes(rootname)
       )
       const anchoring = foundSlice?.anchoring as number[]
-  
+
       const parser = new DOMParser()
       const xml = parser.parseFromString(dzimetadata, "application/xml")
       const size = xml.querySelector("Size")
@@ -389,7 +416,7 @@ export class UserLayerService implements OnDestroy {
       if (height === 0 || isNaN(height)) {
         throw new Error(`dzi xml file error: Height attribute is not a number!`)
       }
-      
+
       // TODO fetch voxel transform based on .target attribute
       if (!(jsonResp.target in VOXEL_SIZE_MAP)) {
         throw new Error(`${jsonResp.target} cannot be rendered`)
@@ -397,23 +424,23 @@ export class UserLayerService implements OnDestroy {
       const { voxelSizes, voxelTransform } = VOXEL_SIZE_MAP[jsonResp.target]
 
       const thickness = 10
-  
+
       const [
         m03,
         m13,
         m23,
-  
+
         m00,
         m10,
         m20,
-  
+
         m01,
         m11,
         m21,
       ] = anchoring
-  
+
       const { mat4, vec3, quat } = await getExportNehuba()
-  
+
       const o = vec3.fromValues(m03, m13, m23)
       const u = vec3.fromValues(m00, m10, m20)
       const v = vec3.fromValues(m01, m11, m21)
@@ -421,14 +448,14 @@ export class UserLayerService implements OnDestroy {
         vec3.create(),
         vec3.cross(vec3.create(), u, v)
       )
-  
+
       const m0 = vec3.scale(vec3.create(), u, 1 / width)
       const m1 = vec3.scale(vec3.create(), v, 1 / height)
       const m2 = vec3.scale(vec3.create(), uxv, thickness)
       const m3 = vec3.sub(vec3.create(), o, voxelTransform)
-  
+
       vec3.multiply(m3, m3, voxelSizes)
-  
+
       const _m = [
         [...Array.from(m0), 0],
         [...Array.from(m1), 0],
@@ -439,7 +466,7 @@ export class UserLayerService implements OnDestroy {
       const voxelDimension = Array.from(vec3.multiply(vec3.create(), [width, height, 1], voxelSizes)) as number[]
       const { orientation, position } = getPositionOrientation(mat4, vec3, quat, _m, voxelDimension)
       const otherOrientation = quat.rotateZ(quat.create(), orientation, Math.PI)
-      
+
       actions.push({
         set: "iavic",
         icon: "iavic-rotation",
@@ -469,7 +496,7 @@ export class UserLayerService implements OnDestroy {
           )
         }
       })
-      
+
       mat4.scale(m, m, voxelSizes)
       mat4.transpose(m, m)
       const _matrix: number[] = Array.from(m)
@@ -485,7 +512,7 @@ export class UserLayerService implements OnDestroy {
     } catch (e) {
       messages.push(e.toString())
     }
-    
+
     return [{
       cleanup: noop,
       meta: {
@@ -554,7 +581,7 @@ export class UserLayerService implements OnDestroy {
     }
     return false
   })
-  async processPCJson(file: File): Promise<ProcessorOutput[]>{
+  async processPCJson(file: File): Promise<ProcessorOutput[]> {
     const arr = JSON.parse(await file.text())
     const layers: AnnotationLayer[] = []
     const selectedTmpl = await this.store$.pipe(
@@ -574,16 +601,16 @@ export class UserLayerService implements OnDestroy {
     for (const item of arr) {
 
       const { r, g, b } = item
-    
+
       const rgbString = [r, g, b].every(v => Number.isInteger(v))
-      ? rgbToHex([r, g, b])
-      : "#ff0000"
-  
+        ? rgbToHex([r, g, b])
+        : "#ff0000"
+
       const id = getUuid()
       const dst = "NEHUBA"
       const xform = await linearTransform(src, dst)
       const layer = new AnnotationLayer(id, rgbString, xform)
-  
+
       const triplets: number[][] = [item.triplets.slice(0, 3)]
       for (const num of item.triplets as number[]) {
         if (triplets.at(-1).length === 3) {
@@ -592,7 +619,7 @@ export class UserLayerService implements OnDestroy {
         }
         triplets.at(-1).push(num)
       }
-      
+
       layer.addAnnotation(triplets.map((triplet, idx) => ({
         id: `${id}-${idx}`,
         type: 'point',
@@ -604,7 +631,7 @@ export class UserLayerService implements OnDestroy {
     // so it can be shown in the overlay
     return [{
       cleanup: () => {
-        for (const layer of layers){
+        for (const layer of layers) {
           layer.dispose()
         }
       },
@@ -620,10 +647,10 @@ export class UserLayerService implements OnDestroy {
     }
     return false
   })
-  async processPtCld(file: File):  Promise<ProcessorOutput[]>{
+  async processPtCld(file: File): Promise<ProcessorOutput[]> {
 
     const text = await file.text()
-    
+
     const id = getUuid()
     const xform = await linearTransform("CYRIL_PTCLD", "NEHUBA")
     const layer = new AnnotationLayer(id, "#ff0000", xform)
@@ -631,9 +658,9 @@ export class UserLayerService implements OnDestroy {
     layer.addAnnotation(text.split("\n").map((line, idx) => ({
       id: `${id}-${idx}`,
       type: "point",
-      point: line.split(" ").map(v => parseFloat(v)*1e6) as [number, number, number],
+      point: line.split(" ").map(v => parseFloat(v) * 1e6) as [number, number, number],
     })))
-    
+
     // TODO also return a custom layer
     // so it can be shown in the overlay
     return [{
@@ -658,10 +685,10 @@ export class UserLayerService implements OnDestroy {
     throw new Error(`Could not find a processor for ${inputStr}`)
   }
 
-  async handleUserInput(input: ValidInputTypes){
+  async handleUserInput(input: ValidInputTypes) {
     try {
       const outputs = await this.#processInput(input)
-      for (const output of outputs){
+      for (const output of outputs) {
 
         const { url, cleanup } = output
         const id = url
@@ -671,15 +698,15 @@ export class UserLayerService implements OnDestroy {
         this.#idToCleanup.set(id, cleanup)
         this.#addLayer(output)
       }
-      
+
     } catch (e) {
       this.snackbar.open(`Error opening file: ${e.toString()}`, "Dismiss")
     }
   }
 
-  #addLayer(processedOutput: ProcessorOutput){
+  #addLayer(processedOutput: ProcessorOutput) {
     const { option, protocol, url, meta, cleanup, actions } = processedOutput
-    
+
     const source = protocol && url && `${protocol}${url}`
     const id = url ? QuickHash.GetHash(url) : getUuid()
     this.#idToCleanup.set(id, cleanup)
@@ -716,13 +743,15 @@ export class UserLayerService implements OnDestroy {
         distinctUntilChanged(),
         filter(url => !!url)
       ).subscribe(url => {
-        this.handleUserInput(`${OVERLAY_LAYER_PROTOCOL}${url}`)}),
+        const escaped = url.replace(/__dblcol__/g, "::")
+        this.handleUserInput(escaped)
+      }),
       this.store$.pipe(
         select(atlasAppearance.selectors.customLayers),
         map(layers => layers.filter(l => l.clType === "customlayer/nglayer")),
         distinctUntilChanged(arrayEqual((o, n) => o.id === n.id)),
         pairwise(),
-      ).subscribe(([ prev, curr ]) => {
+      ).subscribe(([prev, curr]) => {
         const prevIds = prev.map(v => v.id)
         const newIds = curr.map(v => v.id)
         for (const id of prevIds) {

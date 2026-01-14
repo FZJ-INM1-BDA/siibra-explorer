@@ -12,7 +12,7 @@ import { Feature, SxplrAtlas, SxplrParcellation, SxplrRegion } from "src/atlasCo
 import { atlasAppearance, atlasSelection, userInteraction, userPreference } from "src/state";
 import { SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { EntryComponent } from "src/features/entry/entry.component";
-import { TFace, TSandsPoint, getCoord } from "src/util/types";
+import { SANDS_TYPE, TFace, TSandsPoint, getCoord, isSandsPoint } from "src/util/types";
 import { DestroyDirective } from "src/util/directives/destroy.directive";
 import { generalActionError } from "src/state/actions";
 import { enLabels } from "src/uiLabels";
@@ -212,7 +212,7 @@ export class ViewerCmp {
       let spatialObjectSubtitle: string
       if (selectedPoint) {
         const { ['@type']: selectedPtType } = selectedPoint
-        if (selectedPtType === "https://openminds.ebrains.eu/sands/CoordinatePoint") {
+        if (isSandsPoint(selectedPoint)) {
           spatialObjectTitle = `Point: ${selectedPoint.coordinates.map(v => (v.value / 1e6).toFixed(2))} (mm)`
         }
         if (selectedPtType === "siibra-explorer/surface/face") {
@@ -309,8 +309,8 @@ export class ViewerCmp {
           return false
         }
         if (
-          n.selectedPoint?.["@type"] === "https://openminds.ebrains.eu/sands/CoordinatePoint"
-          && o.selectedPoint?.["@type"] === "https://openminds.ebrains.eu/sands/CoordinatePoint"
+          isSandsPoint(o.selectedPoint)
+          && isSandsPoint(n.selectedPoint)
         ) {
           const newCoords = n.selectedPoint.coordinates.map(v => v.value)
           const oldCoords = o.selectedPoint.coordinates.map(v => v.value)
@@ -539,7 +539,7 @@ export class ViewerCmp {
     if (point) {
       pointOfInterest = {
         "@id": `${template.id}-${point.join(',')}`,
-        "@type": "https://openminds.ebrains.eu/sands/CoordinatePoint" as const,
+        "@type": SANDS_TYPE,
         coordinateSpace: {
           "@id": template.id
         },

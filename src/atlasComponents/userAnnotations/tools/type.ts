@@ -5,7 +5,7 @@ import { getUuid } from "src/util/fn"
 import { TLineJsonSpec } from "./line"
 import { TPointJsonSpec } from "./point"
 import { TPolyJsonSpec } from "./poly"
-import { TSandsCoord, TSandsPoint } from "src/util/types"
+import { MayHaveNameDesc, TSandsCoord, TSandsPoint } from "src/util/types"
 
 export { getCoord, TSandsPoint } from "src/util/types"
 
@@ -250,7 +250,7 @@ export type TSandsPolyLine = {
   }
   '@type': 'tmp/poly'
   '@id': string
-}
+} & MayHaveNameDesc
 
 export type TSandsLine = {
   coordinatesFrom: TSandsCoord
@@ -260,7 +260,7 @@ export type TSandsLine = {
   }
   '@type': 'tmp/line'
   '@id': string
-}
+} & MayHaveNameDesc
 
 
 export interface ISandsAnnotation {
@@ -313,6 +313,19 @@ export abstract class IAnnotationGeometry extends Highlightable {
   abstract toJSON(): TRecord
   abstract toString(): string
   abstract toSands(): ISandsAnnotation[keyof ISandsAnnotation]
+  
+  sxplrProp(): MayHaveNameDesc{
+    return {
+      "siibra:explorer": {
+        name: this.name,
+        desc: this.desc,
+      }
+    }
+  }
+  parseSxplrProp(obj: Record<string, any>){
+    this.name = obj?.["siibra:explorer"]?.name
+    this.desc = obj?.["siibra:explorer"]?.desc
+  }
 
   toMetadata(){
     return {

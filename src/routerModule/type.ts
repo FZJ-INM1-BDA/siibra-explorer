@@ -6,8 +6,9 @@ export type TUrlAtlas<T> = {
   a: T   // atlas
   t: T   // template
   p: T   // parcellation
-  r?: T  // region selected
-  rn?: T
+  r?: T  // region selected (deprecated)
+  rn?: T // region selected (hashed)
+  g?: T // geometry selected (point, face (NYI))
 }
 
 export type TUrlPlugin<T> = {

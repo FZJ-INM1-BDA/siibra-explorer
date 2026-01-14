@@ -19,6 +19,7 @@ import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.di
 import { AtlasDownloadModule } from "src/atlas-download/atlas-download.module";
 import { ShareModule } from "src/share";
 import { SxplrWarningsDirective } from "../warnings/warnings.directive";
+import { SxplrTriggers } from "src/util/directives/trigger.directive";
 
 
 @NgModule({
@@ -42,6 +43,7 @@ import { SxplrWarningsDirective } from "../warnings/warnings.directive";
     AtlasDownloadModule,
     ShareModule,
     SxplrWarningsDirective,
+    SxplrTriggers,
   ],
   declarations: [
     TopMenuCmp

@@ -11,6 +11,7 @@ type CustomLayerBase = {
 }
 
 type NgLayerBase = {
+  id: string
   clType: 'customlayer/nglayer' | 'baselayer/nglayer'
   sxplrAnnotations?: Record<string, string>
 } & CustomLayerBase

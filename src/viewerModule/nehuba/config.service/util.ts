@@ -307,7 +307,7 @@ export const spaceMiscInfoMap = new Map([
   }],
   ['nencki/nm/referencespace/v1.0.0/MARMOSET_NM_NISSL_2020', {
     name: 'marmoset-nm',
-    scale: 0.1,
+    scale: 0.15,
   }],
 ])
 
