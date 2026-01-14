@@ -139,7 +139,7 @@ If you do not accept the Terms & Conditions you are not permitted to access or u
     PERMISSION_TO_QUICKTOUR: `Would you like a quick tour?`,
     QUICKTOUR_OK: `Start`,
     QUICKTOUR_NEXTTIME: `Not now`,
-    QUICKTOUR_CANCEL: `Dismiss`,
+    QUICKTOUR_CANCEL: `Do not show again`,
 
     DELETE_ALL_ANNOTATION_CONFIRMATION_MSG: `Are you sure you want to delete all annotations?`,
     LOADING_ANNOTATION_MSG: `Loading annotations... Please wait...`,

@@ -1,7 +1,7 @@
 <ng-template [ngIf]="data$ | async" let-data>
 
-    <h1 *ngIf="data.title" mat-dialog-title class="sxplr-dialog-body">
-        <markdown-dom class="sxplr-dialog-body" [markdown]="data.title">
+    <h1 *ngIf="data.title" mat-dialog-title>
+        <markdown-dom [markdown]="data.title">
         </markdown-dom>
     </h1>
     
