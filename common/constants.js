@@ -63,8 +63,6 @@
     //Viewer mode
     VIEWER_MODE_ANNOTATING: 'annotating',
     VIEWER_MODE_KEYFRAME: 'key frame',
-    VIEWER_MODE_FOCUSVIEW_VOI: 'focusview:voi',
-    VIEWER_MODE_FOCUSVIEW_REG_CONN: 'focusview:regionalconnectivity',
 
 
     // Annotations

@@ -6,6 +6,7 @@ import { Store } from '@ngrx/store';
 import { atlasSelection, userInteraction } from 'src/state';
 import { FeatureViewBase } from '../view/view-base.directive';
 import { ExperimentalService } from 'src/experimental/experimental.service';
+import { FOCUS_VIEW_LABELS } from 'src/util/constants';
 
 // const passRegionIdFeatureIds = [
 //   "1a19693d-d99f-4789-b1ae-8ab5f0bb6432",
@@ -47,7 +48,7 @@ export class FeatureViewComponent extends FeatureViewBase{
   focusOnViewer(){
     this.store.dispatch(
       atlasSelection.actions.setViewerMode({
-        viewerMode: "focusview:voi"
+        viewerMode: FOCUS_VIEW_LABELS.VOI,
       })
     )
   }

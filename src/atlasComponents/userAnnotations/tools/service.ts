@@ -3,7 +3,7 @@ import { ARIA_LABELS } from 'common/constants'
 import { Inject, Optional } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { BehaviorSubject, combineLatest, fromEvent, merge, Observable, of, Subject, Subscription } from "rxjs";
-import {map, switchMap, filter, shareReplay, pairwise, distinctUntilChanged, take, withLatestFrom, scan } from "rxjs/operators";
+import {map, switchMap, filter, shareReplay, pairwise, distinctUntilChanged, take, withLatestFrom, scan, debounceTime } from "rxjs/operators";
 import { NehubaViewerUnit } from "src/viewerModule/nehuba";
 import { NEHUBA_INSTANCE_INJTKN } from "src/viewerModule/nehuba/util";
 import { AbsToolClass, ANNOTATION_EVENT_INJ_TOKEN, IAnnotationEvents, IAnnotationGeometry, INgAnnotationTypes, INJ_ANNOT_TARGET, TAnnotationEvent, ClassInterface, TCallbackFunction, TSands, TGeometryJson, TCallback, DESC_TYPE } from "./type";
@@ -13,7 +13,6 @@ import { Line } from "./line";
 import { Point } from "./point";
 import { FilterAnnotationsBySpace } from "../filterAnnotationBySpace.pipe";
 import { MatSnackBar } from 'src/sharedModules/angularMaterial.exports'
-import { actions } from "src/state/atlasSelection";
 import { atlasSelection } from "src/state";
 import { AnnotationLayer, getViewer } from "src/atlasComponents/annotations";
 import { translateV3Entities } from "src/atlasComponents/sapi/translateV3";
@@ -468,60 +467,6 @@ export class ModularUserAnnotationToolService implements OnDestroy{
       })
     )
 
-    /**
-     * on viewer mode update, either create layer, or show/hide layer
-     */
-    // this.subscription.push(
-    //   store.pipe(
-    //     select(atlasSelection.selectors.viewerMode),
-    //     withLatestFrom(
-    //       this.#voxelSize,
-    //       this.store.pipe(
-    //         select(atlasAppearance.selectors.useViewer)
-    //       )
-    //     ),
-    //     filter(([_viewerMode, _voxelSize, useViewer]) => useViewer === "NEHUBA"),
-    //     switchMap(([viewerMode, voxelSize, _useViewer]) => from(
-    //       retry(() => {
-    //         if (this.annotationLayer) {
-    //           return this.annotationLayer
-    //         }
-    //         if (!voxelSize) {
-    //           throw new Error(`voxelSize of ${this.selectedTmpl.id} cannot be found!`)
-    //         }
-    //         this.annotationLayer = new AnnotationLayer(
-    //           ANNOTATION_LAYER_NAME,
-    //           ModularUserAnnotationToolService.USER_ANNOTATION_LAYER_SPEC.annotationColor
-    //         )
-    //         this.annotationLayer.onHover.subscribe(val => {
-    //           this.annotnEvSubj.next({
-    //             type: 'hoverAnnotation',
-    //             detail: val
-    //               ? {
-    //                 pickedAnnotationId: val.id,
-    //                 pickedOffset: val.offset
-    //               }
-    //               : null
-    //           })
-    //         })
-            
-    //         return this.annotationLayer
-    //       }, { retries: 60, timeout: 1000 })
-    //       ).pipe(
-    //         map(annotationLayer => ({viewerMode, annotationLayer}))
-    //       )
-    //     )
-    //   ).subscribe(({viewerMode, annotationLayer}) => {
-    //     this.currMode = viewerMode
-        
-    //     /**
-    //      * on template changes, the layer gets lost
-    //      * force redraw annotations if layer needs to be recreated
-    //      */
-    //     this.forcedAnnotationRefresh$.next(null)
-    //     annotationLayer.setVisible(viewerMode === ModularUserAnnotationToolService.VIEWER_MODE)
-    //   })
-    // )
     const templateIsVolumetric$ = this.store.pipe(
       select(atlasSelection.selectors.selectedTemplate),
       distinctUntilChanged((o, n) => o?.id === n?.id),
@@ -538,11 +483,15 @@ export class ModularUserAnnotationToolService implements OnDestroy{
           this.annotationLayer = null
         }
       }),
-      templateIsVolumetric$.pipe(
+      combineLatest([
+        nehubaViewer$,
+        templateIsVolumetric$
+      ]).pipe(
         withLatestFrom(this.store.pipe(
           select(atlasSelection.selectors.selectedTemplate)
-        ))
-      ).subscribe(async ([flag, selectedTmpl]) => {
+        )),
+        debounceTime(160),
+      ).subscribe(async ([[_, flag], selectedTmpl]) => {
         let sub: Subscription
         if (sub) {
           sub.unsubscribe()
@@ -554,11 +503,16 @@ export class ModularUserAnnotationToolService implements OnDestroy{
         }
         const viewer = await retry(() => {
           const viewer = getViewer()
-          if (viewer && !viewer[ANNOTATED_SYMBOL]) {
+          if (viewer && (viewer?.layerManager?.managedLayers || []).length > 0) {
             return viewer
           }
-          throw new Error(`viewer not defined, or already annotated`)
+          throw new Error(`viewer not defined, or does not have any layers`)
         }, { timeout: 160, retries: 100 })
+
+        // if already annotated, skip
+        if ( viewer[ANNOTATED_SYMBOL] ) {
+          return
+        }
 
         viewer[ANNOTATED_SYMBOL] = selectedTmpl?.id
         
@@ -744,35 +698,6 @@ export class ModularUserAnnotationToolService implements OnDestroy{
   public focus(){
     console.error(`todo implement me`)
     this.focus$.next(null)
-  }
-
-  /**
-   * @deprecated
-   * @param mode 
-   * @returns 
-   */
-  async switchAnnotationMode(mode: 'on' | 'off' | 'toggle' = 'toggle') {
-    const currMode = await this.store.pipe(
-      select(atlasSelection.selectors.viewerMode),
-      take(1)
-    ).toPromise()
-
-    let payload: 'annotating' = null
-    if (mode === 'on') payload = ARIA_LABELS.VIEWER_MODE_ANNOTATING
-    if (mode === 'off') {
-      if (currMode === ARIA_LABELS.VIEWER_MODE_ANNOTATING) payload = null
-      else return
-    }
-    if (mode === 'toggle') {
-      payload = currMode === ARIA_LABELS.VIEWER_MODE_ANNOTATING
-        ? null
-        : ARIA_LABELS.VIEWER_MODE_ANNOTATING
-    }
-    this.store.dispatch(
-      actions.setViewerMode({
-        viewerMode: payload
-      })
-    )
   }
 
   /**

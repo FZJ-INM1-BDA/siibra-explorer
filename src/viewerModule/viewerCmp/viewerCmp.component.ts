@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, Optional, TemplateRef, ViewChild, inject } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { BehaviorSubject, combineLatest, concat, EMPTY, Observable, of } from "rxjs";
-import { debounceTime, distinctUntilChanged, filter, map, shareReplay, switchMap, take, takeUntil, withLatestFrom } from "rxjs/operators";
+import { debounceTime, distinctUntilChanged, filter, map, shareReplay, switchMap, take, takeUntil } from "rxjs/operators";
 import { CONST, ARIA_LABELS, QUICKTOUR_DESC } from 'common/constants'
 import { IQuickTourData } from "src/ui/quickTour";
 import { EnumViewerEvt, TViewerEvtCtxData, TViewerEvent } from "../viewer.interface";
@@ -18,10 +18,9 @@ import { generalActionError } from "src/state/actions";
 import { enLabels } from "src/uiLabels";
 import { MatDialog, MatDialogRef, MatSnackBar } from "src/sharedModules";
 import { ModularUserAnnotationToolService } from "src/atlasComponents/userAnnotations/tools/service";
-import { PointAssignmentFull } from "src/atlasComponents/sapiViews/volumes/point-assignment-full/point-assignment-full.component";
 import { Point } from "src/atlasComponents/userAnnotations/tools/point";
 import { DoiTemplate } from "src/ui/doi/doi.component";
-import { LABEL_EVENT_TRIGGER, SXPLR_PREFIX, LABEL_EVENT } from "src/util/constants";
+import { LABEL_EVENT_TRIGGER, SXPLR_PREFIX, LABEL_EVENT, FOCUS_VIEW_LABELS } from "src/util/constants";
 
 interface HasName {
   name: string
@@ -58,6 +57,8 @@ export class ViewerCmp {
 
   public CONST = CONST
   public ARIA_LABELS = ARIA_LABELS
+
+  public FOCUS_VIEW_LABELS = FOCUS_VIEW_LABELS
   
   public quickTourRegionSearch: IQuickTourData = {
     order: 7,
@@ -192,12 +193,6 @@ export class ViewerCmp {
       }
     })
   )
-
-  toggleParcellationDelineation(){
-    this.store$.dispatch(
-      atlasAppearance.actions.toggleParcDelineation()
-    )
-  }
 
   public view$ = combineLatest([
     this.#view0$,
@@ -349,23 +344,12 @@ export class ViewerCmp {
     this.#selectedPoint$.pipe(
       takeUntil(this.destroy$),
       filter(point => !!point),
-      withLatestFrom(
-        this.store$.pipe(
-          atlasSelection.fromRootStore.distinctATP()
-        )
+    ).subscribe(() => {
+      this.store$.dispatch(
+        atlasSelection.actions.setViewerMode({
+          viewerMode: FOCUS_VIEW_LABELS.GEOMETRY
+        })
       )
-    ).subscribe(([point, { template, parcellation }]) => {
-      const ref = this.dialog.open(PointAssignmentFull, {
-        data: {
-          point, template, parcellation
-        }
-      })
-
-      ref.afterClosed().subscribe(() => {
-        this.store$.dispatch(
-          atlasSelection.actions.clearSelectedPoint()
-        )
-      })
     })
 
     combineLatest([
@@ -483,14 +467,15 @@ export class ViewerCmp {
       }
       
       if (!!feature){
+        openFeatureDialog = () => this.dialog.open(this.focusFeatureDialog, {
+          data: {
+            feature
+          },
+          width: '75vw',
+          maxHeight: '90vh',
+        })
         this.dialogSvc.registerAndOpenRestorableDialog(
-          () => this.dialog.open(this.focusFeatureDialog, {
-            data: {
-              feature
-            },
-            width: '75vw',
-            maxHeight: '90vh',
-          }),
+          openFeatureDialog,
           () => this.clearShownFeature()
         )
       }
@@ -499,7 +484,7 @@ export class ViewerCmp {
     this.store$.pipe(
       select(atlasSelection.selectors.viewerMode)
     ).subscribe(mode => {
-      if (mode === "focusview:voi") {
+      if (mode === FOCUS_VIEW_LABELS.VOI) {
         this.dialogSvc.closeRestorableDialogs()
       } else {
         this.dialogSvc.openRestorableDialogs()

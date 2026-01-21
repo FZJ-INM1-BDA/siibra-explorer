@@ -1,8 +1,9 @@
 import { SxplrAtlas, SxplrTemplate, SxplrParcellation, SxplrRegion, BoundingBox } from "src/atlasComponents/sapi/sxplrTypes"
+import { FOCUS_VIEW_LABELS } from "src/util/constants"
 import { TSandsPoint, TFace } from "src/util/types"
 
 export const nameSpace = `[state.atlasSelection]`
-export type ViewerMode = 'annotating' | 'key frame' | 'focusview:voi' | 'focusview:regionalconnectivity'
+export type ViewerMode = 'annotating' | 'key frame' | typeof FOCUS_VIEW_LABELS[keyof typeof FOCUS_VIEW_LABELS]
 export type BreadCrumb = {
   id: string
   name: string

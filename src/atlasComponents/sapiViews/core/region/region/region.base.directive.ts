@@ -4,7 +4,7 @@ import { translateV3Entities } from "src/atlasComponents/sapi/translateV3"
 import { rgbToHsl } from 'common/util'
 import { SAPI } from "src/atlasComponents/sapi/sapi.service";
 import { BehaviorSubject, combineLatest, concat, EMPTY, forkJoin, from, merge, of } from "rxjs";
-import { catchError, filter, map, scan, shareReplay, switchMap, take, tap } from "rxjs/operators";
+import { catchError, filter, map, scan, shareReplay, startWith, switchMap, take, tap } from "rxjs/operators";
 import { DecisionCollapse } from "src/atlasComponents/sapi/decisionCollapse.service";
 import { PathReturn } from "src/atlasComponents/sapi/typeV3";
 
@@ -255,34 +255,55 @@ export class SapiViewsCoreRegionRegionBase {
     tap(() => this.#manualBusySignal$.next(false)), 
     shareReplay(1),
   )
-  
-  public dois$ = this.regionalMaps$.pipe(
+
+  #rankeddataset$ = this.regionalMaps$.pipe(
     map(sms => {
+      const allDatasets: PathReturn<"/maps/{map_id}">['datasets'][number][] = []
+      for (const sm of sms){
+        allDatasets.push(...sm.datasets)
+      }
+      allDatasets.sort((a, b) => {
+        const urldiff = a.urls.length - b.urls.length
+        if (urldiff !== 0) return urldiff * -1
+        const descdiff = (a.description ? 1 : 0) - (b.description ? 1 : 0)
+        if (descdiff !== 0) return descdiff * -1
+        const authordiff = (a.contributors.length ? 1 : 0) - (b.contributors.length ? 1 : 0 )
+        if (authordiff !== 0) return authordiff * -1
+        return a > b ? -1 : 1
+      })
+      return allDatasets
+    }),
+    startWith([] as PathReturn<"/maps/{map_id}">['datasets'][number][]),
+    shareReplay(1),
+  )
+  
+  public dois$ = this.#rankeddataset$.pipe(
+    map(dss => {
+      
       const returnUrls: string[] = []
-      for (const sm of sms) {
-        for (const ds of sm.datasets) {
-          for (const url of ds.urls) {
-            returnUrls.push(url.url)
-          }
-          
+
+      for (const ds of dss) {
+        for (const url of ds.urls) {
+          returnUrls.push(url.url)
         }
+        
       }
       return returnUrls
     })
   )
 
-  public desc$ = this.regionalMaps$.pipe(
-    map(sm => {
-      for (const ds of (sm?.[0]?.datasets) || []) {
+  public desc$ = this.#rankeddataset$.pipe(
+    map(dss => {
+      for (const ds of dss){
         if (ds.description) {
           return ds.description
         }
       }
     }),
   )
-  public contributors$ = this.regionalMaps$.pipe(
-    map(sm => {
-      for (const ds of (sm?.[0]?.datasets) || []) {
+  public contributors$ = this.#rankeddataset$.pipe(
+    map(dss => {
+      for (const ds of dss) {
         if (ds.contributors) {
           return ds.contributors.map(c => c.name)
         }

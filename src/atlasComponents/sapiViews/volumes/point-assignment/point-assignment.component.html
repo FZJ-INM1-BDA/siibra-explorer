@@ -19,6 +19,45 @@
 
 <ng-template [ngIf]="df$ | async" let-df>
 
+    <mat-action-list>
+
+        <ng-template [ngIf]="template$ | async" let-template>
+            <button mat-list-item [iav-clipboard-copy]="template.name">
+                <mat-icon matListItemIcon>public</mat-icon>
+                <span matListItemTitle>
+                    {{ template.name }}
+                </span>
+            </button>
+        </ng-template>
+
+        <ng-template [ngIf]="point$ | async | sandsToNum" let-point>
+            
+            <button mat-list-item [iav-clipboard-copy]="point.coords | numbers | addUnitAndJoin : 'mm'"
+                (click)="navigateToPoint(point.coords)">
+                <mat-icon matListItemIcon>location_on</mat-icon>
+                <span matListItemTitle>
+                    {{ point.coords | numbers | addUnitAndJoin : 'mm' }}
+                </span>
+            </button>
+        </ng-template>
+        <ng-template [ngIf]="parcellation$ | async" let-parcellation>
+            <button mat-list-item [iav-clipboard-copy]="parcellation.name">
+                <mat-icon matListItemIcon>map</mat-icon>
+                <span matListItemTitle>
+                    {{ parcellation.name }}
+                </span>
+            </button>
+        </ng-template>
+        <ng-template [ngIf]="assignmentType$ | async" let-type>
+            <button mat-list-item [iav-clipboard-copy]="type">
+                <mat-icon matListItemIcon>functions</mat-icon>
+                <span matListItemTitle>
+                    assignment type: {{ type }}
+                </span>
+            </button>
+        </ng-template>
+    </mat-action-list>  
+
     <mat-divider></mat-divider>
 
     <sxplr-assignment-view-simple

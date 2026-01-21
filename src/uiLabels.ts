@@ -77,4 +77,7 @@ export const enLabels = {
   DELETE_ALL_ANNOTATION_CONFIRMATION_MSG: `Are you sure you want to delete all annotations?`,
 
   SHARE_CUSTOM_URL: 'Create a custom URL',
+
+  DISMISS: "Dismiss",
+  RETURN_TO_DETAIL: "Return to detail view",
 }

@@ -141,7 +141,7 @@ export class PointAssignmentDirective implements OnDestroy, OnInit{
         return null
       }
       const xformedCoord = pipe.transform(val)
-      return `(${xformedCoord.coords.map(v => v.toFixed(2)).join(", ")}) mm`
+      return `${xformedCoord.coords.map(v => v.toFixed(2) + "mm").join(", ")}`
     }),
   )
 

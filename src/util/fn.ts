@@ -19,7 +19,7 @@ export async function retry<T>(fn: () => T, config={timeout: 1000, retries:3}){
       await (() => new Promise(rs => setTimeout(rs, timeout)))()
     }
   }
-  throw new Error(`fn failed ${retries} times, aborting`)
+  throw new Error(`fn ${fn} failed ${retries} times, aborting`)
 }
 
 export async function getExportNehuba() {
@@ -41,12 +41,12 @@ export const arrayOfPrimitiveEqual = <T extends TPrimitive>(o: T[], n: T[]) =>
   o.length === n.length &&
   o.every((el, idx) => n[idx] === el)
 
-interface ISwitchMapWaitFor {
+interface ISwitchMapWaitFor<T> {
   interval?: number
   leading?: boolean
-  condition: (arg?: any) => boolean
+  condition: (arg?: T) => boolean
 }
-export function switchMapWaitFor<T>(opts: ISwitchMapWaitFor){
+export function switchMapWaitFor<T>(opts: ISwitchMapWaitFor<T>){
   return (arg: T) => {
     if (opts.leading && opts.condition(arg)) return of(arg)
     return interval(opts.interval || 16).pipe(
@@ -386,7 +386,7 @@ export function recursiveMutate<T>(arr: T[], getChildren: (obj: T) => T[], mutat
   }
 }
 
-export function bufferUntil<T>(opts: ISwitchMapWaitFor) {
+export function bufferUntil<T>(opts: ISwitchMapWaitFor<T>) {
   const { condition, leading, interval: int = 160 } = opts
   let buffer: T[] = []
   return (src: Observable<T>) => new Observable<T[]>(obs => {

@@ -139,3 +139,9 @@ export const LABEL_EVENT = {
   atlasSelection: "atlasSelection",
   annotate: "annotate",
 } as const
+
+export const FOCUS_VIEW_LABELS = {
+  VOI: "focusview:voi",
+  CONNECTIVITY: "focusview:regionalconnectivity",
+  GEOMETRY: "focusview:selectedgeometry",
+} as const

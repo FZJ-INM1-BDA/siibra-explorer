@@ -26,42 +26,35 @@
   <iav-layout-fourcorners class="sxplr-pe-none">
 
     <!-- top left -->
-    <div iavLayoutFourCornersTopLeft class="align-items-stretch d-inline-flex">
+    <div iavLayoutFourCornersTopLeft
+      class="left-panel-container mt-2 vw-col-10 vw-col-sm-10 vw-col-md-5 vw-col-lg-4 vw-col-xl-3 vw-col-xxl-2 z-index-1 menu-container"
+      [ngClass]="{
+        'vw-col-10-nm vw-col-sm-10-nm vw-col-md-5-nm vw-col-lg-4-nm vw-col-xl-3-nm vw-col-xxl-2-nm': !view.halfSidenavExpanded
+      }">
+
+      <!-- default mode top left tmpl -->
+      <ng-template [ngTemplateOutlet]="defaultMainContentTopLeft"
+        [ngTemplateOutletContext]="{
+          view: view
+        }">
+      </ng-template>
 
       <!-- special mode -->
-      <ng-template [ngIf]="view.viewerMode" let-mode [ngIfElse]="defaultTopLeftTmpl">
+      <ng-template [ngIf]="view.viewerMode" let-mode>
         <ng-template [ngTemplateOutlet]="specialModeTopLeftTmpl"
           [ngTemplateOutletContext]="{ mode: mode, view: view }">
         </ng-template>
       </ng-template>
 
-      <!-- default mode top left tmpl -->
-      <ng-template #defaultTopLeftTmpl>
-        <ng-template [ngTemplateOutlet]="defaultMainContentTopLeft"
-          [ngTemplateOutletContext]="{
-            view: view
-          }">
-        </ng-template>
-      </ng-template>
     </div>
 
     <!-- top right -->
     <div iavLayoutFourCornersTopRight class="ws-no-wrap">
 
-      <!-- exit special mode -->
-      <ng-template [ngIf]="view.viewerMode" let-mode [ngIfElse]="defaultTopRightTmpl">
-        <ng-template [ngTemplateOutlet]="specialTopRightTmpl"
-          [ngTemplateOutletContext]="{
-            mode: mode
-          }">
-        </ng-template>
+      
+      <ng-template [ngTemplateOutlet]="minDefaultMainContentTopRight">
       </ng-template>
       
-      <!-- default mode top right tmpl -->
-      <ng-template #defaultTopRightTmpl>
-        <ng-template [ngTemplateOutlet]="minDefaultMainContentTopRight">
-        </ng-template>
-      </ng-template>
     </div>
 
     <div iavLayoutFourCornersBottomLeft>
@@ -101,7 +94,7 @@
         <ng-template ngFor [ngForOf]="availview.atlases" let-atlas>
           <button mat-menu-item
             (click)="availableATP.selectATP('atlasId', atlas.id)">
-            <mat-icon fontSet="fas" [fontIcon]="atlas.id === view.selectedAtlas.id ? 'fa-circle' : 'fa-none'"></mat-icon>
+            <mat-icon fontSet="fas" [fontIcon]="atlas?.id === view.selectedAtlas?.id ? 'fa-circle' : 'fa-none'"></mat-icon>
             <span>
               {{ atlas.species }}
             </span>
@@ -113,7 +106,7 @@
         <ng-template ngFor [ngForOf]="availview.templates" let-template>
           <button mat-menu-item
             (click)="availableATP.selectATP('templateId', template.id)">
-            <mat-icon fontSet="fas" [fontIcon]="template.id === view.selectedTemplate.id ? 'fa-circle' : 'fa-none'"></mat-icon>
+            <mat-icon fontSet="fas" [fontIcon]="template?.id === view.selectedTemplate?.id ? 'fa-circle' : 'fa-none'"></mat-icon>
             <span>
               {{ template.shortName || template.name }}
             </span>
@@ -128,7 +121,7 @@
           <ng-template ngFor [ngForOf]="grp.parcellations" let-parcellation>
             <button mat-menu-item
               (click)="availableATP.selectATP('parcellationId', parcellation.id)">
-              <mat-icon fontSet="fas" [fontIcon]="parcellation.id === view.selectedParcellation.id ? 'fa-circle' : 'fa-none'"></mat-icon>
+              <mat-icon fontSet="fas" [fontIcon]="parcellation?.id === view.selectedParcellation?.id ? 'fa-circle' : 'fa-none'"></mat-icon>
               <span>
                 {{ parcellation.shortName || parcellation.name }}
               </span>
@@ -138,8 +131,9 @@
         </ng-template>
 
         <ng-template ngFor [ngForOf]="availview.noGroupParcs" let-parcellation>
-          <button mat-menu-item>
-            <mat-icon fontSet="fas" [fontIcon]="parcellation.id === view.selectedParcellation.id ? 'fa-circle' : 'fa-none'"></mat-icon>
+          <button mat-menu-item
+            (click)="availableATP.selectATP('parcellationId', parcellation.id)">
+            <mat-icon fontSet="fas" [fontIcon]="parcellation?.id === view.selectedParcellation?.id ? 'fa-circle' : 'fa-none'"></mat-icon>
             <span>
               {{ parcellation.shortName || parcellation.name }}
             </span>
@@ -158,27 +152,11 @@
 <ng-template #defaultMainContentTopLeft
   let-view="view">
 
-  <div class="mt-2 d-inline-block vw-col-10 vw-col-sm-10 vw-col-md-5 vw-col-lg-4 vw-col-xl-3 vw-col-xxl-2 z-index-1 menu-container"
-    [ngClass]="{
-      'vw-col-10-nm vw-col-sm-10-nm vw-col-md-5-nm vw-col-lg-4-nm vw-col-xl-3-nm vw-col-xxl-2-nm': !view.halfSidenavExpanded
-    }">
-    
-    <sxplr-vertical-bread-crumb class="sxplr-d-block sxplr-overflow-y-auto mat-elevation-z1"
-      [viewerLoaded]="viewerLoaded"
-      *ngIf="view.useViewer"
-      (show)="controlHalfNav(true)">
-    </sxplr-vertical-bread-crumb>
-
-  </div>
-  
-  <sxplr-tab *ngIf="!view.showExperimental"
-    sxplr-label-event
-    [labels]="['atlasSelection']"
-    (triggered)="$event && controlHalfNav(true)"
-    [matTooltip]="view.labels.TOGGLE_SIDE_PANELS"
-    [sxplr-tab-icon]="view.halfSidenavExpanded ? 'fas fa-chevron-left' : 'fas fa-chevron-right'"
-    (sxplr-tab-click)="controlHalfNav(!view.halfSidenavExpanded)">
-  </sxplr-tab>
+  <sxplr-vertical-bread-crumb class="sxplr-d-block sxplr-overflow-y-auto mat-elevation-z1"
+    [viewerLoaded]="viewerLoaded"
+    *ngIf="view.useViewer"
+    (show)="controlHalfNav(true)">
+  </sxplr-vertical-bread-crumb>
 
 </ng-template>
 
@@ -186,17 +164,14 @@
 <!-- special mode top left -->
 <ng-template #specialModeTopLeftTmpl let-mode="mode" let-view="view">
   
-  <mat-card class="mt-2 d-inline-block vw-col-10 vw-col-sm-10 vw-col-md-5 vw-col-lg-4 vw-col-xl-3 vw-col-xxl-2 z-index-1 menu-container"
-    [ngClass]="{
-      'vw-col-10-nm vw-col-sm-10-nm vw-col-md-5-nm vw-col-lg-4-nm vw-col-xl-3-nm vw-col-xxl-2-nm': !view.halfSidenavExpanded
-    }">
+  <mat-card class="sxplr-mt-2">
     <ng-container [ngSwitch]="mode">
       <ng-template [ngSwitchCase]="ARIA_LABELS.VIEWER_MODE_ANNOTATING">
         Annotation no longer has a special mode. Please contact us on how you reached here. We will try to fix the bug ASAP.
       </ng-template>
       <key-frame-controller class="pe-all" *ngSwitchCase="ARIA_LABELS.VIEWER_MODE_KEYFRAME">
       </key-frame-controller>
-      <ng-template [ngSwitchCase]="ARIA_LABELS.VIEWER_MODE_FOCUSVIEW_VOI">
+      <ng-template [ngSwitchCase]="FOCUS_VIEW_LABELS.VOI">
         <ng-template [ngIf]="view.selectedFeature" let-feature>
           <div class="sxplr-pe-all"
             feature-view-base
@@ -209,32 +184,28 @@
               <ng-template [ngIf]="viewerLoaded && fView.voi" let-voi>
                 <mat-card>
                   <mat-card-header>
-                    <mat-card-title>
-                      Previewing overlay volume
+                    <mat-card-title class="with-controls">
+                      <span>
+                        Previewing overlay volume
+                      </span>
+                      <button mat-icon-button
+                        color="warn"
+                        [matTooltip]="view.labels.RETURN_TO_DETAIL"
+                        (click)="exitSpecialViewMode()">
+                        <mat-icon>unfold_more</mat-icon>
+                      </button>
+                      <button mat-icon-button
+                        color="warn"
+                        [matTooltip]="view.labels.DISMISS"
+                        (click)="clearShownFeature(); exitSpecialViewMode()">
+                        <mat-icon>close</mat-icon>
+                      </button>
                     </mat-card-title>
                   </mat-card-header>
                   <mat-card-content>
 
-                    <mat-form-field>
-                      <mat-label>Reference Parcellation</mat-label>
-                      <mat-select [value]="view.selectedParcellation.id"
-                        (selectionChange)="selectParcellationById($event.value)">
-                        <ng-template ngFor [ngForOf]="view.parcsInCurrSpace" let-parc>
-                          <mat-option [value]="parc.id">{{ parc.shortName || parc.name }}</mat-option>
-                        </ng-template>
-                      </mat-select>
-                    </mat-form-field>
-
                     <mat-divider></mat-divider>
 
-                    <mat-slide-toggle [checked]="view.showDelineation"
-                      (change)="toggleParcellationDelineation()"
-                      [iav-key-listener]="[{'type': 'keydown', 'key': 'q', 'capture': true, 'target': 'document' }]"
-                      (iav-key-event)="toggleParcellationDelineation()"
-                      >
-                      Parcellation {{ view.showDelineation ? 'Shown' : 'Hidden' }}
-                    </mat-slide-toggle>
-                    <mat-divider></mat-divider>
                     <ng-layer-ctl
                       [ng-layer-ctl-name]="voi.ngVolume.url"
                       [ng-layer-ctl-format]="voi.ngVolume.format"
@@ -301,7 +272,27 @@
           </div>
         </ng-template>
       </ng-template>
-      <ng-template [ngSwitchCase]="ARIA_LABELS.VIEWER_MODE_FOCUSVIEW_REG_CONN">
+      <ng-template [ngSwitchCase]="FOCUS_VIEW_LABELS.GEOMETRY">
+        <mat-card-header>
+          <mat-card-title class="with-controls">
+            <span>
+              Assignment
+            </span>
+            <button mat-icon-button
+              color="warn"
+              [matTooltip]="view.labels.DISMISS"
+              (click)="clearPoint(); exitSpecialViewMode()">
+              <mat-icon>close</mat-icon>
+            </button>
+          </mat-card-title>
+        </mat-card-header>
+        <sxplr-point-assignment
+          [point]="view.selectedPoint"
+          [template]="view.selectedTemplate"
+          [parcellation]="view.selectedParcellation">
+        </sxplr-point-assignment>
+      </ng-template>
+      <ng-template [ngSwitchCase]="FOCUS_VIEW_LABELS.CONNECTIVITY">
         <mat-card>
           <mat-card-header>
             <mat-card-title>
@@ -351,53 +342,6 @@
     </ng-container>
 
   </mat-card>
-  <ng-template [ngIf]="view$ | async" let-view>
-
-    <div class="special-mode-topleft-wrapper">
-
-      <ng-container [ngSwitch]="mode">
-        <!-- annotating top left -->
-        <ng-template [ngSwitchCase]="ARIA_LABELS.VIEWER_MODE_ANNOTATING">
-          <sxplr-tab
-            [matTooltip]="ARIA_LABELS.TOGGLE_SIDE_PANEL"
-            sxplr-tab-icon="fas fa-list"
-            sxplr-tab-color="primary"
-            (sxplr-tab-click)="controlHalfNav(!view.halfSidenavExpanded)"
-            >
-          </sxplr-tab>
-        </ng-template>
-  
-        <ng-template [ngSwitchCase]="ARIA_LABELS.VIEWER_MODE_KEYFRAME">
-          <ng-template [ngTemplateOutlet]="defaultToggle"></ng-template>
-        </ng-template>
-
-        <ng-template [ngSwitchCase]="ARIA_LABELS.VIEWER_MODE_FOCUSVIEW_VOI">
-          <ng-template [ngTemplateOutlet]="defaultToggle"></ng-template>
-        </ng-template>
-        
-        <ng-template [ngSwitchCase]="ARIA_LABELS.VIEWER_MODE_FOCUSVIEW_REG_CONN">
-          <ng-template [ngTemplateOutlet]="defaultToggle"></ng-template>
-        </ng-template>
-      </ng-container>
-
-      <!-- default toggle button -->
-      <ng-template #defaultToggle>
-        <sxplr-tab
-          [matTooltip]="ARIA_LABELS.TOGGLE_SIDE_PANEL"
-          [sxplr-tab-mat-icon]="view.halfSidenavExpanded ? 'chevron_left' : 'chevron_right'"
-          sxplr-tab-color="primary"
-          (sxplr-tab-click)="controlHalfNav(!view.halfSidenavExpanded)">
-        </sxplr-tab>
-      </ng-template>
-      
-      <sxplr-tab
-        [matTooltip]="ARIA_LABELS.EXIT_MODE"
-        sxplr-tab-icon="fas fa-times"
-        sxplr-tab-color="warn"
-        (sxplr-tab-click)="exitSpecialViewMode()">
-      </sxplr-tab>
-    </div>
-  </ng-template>
 </ng-template>
 
 
@@ -411,31 +355,6 @@
     [viewerLoaded]="viewerLoaded">
   </top-menu-cmp>
 
-</ng-template>
-
-
-<!-- special mode top right -->
-<ng-template #specialTopRightTmpl let-mode="mode">
-  <ng-template sxplrExperimentalFlag [deprecated]="true">
-  <mat-card class="mat-card-sm pe-all m-4">
-    <mat-card-header>
-      <mat-card-subtitle>
-        <span>
-          {{ mode }}
-        </span>
-        
-        <button mat-icon-button
-          color="warn"
-          (click)="exitSpecialViewMode()">
-          <i class="fas fa-times"></i>
-        </button>
-      </mat-card-subtitle>
-    </mat-card-header>
-    <mat-card-content>
-      
-    </mat-card-content>
-  </mat-card>
-  </ng-template>
 </ng-template>
 
 <!-- viewer tmpl -->

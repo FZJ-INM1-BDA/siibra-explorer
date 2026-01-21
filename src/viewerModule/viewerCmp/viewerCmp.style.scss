@@ -32,11 +32,7 @@ mat-drawer
   & > mat-card
   {
 
-    position: absolute;
-    top: 0;
-    left: 0;
     width: 100%;
-    height: 98vh;
 
     pointer-events: all;
     z-index: 9;
@@ -129,11 +125,6 @@ sxplr-tab
   display: inline-block;
 }
 
-.special-mode-topleft-wrapper
-{
-  display: inline-flex;
-  flex-direction: column;
-}
 
 viewer-wrapper
 {
@@ -164,4 +155,38 @@ sxplr-vertical-bread-crumb
   margin: 0.5rem 1.5rem 0rem 1.5rem;
   opacity: 0.5;
   font-size: 0.9rem;
+}
+
+div[iavLayoutFourCornersTopLeft]
+{
+  max-height: 90dvh;
+  overflow-y: auto;
+  padding: 0.5rem 0rem;
+  
+  &.left-panel-container
+  {
+    display: flex;
+    flex-direction: column;
+    justify-content: stretch;
+
+    > *
+    {
+      flex: 0 0 auto;
+    }
+  }
+}
+
+mat-card-title.with-controls
+{
+  display: flex;
+  align-items: center;
+
+  &>span
+  {
+    flex: 0 1 auto;
+  }
+  button
+  {
+    flex: 0 0 auto;
+  }
 }

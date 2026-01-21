@@ -185,6 +185,7 @@ export class AnnotationLayer {
     } catch (e) {
       // errors if viewer is disposed first, which trigger layer.dispose() called
     }
+    this.#layer = null
   }
 
   /**
