@@ -48,6 +48,7 @@ import { NgLayerCtrlCmp } from "./nehuba/nehubaViewerInterface/ngLayerCtl/ngLaye
 import { FileInputModule } from "src/getFileInput/module";
 import { SapiViewsFeatureConnectivityModule } from "src/features/connectivity";
 import { LabelEventDirective } from "src/ui/verticalBreadCrumb/labelEvent.directive";
+import { AvailableATPDirective } from "src/atlasComponents/sapi/core/availableATP.directive";
 
 @NgModule({
   imports: [
@@ -85,6 +86,7 @@ import { LabelEventDirective } from "src/ui/verticalBreadCrumb/labelEvent.direct
     FileInputModule,
     SapiViewsFeatureConnectivityModule,
     LabelEventDirective,
+    AvailableATPDirective,
     
     ...(environment.ENABLE_LEAP_MOTION ? [LeapModule] : [])
   ],

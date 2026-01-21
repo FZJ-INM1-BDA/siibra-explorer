@@ -67,7 +67,8 @@
     <div iavLayoutFourCornersBottomLeft>
       <mat-card class="express-atlas-selection sxplr-muted hoverable sxplr-custom-cmp"
         mat-ripple
-        (click)="triggerLabel(view.eventLabels.atlasSelection)">
+        [matMenuTriggerFor]="expressMenu"
+        >
         <markdown-dom
           [markdown]="{
             atlas: view.selectedAtlas,
@@ -86,6 +87,67 @@
       </div>
     </div>
   </iav-layout-fourcorners>
+
+  <mat-menu #expressMenu="matMenu"
+    available-atp
+    #availableATP="availableATP">
+    <ng-template [ngIf]="availableATP.view$ | async" let-availview>
+      <button mat-menu-item [matMenuTriggerFor]="speciesSubMenu">species</button>
+      <button mat-menu-item [matMenuTriggerFor]="spaceSubMenu">reference space</button>
+      <button mat-menu-item [matMenuTriggerFor]="parcSubMenu">reference parcellation</button>
+
+      
+      <mat-menu #speciesSubMenu="matMenu">
+        <ng-template ngFor [ngForOf]="availview.atlases" let-atlas>
+          <button mat-menu-item
+            (click)="availableATP.selectATP('atlasId', atlas.id)">
+            <mat-icon fontSet="fas" [fontIcon]="atlas.id === view.selectedAtlas.id ? 'fa-circle' : 'fa-none'"></mat-icon>
+            <span>
+              {{ atlas.species }}
+            </span>
+          </button>
+        </ng-template>
+      </mat-menu>
+      
+      <mat-menu #spaceSubMenu="matMenu">
+        <ng-template ngFor [ngForOf]="availview.templates" let-template>
+          <button mat-menu-item
+            (click)="availableATP.selectATP('templateId', template.id)">
+            <mat-icon fontSet="fas" [fontIcon]="template.id === view.selectedTemplate.id ? 'fa-circle' : 'fa-none'"></mat-icon>
+            <span>
+              {{ template.shortName || template.name }}
+            </span>
+          </button>
+        </ng-template>
+      </mat-menu>
+      
+      <mat-menu #parcSubMenu="matMenu">
+        
+        <ng-template ngFor [ngForOf]="availview.groupParcs" let-grp>
+          <label class="menu-label">{{ grp.name }}</label>
+          <ng-template ngFor [ngForOf]="grp.parcellations" let-parcellation>
+            <button mat-menu-item
+              (click)="availableATP.selectATP('parcellationId', parcellation.id)">
+              <mat-icon fontSet="fas" [fontIcon]="parcellation.id === view.selectedParcellation.id ? 'fa-circle' : 'fa-none'"></mat-icon>
+              <span>
+                {{ parcellation.shortName || parcellation.name }}
+              </span>
+            </button>
+          </ng-template>
+          <mat-divider></mat-divider>
+        </ng-template>
+
+        <ng-template ngFor [ngForOf]="availview.noGroupParcs" let-parcellation>
+          <button mat-menu-item>
+            <mat-icon fontSet="fas" [fontIcon]="parcellation.id === view.selectedParcellation.id ? 'fa-circle' : 'fa-none'"></mat-icon>
+            <span>
+              {{ parcellation.shortName || parcellation.name }}
+            </span>
+          </button>
+        </ng-template>
+      </mat-menu>
+    </ng-template>
+  </mat-menu>
 
 </ng-template>
 

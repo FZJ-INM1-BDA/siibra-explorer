@@ -4,7 +4,7 @@ import { combineLatest, merge, Observable, of, Subject } from "rxjs";
 import { debounceTime, distinctUntilChanged, filter, map, startWith, switchMap, take, takeUntil, withLatestFrom } from "rxjs/operators";
 import { SAPI, IDS } from "src/atlasComponents/sapi";
 import { Feature, SxplrParcellation, SxplrRegion, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
-import { FilterGroupedParcellationPipe, GroupedParcellation } from "src/atlasComponents/sapiViews/core/parcellation";
+import { GroupedParcellation } from "src/atlasComponents/sapiViews/core/parcellation";
 import { atlasAppearance, atlasSelection, userInteraction, userPreference } from "src/state";
 import { NEHUBA_CONFIG_SERVICE_TOKEN, NehubaConfigSvc } from "src/viewerModule/nehuba/config.service";
 import { enLabels } from "src/uiLabels"
@@ -22,8 +22,7 @@ import { IAnnotationGeometry } from "src/atlasComponents/userAnnotations/tools/t
 import { BANLIST_CONNECTIVITY, EXPERIMENTAL_CONNECTIVITY, WHITELIST_CONNECTIVITY } from "src/features/connectivity";
 import { ViewerMode } from "src/state/atlasSelection/const";
 import { MM_ID, QV_T, SANDS_TYPE } from "src/util/types";
-
-const pipe = new FilterGroupedParcellationPipe()
+import { AvailableATPDirective } from "src/atlasComponents/sapi/core/availableATP.directive";
 
 
 type PasteTarget = "pos"|"zoom"|"rot"
@@ -52,7 +51,8 @@ function validateNumbers(input: (number|null|undefined)[]): input is number[]{
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   hostDirectives: [
-    DestroyDirective
+    DestroyDirective,
+    AvailableATPDirective,
   ],
 })
 
@@ -80,6 +80,7 @@ export class VerticalBreadCrumbComponent {
   DoiTemplate = DoiTemplate
 
   #destroy$ = inject(DestroyDirective).destroyed$
+  #atpDirective = inject(AvailableATPDirective)
   
   #pasted$ = new Subject<{target: PasteTarget, value: string}>()
   
@@ -113,32 +114,8 @@ export class VerticalBreadCrumbComponent {
     this.#pasted$.next({ target, value: text})
   }
 
-  #selectedATP$ = this.store$.pipe(
-    atlasSelection.fromRootStore.distinctATP()
-  )
   #selectedRegions$ = this.store$.pipe(
     select(atlasSelection.selectors.selectedRegions)
-  )
-  #allAtlases$ = this.sapi.atlases$
-  
-  #atlasStates$ = combineLatest([
-    this.store$.pipe(
-      select(atlasSelection.selectors.selectedAtlas),
-      switchMap(atlas => this.sapi.getAllParcellations(atlas))
-    ),
-    this.store$.pipe(
-      select(atlasSelection.selectors.selectedAtlas),
-      switchMap(atlas => this.sapi.getAllSpaces(atlas))
-    ),
-  ]).pipe(
-    map(([ parcellations, templates ]) => {
-      const noGroupParcs = pipe.transform(parcellations || [], false)
-      const groupParcs = pipe.transform(parcellations || [], true)
-      
-      return {
-        noGroupParcs, groupParcs, templates, parcellations
-      }
-    })
   )
 
   #spaceStates$ = combineLatest([
@@ -158,9 +135,9 @@ export class VerticalBreadCrumbComponent {
       select(atlasSelection.selectors.selectedParcAllRegions)
     ),
     // current labelled map
-    this.#selectedATP$.pipe(
+    this.#atpDirective.view$.pipe(
       switchMap(
-        ({ template, parcellation }) => template && parcellation
+        ({ selectedATP: { template, parcellation } }) => template && parcellation
         ? this.sapi.getLabelledMap(parcellation, template)
         : of(null)
       )
@@ -194,14 +171,13 @@ export class VerticalBreadCrumbComponent {
   )
 
   userSelection$ = combineLatest([
-    this.#selectedATP$,
     this.#selectedRegions$,
-    this.#atlasStates$,
+    this.#atpDirective.view$,
     this.#parcStates$,
     this.#spaceStates$,
     this.#userSelected$,
   ]).pipe(
-    map(([selectedATP, selectedRegions, {noGroupParcs, groupParcs, templates, parcellations }, {allAvailableRegions, labelMappedRegionNames}, { currentViewport }, { selectedFeature, selectedPoint, customLayers}]) => {
+    map(([selectedRegions, {noGroupParcs, groupParcs, templates, parcellations, selectedATP }, {allAvailableRegions, labelMappedRegionNames}, { currentViewport }, { selectedFeature, selectedPoint, customLayers}]) => {
       
       return {
         selectedATP,
@@ -281,7 +257,7 @@ export class VerticalBreadCrumbComponent {
   )
 
   view$ = combineLatest([
-    this.#allAtlases$,
+    this.#atpDirective.view$,
     this.userSelection$,
     this.userSelectionDeducedState$,
     this.userPreferences$,
@@ -289,7 +265,7 @@ export class VerticalBreadCrumbComponent {
     this.#annots$,
   ]).pipe(
     map(([
-      atlases,
+      { atlases },
       {
         selectedATP,
         selectedRegions,
@@ -498,7 +474,8 @@ export class VerticalBreadCrumbComponent {
   }
   public async resetNavigation({rotation: rotationFlag = false, position: positionFlag = false, zoom : zoomFlag = false}: {rotation?: boolean, position?: boolean, zoom?: boolean}) {
 
-    const { template } = await this.#selectedATP$.pipe(
+    const { template } = await this.#atpDirective.view$.pipe(
+      map(({ selectedATP }) => selectedATP),
       take(1)
     ).toPromise()
 
@@ -581,48 +558,8 @@ export class VerticalBreadCrumbComponent {
     )
   }
 
-  public async selectATP(type: string, id: string, regionId?: string) {
-    if (!['atlasId', 'parcellationId', 'templateId'].includes(type)) {
-      console.warn(`type must be of type 'atlasId' | 'parcellationId' | 'templateId'`)
-      return 
-    }
-    if (!id) {
-      console.warn(`id must be defined`)
-      return
-    }
-
-    const { selectedATP, parcellations, templates } = await this.view$.pipe(
-      take(1)
-    ).toPromise()
-
-    const config: {
-      autoSelect: boolean
-      messages: {
-        parcellation?: string
-        template?: string
-      }
-    } = {
-      autoSelect: false,
-      messages: {}
-    }
-    if (type === "atlasId") {
-      config.autoSelect = true
-    }
-    if (type === "templateId") {
-      const wantedTemplate = templates.find(t => t.id === id)
-      config.messages.parcellation = `Current parcellation **${selectedATP?.parcellation?.name}** is not mapped in the selected template **${wantedTemplate?.name}**. Please select one of the following parcellations:`
-    }
-    if (type === "parcellationId") {
-      const wantedParcellation = parcellations.find(p => p.id === id)
-      config.messages.template = `Selected parcellation **${wantedParcellation?.name}** is not mapped in the current template **${selectedATP?.template?.name}**. Please select one of the following templates:`
-    }
-    this.store$.dispatch(
-      atlasSelection.actions.selectATPById({
-        [type]: id,
-        regionId,
-        config,
-      })
-    )
+  public async selectATP(type: 'atlasId' | 'parcellationId' | 'templateId', id: string, regionId?: string) {
+    return await this.#atpDirective.selectATP(type, id, regionId)
   }
 
   public getSubParcellation(obj: GroupedParcellation): SxplrParcellation[] {
