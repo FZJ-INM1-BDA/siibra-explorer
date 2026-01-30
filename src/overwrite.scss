@@ -385,6 +385,17 @@ a[mat-list-item]
   align-items: center;
 }
 
+.sxplr-lean-tab
+{
+    [role="tab"]
+    {
+        padding-left: 8px;
+        padding-right: 8px;
+        min-width: 40px;
+    }
+}
+
+
 .material-icons {
   font-family: 'Material Icons';
   font-weight: normal;

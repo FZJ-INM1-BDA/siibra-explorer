@@ -36,7 +36,6 @@ import { ReactiveFormsModule } from "@angular/forms";
 import { CURRENT_TEMPLATE_DIM_INFO, TemplateInfo, Z_TRAVERSAL_MULTIPLIER } from "./nehuba/layerCtrl.service/layerCtrl.util";
 import { Store } from "@ngrx/store";
 import { atlasSelection, userPreference } from "src/state";
-import { TabComponent } from "src/components/tab/tab.components";
 import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.directive";
 import { HOVER_INTERCEPTOR_INJECTOR } from "src/util/injectionTokens";
 import { ViewerWrapper } from "./viewerWrapper/viewerWrapper.component";
@@ -49,6 +48,7 @@ import { FileInputModule } from "src/getFileInput/module";
 import { SapiViewsFeatureConnectivityModule } from "src/features/connectivity";
 import { LabelEventDirective } from "src/ui/verticalBreadCrumb/labelEvent.directive";
 import { AvailableATPDirective } from "src/atlasComponents/sapi/core/availableATP.directive";
+import { NeighbourOverlay } from "src/components/neighbourOverlay/neighbourOverlay.component";
 
 @NgModule({
   imports: [
@@ -75,7 +75,6 @@ import { AvailableATPDirective } from "src/atlasComponents/sapi/core/availableAT
     NgLayerCtrlCmp,
     SmartChipModule,
     ReactiveFormsModule,
-    TabComponent,
     AtlasViewerRouterModule,
     
     MouseOver,
@@ -87,6 +86,7 @@ import { AvailableATPDirective } from "src/atlasComponents/sapi/core/availableAT
     SapiViewsFeatureConnectivityModule,
     LabelEventDirective,
     AvailableATPDirective,
+    NeighbourOverlay,
     
     ...(environment.ENABLE_LEAP_MOTION ? [LeapModule] : [])
   ],

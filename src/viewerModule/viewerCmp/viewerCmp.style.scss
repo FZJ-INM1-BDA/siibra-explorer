@@ -25,6 +25,8 @@ mat-drawer
   transition: margin-left 200ms cubic-bezier(0.35, 0, 0.25, 1);
 
   position: relative;
+  overflow-x: hidden;
+  overflow-y: auto;
   & > sxplr-vertical-bread-crumb
   {
     position: relative;
@@ -116,13 +118,17 @@ mat-card-content.context-menu-container
   padding: 0;
 }
 
-sxplr-tab
+.sxplr-tab
 {
+  margin-top: 2rem;
   pointer-events: all;
   margin-left: -1rem;
-  margin-top: 2rem;
-  margin-right: 1rem;
-  display: inline-block;
+
+  mat-icon
+  {
+    margin-left: 0.5rem;
+    margin-right: -0.5rem;
+  }
 }
 
 
@@ -162,17 +168,22 @@ div[iavLayoutFourCornersTopLeft]
   max-height: 90dvh;
   overflow-y: auto;
   padding: 0.5rem 0rem;
-  
-  &.left-panel-container
-  {
-    display: flex;
-    flex-direction: column;
-    justify-content: stretch;
 
-    > *
-    {
-      flex: 0 0 auto;
-    }
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  
+}
+
+.left-panel-container
+{
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+
+  > *
+  {
+    flex: 0 0 auto;
   }
 }
 

@@ -20,16 +20,6 @@
     }
 }
 
-
-.list-hover-icon-container
-{
-    height: 0;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    transform: translateY(-2rem);
-}
-
 div.vbc-card-container.vbc-hidden
 {
     &::before
@@ -346,25 +336,6 @@ mat-divider.panel-divider
     &:first-child
     {
         margin-top: 0;
-    }
-}
-
-.tab-content-wrapper
-{
-    background-color: rgba(0, 0, 0, 0.2);
-    mat-card
-    {
-        margin: 0.25rem 0 0 0;
-        overflow-x: hidden;
-
-        &:first-child
-        {
-            margin: 0;
-        }
-    }
-    .hoverable.mat-elevation-z1
-    {
-        margin-bottom: 0;
     }
 }
 

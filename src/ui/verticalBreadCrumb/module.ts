@@ -19,7 +19,6 @@ import { OnFocusSelectDirective } from "./focusSelect.directive";
 import { SxplrDumbFeatureList } from "src/features/dumbList/dumbList.component";
 import { TPBRViewCmp } from "src/features/TPBRView/TPBRView.component";
 import { VolumesModule } from "src/atlasComponents/sapiViews/volumes/volumes.module";
-import { TabComponent } from "src/components/tab/tab.components";
 import { SimpleAssignmentView } from "src/atlasComponents/sapiViews/volumes/assignment-views/simple/assignment-view-simple.component";
 import { FullAssignmentView } from "src/atlasComponents/sapiViews/volumes/assignment-views/full/assignment-view-full.component";
 import { ZipFilesOutputModule } from "src/zipFilesOutput/module";
@@ -38,6 +37,7 @@ import { LabelEventDirective } from "./labelEvent.directive";
 import { AtlasViewerRouterModule } from "src/routerModule";
 import { FileInputModule } from "src/getFileInput/module";
 import { SpotLightModule } from "src/spotlight/spot-light.module";
+import { NeighbourOverlay } from "src/components/neighbourOverlay/neighbourOverlay.component";
 
 @NgModule({
   imports: [
@@ -59,7 +59,6 @@ import { SpotLightModule } from "src/spotlight/spot-light.module";
     SxplrDumbFeatureList,
     TPBRViewCmp,
     VolumesModule,
-    TabComponent,
     SimpleAssignmentView,
     FullAssignmentView,
     ZipFilesOutputModule,
@@ -77,6 +76,7 @@ import { SpotLightModule } from "src/spotlight/spot-light.module";
     AtlasViewerRouterModule,
     FileInputModule,
     SpotLightModule,
+    NeighbourOverlay,
 ],
   declarations: [
     VerticalBreadCrumbComponent,

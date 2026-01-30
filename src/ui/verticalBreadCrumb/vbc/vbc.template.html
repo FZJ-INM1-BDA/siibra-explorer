@@ -1,4 +1,15 @@
-<ng-template [ngIf]="view$ | async" let-view>
+<ng-template #loadingTmpl>
+    <mat-card class="sxplr-m-1">
+        <mat-card-content>
+            <span>
+                Loading ...
+            </span>
+            <mat-spinner [diameter]="24"></mat-spinner>
+        </mat-card-content>
+    </mat-card>
+</ng-template>
+
+<ng-template [ngIf]="view$ | async" let-view [ngIfElse]="loadingTmpl">
 
     <!-- child views -->
     <ng-template #viewNavigate>
@@ -347,7 +358,7 @@
             
             <!-- point assignment -->
             <button mat-list-item
-                *ngIf="view.isVolumetric"
+                *ngIf="view.isVolumetric && view.currentViewport?.center"
                 (click)="assignPoint(view.currentViewport.center, view.selectedATP.template)">
                 <mat-icon matListItemIcon>assessment</mat-icon>
                 <span mat-list-item-title>
@@ -357,20 +368,20 @@
 
             
             <!-- spatial search util directives -->
-            <div iav-switch #switchdir="iavSwitch"></div>
-            <div sxplr-sapiviews-core-space-boundingbox
-                [sxplr-sapiviews-core-space-boundingbox-atlas]="view.selectedATP.atlas"
-                [sxplr-sapiviews-core-space-boundingbox-space]="view.selectedATP.template"
-                [sxplr-sapiviews-core-space-boundingbox-spec]="view.currentViewport && [view.currentViewport.minpoint, view.currentViewport.maxpoint]"
-                #bbox="sxplrSapiViewsCoreSpaceBoundingBox"
-                >
-            </div>
     
             <sxplr-feature-entry
                 class="sxplr-d-none"
                 [template]="view.selectedATP.template"
                 [bbox]="bbox.bbox$ | async | getProperty : 'bbox'"
-                #voiFeatureEntryCmp="featureEntryCmp">
+                #voiFeatureEntryCmp="featureEntryCmp"
+                sxplr-sapiviews-core-space-boundingbox
+                [sxplr-sapiviews-core-space-boundingbox-atlas]="view.selectedATP.atlas"
+                [sxplr-sapiviews-core-space-boundingbox-space]="view.selectedATP.template"
+                [sxplr-sapiviews-core-space-boundingbox-spec]="view.currentViewport && [view.currentViewport.minpoint, view.currentViewport.maxpoint]"
+                #bbox="sxplrSapiViewsCoreSpaceBoundingBox"
+                iav-switch
+                #switchdir="iavSwitch"
+                >
             </sxplr-feature-entry>
             
             <div *ngIf="switchdir.switchState$ | async"
@@ -424,14 +435,16 @@
                     </ng-template>
                 </span>
             </button>
-            
-            <div class="list-hover-icon-container">
-                
+
+            <neighbour-overlay overlayStyle="previousline-end-inset">
+
                 <ng-template [ngIf]="voiFeatureEntryCmp.busy$ | async">
-                    <mat-spinner [diameter]="24"></mat-spinner>
+                    <mat-spinner class="sxplr-flex-static" [diameter]="24"></mat-spinner>
                 </ng-template>
+                <mat-spinner [diameter]="24"></mat-spinner>
 
                 <button mat-mini-fab
+                    class="sxplr-flex-static"
                     [matTooltip]="view.labels.TOGGLE_SPATIAL_BOXES"
                     [color]="(switchdir.switchState$ | async) ? 'accent' : 'default'"
                     (click)="switchdir.toggle()">
@@ -439,7 +452,8 @@
                         {{ (switchdir.switchState$ | async) ? 'visibility' : 'visibility_off' }}
                     </mat-icon>
                 </button>
-            </div>
+            </neighbour-overlay>
+            
 
             <!-- regional details -->
             <ng-template [ngIf]="view.selectedRegions.length === 1">
@@ -777,65 +791,40 @@
         <plugin-banner></plugin-banner>
     </ng-template>
 
-    <mat-card>
-
-        <mat-button-toggle-group #toggleGroup="matButtonToggleGroup" (change)="toggleGroup.value = toggleGroup.value.slice(-1)" multiple>
-            <mat-button-toggle matTooltip="navigation" value="navigation"
-                sxplr-label-event
-                [labels]="[view.eventLabels.atlasSelection]"
-                (triggered)="$event && toggleGroup.value = ['navigation']"
-                #navBtnTog="matButtonToggle">
-                <mat-icon>navigation</mat-icon>
-            </mat-button-toggle>
-            <mat-button-toggle matTooltip="find" value="find">
-                <mat-icon>search</mat-icon>
-            </mat-button-toggle>
-            <mat-button-toggle matTooltip="annotate" value="annotate"
-                sxplr-label-event
-                [labels]="[view.eventLabels.annotate]"
-                (triggered)="$event && toggleGroup.value = ['annotate']"
-                #navBtnTog="matButtonToggle" >
-                <mat-icon>draw</mat-icon>
-            </mat-button-toggle>
-            <mat-button-toggle matTooltip="share" value="share">
-                <mat-icon>share</mat-icon>
-            </mat-button-toggle>
-            <mat-button-toggle matTooltip="widgets" value="widgets">
-                <mat-icon>widgets</mat-icon>
-            </mat-button-toggle>
-        </mat-button-toggle-group>
-        
-        <div *ngIf="toggleGroup.value.includes('navigation')" class="tab-content-wrapper">
-            <ng-template [ngTemplateOutlet]="viewNavigate"></ng-template>
-        </div>
-        <div *ngIf="toggleGroup.value.includes('find')"
-            class="tab-content-wrapper">
-            <mat-card>
+    <mat-card class="sxplr-m-1">
+        <mat-tab-group class="sxplr-lean-tab" [animationDuration]="0">
+            <mat-tab>
+                <ng-template mat-tab-label>
+                    <mat-icon>navigation</mat-icon>
+                </ng-template>
+                <ng-template [ngTemplateOutlet]="viewNavigate"></ng-template>
+            </mat-tab>
+            <mat-tab>
+                <ng-template mat-tab-label>
+                    <mat-icon>search</mat-icon>
+                </ng-template>
                 <ng-template [ngTemplateOutlet]="viewFind"></ng-template>
-            </mat-card>
-        </div>
-        <div *ngIf="toggleGroup.value.includes('annotate')"
-            class="tab-content-wrapper">
-            <mat-card>
-                <ng-template [ngTemplateOutlet]="viewAnnot"
-                    [ngTemplateOutletContext]="{
-                        expanded: toggleGroup.value.includes('annotate')
-                    }"></ng-template>
-            </mat-card>
-        </div>
-        <div *ngIf="toggleGroup.value.includes('share')"
-            class="tab-content-wrapper">
-            <mat-card>
+            </mat-tab>
+            <mat-tab>
+                <ng-template mat-tab-label>
+                    <mat-icon>draw</mat-icon>
+                </ng-template>
+                <ng-template [ngTemplateOutlet]="viewAnnot"></ng-template>
+            </mat-tab>
+            <mat-tab>
+                <ng-template mat-tab-label>
+                    <mat-icon>share</mat-icon>
+                </ng-template>
                 <ng-template [ngTemplateOutlet]="viewShare"></ng-template>
-            </mat-card>
-        </div>
-        <div *ngIf="toggleGroup.value.includes('widgets')"
-            class="tab-content-wrapper">
-            <mat-card>
+            </mat-tab>
+            <mat-tab>
+                <ng-template mat-tab-label>
+                    <mat-icon>widgets</mat-icon>
+                </ng-template>
                 <ng-template [ngTemplateOutlet]="viewTools"></ng-template>
-            </mat-card>
-        </div>
-        
+            </mat-tab>
+        </mat-tab-group>
+
     </mat-card>
 
 
