@@ -5,7 +5,7 @@ import { LoggingService } from "src/logging";
 import { getExportNehuba, getUuid, switchMapWaitFor, waitFor } from "src/util/fn";
 import { deserializeSegment, NEHUBA_CONFIG, SXPLR_STATE_TOKEN, SxplrNehubaState } from "../util";
 import { arrayOrderedEql, rgbToHex } from 'common/util'
-import { IMeshesToLoad, SET_MESHES_TO_LOAD, PERSPECTIVE_ZOOM_FUDGE_FACTOR } from "../constants";
+import { IMeshesToLoad, SET_MESHES_TO_LOAD, PERSPECTIVE_ZOOM_FUDGE_FACTOR, PSEUDO_ONE } from "../constants";
 import { IColorMap, SET_COLORMAP_OBS, SET_LAYER_VISIBILITY } from "../layerCtrl.service";
 
 /**
@@ -17,6 +17,7 @@ import { PeriodicSvc } from "src/util/periodic.service";
 import { ViewerInternalStateSvc, AUTO_ROTATE, TInteralStatePayload } from "src/viewerModule/viewerInternalState.service";
 import { NehubaConfig } from "../config.service";
 import { DestroyDirective } from "src/util/directives/destroy.directive";
+import { arrayEqual } from "src/util/array";
 
 function translateUnit(unit: Unit) {
   if (unit === "m") {
@@ -139,6 +140,11 @@ export class NehubaViewerUnit {
     @Optional() intViewerStateSvc: ViewerInternalStateSvc,
   ) {
     this.#config = structuredClone(config)
+
+    const imgBkgd = (this.#config?.dataset?.imageBackground || []) as number[]
+    if (imgBkgd && arrayEqual((o, n) => o === n, true)(imgBkgd, [1, 1, 1, 1])) {
+      this.#config.dataset.imageBackground = [PSEUDO_ONE, PSEUDO_ONE, PSEUDO_ONE, 1]
+    }
     
     if (sxplrState$) {
       sxplrState$.pipe(
@@ -149,7 +155,7 @@ export class NehubaViewerUnit {
       ).subscribe(({ octantRemoval, theme, clearSubstrate }) => {
 
         const background: [number, number, number, number] = theme === 'light'
-        ? [1, 1, 1, 1]
+        ? [PSEUDO_ONE, PSEUDO_ONE, PSEUDO_ONE, 1]
         : theme === "dark"
           ? [0, 0, 0, 1]
           : (this.#config?.dataset?.imageBackground || [0, 0, 0, 1])
