@@ -7,6 +7,8 @@ import { UtilModule } from "src/util";
 import { IFrameSrcPipe } from "./iframeSrc.pipe";
 import { PluginBannerUI } from "./pluginBanner/pluginBanner.component";
 import { PluginPortal } from "./pluginPortal/pluginPortal.component";
+import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.directive";
+import { PluginDisabledReasons } from "./pluginEnabled.pipe";
 
 
 @NgModule({
@@ -16,11 +18,13 @@ import { PluginPortal } from "./pluginPortal/pluginPortal.component";
     UtilModule,
     AngularMaterialModule,
     HttpClientModule,
-  ],
+    ExperimentalFlagDirective,
+],
   declarations: [
     PluginBannerUI,
     PluginPortal,
     IFrameSrcPipe,
+    PluginDisabledReasons,
   ],
   exports: [
     PluginBannerUI,

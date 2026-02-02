@@ -440,6 +440,10 @@ export class ConnectivityBrowserComponent implements OnChanges {
             return null
           }
           const b = v.matrices[matrixKey]
+
+          // TODO check if this is an issue
+          // checks column
+          // but b.data[idx] is rows?
           const foundIdx = b.columns.findIndex(v => v['name'] === region.name)
           if (typeof foundIdx !== 'number') {
             return null

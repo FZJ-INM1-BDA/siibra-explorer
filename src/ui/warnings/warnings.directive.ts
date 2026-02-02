@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Directive, inject } from "@angular/core";
-import { combineLatest, concat, merge, of, Subject } from "rxjs";
+import { combineLatest, concat, of, Subject } from "rxjs";
 import { catchError, debounceTime, map, scan, shareReplay, switchMap, take, takeUntil } from "rxjs/operators";
 import { IncidentJson, Incident } from "src/atlasComponents/sapi/sxplrTypes";
 import { environment } from "src/environments/environment.common";
@@ -21,8 +21,6 @@ const SEEN_INCIDENT_KEY = `sxplr.seenincident`
 export class SxplrWarningsDirective {
 
   #destroy$ = inject(DestroyDirective).destroyed$
-
-  #country$ = this.http.get(`${environment.BACKEND_URL || ''}live/geolocation`)
 
   #seeIncidents$ = new Subject<[string, string][]>()
 
@@ -51,56 +49,31 @@ export class SxplrWarningsDirective {
     shareReplay(1),
   )
 
-  warnings$ = merge(
-    this.#country$.pipe(
-      map(json => {
-        console.log("Decoded country", json)
-        const conCode = json?.['continent']?.['code']
-        if (conCode === "EU") {
-          return []
-        }
-        return [
-          `As the infrastructure hosting siibra is located in EU, the users outside EU may experience sub-par loading times. We are aware of the issue, and are persuing remedies.
-
-IP lookup carried out on EBRAINS infrastructure with static data provided by www.maxmind.com under CC-BY-SA 4.0 license.`,
-        ]
-      })
-    )
-  ).pipe(
-    catchError(() => of([] as string[])),
-    scan((acc, curr) => acc.concat(...curr), [] as string[]),
-    shareReplay(1),
-  )
-
   incidents$ = this.http.get<IncidentJson>(`${environment.BACKEND_URL || ''}live/messages`).pipe(
     shareReplay(1),
   )
 
-  messages$ = merge(
-    this.warnings$,
-    this.incidents$.pipe(
-      map(resp => resp.incidents.map(formatIncident)),
-      catchError((err) => {
-        console.log(`Error getting incidents: ${err}`)
-        return of([])
-      })
-    )
+  messages$ = this.incidents$.pipe(
+    map(resp => resp.incidents.map(formatIncident)),
+    catchError((err) => {
+      console.log(`Error getting incidents: ${err}`)
+      return of([])
+    })
   ).pipe(
     scan((acc, curr) => acc.concat(...curr), [] as string[])
   )
 
   newMessagesCount$ = combineLatest([
-    this.warnings$,
     this.incidents$,
     this.seenIncidentUuids$
   ]).pipe(
-    map(([warnings, incidents, seenIncidents]) => {
+    map(([incidents, seenIncidents]) => {
 
       const unseenIncidents = incidents.incidents.filter(incident => {
         const [uuid, hash] = hashIncident(incident)
         return seenIncidents[uuid] !== hash
       })
-      return warnings.length + unseenIncidents.length
+      return unseenIncidents.length
     })
   )
   
