@@ -42,3 +42,11 @@ Feature: Plugin jugex
         Given User ran the analysis
         When User toggles `Annotate`
         Then the sample sites should be visible in the atlas viewer
+
+    Scenario: Block listed 
+        Given User launched the atlas viewer
+        Given User selects any mouse atlas
+        When User expands the `[App]` icon at top right
+        Then siibra-jugex icon should be greyed out
+        Then hover should show reason as tooltip
+        Then clicking should _not_ launch the plugin
