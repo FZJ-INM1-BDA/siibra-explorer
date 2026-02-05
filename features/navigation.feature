@@ -4,11 +4,11 @@ Feature: Navigating the viewer
 
     Scenario: User launches the atlas viewer
         When User launches the atlas viewer
-        Then The user should be directed to Human Multilevel Atlas, in MNI152 space, with Julich Brain 3.0 loaded
+        Then The user should be directed to Human Multilevel Atlas, in MNI152 space, with Julich Brain 3.1 loaded
 
     Scenario: On hover shows region name(s)
         Given User launched atlas viewer
-        Given User navigated to Human Multilevel Atlas, in MNI152 space, with Julich brain 3.0 loaded
+        Given User navigated to Human Multilevel Atlas, in MNI152 space, with Julich brain 3.1 loaded
         Given User has not enabled mobile view
         Given The browser's width is at least 900px wide
 

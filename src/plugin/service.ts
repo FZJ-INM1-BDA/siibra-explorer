@@ -8,6 +8,7 @@ import { PluginPortal } from "./pluginPortal/pluginPortal.component";
 import { environment } from "src/environments/environment"
 import { catchError, startWith } from "rxjs/operators";
 import { of } from "rxjs";
+import { PluginManifest } from "./types";
 
 @Injectable({
   providedIn: 'root'
@@ -23,11 +24,7 @@ export class PluginService {
     private http: HttpClient
   ){}
 
-  pluginManifests$ = this.http.get<{
-    'siibra-explorer': true
-    name: string
-    iframeUrl: string
-  }[]>(`${environment.BACKEND_URL || ''}plugins/manifests`).pipe(
+  pluginManifests$ = this.http.get<PluginManifest[]>(`${environment.BACKEND_URL || ''}plugins/manifests`).pipe(
     startWith([]),
     catchError(() =>  of([]))
   )

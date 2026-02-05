@@ -103,6 +103,7 @@ export function getStoreEffects() {
     userInterface.Effects,
     userInteraction.Effect,
     userPreference.Effects,
+    atlasAppearance.Effect,
   ]
 }
 

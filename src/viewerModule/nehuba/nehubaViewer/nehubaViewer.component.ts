@@ -1,11 +1,11 @@
-import { Component, ElementRef, EventEmitter, OnDestroy, Output, Inject, Optional } from "@angular/core";
-import { Subscription, BehaviorSubject, Observable, Subject, of, interval, combineLatest } from 'rxjs'
-import { debounceTime, filter, scan, switchMap, take, distinctUntilChanged, debounce, map } from "rxjs/operators";
+import { Component, ElementRef, EventEmitter, Output, Inject, Optional, inject } from "@angular/core";
+import { BehaviorSubject, Observable, of, interval, combineLatest } from 'rxjs'
+import { debounceTime, filter, scan, switchMap, take, distinctUntilChanged, debounce, map, takeUntil } from "rxjs/operators";
 import { LoggingService } from "src/logging";
 import { getExportNehuba, getUuid, switchMapWaitFor, waitFor } from "src/util/fn";
-import { deserializeSegment, NEHUBA_INSTANCE_INJTKN } from "../util";
+import { deserializeSegment, NEHUBA_CONFIG, SXPLR_STATE_TOKEN, SxplrNehubaState } from "../util";
 import { arrayOrderedEql, rgbToHex } from 'common/util'
-import { IMeshesToLoad, SET_MESHES_TO_LOAD, PERSPECTIVE_ZOOM_FUDGE_FACTOR } from "../constants";
+import { IMeshesToLoad, SET_MESHES_TO_LOAD, PERSPECTIVE_ZOOM_FUDGE_FACTOR, PSEUDO_ONE } from "../constants";
 import { IColorMap, SET_COLORMAP_OBS, SET_LAYER_VISIBILITY } from "../layerCtrl.service";
 
 /**
@@ -16,6 +16,8 @@ import { NgCoordinateSpace, Unit } from "../types";
 import { PeriodicSvc } from "src/util/periodic.service";
 import { ViewerInternalStateSvc, AUTO_ROTATE, TInteralStatePayload } from "src/viewerModule/viewerInternalState.service";
 import { NehubaConfig } from "../config.service";
+import { DestroyDirective } from "src/util/directives/destroy.directive";
+import { arrayEqual } from "src/util/array";
 
 function translateUnit(unit: Unit) {
   if (unit === "m") {
@@ -56,9 +58,14 @@ export const scanFn = (acc: LayerLabelIndex[], curr: LayerLabelIndex) => {
   styleUrls : [
     './nehubaViewer.style.css',
   ],
+  hostDirectives: [
+    DestroyDirective
+  ]
 })
 
-export class NehubaViewerUnit implements OnDestroy {
+export class NehubaViewerUnit {
+
+  #ondestroy$ = inject(DestroyDirective).destroyed$
 
   #translateVoxelToReal: (voxels: number[]) => number[]
 
@@ -71,10 +78,8 @@ export class NehubaViewerUnit implements OnDestroy {
 
   private exportNehuba: any
 
-  private subscriptions: Subscription[] = []
-
   private _nehubaReady = false
-  @Output() public nehubaReady: EventEmitter<null> = new EventEmitter()
+  @Output() public nehubaReady = new BehaviorSubject<boolean>(false)
   @Output() public layersChanged: EventEmitter<null> = new EventEmitter()
   private layersChangedHandler: any
   @Output() public viewerPositionChange: EventEmitter<{ orientation: number[], perspectiveOrientation: number[], perspectiveZoom: number, zoom: number, position: number[], positionReal?: boolean }> = new EventEmitter()
@@ -97,10 +102,7 @@ export class NehubaViewerUnit implements OnDestroy {
 
   @Output() public totalMeshesToLoad = new EventEmitter<number>()
 
-  /* only used to set initial navigation state */
-  public initNav: any
-
-  public config: NehubaConfig
+  #config: NehubaConfig
   public nehubaViewer: any
   private _dim: [number, number, number]
   get dim() {
@@ -109,9 +111,10 @@ export class NehubaViewerUnit implements OnDestroy {
       : [1.5e9, 1.5e9, 1.5e9]
   }
 
+  /**
+   * @description A collection of subscriptions managed by nehubaviewer to interface with nehuba subscriptions, which uses rxjs 5.4.3
+   */
   #newViewerSubs: { unsubscribe: () => void }[] = []
-
-  public ondestroySubscriptions: Subscription[] = []
 
   public nehubaLoaded: boolean = false
 
@@ -125,7 +128,7 @@ export class NehubaViewerUnit implements OnDestroy {
     public elementRef: ElementRef,
     private log: LoggingService,
     private periodicSvc: PeriodicSvc,
-    @Optional() @Inject(NEHUBA_INSTANCE_INJTKN) private nehubaViewer$: Subject<NehubaViewerUnit>,
+    @Inject(NEHUBA_CONFIG) config: NehubaConfig,
     @Optional() @Inject(SET_MESHES_TO_LOAD) private injSetMeshesToLoad$: Observable<IMeshesToLoad>,
     @Optional() @Inject(SET_COLORMAP_OBS) private setColormap$: Observable<IColorMap>,
     @Optional() @Inject(SET_LAYER_VISIBILITY) private layerVis$: Observable<string[]>,
@@ -133,14 +136,52 @@ export class NehubaViewerUnit implements OnDestroy {
     @Optional() @Inject(NG_LAYER_CONTROL) layerCtrlCb: (callback: (arg: TNgLayerCtrl<keyof INgLayerCtrl>) => void) => () => void,
     @Optional() @Inject(Z_TRAVERSAL_MULTIPLIER) multiplier$: Observable<number>,
     @Optional() @Inject(EXTERNAL_LAYER_CONTROL) private externalLayerCtrl: IExternalLayerCtl,
+    @Optional() @Inject(SXPLR_STATE_TOKEN) sxplrState$: Observable<SxplrNehubaState>,
     @Optional() intViewerStateSvc: ViewerInternalStateSvc,
   ) {
+    this.#config = structuredClone(config)
+
+    const imgBkgd = (this.#config?.dataset?.imageBackground || []) as number[]
+    if (imgBkgd && arrayEqual((o, n) => o === n, true)(imgBkgd, [1, 1, 1, 1])) {
+      this.#config.dataset.imageBackground = [PSEUDO_ONE, PSEUDO_ONE, PSEUDO_ONE, 1]
+    }
+    
+    if (sxplrState$) {
+      sxplrState$.pipe(
+        debounce(() => this.nehubaReady.pipe(
+          filter(v => !!v),
+        )),
+        takeUntil(this.#ondestroy$)
+      ).subscribe(({ octantRemoval, theme, clearSubstrate }) => {
+
+        const background: [number, number, number, number] = theme === 'light'
+        ? [PSEUDO_ONE, PSEUDO_ONE, PSEUDO_ONE, 1]
+        : theme === "dark"
+          ? [0, 0, 0, 1]
+          : (this.#config?.dataset?.imageBackground || [0, 0, 0, 1])
+    
+        this.nehubaViewer.crossSectionBackground = background
+        this.nehubaViewer.perspectiveViewBackground = background
+
+        const ctrl = this.nehubaViewer?.ngviewer?.showPerspectiveSliceViews
+        if (ctrl) {
+          const newVal = typeof octantRemoval === 'undefined'
+            ? !ctrl.value
+            : octantRemoval
+          ctrl.restoreState(newVal)
+        }
+        
+        if (clearSubstrate) {
+          this.nehubaViewer.config.layout.useNehubaPerspective.drawSubstrates.color = [1, 1, 1, 0]
+          this.nehubaViewer.redraw()
+        }
+      })
+    }
+
     if (multiplier$) {
-      this.ondestroySubscriptions.push(
-        multiplier$.subscribe(val => this.multplier[0] = val)
-      )
-    } else {
-      this.multplier[0] = 1
+      multiplier$.pipe(
+        takeUntil(this.#ondestroy$)
+      ).subscribe(val => this.multplier[0] = val)
     }
 
     if (intViewerStateSvc) {
@@ -186,7 +227,8 @@ export class NehubaViewerUnit implements OnDestroy {
         }
       })
 
-      this.onDestroyCb.push(() => done())
+      this.#ondestroy$.subscribe(() => done())
+
       next({
         "@id": getUuid(),
         '@type': "TViewerInternalStateEmitterEvent",
@@ -196,15 +238,11 @@ export class NehubaViewerUnit implements OnDestroy {
       this.internalStateNext = next
     }
 
-    if (this.nehubaViewer$) {
-      this.nehubaViewer$.next(this)
-    }
-
     getExportNehuba()
       .then(exportNehuba => {
         this.nehubaLoaded = true
         this.exportNehuba = exportNehuba
-        const fixedZoomPerspectiveSlices = this.config && this.config.layout && this.config.layout.useNehubaPerspective && this.config.layout.useNehubaPerspective.fixedZoomPerspectiveSlices
+        const fixedZoomPerspectiveSlices = this.#config && this.#config.layout && this.#config.layout.useNehubaPerspective && this.#config.layout.useNehubaPerspective.fixedZoomPerspectiveSlices
         if (fixedZoomPerspectiveSlices) {
           const { sliceZoom, sliceViewportWidth, sliceViewportHeight } = fixedZoomPerspectiveSlices
           const dim = Math.min(sliceZoom * sliceViewportWidth, sliceZoom * sliceViewportHeight)
@@ -215,8 +253,8 @@ export class NehubaViewerUnit implements OnDestroy {
 
         const viewer = this.nehubaViewer.ngviewer
 
-        const layers: Record<string, any> = this.config?.dataset?.initialNgState?.layers || {}
-        let layerReadyCallbacks = Object.keys(this.config?.dataset?.initialNgState?.layers || {})
+        const layers: Record<string, any> = this.#config?.dataset?.initialNgState?.layers || {}
+        let layerReadyCallbacks = Object.keys(this.#config?.dataset?.initialNgState?.layers || {})
           .map(name => {
             const layer = layers[name]
             const shader = layer.shader
@@ -247,94 +285,91 @@ export class NehubaViewerUnit implements OnDestroy {
             }
           }
           this._nehubaReady = true
-          this.nehubaReady.emit(null)
+          this.nehubaReady.next(true)
         })
         viewer.registerDisposer(this.layersChangedHandler)
       })
       .catch(e => this.errorEmitter.emit(e))
 
     if (this.setColormap$) {
-      this.ondestroySubscriptions.push(
-        this.setColormap$.pipe(
-          switchMap(switchMapWaitFor({
-            condition: () => this._nehubaReady
-          })),
-          debounceTime(160),
-        ).subscribe(v => {
-          const map = new Map()
-          for (const key in v) {
-            const m = new Map()
-            map.set(key, m)
-            for (const lblIdx in v[key]) {
-              m.set(lblIdx, v[key][lblIdx])
-            }
+      this.setColormap$.pipe(
+        takeUntil(this.#ondestroy$),
+        switchMap(switchMapWaitFor({
+          condition: () => this._nehubaReady
+        })),
+        debounceTime(160),
+      ).subscribe(v => {
+        const map = new Map()
+        for (const key in v) {
+          const m = new Map()
+          map.set(key, m)
+          for (const lblIdx in v[key]) {
+            m.set(lblIdx, v[key][lblIdx])
           }
-          this.setColorMap(map)
-        })
-      )
+        }
+        this.setColorMap(map)
+      })
     } else {
       this.log.error(`SET_COLORMAP_OBS not provided`)
     }
 
     if (this.layerVis$) {
-      this.ondestroySubscriptions.push(
-        this.layerVis$.pipe(
-          switchMap(switchMapWaitFor({
-            condition: () => this._nehubaReady
-          })),
-          distinctUntilChanged(arrayOrderedEql),
-          debounceTime(160),
-        ).subscribe((layerNames: string[]) => {
-          /**
-           * debounce 160ms to set layer invisible etc
-           * on switch from freesurfer -> volumetric viewer, race con results in managed layer not necessarily setting layer visible correctly
-           */
-          const managedLayers = this.nehubaViewer.ngviewer.layerManager.managedLayers
-          managedLayers.forEach(layer => {
-            if (this.externalLayerCtrl && this.externalLayerCtrl.ExternalLayerNames.has(layer.name)) {
-              return
-            }
-            layer.setVisible(false)
-          })
-          
-          for (const layerName of layerNames) {
-            const layer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(layerName)
-            if (layer) {
-              layer.setVisible(true)
-            } else {
-              this.log.log('layer unavailable', layerName)
-            }
+      this.layerVis$.pipe(
+        takeUntil(this.#ondestroy$),
+        switchMap(switchMapWaitFor({
+          condition: () => this._nehubaReady
+        })),
+        distinctUntilChanged(arrayOrderedEql),
+        debounceTime(160),
+      ).subscribe((layerNames: string[]) => {
+        /**
+         * debounce 160ms to set layer invisible etc
+         * on switch from freesurfer -> volumetric viewer, race con results in managed layer not necessarily setting layer visible correctly
+         */
+        const managedLayers = this.nehubaViewer.ngviewer.layerManager.managedLayers
+        managedLayers.forEach(layer => {
+          if (this.externalLayerCtrl && this.externalLayerCtrl.ExternalLayerNames.has(layer.name)) {
+            return
           }
+          layer.setVisible(false)
         })
-      )
+        
+        for (const layerName of layerNames) {
+          const layer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(layerName)
+          if (layer) {
+            layer.setVisible(true)
+          } else {
+            this.log.log('layer unavailable', layerName)
+          }
+        }
+      })
     } else {
       this.log.error(`SET_LAYER_VISIBILITY not provided`)
     }
 
     if (this.segVis$) {
-      this.ondestroySubscriptions.push(
-        this.segVis$.pipe(
-          switchMap(
-            switchMapWaitFor({
-              condition: () => this._nehubaReady,
-              leading: true,
-            })
-          )
-        ).subscribe(val => {
-          // null === hide all seg
-          if (val === null) {
-            this.hideAllSeg()
-            return
-          }
-          // empty array === show all seg
-          if (val.length === 0) {
-            this.showAllSeg()
-            return
-          }
-          // show limited seg
-          this.showSegs(val)
-        })
-      )
+      this.segVis$.pipe(
+        takeUntil(this.#ondestroy$),
+        switchMap(
+          switchMapWaitFor({
+            condition: () => this._nehubaReady,
+            leading: true,
+          })
+        )
+      ).subscribe(val => {
+        // null === hide all seg
+        if (val === null) {
+          this.hideAllSeg()
+          return
+        }
+        // empty array === show all seg
+        if (val.length === 0) {
+          this.showAllSeg()
+          return
+        }
+        // show limited seg
+        this.showSegs(val)
+      })
     } else {
       this.log.error(`SET_SEGMENT_VISIBILITY not provided`)
     }
@@ -342,72 +377,78 @@ export class NehubaViewerUnit implements OnDestroy {
     if (layerCtrlCb) {
       (async () => {
         await waitFor(() => this._nehubaReady)
-
-        this.onDestroyCb.push(
-          layerCtrlCb(message => {
-
-            if (message.type === 'add') {
-              const p = message as TNgLayerCtrl<'add'>
-              this.loadLayer(p.payload)
+        const cleanup = layerCtrlCb(message => {
+          if (message.type === 'add') {
+            const p = message as TNgLayerCtrl<'add'>
+            this.loadLayer(p.payload)
+          }
+          if (message.type === 'remove') {
+            const p = message as TNgLayerCtrl<'remove'>
+            for (const name of p.payload.names){
+              this.removeLayer({ name })
             }
-            if (message.type === 'remove') {
-              const p = message as TNgLayerCtrl<'remove'>
-              for (const name of p.payload.names){
-                this.removeLayer({ name })
-              }
+          }
+          if (message.type === 'update') {
+            const p = message as TNgLayerCtrl<'update'>
+            this.updateLayer(p.payload)
+          }
+          if (message.type === 'setLayerTransparency') {
+            const p = message as TNgLayerCtrl<'setLayerTransparency'>
+            for (const key in p.payload) {
+              this.setLayerTransparency(key, p.payload[key])
             }
-            if (message.type === 'update') {
-              const p = message as TNgLayerCtrl<'update'>
-              this.updateLayer(p.payload)
+          }
+          if (message.type === "updateShader") {
+            const p = message as TNgLayerCtrl<'updateShader'>
+            for (const key in p.payload) {
+              this.setLayerShader(key, p.payload[key])
             }
-            if (message.type === 'setLayerTransparency') {
-              const p = message as TNgLayerCtrl<'setLayerTransparency'>
-              for (const key in p.payload) {
-                this.setLayerTransparency(key, p.payload[key])
-              }
-            }
-            if (message.type === "updateShader") {
-              const p = message as TNgLayerCtrl<'updateShader'>
-              for (const key in p.payload) {
-                this.setLayerShader(key, p.payload[key])
-              }
-            }
-          })
-        )
+          }
+        })
+        
+        this.#ondestroy$.subscribe(() => cleanup())
       })()
     } else {
       this.log.error(`NG_LAYER_CONTROL not provided`)
     }
 
     if (this.injSetMeshesToLoad$) {
-      this.subscriptions.push(
-        combineLatest([
-          this.#triggerMeshLoad$,
-          this.injSetMeshesToLoad$.pipe(
-            scan(scanFn, []),
-          ),
-        ]).pipe(
-          map(([_, val]) => val),
-          debounce(() => this._nehubaReady
-            ? of(true)
-            : interval(160).pipe(
-              filter(() => this._nehubaReady),
-              take(1),
-            )
-          ),
-        ).subscribe(layersLabelIndex => {
-          let totalMeshes = 0
-          for (const layerLayerIndex of layersLabelIndex) {
-            const { layer, labelIndicies } = layerLayerIndex
-            totalMeshes += labelIndicies.length
-            this.nehubaViewer.setMeshesToLoad(labelIndicies, layer)
-          }
-          this.totalMeshesToLoad.emit(totalMeshes)
-        }),
-      )
+      combineLatest([
+        this.#triggerMeshLoad$,
+        this.injSetMeshesToLoad$.pipe(
+          scan(scanFn, []),
+        ),
+      ]).pipe(
+        takeUntil(this.#ondestroy$),
+        map(([_, val]) => val),
+        debounce(() => this._nehubaReady
+          ? of(true)
+          : interval(160).pipe(
+            filter(() => this._nehubaReady),
+            take(1),
+          )
+        ),
+      ).subscribe(layersLabelIndex => {
+        let totalMeshes = 0
+        for (const layerLayerIndex of layersLabelIndex) {
+          const { layer, labelIndicies } = layerLayerIndex
+          totalMeshes += labelIndicies.length
+          this.nehubaViewer.setMeshesToLoad(labelIndicies, layer)
+        }
+        this.totalMeshesToLoad.emit(totalMeshes)
+      })
     } else {
       this.log.error(`SET_MESHES_TO_LOAD not provided`)
     }
+
+    this.#ondestroy$.subscribe(() => {
+
+      while (this.#newViewerSubs.length > 0) {
+        this.#newViewerSubs.pop().unsubscribe()
+      }
+      
+      this.nehubaViewer && this.nehubaViewer.dispose()
+    })
   }
 
   public applyGpuLimit(gpuLimit: number) {
@@ -439,7 +480,7 @@ export class NehubaViewerUnit implements OnDestroy {
     
     const { createNehubaViewer } = this.exportNehuba
 
-    this.nehubaViewer = createNehubaViewer(this.config, (err: string) => {
+    this.nehubaViewer = createNehubaViewer(this.#config, (err: string) => {
       /* print in debug mode */
       this.log.warn(err)
     });
@@ -477,30 +518,8 @@ export class NehubaViewerUnit implements OnDestroy {
     this.newViewerInit()
     window['nehubaViewer'] = this.nehubaViewer
 
-    this.onDestroyCb.push(() => {
-      window['nehubaViewer'] = null
-    })
+    this.#ondestroy$.subscribe(() => window['nehubaViewer'] = null)
   }
-
-  public ngOnDestroy() {
-    if (this.nehubaViewer$) {
-      this.nehubaViewer$.next(null)
-    }
-    while (this.subscriptions.length > 0) {
-      this.subscriptions.pop().unsubscribe()
-    }
-    while (this.#newViewerSubs.length > 0) {
-      this.#newViewerSubs.pop().unsubscribe()
-    }
-    
-    this.ondestroySubscriptions.forEach(s => s.unsubscribe())
-    while (this.onDestroyCb.length > 0) {
-      this.onDestroyCb.pop()()
-    }
-    this.nehubaViewer && this.nehubaViewer.dispose()
-  }
-
-  private onDestroyCb: Array<() => void> = []
 
   private patchNG() {
 
@@ -532,7 +551,7 @@ export class NehubaViewerUnit implements OnDestroy {
     }
 
     /* eslint-disable-next-line @typescript-eslint/no-empty-function */
-    this.onDestroyCb.push(() => LayerManager.prototype.invokeAction = (_arg) => { /** in default neuroglancer, this function is invoked when selection occurs */ })
+    this.#ondestroy$.subscribe(() => LayerManager.prototype.invokeAction = (_arg) => { /** in default neuroglancer, this function is invoked when selection occurs */ })
   }
 
   private filterLayers(l: any, layerObj: any): boolean {
@@ -760,18 +779,6 @@ export class NehubaViewerUnit implements OnDestroy {
     }
   }
 
-  public toggleOctantRemoval(flag?: boolean) {
-    const ctrl = this.nehubaViewer?.ngviewer?.showPerspectiveSliceViews
-    if (!ctrl) {
-      this.log.error(`toggleOctantRemoval failed. this.nehubaViewer.ngviewer?.showPerspectiveSliceViews returns falsy`)
-      return
-    }
-    const newVal = typeof flag === 'undefined'
-      ? !ctrl.value
-      : flag
-    ctrl.restoreState(newVal)
-  }
-
   private async setLayerTransparency(layerName: string, alpha: number) {
     await waitFor(() => {
       const layer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(layerName)
@@ -865,12 +872,12 @@ export class NehubaViewerUnit implements OnDestroy {
       })
       /**
        * somewhat another fudge factor
-       * navigationState.all occassionally emits slice zoom and perspective zoom that maeks no sense
+       * navigationState.all occassionally emits slice zoom and perspective zoom that makes no sense
        * filter those out
        * 
        * TODO find out why, and perhaps inform pavel about this
        */
-      .filter(val => !this.initNav && val?.perspectiveZoom > 10)
+      .filter(val => val?.perspectiveZoom > 10)
       .subscribe(({ orientation, perspectiveOrientation, perspectiveZoom, position, zoom }) => {
         const payload = {
           orientation : Array.from(orientation),
@@ -931,11 +938,6 @@ export class NehubaViewerUnit implements OnDestroy {
     })
     this.nehubaViewer.ngviewer.registerDisposer(coordSpListener)
 
-    if (this.initNav) {
-      this.setNavigationState(this.initNav)
-      this.initNav = null
-    }
-    
   }
 
   private setColorMap(map: Map<string, Map<number, {red: number, green: number, blue: number}>>) {

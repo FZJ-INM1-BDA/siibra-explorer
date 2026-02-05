@@ -91,7 +91,7 @@
     ],
     "codeRepository": "git+https://github.com/fzj-inm1-bda/siibra-explorer.git",
     "dateCreated": "2024-08-28",
-    "dateModified": "2025-11-21",
+    "dateModified": "2026-02-02",
     "datePublished": "2019-04-26",
     "description": "`siibra-explorer` is a browser based 3D viewer for exploring brain atlases that cover different spatial resolutions and modalities. It is built around an interactive 3D view of the brain displaying a unique selection of detailed templates and parcellation maps for the human, macaque, rat or mouse brain, including BigBrain as a microscopic resolution human brain model at its full resolution of 20 micrometers. ",
     "license": "https://spdx.org/licenses/Apache-2.0",
@@ -100,9 +100,9 @@
         "python 3",
         "typescript"
     ],
-    "schema:releaseNotes": "# v2.14.26\n\n## Features\n\n- Added marmoset VIP route\n\n- Serialize selected geometry (currently only points) as `g:` in URL.\n\n- Added reset button to `x-overlay-layer`\n\n- Seen incidents will not be badged\n\n## Bugfixes\n\n- Fixed a bug where parcellation toggle was not visible for atlases with a single parcellation (#1502). Thanks @PolarBean for reporting the issue.\n\n- Fixed documentation in plugin API of required params.\n\n- Fixed error shortcode warning\n\n- Fixed some nifti dtype handling, and shader generation\n\n- Fixed escaping double colon `__dblcol__` --> `::` in `x-overlay-layer`\n\n- Fix incident fetching\n\n## Behind the scene\n\n- Fix deadlinks in docs, added CI pipeline to catch deadlinks in docs\n\n- Removed unused parameters\n\n- Selected features will no longer be cleared when changing parcellation\n\n- Allow showing vanilla neuroglancer ui (with `window.sxplr.showNgUi()`)\n\n- Simplified annotation name/desc serialization\n",
+    "schema:releaseNotes": "# v2.14.27\n\n## Features\n\n- plugins are now only enabled via an allow list mechanism. By default, the plugin will not be enabled. This should not affect launching plugin via URL.\n- (experimental) allow blue substrate to be toggled off\n\n## Bugfixes\n\n- Fixed nifti parsing uint8 (#1506). (Thanks @PolarBean for reporting the issue)\n- Fixed mousehover in light theme issue.\n\n## Behind the scene\n\n- removed geolocation. client IP (in most cases) will not be visible to the application. \n",
     "runtimePlatform": "docker",
-    "version": "2.14.26",
+    "version": "2.14.27",
     "contIntegration": "https://github.com/FZJ-INM1-BDA/siibra-explorer/actions",
     "codemeta:continuousIntegration": {
         "id": "https://github.com/FZJ-INM1-BDA/siibra-explorer/actions"

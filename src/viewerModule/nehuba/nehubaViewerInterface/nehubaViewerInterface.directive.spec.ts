@@ -1,4 +1,4 @@
-import { Component } from "@angular/core"
+import { Component, Injector } from "@angular/core"
 import { TestBed, ComponentFixture, fakeAsync, tick, flush, discardPeriodicTasks } from "@angular/core/testing"
 import { By } from "@angular/platform-browser"
 import { MockStore, provideMockStore } from "@ngrx/store/testing"
@@ -9,6 +9,9 @@ import { userPreference, atlasSelection, atlasAppearance } from "src/state"
 import { LayerCtrlEffects } from "../layerCtrl.service/layerCtrl.effects"
 import { mapTo } from "rxjs/operators"
 import { translateV3Entities } from "src/atlasComponents/sapi/translateV3"
+import { NEHUBA_CONFIG } from "../util"
+import { NehubaConfig } from "../config.service"
+import { provideMockActions } from "@ngrx/effects/testing"
 
 describe('> nehubaViewerInterface.directive.ts', () => {
   let distinctATPSpy: jasmine.Spy
@@ -31,6 +34,7 @@ describe('> nehubaViewerInterface.directive.ts', () => {
         ],
         providers: [
           provideMockStore(),
+          provideMockActions(() => NEVER),
           {
             provide: LayerCtrlEffects,
             useValue: {
@@ -143,11 +147,18 @@ describe('> nehubaViewerInterface.directive.ts', () => {
         it('> if viewerConfig has gpuLimit, gpuMemoryLimit will be in initialNgSTate', async () => {
           
           await directiveInstance.createNehubaInstance(nehubaConfig)
+
+          expect(elCreateComponentSpy).toHaveBeenCalledTimes(1)
+          const c = elCreateComponentSpy.calls
+          const args = c.allArgs()[0]
+          const injector: Injector = args[args.length - 1]['injector']
+          const config = injector.get(NEHUBA_CONFIG) as NehubaConfig
+
           expect(
-            directiveInstance.nehubaViewerInstance?.config?.dataset?.initialNgState?.gpuMemoryLimit
+            config.dataset?.initialNgState?.gpuMemoryLimit
           ).toEqual(gpuLimit)
           expect(
-            directiveInstance.nehubaViewerInstance?.config?.dataset?.initialNgState?.gpuLimit
+            config.dataset?.initialNgState?.gpuLimit
           ).toBeFalsy()
         })
       })

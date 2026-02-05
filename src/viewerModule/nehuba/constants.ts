@@ -69,3 +69,12 @@ export const VOXEL_SIZE_MAP: Record<string, AtlasInfo> = {
   "ABA_Mouse_CCFv3_2015_25um.cutlas": ambaCcfV3,
   "ABA_Mouse_CCFv3_2017_25um.cutlas": ambaCcfV3,
 }
+
+// hbp forke of neuroglancer has a nasty bug where, in perspective view. To reproduce:
+// - go to big brain, disable aux mesh
+// - select any region
+// - move mouse to white space 
+// expected behavior: no hover text - actual behavior - selected region is hovered
+// it seems the algo perspective panel use to pick what is hovered will errorenously pick
+// #ffffff as 1, which seems to cast it as segmentation layer?
+export const PSEUDO_ONE = 254 / 255

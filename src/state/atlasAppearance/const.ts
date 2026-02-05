@@ -11,6 +11,7 @@ type NgLayerBase = {
   sxplrAnnotations?: Record<string, string>
 } & CustomLayerBase
 
+// n.b. custom colormap *only* works if the region has color attribute defined.
 export type ColorMapCustomLayer = {
   clType: 'customlayer/colormap' | 'baselayer/colormap'
   colormap: WeakMap<SxplrRegion, number[]>

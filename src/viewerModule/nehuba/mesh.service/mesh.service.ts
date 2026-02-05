@@ -150,16 +150,17 @@ export class NehubaMeshService implements OnDestroy {
       }
       const hasSegSelected = selectedSegMesh.some(v => v.labelIndicies.length !== 0)
       const hasAuxMesh = auxmesh.length > 0
-      const meshesToLoad: IMeshesToLoad[] = []
-      if (!hasSegSelected) {
-        meshesToLoad.push(
-          ...(hasAuxMesh ? selectedSegMesh : allSegMesh),
-          ...auxmesh,
-        )
-      } else {
-        meshesToLoad.push(...selectedSegMesh, ...auxmesh)
+      
+      if (hasAuxMesh) {
+        return of(...auxmesh, ...selectedSegMesh)
       }
-      return of(...meshesToLoad)
+
+      if (hasSegSelected) {
+        return of(...selectedSegMesh)
+      }
+
+      return of(...allSegMesh)
+
     })
   )
 }

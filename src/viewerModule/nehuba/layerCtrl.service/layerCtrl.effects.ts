@@ -1,17 +1,19 @@
 import { Injectable } from "@angular/core";
 import { createEffect } from "@ngrx/effects";
 import { select, Store } from "@ngrx/store";
-import { concat, forkJoin, from, merge, of } from "rxjs";
+import { combineLatest, concat, forkJoin, from, merge, of } from "rxjs";
 import { switchMap, withLatestFrom, catchError, map, debounceTime, shareReplay, distinctUntilChanged, tap, pairwise, filter } from "rxjs/operators";
-import { NgLayerSpec, NgPrecompMeshSpec, NgSegLayerSpec, SxplrAtlas, SxplrParcellation, SxplrTemplate, VoiFeature } from "src/atlasComponents/sapi/sxplrTypes";
+import { NgLayerSpec, NgPrecompMeshSpec, NgSegLayerSpec, SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate, VoiFeature } from "src/atlasComponents/sapi/sxplrTypes";
 import { SAPI } from "src/atlasComponents/sapi"
-import { atlasAppearance, atlasSelection, annotation } from "src/state";
+import { atlasAppearance, atlasSelection, annotation, generalActions } from "src/state";
 import { arrayEqual } from "src/util/array";
 import { getShader } from "src/util/fn";
 import { PMAP_LAYER_NAME } from "../constants";
 import { QuickHash } from "src/util/fn";
 import { getParcNgId } from "../config.service";
 import { SXPLR_ANNOTATIONS_KEY } from "src/util/constants";
+
+const SELECTED_SEG_CUSTOM_CM_KEY = "SELECTED_SEG_CUSTOM_CM_KEY"
 
 @Injectable()
 export class LayerCtrlEffects {
@@ -210,6 +212,65 @@ export class LayerCtrlEffects {
       return atlasAppearance.actions.setMeshTransparency({
         alpha: 0.2
       })
+    })
+  ))
+
+  onRegionSelected = createEffect(() => combineLatest([
+    this.store.pipe(
+      select(atlasSelection.selectors.selectedRegions),
+      distinctUntilChanged(
+        arrayEqual(
+          (ra, rb) => ra.name === rb.name
+        )
+      )
+    ),
+    this.store.pipe(
+      select(atlasAppearance.selectors.showAllSegMeshes),
+      distinctUntilChanged(),
+    )
+  ]).pipe(
+    withLatestFrom(
+      this.store.pipe(
+        select(atlasSelection.selectors.selectedParcAllRegions)
+      )
+    ),
+    switchMap(([ [selectedRegions, showAllMeshes], allRegions ]) => {
+      const rmAction = atlasAppearance.actions.removeCustomLayers({
+        customLayers: [
+          {
+            id: SELECTED_SEG_CUSTOM_CM_KEY,
+          }
+        ]
+      })
+
+      if (!showAllMeshes || selectedRegions.length === 0) {
+        return of(rmAction)
+      }
+      if (!selectedRegions.every(r => r.color)) {
+        return of(generalActions.noop())
+      }
+
+      const selectedRegionNames = new Set(selectedRegions.map(r => r.name))
+      const colormap = new Map<SxplrRegion, number[]>()
+
+      for (const r of allRegions){
+        if (selectedRegionNames.has(r.name)) {
+          colormap.set(r, r.color)
+        } else {
+          colormap.set(r, [255, 255, 255])
+        }
+      }
+      
+      const addAction = atlasAppearance.actions.addCustomLayers({
+        customLayers: [
+          {
+            id: SELECTED_SEG_CUSTOM_CM_KEY,
+            clType: "customlayer/colormap",
+            colormap
+          }
+        ]
+      })
+      return of(rmAction, addAction)
     })
   ))
 

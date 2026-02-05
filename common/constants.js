@@ -148,9 +148,11 @@ If you do not accept the Terms & Conditions you are not permitted to access or u
     CONFIGURE_LAYER: 'Configure layer',
 
     REMOVE_FRONTAL_OCTANT_HELPER_TEXT: `Hide the octant facing the user, and overlaying the slice views.`,
-    GLASS_BRAIN_ENABLE: `Toggle frontal octant to enable glass brain.`,
+    GLASS_BRAIN_ENABLE: `Disable "Remove frontal octant" to enable glass brain.`,
 
     AUXMESH_DESC: `Some templates contain auxiliary meshes, which compliment the appearance of the template in the perspective view.`,
+
+    SHOW_ALL_MESH_WARN: `Showing all meshes is resource intensive - it can cause the browser to slow down, and even crashes`,
 
     OVERWRITE_SAPI_ENDPOINT_ATTR: `x-sapi-base-url`,
     OVERWRITE_SPATIAL_BACKEND_ATTR: `x-spatial-backend-url`,

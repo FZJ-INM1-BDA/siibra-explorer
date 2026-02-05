@@ -1,19 +1,43 @@
-<mat-action-list>
-  <button mat-menu-item
-    *ngFor="let plugin of availablePlugins$ | async"
-    (click)="launchPlugin(plugin)">
-    <span>
-      {{ plugin.name }}
-    </span>
-  </button>
+<ng-template [ngIf]="view$ | async" let-view>
 
-  <button mat-menu-item *ngIf="experimentalFlag$ | async"
-    (click)="showTmpl(thirdPartyPluginTmpl)">
-    <span>
-      Add third party plugin
-    </span>
-  </button>
-</mat-action-list>
+  <mat-list>
+    <ng-template ngFor [ngForOf]="view.plugins" let-plugin>
+
+      <ng-template [ngIf]="plugin | pluginDisabledReasons : view.atlas : view.template : view.parcellation" let-disableReasons>
+        <ng-template [ngIf]="disableReasons.length > 0" [ngIfElse]="enabledTmpl">
+
+          <mat-list-item [matTooltip]="'Plugin disabled: ' + disableReasons.join(', ')">
+            <span class="sxplr-custom-cmp text warn">
+              <i class="fas fa-exclamation-triangle"></i>
+            </span>
+            
+            <span class="text-muted">
+              {{ plugin.name }}
+            </span>
+          </mat-list-item>
+
+        </ng-template>
+
+        <ng-template #enabledTmpl>
+          <button mat-menu-item (click)="launchPlugin(plugin)">
+            {{ plugin.name }}
+          </button>
+        </ng-template>
+
+      </ng-template>
+
+    </ng-template>
+
+    <ng-template sxplrExperimentalFlag [experimental]="true">
+      <button mat-menu-item (click)="showTmpl(thirdPartyPluginTmpl)">
+        <span>
+          Add third party plugin
+        </span>
+      </button>
+    </ng-template>
+  </mat-list>
+
+</ng-template>
 
 <ng-template #thirdPartyPluginTmpl>
   <h2 mat-dialog-title>
@@ -32,13 +56,10 @@
   </mat-dialog-content>
 
   <mat-dialog-actions align="end">
-    <button (click)="addThirdPartyPlugin(urlInput.value)"
-      mat-raised-button
-      color="primary">
+    <button (click)="addThirdPartyPlugin(urlInput.value)" mat-raised-button color="primary">
       Load
     </button>
-    <button mat-dialog-close
-      mat-button>
+    <button mat-dialog-close mat-button>
       cancel
     </button>
   </mat-dialog-actions>

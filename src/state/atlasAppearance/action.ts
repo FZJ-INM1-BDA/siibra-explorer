@@ -44,7 +44,7 @@ export const addCustomLayers = createAction(
 export const removeCustomLayers = createAction(
   `${nameSpace} removeCustomLayer`,
   props<{
-    customLayers: {id: string}[]
+    customLayers: { id: string }[]
   }>()
 )
 
@@ -61,3 +61,5 @@ export const setShowAllSegMeshes = createAction(
     flag: boolean
   }>()
 )
+
+export const clearSubstrate = createAction(`[${nameSpace}] clearSubstrate`)
