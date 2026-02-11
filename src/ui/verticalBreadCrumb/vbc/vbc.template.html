@@ -805,11 +805,16 @@
                 </ng-template>
                 <ng-template [ngTemplateOutlet]="viewFind"></ng-template>
             </mat-tab>
-            <mat-tab>
+            <mat-tab #drawTab="matTab">
                 <ng-template mat-tab-label>
                     <mat-icon>draw</mat-icon>
                 </ng-template>
-                <ng-template [ngTemplateOutlet]="viewAnnot"></ng-template>
+                <ng-template
+                    [ngTemplateOutlet]="viewAnnot"
+                    [ngTemplateOutletContext]="{
+                        expanded: drawTab.isActive
+                    }">
+                </ng-template>
             </mat-tab>
             <mat-tab>
                 <ng-template mat-tab-label>
