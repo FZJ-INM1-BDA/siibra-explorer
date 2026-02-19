@@ -12,7 +12,7 @@ import { take } from "rxjs/operators";
 
 export class ZipFilesOutput {
   @Input('zip-files-output')
-  zipFiles: Observable<TZipFileConfig[]> | TZipFileConfig[] = []
+  zipFiles: Observable<TZipFileConfig[]> | TZipFileConfig[] | null = []
 
   @Input('zip-files-output-zip-filename')
   zipFilename = 'archive.zip'
@@ -37,6 +37,9 @@ export class ZipFilesOutput {
 
   @HostListener('click')
   async onClick(): Promise<void>{
+    if (!this.zipFiles) {
+      return
+    }
     if (Array.isArray(this.zipFiles)) {
       await this.zipArray(this.zipFiles)
       return

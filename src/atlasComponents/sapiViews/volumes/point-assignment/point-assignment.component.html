@@ -24,16 +24,72 @@
     </ng-template>
 
     <ng-template [ngIf]="df$ | async" let-df>
-        <button mat-list-item
-            (click)="openDialog(datatableTmpl)">
-            <mat-icon matListItemIcon
-                fontSet="fas"
-                fontIcon="fa-table">
-            </mat-icon>
-            <div matListItemTitle>
-                Show Full Assignment ({{ df.data.length }})
-            </div>
-        </button>
+        <ng-template [ngIf]="df.data" let-data>
+            <button mat-list-item
+                (click)="openDialog(datatableTmpl)">
+                <mat-icon matListItemIcon
+                    fontSet="fas"
+                    fontIcon="fa-table">
+                </mat-icon>
+                <div matListItemTitle>
+                    Show Full Assignment ({{ data.length }})
+                </div>
+            </button>
+            
+        </ng-template>
+        
+        <ng-template #datatableTmpl>
+            <h2 mat-dialog-title>Assignment</h2>
+            <mat-dialog-content>
+                <table mat-table [dataSource]="df | dfToDs : comphTableSort"
+                    matSort
+                    #comphTableSort="matSort"
+                    matSortActive="map_value"
+                    matSortDirection="desc">
+                    
+                    <ng-container matColumnDef="region">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                            region
+                        </th>
+                        <td mat-cell *matCellDef="let element">
+                            <button mat-button (click)="selectRegion(element['region'], $event)"
+                                class="ws-no-wrap">
+                                {{ element['region'] }}
+                            </button>
+                        </td>
+                    </ng-container>
+
+                    <ng-template ngFor [ngForOf]="columns$ | async" let-column>
+                        <ng-template [ngIf]="column !== 'region'">
+                            <ng-container [matColumnDef]="column">
+                                <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                                    {{ column }}
+                                </th>
+                                <td mat-cell *matCellDef="let element">
+                                    {{ element[column] | prettyPresent }}
+                                </td>
+                            </ng-container>
+                        </ng-template>
+                    </ng-template>
+                    
+                
+                    <tr mat-header-row *matHeaderRowDef="columns$ | async"></tr>
+                    <tr mat-row *matRowDef="let row; columns: columns$ | async;"></tr>
+                </table>
+            </mat-dialog-content>
+            <mat-dialog-actions align="center">
+                <button mat-raised-button color="primary"
+                    [zip-files-output]="zipfileConfig$ | async"
+                    zip-files-output-zip-filename="pointassignment.zip">
+                    <i class="fas fa-download"></i>
+                    <span>
+                        Download CSV
+                    </span>
+                </button>
+                <button mat-button mat-dialog-close>Close</button>
+            </mat-dialog-actions>
+        </ng-template>
+
     </ng-template>
 
     <ng-template>
@@ -92,56 +148,4 @@
         <tr mat-header-row *matHeaderRowDef="SIMPLE_COLUMNS"></tr>
         <tr class="narrow-row" mat-row *matRowDef="let row; columns: SIMPLE_COLUMNS;"></tr>
     </table>
-</ng-template>
-
-<ng-template #datatableTmpl>
-    <h2 mat-dialog-title>Assignment</h2>
-    <mat-dialog-content>
-        <table mat-table [dataSource]="df$ | async | dfToDs : comphTableSort"
-            matSort
-            #comphTableSort="matSort"
-            matSortActive="map_value"
-            matSortDirection="desc">
-            
-            <ng-container matColumnDef="region">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>
-                    region
-                </th>
-                <td mat-cell *matCellDef="let element">
-                    <button mat-button (click)="selectRegion(element['region'], $event)"
-                        class="ws-no-wrap">
-                        {{ element['region'] }}
-                    </button>
-                </td>
-            </ng-container>
-
-            <ng-template ngFor [ngForOf]="columns$ | async" let-column>
-                <ng-template [ngIf]="column !== 'region'">
-                    <ng-container [matColumnDef]="column">
-                        <th mat-header-cell *matHeaderCellDef mat-sort-header>
-                            {{ column }}
-                        </th>
-                        <td mat-cell *matCellDef="let element">
-                            {{ element[column] | prettyPresent }}
-                        </td>
-                    </ng-container>
-                </ng-template>
-            </ng-template>
-            
-        
-            <tr mat-header-row *matHeaderRowDef="columns$ | async"></tr>
-            <tr mat-row *matRowDef="let row; columns: columns$ | async;"></tr>
-        </table>
-    </mat-dialog-content>
-    <mat-dialog-actions align="center">
-        <button mat-raised-button color="primary"
-            [zip-files-output]="zipfileConfig$ | async"
-            zip-files-output-zip-filename="pointassignment.zip">
-            <i class="fas fa-download"></i>
-            <span>
-                Download CSV
-            </span>
-        </button>
-        <button mat-button mat-dialog-close>Close</button>
-    </mat-dialog-actions>
 </ng-template>
