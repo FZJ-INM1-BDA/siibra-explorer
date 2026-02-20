@@ -1,10 +1,12 @@
-import { Component, Inject, inject } from "@angular/core";
+import { Component, CUSTOM_ELEMENTS_SCHEMA, Inject, inject } from "@angular/core";
 import { MAT_DIALOG_DATA } from "src/sharedModules/angularMaterial.exports"
 import { ARIA_LABELS, CONST } from 'common/constants'
 import { BehaviorSubject, combineLatest, concat, of, timer } from "rxjs";
 import { map, take } from "rxjs/operators";
 import { MediaQueryDirective } from "src/util/directives/mediaQuery.directive";
 import { Action } from "src/util/types";
+import { CommonModule } from "@angular/common";
+import { AngularMaterialModule } from "src/sharedModules";
 
 export type UserLayerInfoData = {
   layerName: string
@@ -22,6 +24,14 @@ export type UserLayerInfoData = {
   ],
   hostDirectives: [
     MediaQueryDirective
+  ],
+  standalone: true,
+  imports: [
+    CommonModule,
+    AngularMaterialModule,
+  ],
+  schemas: [
+    CUSTOM_ELEMENTS_SCHEMA,
   ]
 })
 

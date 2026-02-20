@@ -56,7 +56,7 @@
   </button>
 
   <mat-error *ngIf="customUrl.invalid">
-    Error: {{ customUrl.errors.message }}
+    Error: {{ customUrl.errors?.message || 'Unknown error' }}
   </mat-error>
 
   <mat-hint>

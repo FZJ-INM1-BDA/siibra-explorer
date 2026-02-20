@@ -84,7 +84,13 @@ export class FreeModeUIComponent {
       }
     }
   }
-  async onDrop(files: File[]){
+  async onDrop(files: string|File[]){
+    if (typeof files === "string") {
+      this.snackbar.open("No files were dropped", "Dismiss", {
+        duration: 5000
+      })
+      return
+    }
     if (files.length == 0) {
       this.snackbar.open("No files were dropped", "Dismiss", {
         duration: 5000

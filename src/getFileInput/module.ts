@@ -3,14 +3,14 @@ import { NgModule } from "@angular/core";
 import { FileInputDirective } from "./getFileInput.directive";
 import { FileInputModal } from "./fileInputModal/fileInputModal.component";
 import { FormsModule } from "@angular/forms";
-import { DragDropFileModule } from "src/dragDropFile/module";
 import { AngularMaterialModule } from "src/sharedModules";
+import { DragDropFileDirective } from "src/dragDropFile";
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
-    DragDropFileModule,
+    DragDropFileDirective,
     AngularMaterialModule,
   ],
   declarations: [

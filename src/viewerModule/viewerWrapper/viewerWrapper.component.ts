@@ -6,8 +6,10 @@ import { MainState, atlasAppearance, atlasSelection, userInteraction } from "src
 import { distinctUntilChanged, filter, finalize, map, shareReplay, takeUntil } from "rxjs/operators";
 import { arrayEqual } from "src/util/array";
 import { DestroyDirective } from "src/util/directives/destroy.directive";
-import { CLICK_INTERCEPTOR_INJECTOR, ClickInterceptor, HOVER_INTERCEPTOR_INJECTOR, HoverInterceptor, THoverConfig } from "src/util/injectionTokens";
+import { CLICK_INTERCEPTOR_INJECTOR, ClickInterceptor, DragDropCallback, DragDropEv, HOVER_INTERCEPTOR_INJECTOR, HoverInterceptor, THoverConfig } from "src/util/injectionTokens";
 import { SxplrRegion, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
+import { DragDropFileDirective } from "src/dragDropFile";
+import { REGISTER_USER_DRAG_DROP } from "src/util/injectionTokens"
 
 @Component({
   selector: 'viewer-wrapper',
@@ -16,12 +18,14 @@ import { SxplrRegion, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes"
     './viewerWrapper.style.css'
   ],
   hostDirectives: [
-    DestroyDirective
+    DestroyDirective,
+    DragDropFileDirective,
   ]
 })
 export class ViewerWrapper {
   
   #destroy$ = inject(DestroyDirective).destroyed$
+  #onFileDrop$ = inject(DragDropFileDirective).dragDropOnDrop
 
   @Output('viewer-event')
   viewerEvent$ = new Subject<
@@ -56,6 +60,19 @@ export class ViewerWrapper {
       takeUntil(this.#destroy$)
     ).subscribe(tmpl => {
       this.#selectedTemplate = tmpl
+    })
+
+    const dndCbs = inject(REGISTER_USER_DRAG_DROP) as DragDropCallback[]
+
+    this.#onFileDrop$.pipe(
+      takeUntil(this.#destroy$)
+    ).subscribe(files => {
+      const payload: DragDropEv = typeof files === "string"
+      ? { type : "text", payload: { input: files }}
+      : { type: "file", payload: { files } }
+      for (const callback of dndCbs){
+        callback(payload)
+      }
     })
 
     /**

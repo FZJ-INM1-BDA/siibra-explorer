@@ -1,4 +1,4 @@
-import { Component, Optional, TemplateRef, ViewChild } from "@angular/core";
+import { Component, inject, Optional, ViewChild } from "@angular/core";
 import { ARIA_LABELS, CONST } from "common/constants";
 import { ModularUserAnnotationToolService } from "../tools/service";
 import { IAnnotationGeometry, TExportFormats } from "../tools/type";
@@ -6,13 +6,10 @@ import { ComponentStore } from "src/viewerModule/componentStore";
 import { debounceTime, map, shareReplay, startWith } from "rxjs/operators";
 import { combineLatest, concat, Observable, of, Subscription } from "rxjs";
 import { TZipFileConfig } from "src/zipFilesOutput/type";
-import { TFileInputEvent } from "src/getFileInput/type";
 import { FileInputDirective } from "src/getFileInput/getFileInput.directive";
-import { MatSnackBar } from 'src/sharedModules/angularMaterial.exports'
-import { unzip } from "src/zipFilesOutput/zipFilesOutput.directive";
 import { DialogService } from "src/services/dialogService.service";
-import { MatDialog } from "src/sharedModules/angularMaterial.exports";
 import { userAnnotationRouteKey } from "../constants";
+import { DragDropCallback, REGISTER_USER_DRAG_DROP } from "src/util/injectionTokens"
 
 const README = `{id}.sands.json file contains the data of annotations. {id}.desc.json contains the metadata of annotations.`
 
@@ -83,16 +80,19 @@ export class AnnotationList {
     }),
     shareReplay(1),
   )
+  
+  #dndCbs: (DragDropCallback)[] = []
   constructor(
     private annotSvc: ModularUserAnnotationToolService,
-    private snackbar: MatSnackBar,
-    private dialog: MatDialog,
     cStore: ComponentStore<{ useFormat: TExportFormats }>,
     @Optional() private dialogSvc: DialogService,
   ) {
     cStore.setState({
       useFormat: 'sands'
     })
+
+    const dndCbs = inject(REGISTER_USER_DRAG_DROP) as DragDropCallback[]
+    this.#dndCbs = dndCbs    
 
     this.subs.push(
       this.managedAnnotations$.subscribe(anns => this.managedAnnotations = anns),
@@ -119,73 +119,13 @@ export class AnnotationList {
     this.annotSvc.toggleAnnotationVisibilityById(id)
   }
 
-  private parseAndAddAnnotation(input: string) {
-    const json = JSON.parse(input)
-    const annotation = this.annotSvc.parseAnnotationObject(json)
-    if (annotation) this.annotSvc.importAnnotation(annotation)
-  }
-
-  async handleImportEvent(ev: TFileInputEvent<'text' | 'file'>){
-
-    const { abort } = this.dialogSvc.blockUserInteraction({
-      title: CONST.LOADING_TXT,
-      markdown: CONST.LOADING_ANNOTATION_MSG,
-    })
-    try {
-      const clearFileInputAndInform = () => {
-        if (this.fileInput) {
-          this.fileInput.clear()
-        }
-        this.snackbar.open('Annotation imported successfully!', 'Dismiss', {
-          duration: 3000
-        })
-      }
-
-      if (ev.type === 'text') {
-        const input = (ev as TFileInputEvent<'text'>).payload.input
-        /**
-         * parse as json, and go through the parsers
-         */
-        this.parseAndAddAnnotation(input)
-        clearFileInputAndInform()
-        return
-      }
-      if (ev.type === 'file') {
-        const files = (ev as TFileInputEvent<'file'>).payload.files
-        if (files.length === 0) throw new Error(`Need at least one file.`)
-        if (files.length > 1) throw new Error(`Parsing multiple files are not yet supported`)
-        const file = files[0]
-        const isJson = /\.json$/.test(file.name)
-        const isZip = /\.zip$/.test(file.name)
-        if (isZip) {
-          const files = await unzip(file)
-          const sands = files.filter(f => /\.json$/.test(f.filename))
-          for (const sand of sands) {
-            this.parseAndAddAnnotation(sand.filecontent)
-          }
-          clearFileInputAndInform()
-        }
-        if (isJson) {
-          const reader = new FileReader()
-          reader.onload = evt => {
-            const out = evt.target.result
-            this.parseAndAddAnnotation(out as string)
-            clearFileInputAndInform()
-          }
-          reader.onerror = e => { throw e }
-          reader.readAsText(file, 'utf-8')
-        }
-        /**
-         * check if zip or json
-         */
-        return
-      }
-    } catch (e) {
-      this.snackbar.open(`Error importing: ${e.toString()}`, 'Dismiss', {
-        duration: 3000
-      })
-    } finally {
-      abort()
+  /**
+   * @deprecated this handler should be removed, as drag drop onto the atlas canvas
+   * already does what this import does.
+   */
+  async handleImportEvent(ev: any){
+    for (const f of this.#dndCbs){
+      f(ev)
     }
   }
 
@@ -210,9 +150,5 @@ export class AnnotationList {
         }
       }
     }
-  }
-
-  public openDialog(template: TemplateRef<any>) {
-    this.dialog.open(template)
   }
 }

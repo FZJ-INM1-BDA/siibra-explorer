@@ -24,11 +24,12 @@ import { MeshEffects } from "./mesh.effects/mesh.effects";
 import { NehubaLayoutOverlayModule } from "./layoutOverlay";
 import { NgAnnotationService } from "./annotation/service";
 import { NehubaViewerContainer } from "./nehubaViewerInterface/nehubaViewerContainer.component";
-import { NehubaUserLayerModule } from "./userLayers";
 import { DialogModule } from "src/ui/dialogInfo";
 import { CoordTextBox } from "src/components/coordTextBox";
 import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.directive";
 import { MediaQueryDirective } from "src/util/directives/mediaQuery.directive";
+import { DragDropCallback, REGISTER_USER_DRAG_DROP } from "src/util/injectionTokens";
+import { UserLayerService } from "./userLayers/service";
 
 @NgModule({
   imports: [
@@ -40,7 +41,6 @@ import { MediaQueryDirective } from "src/util/directives/mediaQuery.directive";
     ComponentsModule,
     ShareModule,
     WindowResizeModule,
-    NehubaUserLayerModule,
     MediaQueryDirective,
 
     /**
@@ -86,10 +86,38 @@ import { MediaQueryDirective } from "src/util/directives/mediaQuery.directive";
       provide: APP_INITIALIZER,
       multi: true,
       useFactory: (_svc: NgAnnotationService) => () => Promise.resolve(),
-      deps: [ NgAnnotationService ]
+      deps: [NgAnnotationService]
+    },
+    {
+      provide: REGISTER_USER_DRAG_DROP,
+      multi: true,
+      useFactory: (userLayerSvc: UserLayerService, nehubaInst: BehaviorSubject<any>) => {
+        const cb: DragDropCallback = async ev => {
+          if (ev.type === "file") {
+
+            if (!nehubaInst.getValue()) {
+              return
+            }
+            const files = ev.payload.files
+            if (files.length !== 1) {
+              return
+            }
+            const file = files[0]
+            await userLayerSvc.handleUserInput(file)
+            return
+          }
+
+          if (ev.type === "text") {
+            await userLayerSvc.handleUserInput(ev.payload.input)
+            return
+          }
+        }
+        return cb
+      },
+      deps: [UserLayerService, NEHUBA_INSTANCE_INJTKN]
     },
     NgAnnotationService
   ]
 })
 
-export class NehubaModule{}
+export class NehubaModule { }

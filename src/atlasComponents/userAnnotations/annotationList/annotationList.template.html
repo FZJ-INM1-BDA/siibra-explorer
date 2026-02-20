@@ -12,7 +12,15 @@
             <mat-card-subtitle>
                 <!-- import -->
                 <ng-template #importMessageTmpl>
-                    Please select a annotation file to import.
+                    <p>
+                        <i class="fas fa-exclamation-triangle sxplr-custom-cmp text warn"></i> Deprecation Notice
+                    </p>
+                    <p>
+                        You can now drag-and-drop annotation zip file directly on the atlas. This import dialog will be deprecated soon.
+                    </p>
+                    <p>
+                        Please select a annotation file to import.
+                    </p>
                 </ng-template>
     
                 <button mat-icon-button
@@ -29,7 +37,7 @@
                 <!-- export -->
                 <button mat-icon-button
                     [zip-files-output]="filesExport$"
-                    zip-files-output-zip-filename="exported_annotations.zip"
+                    zip-files-output-zip-filename="exported_annotations.sxplr.annot.zip"
                     [attr.aria-label]="ARIA_LABELS.USER_ANNOTATION_EXPORT"
                     [matTooltip]="ARIA_LABELS.USER_ANNOTATION_EXPORT"
                     [disabled]="!(manAnnExists$ | async)">
@@ -39,7 +47,8 @@
                 <!-- share -->
                 <button mat-icon-button
                     [matTooltip]="ARIA_LABELS.SHARE_CUSTOM_URL"
-                    (click)="openDialog(saneUrlTmpl)"
+                    [sxplr-dialog]="saneUrlTmpl"
+                    sxplr-dialog-size="auto"
                     iav-state-aggregator
                     #stateAggregator="iavStateAggregator">
                     <i class="fas fa-share-square"></i>

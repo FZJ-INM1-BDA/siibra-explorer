@@ -590,13 +590,9 @@ export class UserLayerService implements OnDestroy {
   }
 
   async handleUserInput(input: ValidInputTypes){
-    try {
-      const processedOutput = await this.#processInput(input)
-      this.#addLayer(processedOutput)
-      return
-    } catch (e) {
-      this.snackbar.open(`Error opening file: ${e.toString()}`, "Dismiss")
-    }
+    const processedOutput = await this.#processInput(input)
+    this.#addLayer(processedOutput)
+    return
   }
 
   #addLayer(processedOutput: ProcessorOutput){

@@ -5,7 +5,8 @@ import { MatSnackBar, MatSnackBarRef, SimpleSnackBar } from "src/sharedModules/a
 
 @Directive({
   selector: '[drag-drop-file]',
-  exportAs: 'dragDropFile'
+  exportAs: 'dragDropFile',
+  standalone: true,
 })
 
 export class DragDropFileDirective implements OnDestroy {
@@ -14,7 +15,7 @@ export class DragDropFileDirective implements OnDestroy {
   public snackText: string
 
   @Output('drag-drop-file')
-  public dragDropOnDrop: EventEmitter<File[]> = new EventEmitter()
+  public dragDropOnDrop: EventEmitter<string|(File[])> = new EventEmitter()
 
   @HostBinding('style.transition')
   public transition = `opacity 300ms ease-in`
@@ -43,6 +44,12 @@ export class DragDropFileDirective implements OnDestroy {
   public ondrop(ev: DragEvent) {
     ev.preventDefault()
     this.reset()
+
+    const text = ev?.dataTransfer?.getData("text")
+    if (typeof text === "string") {
+      this.dragDropOnDrop.emit(text)
+      return
+    }
 
     this.dragDropOnDrop.emit(Array.from(ev?.dataTransfer?.files || []))
   }

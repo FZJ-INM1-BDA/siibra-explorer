@@ -695,6 +695,10 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     })
   }
 
+  parseAnnotationString(input: string){
+    return this.parseAnnotationObject(JSON.parse(input))
+  }
+
   parseAnnotationObject(json: TSands | TGeometryJson | TTypedAnnMetadata): IAnnotationGeometry | null{
     let returnObj: IAnnotationGeometry
     if (json['@type'] === 'tmp/poly') {
