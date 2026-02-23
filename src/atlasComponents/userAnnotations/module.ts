@@ -83,6 +83,7 @@ import { DialogModule } from "src/ui/dialogInfo";
             const annot = annotSvc.parseAnnotationObject(json)
             if (annot) {
               annotSvc.importAnnotation(annot)
+              annotSvc.remark()
             }
           } catch (e) {
             return
@@ -121,6 +122,7 @@ import { DialogModule } from "src/ui/dialogInfo";
               const annotation = annotSvc.parseAnnotationString(sand.filecontent)
               if (annotation) {
                 annotSvc.importAnnotation(annotation)
+                annotSvc.remark()
               }
             }
           }
@@ -131,6 +133,7 @@ import { DialogModule } from "src/ui/dialogInfo";
               const annotation = annotSvc.parseAnnotationString(out as string)
               if (annotation) {
                 annotSvc.importAnnotation(annotation)
+                annotSvc.remark()
               }
             }
             reader.onerror = e => { throw e }

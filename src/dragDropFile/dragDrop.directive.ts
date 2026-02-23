@@ -46,7 +46,7 @@ export class DragDropFileDirective implements OnDestroy {
     this.reset()
 
     const text = ev?.dataTransfer?.getData("text")
-    if (typeof text === "string") {
+    if (text && typeof text === "string") {
       this.dragDropOnDrop.emit(text)
       return
     }
