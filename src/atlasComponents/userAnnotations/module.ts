@@ -22,6 +22,10 @@ import { Router } from "@angular/router";
 import { DECODE_ENCODE, DecodeEncode } from "src/routerModule/util";
 import { userAnnotationRouteKey } from "./constants";
 import { RecursivePartial } from "src/util/recursivePartial";
+import { REGISTER_USER_DRAG_DROP, DragDropCallback } from "src/util/injectionTokens"
+import { ModularUserAnnotationToolService } from "./tools/service";
+import { unzip } from "src/zipFilesOutput/zipFilesOutput.directive";
+import { DialogModule } from "src/ui/dialogInfo";
 
 @NgModule({
   imports: [
@@ -36,7 +40,8 @@ import { RecursivePartial } from "src/util/recursivePartial";
     ZipFilesOutputModule,
     ShareModule,
     StateModule,
-  ],
+    DialogModule
+],
   declarations: [
     AnnotationMode,
     AnnotationList,
@@ -59,11 +64,86 @@ import { RecursivePartial } from "src/util/recursivePartial";
     // ... in url correctly
     {
       provide: APP_INITIALIZER,
-      useFactory:(_svc: RoutedAnnotationService) => {
+      useFactory: (_svc: RoutedAnnotationService) => {
         return () => Promise.resolve()
       },
-      deps: [ RoutedAnnotationService ],
+      deps: [RoutedAnnotationService],
       multi: true
+    },
+    {
+      provide: REGISTER_USER_DRAG_DROP,
+      useFactory: (annotSvc: ModularUserAnnotationToolService) => {
+        const cb: DragDropCallback = async ev => {
+          if (ev.type !== "text") {
+            return
+          }
+          try {
+            const json = JSON.parse(ev.payload.input)
+
+            const annot = annotSvc.parseAnnotationObject(json)
+            if (annot) {
+              annotSvc.importAnnotation(annot)
+              annotSvc.remark()
+            }
+          } catch (e) {
+            return
+          }
+
+        }
+        return cb
+      },
+      multi: true,
+      deps: [ModularUserAnnotationToolService]
+    },
+    {
+      provide: REGISTER_USER_DRAG_DROP,
+      useFactory: (annotSvc: ModularUserAnnotationToolService) => {
+        const cb: DragDropCallback = async ev => {
+          if (ev.type !== "file") {
+            return
+          }
+
+          const files = ev.payload.files
+          if (files.length === 0) {
+            console.error(`UserAnnotationModule: Need at least one file.`)
+            return
+          }
+          if (files.length > 1) {
+            console.error(`UserAnnotationModule: parsing multiple files are not yet supported`)
+            return
+          }
+          const file = files[0]
+          const isJson = /\.json$/.test(file.name)
+          const isZip = /\.zip$/.test(file.name)
+          if (isZip) {
+            const files = await unzip(file)
+            const sands = files.filter(f => /\.json$/.test(f.filename))
+            for (const sand of sands) {
+              const annotation = annotSvc.parseAnnotationString(sand.filecontent)
+              if (annotation) {
+                annotSvc.importAnnotation(annotation)
+                annotSvc.remark()
+              }
+            }
+          }
+          if (isJson) {
+            const reader = new FileReader()
+            reader.onload = evt => {
+              const out = evt.target.result
+              const annotation = annotSvc.parseAnnotationString(out as string)
+              if (annotation) {
+                annotSvc.importAnnotation(annotation)
+                annotSvc.remark()
+              }
+            }
+            reader.onerror = e => { throw e }
+            reader.readAsText(file, 'utf-8')
+          }
+        }
+        return cb
+      },
+      multi: true,
+      deps: [ModularUserAnnotationToolService]
     },
     {
       provide: INIT_ROUTE_TO_STATE,
@@ -89,4 +169,4 @@ import { RecursivePartial } from "src/util/recursivePartial";
   ]
 })
 
-export class UserAnnotationsModule{}
+export class UserAnnotationsModule { }

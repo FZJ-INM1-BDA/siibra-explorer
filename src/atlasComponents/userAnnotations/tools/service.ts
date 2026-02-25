@@ -317,6 +317,19 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     }
   }
 
+  remark(){
+    this.snackbar.open(
+      `Annotation(s) loaded`,
+      `Open`
+    ).afterDismissed().subscribe(v => {
+      if (v.dismissedByAction) {
+        this.store.dispatch(
+          atlasSelection.actions.setViewerMode({ viewerMode: "annotating" })
+        )
+      }
+    })
+  }
+
   constructor(
     private store: Store<any>,
     private snackbar: MatSnackBar,
@@ -693,6 +706,10 @@ export class ModularUserAnnotationToolService implements OnDestroy{
         name: this.defaultTool.name || null
       }
     })
+  }
+
+  parseAnnotationString(input: string){
+    return this.parseAnnotationObject(JSON.parse(input))
   }
 
   parseAnnotationObject(json: TSands | TGeometryJson | TTypedAnnMetadata): IAnnotationGeometry | null{

@@ -13,6 +13,7 @@ import { ZipFilesOutputModule } from "src/zipFilesOutput/module"
 import { AnnotationVisiblePipe } from "../annotationVisible.pipe"
 import { SingleAnnotationClsIconPipe, SingleAnnotationNamePipe } from "../singleAnnotationUnit/singleAnnotationUnit.component"
 import { AngularMaterialModule } from "src/sharedModules"
+import { REGISTER_USER_DRAG_DROP } from "src/util/injectionTokens"
 
 class MockModularUserAnnotationToolService {
   hiddenAnnotations$ = of([])
@@ -46,6 +47,10 @@ describe("annotationList.component.ts", () => {
           {
             provide: ModularUserAnnotationToolService,
             useClass: MockModularUserAnnotationToolService
+          },
+          {
+            provide: REGISTER_USER_DRAG_DROP,
+            useValue: []
           }
         ],
         declarations: [

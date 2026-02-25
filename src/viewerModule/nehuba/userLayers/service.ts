@@ -583,20 +583,14 @@ export class UserLayerService implements OnDestroy {
         return await processor.apply(this, [input])
       }
     }
-    const inputStr = input instanceof File
-      ? input.name
-      : input
-    throw new Error(`Could not find a processor for ${inputStr}`)
   }
 
   async handleUserInput(input: ValidInputTypes){
-    try {
-      const processedOutput = await this.#processInput(input)
+    const processedOutput = await this.#processInput(input)
+    if (processedOutput) {
       this.#addLayer(processedOutput)
-      return
-    } catch (e) {
-      this.snackbar.open(`Error opening file: ${e.toString()}`, "Dismiss")
     }
+    return
   }
 
   #addLayer(processedOutput: ProcessorOutput){

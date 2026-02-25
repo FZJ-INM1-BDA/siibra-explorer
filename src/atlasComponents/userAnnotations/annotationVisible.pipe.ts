@@ -7,7 +7,7 @@ import { IAnnotationGeometry } from "./tools/type";
 })
 
 export class AnnotationVisiblePipe implements PipeTransform{
-  public transform(hiddenAnns: IAnnotationGeometry[], thisAnn: IAnnotationGeometry): boolean {
-    return hiddenAnns.findIndex(a => a.id === thisAnn.id) < 0
+  public transform(hiddenAnns: IAnnotationGeometry[]|null, thisAnn: IAnnotationGeometry): boolean {
+    return !hiddenAnns || hiddenAnns.findIndex(a => a.id === thisAnn.id) < 0
   }
 }

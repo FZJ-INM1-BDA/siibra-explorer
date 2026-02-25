@@ -108,8 +108,6 @@ These outlines are based on the authoritative Terms and Conditions are found <ht
 If you do not accept the Terms & Conditions you are not permitted to access or use the KG to search for, to submit, to post, or to download any materials found there-in.
 `,
 
-    NEHUBA_DRAG_DROP_TEXT: `Drag and drop any .nii.gz, .nii, .json or .swc files.`,
-
     LOADING_TXT: `Loading ...`,
 
     CANNOT_DECIPHER_HEMISPHERE: 'Cannot decipher region hemisphere.',
