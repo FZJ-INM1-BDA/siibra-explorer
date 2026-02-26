@@ -100,9 +100,9 @@
         "python 3",
         "typescript"
     ],
-    "schema:releaseNotes": "# v2.14.29\n\n## Bugfix\n\n- 1um section best view point\n",
+    "schema:releaseNotes": "# v2.14.30\n\n## Bugfix\n\n- (for real) 1um section best view point (this time)\n\n",
     "runtimePlatform": "docker",
-    "version": "2.14.29",
+    "version": "2.14.30",
     "contIntegration": "https://github.com/FZJ-INM1-BDA/siibra-explorer/actions",
     "codemeta:continuousIntegration": {
         "id": "https://github.com/FZJ-INM1-BDA/siibra-explorer/actions"
