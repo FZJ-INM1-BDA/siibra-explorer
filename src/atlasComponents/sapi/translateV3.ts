@@ -696,7 +696,7 @@ class TranslateV3 {
       const found = /B20_([0-9]{4})/.exec(url)
       if (found) {
         const sectionId = parseInt(found[1])
-        const realYDis = (sectionId * 2e4 - 70010000) / 1e6
+        const realYDis = (sectionId * 2e4 - 70010000 + 10e3) / 1e6
         return {
           version: 1,
           preferredColormap: ["greyscale"],
