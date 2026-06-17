@@ -1,0 +1,12 @@
+.vive-spinner {
+  animation: spinning 1400ms linear infinite running;
+}
+
+@keyframes spinning {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(359deg); }
+}
+
+.vive-muted {
+  opacity: 0.5;
+}

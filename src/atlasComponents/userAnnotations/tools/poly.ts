@@ -1,5 +1,7 @@
 import { IAnnotationTools, IAnnotationGeometry, TAnnotationEvent, IAnnotationEvents, AbsToolClass, INgAnnotationTypes, TToolType, TBaseAnnotationGeomtrySpec, TSandsPolyLine, getCoord, TCallbackFunction } from "./type";
 import { Point, TPointJsonSpec } from './point'
+import { applyColormap, normalise, Colormap } from './colormap.util'
+import { TNgAnnotationLine } from './type'
 import { Directive, OnDestroy } from "@angular/core";
 import { Observable, Subject, Subscription } from "rxjs";
 import { filter, switchMapTo, takeUntil, withLatestFrom } from "rxjs/operators";
@@ -224,6 +226,78 @@ export class Polygon extends IAnnotationGeometry{
   }
 }
 
+// ---------------------------------------------------------------------------
+// ColoredPolygon — Polygon with per-vertex scalar values + colormap
+// ---------------------------------------------------------------------------
+
+/** A TNgAnnotationLine carrying an optional per-edge RGB hint. */
+export type TNgAnnotationColoredLine = TNgAnnotationLine & {
+  rgb?: [number, number, number]
+}
+
+export type TColoredPolyJsonSpec = Omit<TPolyJsonSpec, '@type'> & {
+  '@type': 'siibra-ex/annotation/colored-polyline'
+  values?: number[]
+  valueRange?: [number, number]
+  colormap?: Colormap
+}
+
+export class ColoredPolygon extends Polygon {
+
+  public override annotationType = 'ColoredPolygon'
+
+  public values: number[] = []
+  public valueRange: [number, number] = [0, 1]
+  public colormap: Colormap = 'jet'
+
+  public override toNgAnnotation(): TNgAnnotationColoredLine[] {
+    const [lo, hi] = this.valueRange
+    return this.edges.map((indices, edgeIdx) => {
+      const pt1 = this.points[indices[0]]
+      const pt2 = this.points[indices[1]]
+      const rgb  = applyColormap(normalise(this.values[indices[0]] ?? 0, lo, hi), this.colormap)
+      return {
+        id:          `${this.id}_${edgeIdx}_0`,
+        pointA:      [pt1.x, pt1.y, pt1.z] as [number, number, number],
+        pointB:      [pt2.x, pt2.y, pt2.z] as [number, number, number],
+        type:        'line' as const,
+        description: '',
+        rgb,
+      }
+    })
+  }
+
+  public override toJSON(): TPolyJsonSpec {
+    const base = super.toJSON() as Omit<TPolyJsonSpec, '@type'>
+    return {
+      ...base,
+      '@type':    'siibra-ex/annotation/colored-polyline',
+      values:     [...this.values],
+      valueRange: [...this.valueRange],
+      colormap:   this.colormap,
+    } as unknown as TPolyJsonSpec
+  }
+
+  public toColoredJSON(): TColoredPolyJsonSpec {
+    return this.toJSON() as unknown as TColoredPolyJsonSpec
+  }
+
+  static fromColoredJSON(json: TColoredPolyJsonSpec): ColoredPolygon {
+    return new ColoredPolygon(json)
+  }
+
+  constructor(spec?: TColoredPolyJsonSpec) {
+    super(spec as unknown as TPolyJsonSpec)
+    if (spec) {
+      if (spec.values)     this.values     = [...spec.values]
+      if (spec.valueRange) this.valueRange = [...spec.valueRange] as [number, number]
+      if (spec.colormap)   this.colormap   = spec.colormap
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+
 export const POLY_ICON_CLASS = 'fas fa-draw-polygon'
 
 @Directive()
@@ -234,7 +308,7 @@ export class ToolPolygon extends AbsToolClass<Polygon> implements IAnnotationToo
   public iconClass = POLY_ICON_CLASS
   public toolType: TToolType = 'drawing'
 
-  private selectedPoly: Polygon
+  private selectedPoly: ColoredPolygon
   private lastAddedPoint: Point
 
   protected managedAnnotations: Polygon[] = []
@@ -328,11 +402,14 @@ export class ToolPolygon extends AbsToolClass<Polygon> implements IAnnotationToo
         withLatestFrom(this.hoverAnnotation$)
       ).subscribe(([mouseev, ann]) => {
         if (!this.selectedPoly) {
-          const newPoly =  new Polygon({
+          const newPoly = new ColoredPolygon({
             edges: [],
             points: [],
             space: this.space,
-            '@type': 'siibra-ex/annotation/polyline'
+            '@type': 'siibra-ex/annotation/colored-polyline',
+            values: [],
+            valueRange: [0, 1],
+            colormap: 'jet',
           })
           this.addAnnotation(newPoly)
           this.selectedPoly = newPoly
@@ -370,6 +447,11 @@ export class ToolPolygon extends AbsToolClass<Polygon> implements IAnnotationToo
           this.lastAddedPoint
         )
         this.lastAddedPoint = addedPoint
+
+        // Assign sequential index as scalar value; normalise range to [0, n-1].
+        const ptIdx = this.selectedPoly.points.length - 1
+        this.selectedPoly.values[ptIdx] = ptIdx
+        this.selectedPoly.valueRange = [0, Math.max(1, ptIdx)]
 
         /**
          * always emit new annotation onclick

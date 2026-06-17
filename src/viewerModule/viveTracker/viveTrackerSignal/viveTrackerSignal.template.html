@@ -1,0 +1,15 @@
+<mat-card *ngIf="connected$ | async; else disconnected">
+  <span>Vive Tracker verbunden</span>
+  <ng-container *ngIf="pose$ | async as pose">
+    <span>x={{ pose.x | number:'1.2-2' }}
+          y={{ pose.y | number:'1.2-2' }}
+          z={{ pose.z | number:'1.2-2' }}</span>
+  </ng-container>
+</mat-card>
+
+<ng-template #disconnected>
+  <mat-card>
+    <span class="vive-muted">Vive Tracker nicht verbunden</span>
+    <i class="vive-muted vive-spinner fas fa-circle-notch fa-2x"></i>
+  </mat-card>
+</ng-template>

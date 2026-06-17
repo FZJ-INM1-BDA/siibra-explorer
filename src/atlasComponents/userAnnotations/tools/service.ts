@@ -15,7 +15,7 @@ import { FilterAnnotationsBySpace } from "../filterAnnotationBySpace.pipe";
 import { MatSnackBar } from 'src/sharedModules/angularMaterial.exports'
 import { actions } from "src/state/atlasSelection";
 import { atlasSelection } from "src/state";
-import { AnnotationLayer, getViewer } from "src/atlasComponents/annotations";
+import { AnnotationLayer, ColoredAnnotationLayer, getViewer } from "src/atlasComponents/annotations";
 import { translateV3Entities } from "src/atlasComponents/sapi/translateV3";
 import { HOVER_INTERCEPTOR_INJECTOR, HoverInterceptor, THoverConfig } from "src/util/injectionTokens";
 import { isSandsPoint } from "src/util/types";
@@ -24,6 +24,7 @@ import { isSandsPoint } from "src/util/types";
 const ANNOTATED_SYMBOL = Symbol("ANNOTATED_SYMBOL")
 const LOCAL_STORAGE_KEY = 'userAnnotationKey'
 const ANNOTATION_LAYER_NAME = "modular_tool_layer_name"
+const COLORED_ANNOTATION_LAYER_NAME = "colored_modular_tool_layer_name"
 
 type TAnnotationMetadata = {
   id: string
@@ -82,6 +83,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
   private previewNgAnnIds: string[] = []
 
   private annotationLayer: AnnotationLayer
+  private coloredAnnotationLayer: ColoredAnnotationLayer
   private activeToolName: string
   private forcedAnnotationRefresh$ = new BehaviorSubject(null)
 
@@ -503,8 +505,14 @@ export class ModularUserAnnotationToolService implements OnDestroy{
             this.deleteNgAnnotationById(annotation.id)
             continue
           }
-          if (!this.annotationLayer) continue
-          this.annotationLayer.updateAnnotation(annotation)
+          // Route colored annotations to the colored layer; plain ones to the standard layer.
+          if ('rgb' in annotation && annotation['rgb'] != null) {
+            if (!this.coloredAnnotationLayer) continue
+            this.coloredAnnotationLayer.updateAnnotation(annotation as any)
+          } else {
+            if (!this.annotationLayer) continue
+            this.annotationLayer.updateAnnotation(annotation)
+          }
         }
       })
     )
@@ -526,6 +534,10 @@ export class ModularUserAnnotationToolService implements OnDestroy{
         if (this.annotationLayer) {
           this.annotationLayer.dispose()
           this.annotationLayer = null
+        }
+        if (this.coloredAnnotationLayer) {
+          this.coloredAnnotationLayer.dispose()
+          this.coloredAnnotationLayer = null
         }
       }),
       templateIsVolumetric$.pipe(
@@ -556,11 +568,13 @@ export class ModularUserAnnotationToolService implements OnDestroy{
           ANNOTATION_LAYER_NAME,
           ModularUserAnnotationToolService.USER_ANNOTATION_LAYER_SPEC.annotationColor
         )
+        this.coloredAnnotationLayer = new ColoredAnnotationLayer(COLORED_ANNOTATION_LAYER_NAME)
         const mode = await this.store.pipe(
           select(atlasSelection.selectors.viewerMode),
           take(1),
         ).toPromise()
         this.annotationLayer.setVisible(mode === ModularUserAnnotationToolService.VIEWER_MODE)
+        this.coloredAnnotationLayer.setVisible(mode === ModularUserAnnotationToolService.VIEWER_MODE)
         sub = this.annotationLayer.onHover.subscribe(val => {
           this.annotnEvSubj.next({
             type: 'hoverAnnotation',
@@ -579,6 +593,9 @@ export class ModularUserAnnotationToolService implements OnDestroy{
       ).subscribe(mode => {
         if (this.annotationLayer) {
           this.annotationLayer.setVisible(mode === ModularUserAnnotationToolService.VIEWER_MODE)
+        }
+        if (this.coloredAnnotationLayer) {
+          this.coloredAnnotationLayer.setVisible(mode === ModularUserAnnotationToolService.VIEWER_MODE)
         }
       })  
     )
@@ -693,7 +710,8 @@ export class ModularUserAnnotationToolService implements OnDestroy{
   }
 
   private deleteNgAnnotationById(annId: string) {
-    this.annotationLayer.removeAnnotation({ id: annId })
+    this.annotationLayer?.removeAnnotation({ id: annId })
+    this.coloredAnnotationLayer?.removeAnnotation({ id: annId })
   }
 
   public defaultTool: AbsToolClass<any>
