@@ -180,6 +180,79 @@ export class UserLayerService implements OnDestroy {
       throw e
     }
   }
+  
+  @RegisterSource(
+    async input => input instanceof File && input.name.endsWith(".csv")
+  )
+  async processCsv(file: File) {
+    const THRESHOLD = 100_000 // display 200k point max
+    
+    function parseCsvLine(csvLine: string){
+      const rvals = csvLine.split(",").map(v => Number(v.trim())*1e6)
+      if (rvals.length !== 3) {
+        throw Error(`Expected exactly 3 elements, but got ${rvals.length}: ${rvals}`)
+      }
+      if (!rvals.every(v => typeof v === "number" && !isNaN(v))) {
+        throw Error(`Expected every element is a number, and is not NaN, but untrue: ${rvals}`)
+      }
+      return rvals
+    }
+    try {
+      const pointClds: number[][] = []
+      const stream = file.stream()
+      const reader = stream.getReader()
+      const decoder = new TextDecoder("utf-8")
+      let accumulator = ""
+      let counter = 0
+      while (true) {
+        const { done, value } = await reader.read()
+        accumulator += decoder.decode(value, {stream: true})
+        if (done) {
+          break
+        }
+      }
+      const splitAcc = accumulator.split("\n")
+
+      const useMod = Math.ceil(splitAcc.length / THRESHOLD)
+    
+      for (const line of splitAcc){
+        counter += 1
+        try {
+          if (counter % useMod === 0) {
+            const pt = parseCsvLine(line)
+            pointClds.push(pt)
+          }
+        } catch (e) {
+          console.error(e)
+          continue
+        }
+      }
+
+      console.log(splitAcc.length)
+
+      const id = "csv-layer-annot"
+    
+      const layer = new AnnotationLayer("csv-layer-annot")
+      layer.addAnnotation(pointClds.map((triplet, idx) => ({
+        id: `${id}-${idx}`,
+        type: 'point',
+        point: triplet.map(v => v) as [number, number, number]
+      })))
+      
+      return {
+        cleanup: () => {
+          layer.dispose()
+        },
+        meta: {
+          filename: file.name,
+        }
+      }
+      
+    } catch (e) {
+      console.log("error", e)
+      throw e
+    }
+  }
 
   @RegisterSource(
     async input => typeof input === "string" && input.startsWith(OVERLAY_LAYER_PROTOCOL)
