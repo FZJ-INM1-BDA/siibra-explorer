@@ -204,6 +204,7 @@ export class UserLayerService implements OnDestroy {
       const decoder = new TextDecoder("utf-8")
       let accumulator = ""
       let counter = 0
+      // eslint-disable-next-line no-constant-condition
       while (true) {
         const { done, value } = await reader.read()
         accumulator += decoder.decode(value, {stream: true})
