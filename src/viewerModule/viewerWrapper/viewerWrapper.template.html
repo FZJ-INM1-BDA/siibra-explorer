@@ -1,14 +1,14 @@
 <ng-container [ngSwitch]="useViewer$ | async">
 
     <!-- nehuba viewer -->
-    <iav-cmp-viewer-nehuba-glue class="d-block w-100 h-100 position-absolute left-0 tosxplr-p-0"
+    <iav-cmp-viewer-nehuba-glue
       *ngSwitchCase="'nehuba'"
       (viewerEvent)="handleViewerEvent($event)"
       #iavCmpViewerNehubaGlue="iavCmpViewerNehubaGlue">
     </iav-cmp-viewer-nehuba-glue>
 
     <!-- three surfer (free surfer viewer) -->
-    <tmp-threesurfer-lifecycle class="d-block w-100 h-100 position-absolute left-0 tosxplr-p-0"
+    <tmp-threesurfer-lifecycle
       *ngSwitchCase="'threeSurfer'"
       (viewerEvent)="handleViewerEvent($event)">
     </tmp-threesurfer-lifecycle>

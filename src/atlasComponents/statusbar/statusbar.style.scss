@@ -1,0 +1,32 @@
+:host
+{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+mat-divider.statsbar-vert-divider
+{
+    height: 2em;
+}
+
+button
+{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.region-list-search-row
+{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+sxplr-sapiviews-core-rich-regionshierarchy
+{
+    height: calc(100% - 52px);
+    width: 100%;
+    padding: 0 0 0.4rem 0;
+}

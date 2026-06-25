@@ -37,6 +37,9 @@ const THEMES = ["default", "ebrains"]
 
 export class TopMenuCmp {
 
+  @Input()
+  rawflag: boolean = false
+
   #destroy$ = inject(DestroyDirective).destroyed$
 
   #currentTheme$ = new BehaviorSubject<string>(null)

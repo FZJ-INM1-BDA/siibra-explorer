@@ -147,7 +147,7 @@ export class EntryComponent extends TPBRCategoryDirective implements AfterViewIn
         return of([])
       }
       
-      const { template, bbox } = val
+      const { template } = val
       if (template?.id !== IDS.TEMPLATES.AMBA_CCF_V3) {
         return of([])
       }

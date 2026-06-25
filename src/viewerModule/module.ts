@@ -49,6 +49,7 @@ import { SapiViewsFeatureConnectivityModule } from "src/features/connectivity";
 import { LabelEventDirective } from "src/ui/verticalBreadCrumb/labelEvent.directive";
 import { AvailableATPDirective } from "src/atlasComponents/sapi/core/availableATP.directive";
 import { NeighbourOverlay } from "src/components/neighbourOverlay/neighbourOverlay.component";
+import { StatusbarCmp } from "src/atlasComponents/statusbar/statusbar.component";
 
 @NgModule({
   imports: [
@@ -87,6 +88,7 @@ import { NeighbourOverlay } from "src/components/neighbourOverlay/neighbourOverl
     LabelEventDirective,
     AvailableATPDirective,
     NeighbourOverlay,
+    StatusbarCmp,
     
     ...(environment.ENABLE_LEAP_MOTION ? [LeapModule] : [])
   ],

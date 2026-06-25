@@ -13,7 +13,7 @@ import { SxplrRegion, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes"
   selector: 'viewer-wrapper',
   templateUrl: './viewerWrapper.template.html',
   styleUrls: [
-    './viewerWrapper.style.css'
+    './viewerWrapper.style.scss'
   ],
   hostDirectives: [
     DestroyDirective

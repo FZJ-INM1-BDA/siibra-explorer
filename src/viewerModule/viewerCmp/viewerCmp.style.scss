@@ -201,3 +201,22 @@ mat-card-title.with-controls
     flex: 0 0 auto;
   }
 }
+
+.viewer-parent
+{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+
+  & > viewer-wrapper
+  {
+    flex: 1 1 auto;
+  }
+  & > .viewer-status
+  {
+    flex: 0 0 auto;
+  }
+}

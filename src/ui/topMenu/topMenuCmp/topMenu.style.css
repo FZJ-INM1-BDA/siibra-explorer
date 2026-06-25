@@ -2,7 +2,6 @@
 {
   flex: 0 0 0;
   margin-right: 0.4em;
-  display:inline-block;
 }
 
 :host > *
@@ -10,12 +9,20 @@
   pointer-events: all;
 }
 
-.btnWrapper
+:not(.rawcontainer) .btnWrapper
 {
   margin: 0.5rem 0;
 }
 
+
 .mat-tab-content
 {
   padding: 0.8rem 1.2rem;
+}
+
+.rawcontainer
+{
+  display: flex;
+  flex-direction: row-reverse;
+  margin: 0;
 }

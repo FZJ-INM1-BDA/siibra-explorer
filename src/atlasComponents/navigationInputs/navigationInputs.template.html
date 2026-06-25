@@ -1,0 +1,52 @@
+<ng-template [ngIf]="view$ | async" let-view>
+    <ng-template iav-media-query
+        #media="iavMediaQuery"
+        [ngIf]="(media.mediaBreakPoint$ | async) > 3"
+        [ngIfElse]="directTmpl">
+        <button mat-button color="primary" [sxplr-dialog]="dialogTmpl">
+            <mat-icon>location_on</mat-icon>
+        </button>
+    </ng-template>
+
+    <ng-template #contentTmpl>
+        <ng-template [ngIf]="view.useViewer === 'nehuba'">
+            
+                <form [formGroup]="navigationCtlForm">
+                    <ng-template ngFor [ngForOf]="['x', 'y', 'z']" let-axis>
+                        <input class="sxplr-custom-cmp input"
+                            type="text" [formControlName]="axis"
+                            (paste)="onPaste($event)">
+                    </ng-template>
+                </form>
+        </ng-template>
+    </ng-template>
+
+    <ng-template #directTmpl>
+        <ng-template [ngTemplateOutlet]="contentTmpl"></ng-template>
+        <button mat-icon-button
+            [matTooltip]="view.labels.COPY_CURRENT_POSITION"
+            [iav-clipboard-copy]="view.positionMm | addUnitAndJoin : 'mm'">
+            <mat-icon>content_copy</mat-icon>
+        </button>
+    </ng-template>
+
+    <ng-template #dialogTmpl>
+        <h1 mat-dialog-title>Navigation Position</h1>
+        <div mat-dialog-content>
+            <ng-template [ngTemplateOutlet]="contentTmpl"></ng-template>
+        </div>
+        <div mat-dialog-actions>
+            
+            <button mat-button
+                [matTooltip]="view.labels.COPY_CURRENT_POSITION"
+                [iav-clipboard-copy]="view.positionMm | addUnitAndJoin : 'mm'">
+                <mat-icon>content_copy</mat-icon>
+                Copy
+            </button>
+            
+            <button mat-button mat-dialog-close>
+                Close
+            </button>
+        </div>
+    </ng-template>
+</ng-template>

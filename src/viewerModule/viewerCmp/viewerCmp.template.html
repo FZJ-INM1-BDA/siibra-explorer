@@ -53,6 +53,8 @@
 
       </div>
       
+      <ng-template sxplrExperimentalFlag [deprecated]="true">
+
       <button mat-raised-button
         [color]="view.halfSidenavExpanded ? 'primary' : 'primary'"
         class="sxplr-tab"
@@ -61,6 +63,7 @@
         <mat-icon>{{ view.halfSidenavExpanded ? 'chevron_left' : 'chevron_right' }}</mat-icon>
         
       </button>
+      </ng-template>
 
 
     </div>
@@ -75,6 +78,8 @@
     </div>
 
     <div iavLayoutFourCornersBottomLeft>
+      <ng-template sxplrExperimentalFlag [deprecated]="true">
+
       <mat-card class="express-atlas-selection sxplr-muted hoverable sxplr-custom-cmp"
         mat-ripple
         [matMenuTriggerFor]="expressMenu"
@@ -88,6 +93,7 @@
           } | atprToMd">
         </markdown-dom>
       </mat-card>
+      </ng-template>
     </div>
 
     <!-- buttom right -->
@@ -169,11 +175,15 @@
 <ng-template #defaultMainContentTopLeft
   let-view="view">
 
+  <ng-template sxplrExperimentalFlag [deprecated]="true">
+
   <sxplr-vertical-bread-crumb class="sxplr-d-block sxplr-overflow-y-auto mat-elevation-z1"
     [viewerLoaded]="viewerLoaded"
     *ngIf="view.useViewer"
     (show)="controlHalfNav(true)">
   </sxplr-vertical-bread-crumb>
+
+  </ng-template>
 
 </ng-template>
 
@@ -394,22 +404,32 @@
 <ng-template #minDefaultMainContentTopRight>
 
   <!-- signin banner at top right corner -->
+  <ng-template sxplrExperimentalFlag [deprecated]="true">
+
   <top-menu-cmp class="mt-3 mr-2 d-inline-block"
     [ismobile]="(media.mediaBreakPoint$ | async) > 3"
     [viewerLoaded]="viewerLoaded">
   </top-menu-cmp>
+  </ng-template>
 
 </ng-template>
 
 <!-- viewer tmpl -->
 <ng-template #viewerTmpl>
-  <div class="position-absolute w-100 h-100 z-index-1"
+  <div class="viewer-parent"
     ctx-menu-host
     [ctx-menu-host-tmpl]="viewerCtxMenuTmpl">
     <viewer-wrapper
       (viewer-event)="handleViewerCtxEvent($event)">
     </viewer-wrapper>
 
+    <ng-template sxplrExperimentalFlag [experimental]="true">
+
+    <div class="viewer-status sxplr-custom-cmp bg text sxplr-of-x-auto">
+      <sxplr-status-bar></sxplr-status-bar>
+    </div>
+    
+    </ng-template>
   </div>
 </ng-template>
 

@@ -43,6 +43,9 @@ function filterGetIsNotExtra(input: SxplrRegion|string|RegionExtra): input is Sx
 
 export class SapiViewsCoreRichRegionListSearch {
 
+  @Input()
+  rawflag: boolean = false
+
   readonly #ondestroy$ = inject(DestroyDirective).destroyed$
 
   ARIA_LABELS = ARIA_LABELS

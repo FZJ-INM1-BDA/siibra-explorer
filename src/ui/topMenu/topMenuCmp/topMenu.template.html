@@ -1,4 +1,19 @@
-<ng-template [ngIf]="ismobile" [ngIfElse]="fullTmpl">
+<ng-template [ngIf]="rawflag">
+  <div class="rawcontainer">
+    <!-- signin -->
+    <ng-container *ngTemplateOutlet="signinBtnTmpl">
+    </ng-container>
+
+    <!-- help one pager -->
+    <ng-container *ngTemplateOutlet="helpBtnTmpl">
+    </ng-container>
+
+    <ng-container *ngTemplateOutlet="experimentalToggleBtnTmpl">
+    </ng-container>
+  </div>
+</ng-template>
+
+<ng-template [ngIf]="!rawflag && ismobile">
   <div iav-fab-speed-dial-container
     #fab="iavFabSpeedDialContainer"
     class="d-flex flex-column align-items-center">
@@ -28,7 +43,7 @@
   </div>
 </ng-template>
 
-<ng-template #fullTmpl>
+<ng-template [ngIf]="!rawflag && !ismobile">
   <mat-card class="d-flex flex-row-reverse"
     quick-tour
     [quick-tour-description]="quickTourData.description"

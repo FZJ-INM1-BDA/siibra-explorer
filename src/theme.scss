@@ -99,6 +99,15 @@ $typographic-config: mat.define-typography-config();
     {
       color: mat.get-color-from-palette($warn, 500);
     }
+
+    &.input
+    {
+      background-color: mat.get-color-from-palette($background, card);
+      color: mat.get-color-from-palette($foreground, secondary-text);
+      border: none;
+      border-bottom: solid 1px rgba(128,128,128,0.9);
+      padding: 0.5rem 1.25rem 0.25rem;
+    }
   }
 }
 

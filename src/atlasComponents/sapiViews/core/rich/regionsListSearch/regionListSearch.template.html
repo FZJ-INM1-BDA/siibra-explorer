@@ -1,4 +1,5 @@
 <mat-form-field
+  *ngIf="!rawflag; else rawTmpl"
   class="sxplr-w-100"
   subscriptSizing="dynamic"
   floatLabel="auto">
@@ -21,6 +22,18 @@
   </div>
 
 </mat-form-field>
+
+<ng-template #rawTmpl>
+  <input
+    class="sxplr-custom-cmp input"
+    [placeholder]="currentSearch || 'Search for regions'"
+    #trigger="matAutocompleteTrigger"
+    type="text"
+    name="searchTerm"
+    [attr.aria-label]="ARIA_LABELS.TEXT_INPUT_SEARCH_REGION"
+    [formControl]="searchFormControl"
+    [matAutocomplete]="auto">
+</ng-template>
 
 <mat-autocomplete
   (optionSelected)="optionSelected($event)"
