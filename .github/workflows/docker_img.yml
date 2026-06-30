@@ -63,7 +63,7 @@ jobs:
           envObj:
             HOST_PATHNAME: "/viewer-dev"
             OVERWRITE_API_ENDPOINT: "https://siibra-api-rc.apps.prod-jsccloud.ebrains.eu/v3_0"
-          EOF
+        EOF
           echo "DELTA_B64=$(base64 -w 0 /tmp/delta.yaml)" >> "$GITHUB_OUTPUT"
           echo "MR_TITLE='siibra explorer [dev] '$GIT_DIGEST" >> "$GITHUB_OUTPUT"
         fi
