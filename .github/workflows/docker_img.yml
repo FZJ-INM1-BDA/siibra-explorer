@@ -212,11 +212,11 @@ jobs:
     steps:
     - run: |
         UPDATE_FILES=$(jq -cn \
-          --arg filename "${{ steps.deploy-vars.outputs.DEPLOY_FILE }}" \
-          --arg delta "${{ steps.deploy-vars.outputs.DELTA_B64 }}" \
+          --arg filename "${{ needs.set-vars.outputs.DEPLOY_FILE }}" \
+          --arg delta "${{ needs.set-vars.outputs.DELTA_B64 }}" \
           '[{"filename": $filename, "delta": $delta}]')
         
-        MR_TITLE="${{ steps.set-vars.outputs.MR_TITLE }}"
+        MR_TITLE="${{ needs.set-vars.outputs.MR_TITLE }}"
 
         curl -fL -X POST \
           --form "token=${{ secrets.GITLAB_GITOPS_TRIGGER_TOKEN }}" \
