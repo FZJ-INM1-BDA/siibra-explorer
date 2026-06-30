@@ -206,17 +206,23 @@ jobs:
         docker tag $DOCKER_BUILT_TAG $VERSIONED_DOCKER_BUILT_TAG
         docker push $VERSIONED_DOCKER_BUILT_TAG
 
-  trigger-deploy-dev-rancher:
-    if: ${{ needs.set-vars.outputs.BRANCH_NAME == 'dev' && success() }}
+  trigger-deploy-rancher:
     needs:
       - build-docker-img-ebrains
       - set-vars
     runs-on: ubuntu-latest
     steps:
     - run: |
+        DEPLOY_FILE="${{ needs.set-vars.outputs.DEPLOY_FILE }}"
+        DELTA_B64="${{ needs.set-vars.outputs.DELTA_B64 }}"
+        if [[ -z "$DEPLOY_FILE" || -z "$DELTA_B64" ]]; then
+          echo "DEPLOY_FILE or DELTA_B64 is undefined, skipping deploy"
+          exit 1
+        fi
+
         UPDATE_FILES=$(jq -cn \
-          --arg filename "${{ needs.set-vars.outputs.DEPLOY_FILE }}" \
-          --arg delta "${{ needs.set-vars.outputs.DELTA_B64 }}" \
+          --arg filename "$DEPLOY_FILE" \
+          --arg delta "$DELTA_B64" \
           '[{"filename": $filename, "delta": $delta}]')
         
         MR_TITLE="${{ needs.set-vars.outputs.MR_TITLE }}"
@@ -228,94 +234,62 @@ jobs:
           --form "variables[MR_TITLE]=$MR_TITLE" \
           "${{ secrets.GITLAB_GITOPS_URL }}/api/v4/projects/${{ secrets.GITLAB_GITOPS_PROJECT_ID }}/trigger/pipeline"
 
+  cypress-staging-viewer:
+    if: ${{ needs.set-vars.outputs.BRANCH_NAME == 'staging' }}
+    needs:
+    - trigger-deploy-rancher
+    - set-vars
+    strategy:
+      fail-fast: false
+      matrix:
+        os: 
+        - ubuntu-latest
+        # - windows-latest
+        - macos-latest
+        viewer:
+        - ng
+        - fsa
+        browser:
+        - chrome
+        - webkit
+        include:
+        - viewer: ng
+          saneurl: human
+        - viewer: fsa
+          saneurl: fsaverage
+        exclude:
+        - os: ubuntu-latest
+          browser: webkit
+        # - os: windows-latest
+        #   browser: webkit
+    uses: ./.github/workflows/_screenshot.yml
+    with:
+      url: https://atlases.ebrains.eu/viewer-staging/go/${{ matrix.saneurl }}
+      screenshot-filename: ${{ needs.set-vars.outputs.GIT_DIGEST }}/viewer-preview/${{ matrix.viewer }}_${{ matrix.os }}_${{ matrix.browser }}
+    secrets:
+      client-id: ${{ secrets.EBRAINS_SIIBRA_EXPLORER_OIDC_CLIENTID}}
+      client-secret: ${{ secrets.EBRAINS_SIIBRA_EXPLORER_OIDC_CLIENTSECRET}}
 
-  # trigger-deploy-rc-rancher:
-  #   if: ${{ needs.set-vars.outputs.BRANCH_NAME == 'staging' && success() }}
-  #   needs:
-  #     - build-docker-img-ebrains
-  #     - set-vars
-  #   uses: ./.github/workflows/deploy-helm.yml
-  #   with:
-  #     DEPLOYMENT_NAME: rc
-  #     IMAGE_TAG: staging
+  cypress-staging-url:
+    if: ${{ needs.set-vars.outputs.BRANCH_NAME == 'staging' }}
+    needs:
+    - trigger-deploy-rancher
+    - set-vars
+    strategy:
+      fail-fast: false
+      matrix:
+        saneurl:
+        - siibra_paper_2023_2A
+        - siibra_paper_2023_2B
+        - siibra_paper_2023_2C
+        - siibra_paper_2023_2D
+        - siibra_paper_2023_2E
+        - siibra_paper_2023_2F
+    uses: ./.github/workflows/_screenshot.yml
+    with:
+      url: https://atlases.ebrains.eu/viewer-staging/go/${{ matrix.saneurl }}
+      screenshot-filename: ${{ needs.set-vars.outputs.GIT_DIGEST }}/url-preview/${{ matrix.saneurl }}
+    secrets:
+      client-id: ${{ secrets.EBRAINS_SIIBRA_EXPLORER_OIDC_CLIENTID}}
+      client-secret: ${{ secrets.EBRAINS_SIIBRA_EXPLORER_OIDC_CLIENTSECRET}}
 
-  #     # temporarily use ghcr, as ebrains harbor cannot be auth'ed
-  #     IMAGE_REPO: docker-registry.ebrains.eu/siibra/siibra-explorer
-
-  #     # GIT_DIGEST may (sometimes) be all numbers. prepend 'h' to cast to str
-  #     IMAGE_DIGEST: h${{ needs.set-vars.outputs.GIT_DIGEST }}
-  #   secrets:
-  #     KUBECONFIG: ${{ secrets.KUBECONFIG }}
-
-  # cypress-staging-viewer:
-    
-  #   needs:
-  #   - trigger-deploy-rc-rancher
-  #   - set-vars
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       os: 
-  #       - ubuntu-latest
-  #       # - windows-latest
-  #       - macos-latest
-  #       viewer:
-  #       - ng
-  #       - fsa
-  #       browser:
-  #       - chrome
-  #       - webkit
-  #       include:
-  #       - viewer: ng
-  #         saneurl: human
-  #       - viewer: fsa
-  #         saneurl: fsaverage
-  #       exclude:
-  #       - os: ubuntu-latest
-  #         browser: webkit
-  #       # - os: windows-latest
-  #       #   browser: webkit
-  #   uses: ./.github/workflows/_screenshot.yml
-  #   with:
-  #     url: https://atlases.ebrains.eu/viewer-staging/go/${{ matrix.saneurl }}
-  #     screenshot-filename: ${{ needs.set-vars.outputs.GIT_DIGEST }}/viewer-preview/${{ matrix.viewer }}_${{ matrix.os }}_${{ matrix.browser }}
-  #   secrets:
-  #     client-id: ${{ secrets.EBRAINS_SIIBRA_EXPLORER_OIDC_CLIENTID}}
-  #     client-secret: ${{ secrets.EBRAINS_SIIBRA_EXPLORER_OIDC_CLIENTSECRET}}
-
-  # cypress-staging-url:
-  #   needs:
-  #   - trigger-deploy-rc-rancher
-  #   - set-vars
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       saneurl:
-  #       - siibra_paper_2023_2A
-  #       - siibra_paper_2023_2B
-  #       - siibra_paper_2023_2C
-  #       - siibra_paper_2023_2D
-  #       - siibra_paper_2023_2E
-  #       - siibra_paper_2023_2F
-  #   uses: ./.github/workflows/_screenshot.yml
-  #   with:
-  #     url: https://atlases.ebrains.eu/viewer-staging/go/${{ matrix.saneurl }}
-  #     screenshot-filename: ${{ needs.set-vars.outputs.GIT_DIGEST }}/url-preview/${{ matrix.saneurl }}
-  #   secrets:
-  #     client-id: ${{ secrets.EBRAINS_SIIBRA_EXPLORER_OIDC_CLIENTID}}
-  #     client-secret: ${{ secrets.EBRAINS_SIIBRA_EXPLORER_OIDC_CLIENTSECRET}}
-
-  # trigger-deploy-master-rancher:
-  #   if: ${{ needs.set-vars.outputs.BRANCH_NAME == 'master' && success() }}
-  #   needs:
-  #     - build-docker-img-ebrains
-  #     - set-vars
-  #   uses: ./.github/workflows/deploy-helm.yml
-  #   with:
-  #     DEPLOYMENT_NAME: prod
-  #     IMAGE_TAG: ${{ needs.set-vars.outputs.SXPLR_VERSION }}
-
-  #     # GIT_DIGEST may (sometimes) be all numbers. prepend 'h' to cast to str
-  #     IMAGE_DIGEST: h${{ needs.set-vars.outputs.GIT_DIGEST }}
-  #   secrets:
-  #     KUBECONFIG: ${{ secrets.KUBECONFIG }}
