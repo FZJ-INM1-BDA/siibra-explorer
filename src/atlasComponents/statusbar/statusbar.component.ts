@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { Component, inject } from "@angular/core";
+import { Component, inject, Input } from "@angular/core";
 import { SAPI } from "../sapi";
 import { select, Store } from "@ngrx/store";
 import { atlasAppearance, atlasSelection, StateModule } from "src/state";
@@ -23,6 +23,8 @@ import { ShareModule } from "src/share";
 import { FindCmp } from "src/ui/find/find.component";
 import { AnnotateCmp } from "src/ui/annotate/annotate.component";
 import { PluginModule } from "src/plugin";
+import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.directive";
+import { ScreenshotModule } from "src/screenshot";
 
 @Component({
   selector: 'sxplr-status-bar',
@@ -48,6 +50,8 @@ import { PluginModule } from "src/plugin";
     AnnotateCmp,
     StateModule,
     PluginModule,
+    ExperimentalFlagDirective,
+    ScreenshotModule,
   ],
   hostDirectives: [
     AvailableATPDirective,
@@ -55,6 +59,9 @@ import { PluginModule } from "src/plugin";
 })
 
 export class StatusbarCmp {
+
+  @Input()
+  halfmode: "top" | "bottom" = "bottom"
 
   #atpDir = inject(AvailableATPDirective)
 

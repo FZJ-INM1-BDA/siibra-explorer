@@ -5,7 +5,6 @@ import { ComponentsModule } from "src/components";
 import { ContextMenuModule, ContextMenuService, TContextMenuReg } from "src/contextMenuModule";
 import { LayoutModule } from "src/layouts/layout.module";
 import { AngularMaterialModule } from "src/sharedModules";
-import { TopMenuModule } from "src/ui/topMenu/module";
 import { CONTEXT_MENU_ITEM_INJECTOR, TContextMenu, UtilModule } from "src/util";
 import { NehubaModule, NehubaViewerUnit } from "./nehuba";
 import { ThreeSurferModule } from "./threeSurfer";
@@ -42,11 +41,9 @@ import { ViewerWrapper } from "./viewerWrapper/viewerWrapper.component";
 import { MediaQueryDirective } from "src/util/directives/mediaQuery.directive";
 import { TPBRViewCmp } from "src/features/TPBRView/TPBRView.component";
 import { AtlasViewerRouterModule } from "src/routerModule";
-import { VerticalBreadCrumbModule } from "src/ui/verticalBreadCrumb";
 import { NgLayerCtrlCmp } from "./nehuba/nehubaViewerInterface/ngLayerCtl/ngLayerCtrl.component";
 import { FileInputModule } from "src/getFileInput/module";
 import { SapiViewsFeatureConnectivityModule } from "src/features/connectivity";
-import { LabelEventDirective } from "src/ui/verticalBreadCrumb/labelEvent.directive";
 import { AvailableATPDirective } from "src/atlasComponents/sapi/core/availableATP.directive";
 import { NeighbourOverlay } from "src/components/neighbourOverlay/neighbourOverlay.component";
 import { StatusbarCmp } from "src/atlasComponents/statusbar/statusbar.component";
@@ -58,8 +55,6 @@ import { StatusbarCmp } from "src/atlasComponents/statusbar/statusbar.component"
     ThreeSurferModule,
     LayoutModule,
     AngularMaterialModule,
-    TopMenuModule,
-    VerticalBreadCrumbModule,
     UtilModule,
     ComponentsModule,
     UserAnnotationsModule,
@@ -85,7 +80,6 @@ import { StatusbarCmp } from "src/atlasComponents/statusbar/statusbar.component"
     TPBRViewCmp,
     FileInputModule,
     SapiViewsFeatureConnectivityModule,
-    LabelEventDirective,
     AvailableATPDirective,
     NeighbourOverlay,
     StatusbarCmp,

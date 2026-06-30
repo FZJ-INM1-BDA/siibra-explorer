@@ -53,7 +53,7 @@
 
       </div>
       
-      <ng-template sxplrExperimentalFlag [deprecated]="true">
+      <!-- <ng-template sxplrExperimentalFlag [deprecated]="true">
 
       <button mat-raised-button
         [color]="view.halfSidenavExpanded ? 'primary' : 'primary'"
@@ -63,7 +63,7 @@
         <mat-icon>{{ view.halfSidenavExpanded ? 'chevron_left' : 'chevron_right' }}</mat-icon>
         
       </button>
-      </ng-template>
+      </ng-template> -->
 
 
     </div>
@@ -78,22 +78,6 @@
     </div>
 
     <div iavLayoutFourCornersBottomLeft>
-      <ng-template sxplrExperimentalFlag [deprecated]="true">
-
-      <mat-card class="express-atlas-selection sxplr-muted hoverable sxplr-custom-cmp"
-        mat-ripple
-        [matMenuTriggerFor]="expressMenu"
-        >
-        <markdown-dom
-          [markdown]="{
-            atlas: view.selectedAtlas,
-            template: view.selectedTemplate,
-            parcellation: view.selectedParcellation,
-            regions: view.selectedRegions
-          } | atprToMd">
-        </markdown-dom>
-      </mat-card>
-      </ng-template>
     </div>
 
     <!-- buttom right -->
@@ -172,26 +156,14 @@
 
 <!-- top left -->
 <!-- default top left -->
-<ng-template #defaultMainContentTopLeft
-  let-view="view">
-
-  <ng-template sxplrExperimentalFlag [deprecated]="true">
-
-  <sxplr-vertical-bread-crumb class="sxplr-d-block sxplr-overflow-y-auto mat-elevation-z1"
-    [viewerLoaded]="viewerLoaded"
-    *ngIf="view.useViewer"
-    (show)="controlHalfNav(true)">
-  </sxplr-vertical-bread-crumb>
-
-  </ng-template>
-
+<ng-template #defaultMainContentTopLeft let-view="view">
 </ng-template>
 
 
 <!-- special mode top left -->
 <ng-template #specialModeTopLeftTmpl let-mode="mode" let-view="view">
 
-  <div class="sxplr-pe-all">
+  <div class="special-mode-parent">
     <ng-container [ngSwitch]="mode">
       <!-- catch case where annotation mode is activated -->
       <ng-template [ngSwitchCase]="ARIA_LABELS.VIEWER_MODE_ANNOTATING">
@@ -403,15 +375,6 @@
 <!-- default top right -->
 <ng-template #minDefaultMainContentTopRight>
 
-  <!-- signin banner at top right corner -->
-  <ng-template sxplrExperimentalFlag [deprecated]="true">
-
-  <top-menu-cmp class="mt-3 mr-2 d-inline-block"
-    [ismobile]="(media.mediaBreakPoint$ | async) > 3"
-    [viewerLoaded]="viewerLoaded">
-  </top-menu-cmp>
-  </ng-template>
-
 </ng-template>
 
 <!-- viewer tmpl -->
@@ -419,17 +382,18 @@
   <div class="viewer-parent"
     ctx-menu-host
     [ctx-menu-host-tmpl]="viewerCtxMenuTmpl">
+
+    <ng-template sxplrExperimentalFlag [experimental]="true">
+    <sxplr-status-bar halfmode="top" class="viewer-status sxplr-custom-cmp bg text sxplr-of-x-auto"></sxplr-status-bar>
+    </ng-template>
+
     <viewer-wrapper
       (viewer-event)="handleViewerCtxEvent($event)">
     </viewer-wrapper>
 
-    <ng-template sxplrExperimentalFlag [experimental]="true">
-
     <div class="viewer-status sxplr-custom-cmp bg text sxplr-of-x-auto">
       <sxplr-status-bar></sxplr-status-bar>
     </div>
-    
-    </ng-template>
   </div>
 </ng-template>
 

@@ -220,3 +220,10 @@ mat-card-title.with-controls
     flex: 0 0 auto;
   }
 }
+
+.special-mode-parent
+{
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+  pointer-events: all;
+}
