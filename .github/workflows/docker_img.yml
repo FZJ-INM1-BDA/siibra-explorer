@@ -219,7 +219,7 @@ jobs:
         MR_TITLE="${{ needs.set-vars.outputs.MR_TITLE }}"
 
         curl -fL -X POST \
-          --form "token=${{ secrets.GITLAB_GITOPS_TRIGGER_TOKEN }}" \
+          --form "token=${{ secrets.GITLAB_TRIGGER_TOKEN }}" \
           --form "ref=main" \
           --form "variables[UPDATE_FILES]=$UPDATE_FILES" \
           --form "variables[MR_TITLE]=$MR_TITLE" \
