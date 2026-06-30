@@ -51,21 +51,24 @@ jobs:
 
         if [[ "$BRANCH_NAME" == 'dev' ]]
         then
-          echo "DEPLOY_FILE=siibra-sxplr/siibra-explorer/values/dev.yaml" >> "$GITHUB_OUTPUT"
+
+        echo "DEPLOY_FILE=siibra-sxplr/siibra-explorer/values/dev.yaml" >> "$GITHUB_OUTPUT"
           
-          cat > /tmp/delta.yaml << EOF
-          image:
-            tag: "dev"
+        cat > /tmp/delta.yaml << EOF
+        image:
+          tag: "dev"
 
-          podAnnotations:
-            image-digest: "h-$GIT_DIGEST"
+        podAnnotations:
+          image-digest: "h-$GIT_DIGEST"
 
-          envObj:
-            HOST_PATHNAME: "/viewer-dev"
-            OVERWRITE_API_ENDPOINT: "https://siibra-api-rc.apps.prod-jsccloud.ebrains.eu/v3_0"
+        envObj:
+          HOST_PATHNAME: "/viewer-dev"
+          OVERWRITE_API_ENDPOINT: "https://siibra-api-rc.apps.prod-jsccloud.ebrains.eu/v3_0"
         EOF
-          echo "DELTA_B64=$(base64 -w 0 /tmp/delta.yaml)" >> "$GITHUB_OUTPUT"
-          echo "MR_TITLE='siibra explorer [dev] '$GIT_DIGEST" >> "$GITHUB_OUTPUT"
+
+        echo "DELTA_B64=$(base64 -w 0 /tmp/delta.yaml)" >> "$GITHUB_OUTPUT"
+        echo "MR_TITLE=siibra explorer [dev] $GIT_DIGEST" >> "$GITHUB_OUTPUT"
+
         fi
 
         # DEPLOY_ID == remove _ / and lowercase everything from branch
