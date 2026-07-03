@@ -5,6 +5,7 @@ on:
     branches:
       - "master"
       - "staging"
+      - "dev"
     # do not rebuild if...
     paths-ignore:
       # docs (docs are built on readthedocs any way)
@@ -20,6 +21,9 @@ jobs:
       DEPLOY_ID: ${{ steps.set-vars-step.outputs.DEPLOY_ID }}
       SXPLR_VERSION: ${{ steps.set-vars-step.outputs.SXPLR_VERSION }}
       EXPERIMENTAL_FEATURE_FLAG: ${{ steps.set-vars-step.outputs.EXPERIMENTAL_FEATURE_FLAG }}
+      DEPLOY_FILE: ${{ steps.set-vars-step.outputs.DEPLOY_FILE }}
+      DELTA_B64: ${{ steps.set-vars-step.outputs.DELTA_B64 }}
+      MR_TITLE: ${{ steps.set-vars-step.outputs.MR_TITLE }}
     steps:
     - uses: actions/checkout@v4
     - id: 'set-vars-step'
@@ -43,6 +47,33 @@ jobs:
           echo "BUILD_TEXT=" >> $GITHUB_OUTPUT
         else
           echo "BUILD_TEXT=$BRANCH_NAME" >> $GITHUB_OUTPUT
+        fi
+
+        if [[ "$BRANCH_NAME" == 'dev' ]]
+        then
+
+        echo "DEPLOY_FILE=siibra-sxplr/siibra-explorer/values/dev.yaml" >> "$GITHUB_OUTPUT"
+        cat > /tmp/delta.yaml << EOF
+        podAnnotations:
+          image-digest: "h-$GIT_DIGEST"
+        EOF
+        echo "DELTA_B64=$(base64 -w 0 /tmp/delta.yaml)" >> "$GITHUB_OUTPUT"
+        echo "MR_TITLE=siibra explorer [dev] $GIT_DIGEST" >> "$GITHUB_OUTPUT"
+
+        fi
+
+        
+        if [[ "$BRANCH_NAME" == 'staging' ]]
+        then
+
+        echo "DEPLOY_FILE=siibra-sxplr/siibra-explorer/values/rc.yaml" >> "$GITHUB_OUTPUT"
+        cat > /tmp/delta.yaml << EOF
+        podAnnotations:
+          image-digest: "h-$GIT_DIGEST"
+        EOF
+        echo "DELTA_B64=$(base64 -w 0 /tmp/delta.yaml)" >> "$GITHUB_OUTPUT"
+        echo "MR_TITLE=siibra explorer [staging] $GIT_DIGEST" >> "$GITHUB_OUTPUT"
+
         fi
 
         # DEPLOY_ID == remove _ / and lowercase everything from branch
@@ -104,6 +135,7 @@ jobs:
         context: .
         push: true
         tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.BRANCH_NAME }}
+        no-cache: true
         build-args: |
           BUILD_HASH=${{ env.GIT_DIGEST }}
           MATOMO_URL=${{ env.MATOMO_URL }}
@@ -112,14 +144,6 @@ jobs:
           EXPERIMENTAL_FEATURE_FLAG=${{ env.EXPERIMENTAL_FEATURE_FLAG }}
 
   build-docker-img-ebrains:
-
-    strategy:
-      matrix:
-        include:
-        - suffix: "-leap"
-          build_arg: "ENABLE_LEAP_MOTION=true"
-        - suffix: ""
-          build_arg: "ENABLE_LEAP_MOTION=false"
   
     runs-on: ubuntu-latest
     needs:
@@ -129,7 +153,11 @@ jobs:
       MATOMO_URL: 'https://stats.humanbrainproject.eu/'
       PRODUCTION: 'true'
       DOCKER_REGISTRY: 'docker-registry.ebrains.eu/siibra/'
+      # K8S_DOCKER_REGISTRY: 'docker-registry-dev.ebrains.eu/siibra/'
 
+      SIIBRA_API_STABLE: 'https://siibra-api-stable.apps.hbp.eu/v3_0,https://siibra-api.apps.ebrains.eu/v3_0'
+      SIIBRA_API_RC: 'https://siibra-api-rc.apps.hbp.eu/v3_0'
+      SIIBRA_API_LATEST: 'https://siibra-api-latest.apps-dev.hbp.eu/v3_0'
       GIT_DIGEST: ${{ needs.set-vars.outputs.GIT_DIGEST }}
       BRANCH_NAME: ${{ needs.set-vars.outputs.BRANCH_NAME }}
       EXPERIMENTAL_FEATURE_FLAG: ${{ needs.set-vars.outputs.EXPERIMENTAL_FEATURE_FLAG }}
@@ -139,9 +167,10 @@ jobs:
     - id: 'build-docker-image'
       name: 'Build docker image'
       run: |
-        echo "Git digest: ${{ env.GIT_DIGEST }} "
+        echo "Git digest: ${{ env.GIT_DIGEST}} "
 
-        DOCKER_BUILT_TAG=${{ env.DOCKER_REGISTRY }}siibra-explorer:${BRANCH_NAME}${{ matrix.suffix }}
+        DOCKER_BUILT_TAG=${{ env.DOCKER_REGISTRY }}siibra-explorer:$BRANCH_NAME
+        # K8S_DOCKER_BUILT_TAG=${{ env.K8S_DOCKER_REGISTRY }}siibra-explorer:$BRANCH_NAME
         echo "Building $DOCKER_BUILT_TAG"
         docker build \
           --build-arg BUILD_HASH=${{ env.GIT_DIGEST }} \
@@ -149,11 +178,14 @@ jobs:
           --build-arg MATOMO_ID=${{ env.MATOMO_ID }} \
           --build-arg SIIBRA_API_ENDPOINTS=${{ env.SIIBRA_API_STABLE }} \
           --build-arg EXPERIMENTAL_FEATURE_FLAG=${{ env.EXPERIMENTAL_FEATURE_FLAG }} \
-          --build-arg ${{ matrix.build_arg }} \
           -t $DOCKER_BUILT_TAG \
           .
         echo "Successfully built $DOCKER_BUILT_TAG"
         echo "DOCKER_BUILT_TAG=$DOCKER_BUILT_TAG" >> $GITHUB_ENV
+
+        # echo "Tagging $DOCKER_BUILT_TAG as $K8S_DOCKER_BUILT_TAG"
+        # docker tag $DOCKER_BUILT_TAG $K8S_DOCKER_BUILT_TAG
+        # echo "K8S_DOCKER_BUILT_TAG=$K8S_DOCKER_BUILT_TAG" >> $GITHUB_ENV
 
         inspect_str=$(docker image inspect --format='json' $DOCKER_BUILT_TAG)
         echo "Inspected tag: $inspect_str"
@@ -179,106 +211,90 @@ jobs:
         docker tag $DOCKER_BUILT_TAG $VERSIONED_DOCKER_BUILT_TAG
         docker push $VERSIONED_DOCKER_BUILT_TAG
 
-    # - name: '(experimental) Push to k8s docker registry'
-    #   run: |
-    #     echo "curl first otherwise docker login result in tls handshake timeout"
-    #     curl -v https://docker-registry-dev.ebrains.eu/v2/
-    #     echo "Login to docker registry"
-    #     echo '${{ secrets.EBRAINS_K8S_DOCKER_REG_TOKEN }}' | \
-    #     docker login \
-    #       -u '${{ secrets.EBRAINS_K8S_DOCKER_REG_USER }}' \
-    #       --password-stdin \
-    #       docker-registry-dev.ebrains.eu
-    #     echo "Pushing $K8S_DOCKER_BUILT_TAG"
-    #     docker push $K8S_DOCKER_BUILT_TAG
-
-  trigger-deploy-rc-rancher:
-    if: ${{ needs.set-vars.outputs.BRANCH_NAME == 'staging' && success() }}
+  trigger-deploy-rancher:
     needs:
       - build-docker-img-ebrains
       - set-vars
-    uses: ./.github/workflows/deploy-helm.yml
-    with:
-      DEPLOYMENT_NAME: rc
-      IMAGE_TAG: staging
+    runs-on: ubuntu-latest
+    steps:
+    - run: |
+        DEPLOY_FILE="${{ needs.set-vars.outputs.DEPLOY_FILE }}"
+        DELTA_B64="${{ needs.set-vars.outputs.DELTA_B64 }}"
+        if [[ -z "$DEPLOY_FILE" || -z "$DELTA_B64" ]]; then
+          echo "DEPLOY_FILE or DELTA_B64 is undefined, skipping deploy"
+          exit 1
+        fi
 
-      # temporarily use ghcr, as ebrains harbor cannot be auth'ed
-      IMAGE_REPO: docker-registry.ebrains.eu/siibra/siibra-explorer
+        UPDATE_FILES=$(jq -cn \
+          --arg filename "$DEPLOY_FILE" \
+          --arg delta "$DELTA_B64" \
+          '[{"filename": $filename, "delta": $delta}]')
+        
+        MR_TITLE="${{ needs.set-vars.outputs.MR_TITLE }}"
 
-      # GIT_DIGEST may (sometimes) be all numbers. prepend 'h' to cast to str
-      IMAGE_DIGEST: h${{ needs.set-vars.outputs.GIT_DIGEST }}
-    secrets:
-      KUBECONFIG: ${{ secrets.KUBECONFIG }}
+        curl -fL -X POST \
+          --form "token=${{ secrets.GITLAB_TRIGGER_TOKEN }}" \
+          --form "ref=main" \
+          --form "variables[UPDATE_FILES]=$UPDATE_FILES" \
+          --form "variables[MR_TITLE]=$MR_TITLE" \
+          "${{ secrets.GITLAB_GITOPS_URL }}/api/v4/projects/${{ secrets.GITLAB_GITOPS_PROJECT_ID }}/trigger/pipeline"
 
-  cypress-staging-viewer:
-    
-    needs:
-    - trigger-deploy-rc-rancher
-    - set-vars
-    strategy:
-      fail-fast: false
-      matrix:
-        os: 
-        - ubuntu-latest
-        # - windows-latest
-        - macos-latest
-        viewer:
-        - ng
-        - fsa
-        browser:
-        - chrome
-        - webkit
-        include:
-        - viewer: ng
-          saneurl: human
-        - viewer: fsa
-          saneurl: fsaverage
-        exclude:
-        - os: ubuntu-latest
-          browser: webkit
-        # - os: windows-latest
-        #   browser: webkit
-    uses: ./.github/workflows/_screenshot.yml
-    with:
-      url: https://atlases.ebrains.eu/viewer-staging/go/${{ matrix.saneurl }}
-      screenshot-filename: ${{ needs.set-vars.outputs.GIT_DIGEST }}/viewer-preview/${{ matrix.viewer }}_${{ matrix.os }}_${{ matrix.browser }}
-    secrets:
-      client-id: ${{ secrets.EBRAINS_SIIBRA_EXPLORER_OIDC_CLIENTID}}
-      client-secret: ${{ secrets.EBRAINS_SIIBRA_EXPLORER_OIDC_CLIENTSECRET}}
+  # cypress-staging-viewer:
+  #   if: ${{ needs.set-vars.outputs.BRANCH_NAME == 'staging' }}
+  #   needs:
+  #   - trigger-deploy-rancher
+  #   - set-vars
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       os: 
+  #       - ubuntu-latest
+  #       # - windows-latest
+  #       - macos-latest
+  #       viewer:
+  #       - ng
+  #       - fsa
+  #       browser:
+  #       - chrome
+  #       - webkit
+  #       include:
+  #       - viewer: ng
+  #         saneurl: human
+  #       - viewer: fsa
+  #         saneurl: fsaverage
+  #       exclude:
+  #       - os: ubuntu-latest
+  #         browser: webkit
+  #       # - os: windows-latest
+  #       #   browser: webkit
+  #   uses: ./.github/workflows/_screenshot.yml
+  #   with:
+  #     url: https://atlases.ebrains.eu/viewer-staging/go/${{ matrix.saneurl }}
+  #     screenshot-filename: ${{ needs.set-vars.outputs.GIT_DIGEST }}/viewer-preview/${{ matrix.viewer }}_${{ matrix.os }}_${{ matrix.browser }}
+  #   secrets:
+  #     client-id: ${{ secrets.EBRAINS_SIIBRA_EXPLORER_OIDC_CLIENTID}}
+  #     client-secret: ${{ secrets.EBRAINS_SIIBRA_EXPLORER_OIDC_CLIENTSECRET}}
 
-  cypress-staging-url:
-    needs:
-    - trigger-deploy-rc-rancher
-    - set-vars
-    strategy:
-      fail-fast: false
-      matrix:
-        saneurl:
-        - siibra_paper_2023_2A
-        - siibra_paper_2023_2B
-        - siibra_paper_2023_2C
-        - siibra_paper_2023_2D
-        - siibra_paper_2023_2E
-        - siibra_paper_2023_2F
-    uses: ./.github/workflows/_screenshot.yml
-    with:
-      url: https://atlases.ebrains.eu/viewer-staging/go/${{ matrix.saneurl }}
-      screenshot-filename: ${{ needs.set-vars.outputs.GIT_DIGEST }}/url-preview/${{ matrix.saneurl }}
-    secrets:
-      client-id: ${{ secrets.EBRAINS_SIIBRA_EXPLORER_OIDC_CLIENTID}}
-      client-secret: ${{ secrets.EBRAINS_SIIBRA_EXPLORER_OIDC_CLIENTSECRET}}
+  # cypress-staging-url:
+  #   if: ${{ needs.set-vars.outputs.BRANCH_NAME == 'staging' }}
+  #   needs:
+  #   - trigger-deploy-rancher
+  #   - set-vars
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       saneurl:
+  #       - siibra_paper_2023_2A
+  #       - siibra_paper_2023_2B
+  #       - siibra_paper_2023_2C
+  #       - siibra_paper_2023_2D
+  #       - siibra_paper_2023_2E
+  #       - siibra_paper_2023_2F
+  #   uses: ./.github/workflows/_screenshot.yml
+  #   with:
+  #     url: https://atlases.ebrains.eu/viewer-staging/go/${{ matrix.saneurl }}
+  #     screenshot-filename: ${{ needs.set-vars.outputs.GIT_DIGEST }}/url-preview/${{ matrix.saneurl }}
+  #   secrets:
+  #     client-id: ${{ secrets.EBRAINS_SIIBRA_EXPLORER_OIDC_CLIENTID}}
+  #     client-secret: ${{ secrets.EBRAINS_SIIBRA_EXPLORER_OIDC_CLIENTSECRET}}
 
-  trigger-deploy-master-rancher:
-    if: ${{ needs.set-vars.outputs.BRANCH_NAME == 'master' && success() }}
-    needs:
-      - build-docker-img-ebrains
-      - set-vars
-    uses: ./.github/workflows/deploy-helm.yml
-    with:
-      DEPLOYMENT_NAME: prod
-      IMAGE_TAG: ${{ needs.set-vars.outputs.SXPLR_VERSION }}
-
-      # GIT_DIGEST may (sometimes) be all numbers. prepend 'h' to cast to str
-      IMAGE_DIGEST: h${{ needs.set-vars.outputs.GIT_DIGEST }}
-    secrets:
-      KUBECONFIG: ${{ secrets.KUBECONFIG }}
