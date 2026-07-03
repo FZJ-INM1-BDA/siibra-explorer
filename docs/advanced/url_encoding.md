@@ -45,6 +45,7 @@ Here is a comprehensive list of the state encoded in the URL:
 | feature | `f:` | id property + additional escaping[^3] | |
 | misc viewer state | `vs:` | misc viewer state serialization[^4] | | 
 | auto launch plugin | `pl` (query param) | stringified JSON representing `string[]` | `?pl=%5B%22http%3A%2F%2Flocalhost%3A1234%2Fmanifest.json%22%5D` . Modern browsers also accept `?pl=["http://localhost:1234/manifest.json"]` |
+| volume layer | `x-overlay-layer` | layer to be loaded, in the format of `<protocol>://<url>`[^5],   | `/x-overlay-layer:nifti:%2F%2Fhttps:%2F%2Fdata-proxy.ebrains.eu%2Fapi%2Fv1%2Fpublic%2Fbuckets%2Ftest-sept-22%2Fheat_volume_interpolated_smoothed_half_res_16bit_int.nii.gz` |
 
 [^1]: Quick hash. [[source]](https://github.com/FZJ-INM1-BDA/siibra-explorer/blob/v2.14.4/src/util/fn.ts#L146-L154) Quick one way hash. It will likely be deprecated in favor of [crypto.digest](https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest) in the near future.
 
@@ -55,3 +56,5 @@ Here is a comprehensive list of the state encoded in the URL:
 [^3]: additional feature id escaping: since feature id can be a lot more varied, they are further encoded by: first instance of `://` is replaced with `~ptc~`; all instances of `:` is replaced with `~`; *any* occurances `[()]` are URL encoded.
 
 [^4]: miscellaneous viewer state serialization. [[source]](https://github.com/FZJ-INM1-BDA/siibra-explorer/blob/v2.14.4/src/routerModule/routeStateTransform.service.ts#L272-L293) Various viewer configuration related state is encoded. This encoded state is versioned, in order to preserve backwards compatibility. The current version is `v1`. In the current version, three `uint8` values are base64 encoded. First encodes for panel mode ( four-panel, `FOUR_PANEL`, encoded as `1`; `PIP_PANEL`, encoded as `2`). Second encodes for panel order. Third encodes for the bit masked boolean flags for octant removal and show delination, with the remaining 6 bits ignored.
+
+[^5]: supported protocols include: `nifti://`, `precomputed://`, `zarr://`, `n5://`, `swc://`, `deepzoom://`, any double colon `::` in <url> needs to be escaped to `__dblcol__`. Escaped url then must be URI encoded.
