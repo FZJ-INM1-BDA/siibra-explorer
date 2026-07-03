@@ -44,8 +44,9 @@ Here is a comprehensive list of the state encoded in the URL:
 | navigation | `@:` | navigation state hash[^2] | |
 | feature | `f:` | id property + additional escaping[^3] | |
 | misc viewer state | `vs:` | misc viewer state serialization[^4] | | 
+| volume layer | `x-overlay-layer:` | layer to be loaded, in the format of `<protocol>://<url>`[^5],   | `/x-overlay-layer:nifti:%2F%2Fhttps:%2F%2Fdata-proxy.ebrains.eu%2Fapi%2Fv1%2Fpublic%2Fbuckets%2Ftest-sept-22%2Fheat_volume_interpolated_smoothed_half_res_16bit_int.nii.gz` |
 | auto launch plugin | `pl` (query param) | stringified JSON representing `string[]` | `?pl=%5B%22http%3A%2F%2Flocalhost%3A1234%2Fmanifest.json%22%5D` . Modern browsers also accept `?pl=["http://localhost:1234/manifest.json"]` |
-| volume layer | `x-overlay-layer` | layer to be loaded, in the format of `<protocol>://<url>`[^5],   | `/x-overlay-layer:nifti:%2F%2Fhttps:%2F%2Fdata-proxy.ebrains.eu%2Fapi%2Fv1%2Fpublic%2Fbuckets%2Ftest-sept-22%2Fheat_volume_interpolated_smoothed_half_res_16bit_int.nii.gz` |
+
 
 [^1]: Quick hash. [[source]](https://github.com/FZJ-INM1-BDA/siibra-explorer/blob/v2.14.4/src/util/fn.ts#L146-L154) Quick one way hash. It will likely be deprecated in favor of [crypto.digest](https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest) in the near future.
 
