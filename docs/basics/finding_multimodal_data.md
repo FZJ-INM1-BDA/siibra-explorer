@@ -13,7 +13,7 @@ The sidepanel provides a dedicated tab entitled "Features" which lists all found
 
 ![](https://data-proxy.ebrains.eu/api/v1/buckets/reference-atlas-data/static/siibra-explorer-datafeatures.png){ style="width:800px"}
 
-Features are so far organized into categories "cellular", "molecular", "functional", "connectivity", "macrostructural" and "other". 
+Features are so far organized into categories "cellular", "molecular", "fibres", "functional", "connectivity", "macrostructural" and "other". 
 Each entry in these categories corresponds to a dataset on a public repository, typically the [EBRAINS Knowlege Graph](https://kg.ebrains.eu/search). 
 Their basic metadata is shown in the viewer, including a description and link to the original resource, as shown below for a dataset of cortical receptor densities from the "molecular" category. 
 

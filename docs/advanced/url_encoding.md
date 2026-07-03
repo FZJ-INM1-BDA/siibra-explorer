@@ -16,7 +16,7 @@ The resultant string is then prepended by `<path_to_viewer>#/`, where `<path_to_
 
     | state | prefix | value | serialized | prefix + serialized |
     | --- | --- | --- | --- | --- |
-    | atlas | `a:` | Multilevel Human Atlas | `juelich:iav:atlas:v1.0.0:1` | `a:juelich:iav:atlas:v1.0.0:1` |
+    | atlas | `a:` | Multilevel Human Brain Atlas | `juelich:iav:atlas:v1.0.0:1` | `a:juelich:iav:atlas:v1.0.0:1` |
     | space | `t:` | ICBM 2009c nonlinear asymmetrical | `minds:core:referencespace:v1.0.0:dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2` | `t:minds:core:referencespace:v1.0.0:dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2` |
     | parcellation | `p:` | Julich Brain v3.0.3 | `minds:core:parcellationatlas:v1.0.0:94c1125b-b87e-45e4-901c-00daee7f2579-300` | `p:minds:core:parcellationatlas:v1.0.0:94c1125b-b87e-45e4-901c-00daee7f2579-300` |
 
