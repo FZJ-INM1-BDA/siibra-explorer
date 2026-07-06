@@ -47,6 +47,8 @@ import { SapiViewsFeatureConnectivityModule } from "src/features/connectivity";
 import { AvailableATPDirective } from "src/atlasComponents/sapi/core/availableATP.directive";
 import { NeighbourOverlay } from "src/components/neighbourOverlay/neighbourOverlay.component";
 import { StatusbarCmp } from "src/atlasComponents/statusbar/statusbar.component";
+import { AnnotateCmp } from "src/ui/annotate/annotate.component";
+import { ViewerModeDirective } from "src/util/directives/viewmode.directive";
 
 @NgModule({
   imports: [
@@ -83,6 +85,8 @@ import { StatusbarCmp } from "src/atlasComponents/statusbar/statusbar.component"
     AvailableATPDirective,
     NeighbourOverlay,
     StatusbarCmp,
+    AnnotateCmp,
+    ViewerModeDirective,
     
     ...(environment.ENABLE_LEAP_MOTION ? [LeapModule] : [])
   ],

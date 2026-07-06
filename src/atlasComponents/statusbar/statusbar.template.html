@@ -3,7 +3,11 @@
     <button mat-icon-button [matMenuTriggerFor]="findMenu">
         <mat-icon>search</mat-icon>
     </button>
-    <button mat-icon-button [matMenuTriggerFor]="annotateMenu">
+    <button mat-icon-button
+        sxplr-view-mode="toggle"
+        sxplr-view-mode-target="annotating"
+        [color]="(viewMode.viewerMode$ | async) === 'annotating' ? 'primary': 'default'"
+        #viewMode="sxplrViewMode">
         <mat-icon>draw</mat-icon>
     </button>
     <button mat-icon-button [matMenuTriggerFor]="shareMenu">
@@ -444,10 +448,6 @@
     <sxplr-find></sxplr-find>
 </mat-menu>
 
-<mat-menu #annotateMenu="matMenu">
-    <sxplr-annotate></sxplr-annotate>
-</mat-menu>
-
 
 <mat-menu #shareMenu="matMenu">
     <mat-action-list>
@@ -483,9 +483,12 @@
 </mat-menu>
 
 <mat-menu #toolMenu="matMenu">
+
+    <ng-template sxplrExperimentalFlag [experimental]="true">
     <mat-action-list>
         <button mat-list-item
-            key-frame-play-now
+            sxplr-view-mode="toggle"
+            sxplr-view-mode-target="key frame"
             [matTooltip]="'Animate viewer state between keyframes'">
             <mat-icon matListItemIcon>play_arrow</mat-icon>
             <span matListItemTitle>
@@ -493,8 +496,8 @@
             </span>
         </button>
     </mat-action-list>
-
     <mat-divider></mat-divider>
+    </ng-template>
 
     <plugin-banner></plugin-banner>
 </mat-menu>

@@ -168,8 +168,18 @@
       <!-- catch case where annotation mode is activated -->
       <ng-template [ngSwitchCase]="ARIA_LABELS.VIEWER_MODE_ANNOTATING">
         <mat-card class="sxplr-m-1">
+          <mat-card-header>
+            <mat-card-title class="with-controls">
+              <span>Annotating</span>
+              <button mat-icon-button
+                color="warn"
+                sxplr-view-mode="off">
+                <mat-icon>close</mat-icon>
+              </button>
+            </mat-card-title>
+          </mat-card-header>
           <mat-card-content>
-            Annotation no longer has a special mode. Please contact us on how you reached here. We will try to fix the bug ASAP.
+            <sxplr-annotate></sxplr-annotate>
           </mat-card-content>
         </mat-card>
       </ng-template>
@@ -177,6 +187,16 @@
       <!-- key frame mode -->
       <ng-template [ngSwitchCase]="ARIA_LABELS.VIEWER_MODE_KEYFRAME">
         <mat-card class="sxplr-m-1">
+          <mat-card-header>
+            <mat-card-title class="with-controls">
+              <span>Key Frame Control</span>
+              <button mat-icon-button
+                sxplr-view-mode="off"
+                color="warn">
+                <mat-icon>close</mat-icon>
+              </button>
+            </mat-card-title>
+          </mat-card-header>
           <mat-card-content>
             <key-frame-controller></key-frame-controller>
           </mat-card-content>

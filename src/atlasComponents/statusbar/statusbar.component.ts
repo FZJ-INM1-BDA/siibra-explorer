@@ -21,10 +21,10 @@ import { SapiViewsCoreRegionModule } from "../sapiViews/core/region";
 import { SapiViewsUtilModule } from "../sapiViews";
 import { ShareModule } from "src/share";
 import { FindCmp } from "src/ui/find/find.component";
-import { AnnotateCmp } from "src/ui/annotate/annotate.component";
 import { PluginModule } from "src/plugin";
 import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.directive";
 import { ScreenshotModule } from "src/screenshot";
+import { ViewerModeDirective } from "src/util/directives/viewmode.directive";
 
 @Component({
   selector: 'sxplr-status-bar',
@@ -47,11 +47,11 @@ import { ScreenshotModule } from "src/screenshot";
     SapiViewsUtilModule,
     ShareModule,
     FindCmp,
-    AnnotateCmp,
     StateModule,
     PluginModule,
     ExperimentalFlagDirective,
     ScreenshotModule,
+    ViewerModeDirective,
   ],
   hostDirectives: [
     AvailableATPDirective,

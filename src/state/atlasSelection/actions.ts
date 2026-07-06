@@ -86,7 +86,7 @@ export const setNavigation = createAction(
 export const setViewerMode = createAction(
   `${nameSpace} setViewerMode`,
   props<{
-    viewerMode: ViewerMode
+    viewerMode: ViewerMode|null
   }>()
 )
 
