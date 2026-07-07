@@ -107,3 +107,9 @@ export const SXPLR_ANNOTATIONS_KEY = {
   TEMPLATE_ID: "sxplrAnnotation.template.id",
   PARCELLATION_ID: "sxplrAnnotation.parcellation.id",
 } as const
+
+export type SxplrConf = {
+  HIDE_POPUP: boolean
+}
+
+export const SXPLR_CONF_TOKEN = new InjectionToken<SxplrConf>("SXPLR_CONF_TOKEN")

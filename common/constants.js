@@ -154,6 +154,7 @@ If you do not accept the Terms & Conditions you are not permitted to access or u
 
     OVERWRITE_SAPI_ENDPOINT_ATTR: `x-sapi-base-url`,
     OVERWRITE_SPATIAL_BACKEND_ATTR: `x-spatial-backend-url`,
+    HIDE_POPUP_ATTR: `x-hide-popup`,
     DATA_ERROR_ATTR: `data-error`,
 
     FREE_MODE: `x-sxplr-free-mode`,

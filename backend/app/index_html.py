@@ -2,8 +2,8 @@ from fastapi import APIRouter, Request
 from pathlib import Path
 from fastapi.responses import Response
 from typing import Dict
-from .const import ERROR_KEY, DATA_ERROR_ATTR, OVERWRITE_SAPI_ENDPOINT_ATTR, COOKIE_KWARGS, OVERWRITE_SPATIAL_BACKEND_ATTR, FREE_MODE
-from .config import PATH_TO_PUBLIC, OVERWRITE_API_ENDPOINT, OVERWRITE_SPATIAL_ENDPOINT
+from .const import ERROR_KEY, DATA_ERROR_ATTR, OVERWRITE_SAPI_ENDPOINT_ATTR, COOKIE_KWARGS, OVERWRITE_SPATIAL_BACKEND_ATTR, HIDE_POPUP_ATTR, FREE_MODE
+from .config import PATH_TO_PUBLIC, OVERWRITE_API_ENDPOINT, OVERWRITE_SPATIAL_ENDPOINT, HIDE_POPUP
 
 path_to_index = Path(PATH_TO_PUBLIC) / "index.html"
 index_html: str = None
@@ -40,6 +40,9 @@ async def get_index_html(request: Request):
     
     if OVERWRITE_SPATIAL_ENDPOINT:
         attributes_to_append[OVERWRITE_SPATIAL_BACKEND_ATTR] = OVERWRITE_SPATIAL_ENDPOINT
+    
+    if HIDE_POPUP:
+        attributes_to_append[HIDE_POPUP_ATTR] = HIDE_POPUP
     
     if enable_free_mode:
         attributes_to_append[FREE_MODE] = "true"

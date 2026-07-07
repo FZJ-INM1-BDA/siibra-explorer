@@ -9,6 +9,7 @@ import {
   ViewChild,
   ElementRef,
   Inject,
+  Optional,
 } from "@angular/core";
 import { Store, select } from "@ngrx/store";
 import { Observable, Subscription, merge, timer, fromEvent } from "rxjs";
@@ -27,6 +28,7 @@ import { userPreference } from "src/state"
 import { DARKTHEME } from "src/util/injectionTokens";
 import { EnumQuickTourSeverity } from "src/ui/quickTour/constrants";
 import { SAPI } from "src/atlasComponents/sapi";
+import { SXPLR_CONF_TOKEN, SxplrConf } from "src/util/constants";
 
 
 @Component({
@@ -73,7 +75,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     private slService: SlServiceService,
     private clickIntService: ClickInterceptorService,
     @Inject(DOCUMENT) private document: Document,
-    @Inject(DARKTHEME) private darktheme$: Observable<boolean>
+    @Inject(DARKTHEME) private darktheme$: Observable<boolean>,
+    @Optional() @Inject(SXPLR_CONF_TOKEN) private sxplrConf: SxplrConf
   ) {
 
     // stop propagation of copy event at body level
@@ -157,6 +160,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
      * TODO avoid creating new views in lifecycle hooks in general
      */
     this.store.pipe(
+      filter(() =>  !this.sxplrConf?.HIDE_POPUP),
       select(userPreference.selectors.agreedToCookie),
       filter(val => !val),
       delay(0),

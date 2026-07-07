@@ -24,6 +24,8 @@ OVERWRITE_SAPI_ENDPOINT_ATTR = "x-sapi-base-url"
 
 OVERWRITE_SPATIAL_BACKEND_ATTR = "x-spatial-backend-url"
 
+HIDE_POPUP_ATTR = "x-hide-popup"
+
 DOCUMENTATION_URL = "https://siibra-explorer.readthedocs.io/en/stable/"
 
 INPUT_FORMAT = ["nifti", "json", "swc"]
