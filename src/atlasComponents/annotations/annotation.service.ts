@@ -121,7 +121,7 @@ export class AnnotationLayer {
     private color="#ffffff",
     affine=ID_AFFINE,
   ){
-    promiseViewer().then(viewer => {
+    promiseNehubaViewer().then(viewer => {
       this.#coupleToViewer(viewer, affine)
     })
   }
@@ -287,18 +287,18 @@ export class AnnotationLayer {
   }
 }
 
-export function getViewer(){
-  const viewer = (window as any).viewer
-  if (viewer) {
-    return viewer
+export function getNehubaViewer(){
+  const nehubaViewer = (window as any).nehubaViewer
+  if (nehubaViewer) {
+    return nehubaViewer
   }
-  throw new Error(`window.viewer not defined`)
+  throw new Error(`window.nehubaViewer not defined`)
 }
 
-export async function promiseViewer(){
+export async function promiseNehubaViewer(){
   try {
-    return getViewer()
+    return getNehubaViewer()
   } catch (e) {
-    return await retry(() => getViewer(), { timeout: 160, retries: 1e10 })
+    return await retry(() => getNehubaViewer(), { timeout: 160, retries: 1e10 })
   } 
 }

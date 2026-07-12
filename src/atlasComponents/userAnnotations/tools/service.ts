@@ -14,7 +14,7 @@ import { Point } from "./point";
 import { FilterAnnotationsBySpace } from "../filterAnnotationBySpace.pipe";
 import { MatSnackBar } from 'src/sharedModules/angularMaterial.exports'
 import { atlasSelection } from "src/state";
-import { AnnotationLayer, getViewer } from "src/atlasComponents/annotations";
+import { AnnotationLayer, getNehubaViewer } from "src/atlasComponents/annotations";
 import { translateV3Entities } from "src/atlasComponents/sapi/translateV3";
 import { HOVER_INTERCEPTOR_INJECTOR, HoverInterceptor, THoverConfig } from "src/util/injectionTokens";
 import { ToolCmpBase } from "./toolCmp.base";
@@ -502,7 +502,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
           return
         }
         const viewer = await retry(() => {
-          const viewer = getViewer()
+          const viewer = getNehubaViewer()
           if (viewer && (viewer?.layerManager?.managedLayers || []).length > 0) {
             return viewer
           }
@@ -573,7 +573,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     window.localStorage.removeItem(LOCAL_STORAGE_KEY)
     
     const { pako } = await getExportNehuba()
-    const decoded = pako.inflate(bin, { to: 'string' })
+    const decoded = await pako.inflateAsync(bin, { to: 'string' })
     const arr = JSON.parse(decoded)
     const anns: IAnnotationGeometry[] = []
     for (const obj of arr) {

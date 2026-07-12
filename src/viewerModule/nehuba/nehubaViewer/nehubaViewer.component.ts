@@ -585,6 +585,9 @@ export class NehubaViewerUnit implements OnDestroy {
   }
 
   public loadLayer(layerObj: any) {
+    console.log(layerObj)
+    this.nehubaViewer.addLayer(layerObj)
+    return
     const viewer = this.nehubaViewer.ngviewer
     return Object.keys(layerObj)
       .filter(key =>
@@ -815,6 +818,7 @@ export class NehubaViewerUnit implements OnDestroy {
   }
 
   public redraw(){
+    return
     this.nehubaViewer.redraw()
   }
 
@@ -942,6 +946,8 @@ export class NehubaViewerUnit implements OnDestroy {
   private setColorMap(map: Map<string, Map<number, {red: number, green: number, blue: number}>>) {
     this.multiNgIdColorMap = map
     const mainDict: Record<string, Record<number, string>> = {}
+    debugger
+    return
     for (const [ ngId, cMap ] of map.entries()) {
       const nRecord: Record<number, string> = {}
       for (const [ key, cm ] of cMap.entries()) {

@@ -433,7 +433,8 @@ body
       visibility: hidden;
     }
 
-    .neuroglancer-layer-side-panel
+    .neuroglancer-layer-side-panel,
+    .neuroglancer-side-panel-column
     {
       display: none;
     }

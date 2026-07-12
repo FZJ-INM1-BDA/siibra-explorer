@@ -396,7 +396,8 @@ export class SAPI{
           const arraybuffer = await resp.arrayBuffer()
           let outbuf: ArrayBuffer
           try {
-            outbuf = (await getExportNehuba()).pako.inflate(arraybuffer).buffer
+            const { pako } = await getExportNehuba()
+            outbuf = (await pako.inflateAsync(arraybuffer)).buffer
           } catch (e) {
             console.log("unpack error", e)
             outbuf = arraybuffer
@@ -411,6 +412,7 @@ export class SAPI{
           })
 
           const { meta, buffer } = result
+          console.log("after?")
           return { meta, buffer } as {
             meta: {
               min: number

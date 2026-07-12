@@ -138,13 +138,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
      * This should speed up where user first navigate to the home page,
      * and the main.bundle should be downloading after atlasviewer has been rendered
      */
-    if (this.meetsRequirement) {
-      const prefecthMainBundle = this.rd.createElement('link')
-      prefecthMainBundle.rel = 'preload'
-      prefecthMainBundle.as = 'script'
-      prefecthMainBundle.href = 'main.bundle.js'
-      this.rd.appendChild(this.document.head, prefecthMainBundle)
-    }
 
     /**
      * Show Cookie disclaimer if not yet agreed

@@ -173,7 +173,7 @@ export class UserLayerService implements OnDestroy {
     const buf = await file.arrayBuffer()
     try {
       const { pako } = await getExportNehuba()
-      const outbuf = pako.inflate(buf).buffer
+      const outbuf = (await pako.inflatAsync(buf)).buffer
       return await this.#processUnpackedNiiBuf(outbuf, file)
     } catch (e) {
       console.log("unpack error", e)

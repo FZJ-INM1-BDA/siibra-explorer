@@ -59,6 +59,9 @@ export class NehubaNavigationEffects implements OnDestroy{
   
         const gen = timedValues()
         const src = currentNavigation
+        if (!currentNavigation) {
+          return
+        } 
   
         const dest = {
           ...src,
