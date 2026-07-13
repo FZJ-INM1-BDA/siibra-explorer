@@ -1,0 +1,36 @@
+<ng-template [ngIf]="tprb$ | async" let-tprb>
+
+    <mat-tab-group>
+        <mat-tab label="features">
+            <ng-template matTabContent>
+
+                <sxplr-feature-entry
+                    
+                    [template]="tprb.template"
+                    [bbox]="bbox.bbox$ | async | getProperty : 'bbox'"
+                    #voiFeatureEntryCmp="featureEntryCmp"
+                    sxplr-sapiviews-core-space-boundingbox
+                    [sxplr-sapiviews-core-space-boundingbox-space]="tprb.template"
+                    [sxplr-sapiviews-core-space-boundingbox-spec]="tprb.bbox"
+                    #bbox="sxplrSapiViewsCoreSpaceBoundingBox"
+                    >
+                </sxplr-feature-entry>
+                
+                <div voiBbox
+                    [geometry]="voiFeatureEntryCmp.geometry$ | async"
+                    [volumes]="voiFeatureEntryCmp.volumes$ | async"
+                    [features]="voiFeatureEntryCmp.features$ | async">
+                </div>
+            </ng-template>
+        </mat-tab>
+        <mat-tab label="regions">
+            <ng-template matTabContent>
+                <sxplr-point-assignment
+                    [point]="tprb.point | ptToSands : tprb.template.id"
+                    [template]="tprb.template"
+                    [parcellation]="tprb.parcellation">
+                </sxplr-point-assignment>
+            </ng-template>
+        </mat-tab>
+    </mat-tab-group>
+</ng-template>

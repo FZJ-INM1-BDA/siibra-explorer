@@ -62,7 +62,7 @@ export class PointAssignmentDirective implements OnDestroy, OnInit{
         }
         
         this.#layer.updateAnnotation({
-          point: pt.coordinates.map(v => v.value) as [number, number, number],
+          point: pipe.transform(pt).coords.map(v => v * 1e6) as [number, number, number],
           type: "point",
           id: this.#pointId
         })
@@ -111,6 +111,7 @@ export class PointAssignmentDirective implements OnDestroy, OnInit{
   #error$ = new BehaviorSubject<string>(null)
   error$ = this.#error$.asObservable()
 
+  // TODO consider using debounce like to instant update text, but debounce call to API assign
   point$ = new BehaviorSubject<TSandsPoint>(null)
   @Input()
   set point(val: TSandsPoint|TFace) {
@@ -195,7 +196,7 @@ ${warningMsg}`
         this.sapi.v3Get("/map/assign", {
           query: {
             parcellation_id: parcellation.id,
-            point: point.coordinates.map(v => `${v.value/1e6}mm`).join(','),
+            point: point.coordinates.map(v => `${v.value}mm`).join(','),
             space_id: template.id,
             sigma_mm: 0
           }

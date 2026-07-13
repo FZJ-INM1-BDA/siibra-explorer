@@ -141,6 +141,7 @@ export const LABEL_EVENT = {
 } as const
 
 export const FOCUS_VIEW_LABELS = {
+  FEATURE: "focusview:feature",
   VOI: "focusview:voi",
   CONNECTIVITY: "focusview:regionalconnectivity",
   GEOMETRY: "focusview:selectedgeometry",

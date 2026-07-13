@@ -49,6 +49,8 @@ import { NeighbourOverlay } from "src/components/neighbourOverlay/neighbourOverl
 import { StatusbarCmp } from "src/atlasComponents/statusbar/statusbar.component";
 import { AnnotateCmp } from "src/ui/annotate/annotate.component";
 import { ViewerModeDirective } from "src/util/directives/viewmode.directive";
+import { TopMenuModule } from "src/ui/topMenu/module";
+import { FeatureCombinedViewCmp } from "src/features/combinedView/combinedView.component";
 
 @NgModule({
   imports: [
@@ -87,6 +89,8 @@ import { ViewerModeDirective } from "src/util/directives/viewmode.directive";
     StatusbarCmp,
     AnnotateCmp,
     ViewerModeDirective,
+    TopMenuModule,
+    FeatureCombinedViewCmp,
     
     ...(environment.ENABLE_LEAP_MOTION ? [LeapModule] : [])
   ],

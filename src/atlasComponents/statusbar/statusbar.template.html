@@ -1,6 +1,9 @@
 <ng-template [ngIf]="view$ | async" let-view>
     <ng-template sxplrExperimentalFlag [experimental]="halfmode === 'top'">
-    <button mat-icon-button [matMenuTriggerFor]="findMenu">
+    <button mat-icon-button
+        [color]="(viewMode.viewerMode$ | async) === 'focusview:feature' ? 'primary': 'default'"
+        sxplr-view-mode="toggle"
+        sxplr-view-mode-target="focusview:feature">
         <mat-icon>search</mat-icon>
     </button>
     <button mat-icon-button
@@ -131,68 +134,99 @@
     <!-- region(s) -->
     
     <ng-template [ngIf]="view.selectedRegions.length == 0">
-        <ng-template [ngTemplateOutlet]="expressRegionSearchTmpl"></ng-template>
+        <ng-template iav-media-query #media="iavMediaQuery"
+            [ngIf]="(media.mediaBreakPoint$ | async) > 3"
+            [ngIfElse]="regHierTmpl">
+            <button mat-button
+                [sxplr-dialog]="regionHierarchyTmpl"
+                [matTooltip]="view.labels.REGION_HIERARCHY"
+                sxplr-dialog-size="xl"
+                #showHierarchyBtn="sxplrDialog">
+                <mat-icon>account_tree</mat-icon>
+            </button>
+        </ng-template>
+        
+        <ng-template #regHierTmpl>
+            <ng-template [ngTemplateOutlet]="expressRegionSearchTmpl"></ng-template>
+        </ng-template>
     </ng-template>
 
     <ng-template [sxplr-dialog]="regionHierarchyTmpl" sxplr-dialog-size="xl" #showHierarchyBtn="sxplrDialog">
     </ng-template>
     
     <ng-template [ngIf]="view.selectedRegions.length == 1">
-        <ng-template [ngTemplateOutlet]="rawBtn"
+        <ng-template [ngTemplateOutlet]="btnTmpl" [ngTemplateOutletContext]="{
+            name: view.selectedRegions[0].name,
+            icon: 'account_tree',
+            color: 'primary',
+            suffixTmpl: singleRegionSuffixTmpl,
+            menuData: {
+                current: null,
+                type: null,
+                options: []
+            }
+        }">
+
+        </ng-template>
+        <ng-template #singleRegionSuffixTmpl>
+            <div sxplr-sapiviews-core-region
+                class="vbc-row-fixed"
+                #regionDirective="sapiViewsCoreRegion"
+                (sxplr-sapiviews-core-region-navigate-to)="navigateTo($event)"
+                [sxplr-sapiviews-core-region-region]="view.selectedRegions[0]"
+                [sxplr-sapiviews-core-region-atlas]="view.selectedATP.atlas"
+                [sxplr-sapiviews-core-region-parcellation]="view.selectedATP.parcellation"
+                [sxplr-sapiviews-core-region-template]="view.selectedATP.template"
+                [sxplr-sapiviews-core-region-detail-flag]="true">
+            </div>
+            
+            <!-- centroid -->
+            <ng-template [ngIf]="regionDirective.regionPosition$ | async" let-position>
+                <button mat-icon-button [matTooltip]="'centroid: ' + (position | numbers | addUnitAndJoin : 'mm')"
+                    class="vbc-row-fixed"
+                    (click)="navigateTo(position)">
+                    <mat-icon>place</mat-icon>
+                </button>
+            </ng-template>
+            
+            <!-- info -->
+            <ng-template [ngIf]="(regionDirective.desc$ | async) || ((regionDirective.dois$ | async) || []).length > 0">
+                
+                <button mat-icon-button
+                    class="vbc-row-fixed"
+                    [matTooltip]="view.labels.DETAILS"
+                    [sxplr-dialog]="DoiTemplate"
+                    [sxplr-dialog-size]="null"
+                    [sxplr-dialog-data]="{
+                        title: view.selectedRegions[0].name,
+                        desc: regionDirective.desc$ | async,
+                        contributors: regionDirective.contributors$ | async | dedup,
+                        actions: regionDirective.dois$ | async
+                    }">
+                    <mat-icon>info</mat-icon>
+                </button>
+            </ng-template>
+
+            <button mat-icon-button
+                color="warn"
+                (click)="clearRoi()"
+                [matTooltip]="view.labels.CLEAR_SELECTED_REGION">
+                <mat-icon>clear</mat-icon>
+            </button>
+        </ng-template>
+
+        <!-- <ng-template [ngTemplateOutlet]="rawBtn"
             [ngTemplateOutletContext]="{
                 name: view.selectedRegions[0].name,
                 icon: 'check_box',
                 onclick: showHierarchyBtn.onClick.bind(showHierarchyBtn),
             }"
             [sxplr-dialog]="regionHierarchyTmpl">
-        </ng-template>
+        </ng-template> -->
 
         <!-- util: region directive -->
-        <div sxplr-sapiviews-core-region
-            class="vbc-row-fixed"
-            #regionDirective="sapiViewsCoreRegion"
-            (sxplr-sapiviews-core-region-navigate-to)="navigateTo($event)"
-            [sxplr-sapiviews-core-region-region]="view.selectedRegions[0]"
-            [sxplr-sapiviews-core-region-atlas]="view.selectedATP.atlas"
-            [sxplr-sapiviews-core-region-parcellation]="view.selectedATP.parcellation"
-            [sxplr-sapiviews-core-region-template]="view.selectedATP.template"
-            [sxplr-sapiviews-core-region-detail-flag]="true">
-        </div>
-        
-        <!-- centroid -->
-        <ng-template [ngIf]="regionDirective.regionPosition$ | async" let-position>
-            <button mat-icon-button [matTooltip]="'centroid: ' + (position | numbers | addUnitAndJoin : 'mm')"
-                class="vbc-row-fixed"
-                (click)="navigateTo(position)">
-                <mat-icon>place</mat-icon>
-            </button>
-        </ng-template>
-        
-        <!-- info -->
-        <ng-template [ngIf]="(regionDirective.desc$ | async) || ((regionDirective.dois$ | async) || []).length > 0">
-            
-            <button mat-icon-button
-                class="vbc-row-fixed"
-                [matTooltip]="view.labels.DETAILS"
-                [sxplr-dialog]="DoiTemplate"
-                [sxplr-dialog-size]="null"
-                [sxplr-dialog-data]="{
-                    title: view.selectedRegions[0].name,
-                    desc: regionDirective.desc$ | async,
-                    contributors: regionDirective.contributors$ | async | dedup,
-                    actions: regionDirective.dois$ | async
-                }">
-                <mat-icon>info</mat-icon>
-            </button>
-        </ng-template>
-
-        <button mat-icon-button
-            color="warn"
-            (click)="clearRoi()"
-            [matTooltip]="view.labels.CLEAR_SELECTED_REGION">
-            <mat-icon>clear</mat-icon>
-        </button>
     </ng-template>
+
 
     <ng-template [ngIf]="view.selectedRegions.length > 1">
         
@@ -228,7 +262,7 @@
     <mat-divider vertical class="statsbar-vert-divider sxplr-ml-2 sxplr-mr-2"></mat-divider>
     </ng-template>
 
-    <ng-template sxplrExperimentalFlag [experimental]="halfmode === 'top'">
+    <ng-template sxplrExperimentalFlag [experimental]="false">
     <div class="spacer"></div>
     <top-menu-cmp [rawflag]="true"></top-menu-cmp>
     </ng-template>
@@ -321,10 +355,13 @@
 
 
 <!-- button tmpl  -->
-<ng-template #btnTmpl let-name="name" let-icon="icon" let-suffixTmpl="suffixTmpl" let-menuData="menuData">
+<ng-template #btnTmpl let-name="name" let-icon="icon" let-color="color" let-suffixTmpl="suffixTmpl" let-menuData="menuData">
     <ng-template iav-media-query #media="iavMediaQuery" [ngIf]="(media.mediaBreakPoint$ | async) > 3"
         [ngIfElse]="nameBtnTmpl">
-        <button mat-button color="primary" [matMenuTriggerFor]="selectATPMenu" [matMenuTriggerData]="menuData | mergeObj : {
+        <button mat-button
+            [color]="color || 'default'"
+            [matMenuTriggerFor]="selectATPMenu"
+            [matMenuTriggerData]="menuData | mergeObj : {
                 suffixTmpl: suffixTmpl
             }">
             <mat-icon>{{ icon }}</mat-icon>
@@ -332,22 +369,24 @@
 
     </ng-template>
     <ng-template #nameBtnTmpl>
-        <button mat-button [matMenuTriggerFor]="selectATPMenu" [matMenuTriggerData]="menuData">
+        <button mat-button
+            [color]="color || 'default'"
+            [matMenuTriggerFor]="selectATPMenu"
+            [matMenuTriggerData]="menuData | mergeObj : {
+                suffixTmpl: suffixTmpl
+            }">
             {{ name }}
         </button>
 
-        <ng-template [ngIf]="suffixTmpl">
-            <ng-template [ngTemplateOutlet]="suffixTmpl"></ng-template>
-        </ng-template>
     </ng-template>
 
 </ng-template>
 
 <!-- raw button tmpl -->
-<ng-template #rawBtn let-name="name" let-icon="icon" let-onclick="onclick">
+<ng-template #rawBtn let-name="name" let-icon="icon" let-onclick="onclick" let-color="color">
     <ng-template iav-media-query #media="iavMediaQuery" [ngIf]="(media.mediaBreakPoint$ | async) > 3"
         [ngIfElse]="nameBtnTmpl">
-        <button mat-button color="primary" (click)="onclick && onclick()">
+        <button mat-button [color]="color || 'default'" (click)="onclick && onclick()">
             <mat-icon>{{ icon }}</mat-icon>
         </button>
 
@@ -364,8 +403,14 @@
 
 <!-- menu tmpl to control popout menu -->
 <mat-menu #selectATPMenu="matMenu">
-    <ng-template matMenuContent let-current="current" let-options="options" let-groupedOptions="groupedOptions"
-        let-type="type" let-getSubMenu="getSubMenu" let-optionTemplate="optionTemplate" let-suffixTmpl="suffixTmpl">
+    <ng-template matMenuContent
+        let-current="current"
+        let-options="options"
+        let-groupedOptions="groupedOptions"
+        let-type="type"
+        let-getSubMenu="getSubMenu"
+        let-optionTemplate="optionTemplate"
+        let-suffixTmpl="suffixTmpl">
 
         <button *ngFor="let opt of (groupedOptions || [])" mat-menu-item class="menu-button"
             [matMenuTriggerFor]="selectATPSubMenu" [matMenuTriggerData]="{

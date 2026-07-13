@@ -218,6 +218,7 @@ mat-card-title.with-controls
   & > .viewer-status
   {
     flex: 0 0 auto;
+    overflow-y: hidden;
   }
 }
 
@@ -226,4 +227,9 @@ mat-card-title.with-controls
   margin-top: 2rem;
   margin-bottom: 2rem;
   pointer-events: all;
+}
+
+top-menu-cmp
+{
+  margin: 1rem 0.25rem;
 }

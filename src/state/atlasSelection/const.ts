@@ -10,12 +10,12 @@ export type BreadCrumb = {
 }
 
 export type AtlasSelectionState = {
-  selectedAtlas: SxplrAtlas
-  selectedTemplate: SxplrTemplate
-  selectedParcellation: SxplrParcellation
+  selectedAtlas: SxplrAtlas|null
+  selectedTemplate: SxplrTemplate|null
+  selectedParcellation: SxplrParcellation|null
   selectedParcellationAllRegions: SxplrRegion[]
 
-  currentViewport: BoundingBox
+  currentViewport: BoundingBox|null
 
   selectedRegions: SxplrRegion[]
   standAloneVolumes: string[]
@@ -32,7 +32,7 @@ export type AtlasSelectionState = {
     perspectiveZoom: number
   }
 
-  viewerMode: ViewerMode
+  viewerMode: ViewerMode|null
   breadcrumbs: BreadCrumb[]
 
   selectedPoint: TSandsPoint|TFace

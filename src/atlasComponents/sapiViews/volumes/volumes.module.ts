@@ -14,6 +14,7 @@ import { SimpleAssignmentView } from './assignment-views/simple/assignment-view-
 import { FullAssignmentView } from './assignment-views/full/assignment-view-full.component';
 import { PointAssignmentFull } from './point-assignment-full/point-assignment-full.component';
 import { TPBRViewCmp } from 'src/features/TPBRView/TPBRView.component';
+import { PtToSandesPipe } from './ptToSands.pipe';
 
 
 @NgModule({
@@ -22,6 +23,7 @@ import { TPBRViewCmp } from 'src/features/TPBRView/TPBRView.component';
     PointAssignmentFull,
     SandsToNumPipe,
     PointAssignmentDirective,
+    PtToSandesPipe,
   ],
   imports: [
     CommonModule,
@@ -41,6 +43,7 @@ import { TPBRViewCmp } from 'src/features/TPBRView/TPBRView.component';
     PointAssignmentFull,
     SandsToNumPipe,
     PointAssignmentDirective,
+    PtToSandesPipe,
   ]
 })
 export class VolumesModule { }

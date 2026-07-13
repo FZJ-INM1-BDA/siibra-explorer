@@ -3,7 +3,7 @@
         #media="iavMediaQuery"
         [ngIf]="(media.mediaBreakPoint$ | async) > 3"
         [ngIfElse]="directTmpl">
-        <button mat-button color="primary" [sxplr-dialog]="dialogTmpl">
+        <button mat-button [sxplr-dialog]="dialogTmpl">
             <mat-icon>location_on</mat-icon>
         </button>
     </ng-template>
@@ -14,8 +14,10 @@
                 <form [formGroup]="navigationCtlForm">
                     <ng-template ngFor [ngForOf]="['x', 'y', 'z']" let-axis>
                         <input class="sxplr-custom-cmp input"
-                            type="text" [formControlName]="axis"
-                            (paste)="onPaste($event)">
+                            type="text"
+                            [formControlName]="axis"
+                            (paste)="onPaste($event)"
+                            sxplr-on-focus-select>
                     </ng-template>
                 </form>
         </ng-template>

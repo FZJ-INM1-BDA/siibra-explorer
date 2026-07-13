@@ -12,6 +12,7 @@ import { DestroyDirective } from "src/util/directives/destroy.directive";
 import { SapiViewsUtilModule } from "../sapiViews";
 import { MediaQueryDirective } from "src/util/directives/mediaQuery.directive";
 import { DialogModule } from "src/ui/dialogInfo";
+import { OnFocusSelectDirective } from "src/util/onfocusSelect.directive";
 
 type PasteTarget = "pos"|"zoom"|"rot"
 
@@ -60,6 +61,7 @@ function validateNumbers(input: (number|null|undefined)[]): input is number[]{
     SapiViewsUtilModule,
     MediaQueryDirective,
     DialogModule,
+    OnFocusSelectDirective,
   ],
   hostDirectives: [
     DestroyDirective,

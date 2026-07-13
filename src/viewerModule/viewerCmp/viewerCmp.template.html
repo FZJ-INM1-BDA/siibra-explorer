@@ -157,6 +157,9 @@
 <!-- top left -->
 <!-- default top left -->
 <ng-template #defaultMainContentTopLeft let-view="view">
+  <ng-template sxplrExperimentalFlag [experimental]="true">
+  <sxplr-status-bar halfmode="top" class="pe-all"></sxplr-status-bar>
+  </ng-template>
 </ng-template>
 
 
@@ -165,6 +168,32 @@
 
   <div class="special-mode-parent">
     <ng-container [ngSwitch]="mode">
+      <ng-template [ngSwitchCase]="FOCUS_VIEW_LABELS.FEATURE">
+        <mat-card class="sxplr-m-1">
+          <mat-card-header>
+            <mat-card-title class="with-controls">
+              <span>Features</span>
+              <button mat-icon-button
+                color="warn"
+                sxplr-view-mode="off">
+                <mat-icon>close</mat-icon>
+              </button>
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <feature-combined-view
+              [tprb]="{
+                template: view.selectedTemplate,
+                parcellation: view.selectedParcellation,
+                region: view.selectedRegions[0],
+                bbox: view.currentViewport && [view.currentViewport.minpoint, view.currentViewport.maxpoint],
+                point: view.currentViewport && view.currentViewport.center
+              }">
+            </feature-combined-view>
+          </mat-card-content>
+        </mat-card>
+      </ng-template>
+
       <!-- catch case where annotation mode is activated -->
       <ng-template [ngSwitchCase]="ARIA_LABELS.VIEWER_MODE_ANNOTATING">
         <mat-card class="sxplr-m-1">
@@ -394,7 +423,9 @@
 <!-- top right -->
 <!-- default top right -->
 <ng-template #minDefaultMainContentTopRight>
-
+  <ng-template sxplrExperimentalFlag [experimental]="true">
+  <top-menu-cmp [ismobile]="(media.mediaBreakPoint$ | async) > 3"></top-menu-cmp>
+  </ng-template>
 </ng-template>
 
 <!-- viewer tmpl -->
@@ -402,10 +433,6 @@
   <div class="viewer-parent"
     ctx-menu-host
     [ctx-menu-host-tmpl]="viewerCtxMenuTmpl">
-
-    <ng-template sxplrExperimentalFlag [experimental]="true">
-    <sxplr-status-bar halfmode="top" class="viewer-status sxplr-custom-cmp bg text sxplr-of-x-auto"></sxplr-status-bar>
-    </ng-template>
 
     <viewer-wrapper
       (viewer-event)="handleViewerCtxEvent($event)">

@@ -121,6 +121,9 @@ export class ViewerCmp {
   #selectedPoint$ = this.store$.pipe(
     select(atlasSelection.selectors.relevantSelectedPoint)
   )
+  #currentViewport$ = this.store$.pipe(
+    select(atlasSelection.selectors.currentViewport)
+  )
 
   #currentMap$ = combineLatest([
     this.#templateSelected$,
@@ -137,10 +140,11 @@ export class ViewerCmp {
     this.#viewerMode$,
     this.#selectedFeature$,
     this.#selectedPoint$,
+    this.#currentViewport$,
     this.selectedATP,
   ]).pipe(
-    map(([ selectedRegions, viewerMode, selectedFeature, selectedPoint, { template: selectedTemplate, parcellation: selectedParcellation, atlas: selectedAtlas } ]) => ({
-      selectedRegions, viewerMode, selectedFeature, selectedPoint, selectedTemplate, selectedParcellation, selectedAtlas
+    map(([ selectedRegions, viewerMode, selectedFeature, selectedPoint, currentViewport, { template: selectedTemplate, parcellation: selectedParcellation, atlas: selectedAtlas } ]) => ({
+      selectedRegions, viewerMode, selectedFeature, selectedPoint, selectedTemplate, selectedParcellation, selectedAtlas, currentViewport
     })),
     switchMap(val => {
       return concat(
@@ -202,9 +206,9 @@ export class ViewerCmp {
     this.#view2$,
   ]).pipe(
     map(([v0, v1, atlasAppearanceState, labels, v2]) => ({ ...v0, ...v1, ...atlasAppearanceState, labels, ...v2 })),
-    map(({ selectedAtlas, selectedRegions, viewerMode, selectedFeature, selectedPoint, selectedTemplate, selectedParcellation, currentMap, allAvailableRegions, fullSidenavExpanded, halfSidenavExpanded, labels, useViewer, showDelineation, showExperimental, parcsInCurrSpace }) => {
-      let spatialObjectTitle: string
-      let spatialObjectSubtitle: string
+    map(({ selectedAtlas, selectedRegions, viewerMode, selectedFeature, selectedPoint, selectedTemplate, selectedParcellation, currentMap, allAvailableRegions, fullSidenavExpanded, halfSidenavExpanded, labels, useViewer, showDelineation, showExperimental, parcsInCurrSpace, currentViewport }) => {
+      let spatialObjectTitle: string|null = null
+      let spatialObjectSubtitle: string|null = null
       if (selectedPoint) {
         const { ['@type']: selectedPtType } = selectedPoint
         if (isSandsPoint(selectedPoint)) {
@@ -234,6 +238,7 @@ export class ViewerCmp {
         leafRegions: allAvailableRegions.filter(r => !parentIds.has(r.id)),
         branchRegions: allAvailableRegions.filter(r => parentIds.has(r.id)),
         parcsInCurrSpace,
+        currentViewport,
 
         /**
          * Selected Spatial Object
