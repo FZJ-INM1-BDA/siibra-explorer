@@ -18,7 +18,6 @@ jobs:
       GIT_DIGEST: ${{ steps.set-vars-step.outputs.GIT_DIGEST }}
       BRANCH_NAME: ${{ steps.set-vars-step.outputs.BRANCH_NAME }}
       BUILD_TEXT: ${{ steps.set-vars-step.outputs.BUILD_TEXT }}
-      DEPLOY_ID: ${{ steps.set-vars-step.outputs.DEPLOY_ID }}
       SXPLR_VERSION: ${{ steps.set-vars-step.outputs.SXPLR_VERSION }}
       EXPERIMENTAL_FEATURE_FLAG: ${{ steps.set-vars-step.outputs.EXPERIMENTAL_FEATURE_FLAG }}
       DEPLOY_FILE: ${{ steps.set-vars-step.outputs.DEPLOY_FILE }}
@@ -41,6 +40,10 @@ jobs:
         echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_OUTPUT
 
         echo "Branch is $BRANCH_NAME ."
+        
+        SXPLR_VERSION=$(jq -r '.version' package.json)
+        echo "SXPLR_VERSION=$SXPLR_VERSION"
+        echo "SXPLR_VERSION=$SXPLR_VERSION" >> $GITHUB_OUTPUT
 
         if [[ "$BRANCH_NAME" == 'master' ]]
         then
@@ -76,13 +79,19 @@ jobs:
 
         fi
 
-        # DEPLOY_ID == remove _ / and lowercase everything from branch
-        DEPLOY_ID=$(echo ${BRANCH_NAME//[_\/]/} | awk '{ print tolower($0) }')
-        echo "DEPLOY_ID=$DEPLOY_ID" >> $GITHUB_OUTPUT
+        
+        if [[ "$BRANCH_NAME" == 'master' ]]
+        then
 
-        SXPLR_VERSION=$(jq -r '.version' package.json)
-        echo "SXPLR_VERSION=$SXPLR_VERSION"
-        echo "SXPLR_VERSION=$SXPLR_VERSION" >> $GITHUB_OUTPUT
+        echo "DEPLOY_FILE=siibra-sxplr/siibra-explorer/values/prod.yaml" >> "$GITHUB_OUTPUT"
+        cat > /tmp/delta.yaml << EOF
+        image:
+          tag: "$SXPLR_VERSION"
+        EOF
+        echo "DELTA_B64=$(base64 -w 0 /tmp/delta.yaml)" >> "$GITHUB_OUTPUT"
+        echo "MR_TITLE=siibra explorer [prod] $GIT_DIGEST" >> "$GITHUB_OUTPUT"
+
+        fi
 
         if [[ "$GITHUB_REF" == 'refs/heads/master' ]] || [[ "$GITHUB_REF" == 'refs/heads/staging' ]]
         then
