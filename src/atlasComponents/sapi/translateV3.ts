@@ -265,6 +265,8 @@ class TranslateV3 {
     const { ...rest } = ds[0] || {}
     const { ['@id']: prevId } = parcellation.version?.prev || {}
     const collection = parcellation.version?.collection
+    const versionName = parcellation.version?.name
+    
     return {
       ...rest,
       id: parcellation["@id"],
@@ -273,6 +275,7 @@ class TranslateV3 {
       type: "SxplrParcellation",
       prevId,
       collection,
+      versionName,
       shortName: parcellation.shortname,
     }
   }

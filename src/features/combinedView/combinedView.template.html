@@ -1,4 +1,10 @@
-<ng-template [ngIf]="tprb$ | async" let-tprb>
+<ng-template #spinnerTmpl>
+    <div class="center-a-div">
+        <mat-spinner></mat-spinner>
+    </div>
+</ng-template>
+
+<ng-template [ngIf]="view$ | async" [ngIfElse]="spinnerTmpl" let-view>
 
     <mat-tab-group>
         <mat-tab label="features">
@@ -6,12 +12,15 @@
 
                 <sxplr-feature-entry
                     
-                    [template]="tprb.template"
+                    [template]="view.template"
                     [bbox]="bbox.bbox$ | async | getProperty : 'bbox'"
+                    [parcellation]="view.parcellation"
+                    [hideConnectivity]="true"
+                    [region]="view.region"
                     #voiFeatureEntryCmp="featureEntryCmp"
                     sxplr-sapiviews-core-space-boundingbox
-                    [sxplr-sapiviews-core-space-boundingbox-space]="tprb.template"
-                    [sxplr-sapiviews-core-space-boundingbox-spec]="tprb.bbox"
+                    [sxplr-sapiviews-core-space-boundingbox-space]="view.template"
+                    [sxplr-sapiviews-core-space-boundingbox-spec]="view.bbox"
                     #bbox="sxplrSapiViewsCoreSpaceBoundingBox"
                     >
                 </sxplr-feature-entry>
@@ -23,14 +32,49 @@
                 </div>
             </ng-template>
         </mat-tab>
-        <mat-tab label="regions">
+        <mat-tab label="assignment">
             <ng-template matTabContent>
                 <sxplr-point-assignment
-                    [point]="tprb.point | ptToSands : tprb.template.id"
-                    [template]="tprb.template"
-                    [parcellation]="tprb.parcellation">
+                    [point]="view.point | ptToSands : view.template.id"
+                    [template]="view.template"
+                    [parcellation]="view.parcellation">
                 </sxplr-point-assignment>
             </ng-template>
         </mat-tab>
+        <ng-template [ngIf]="view.showConnectivity">
+            <mat-tab label="connectivity">
+                
+                <ng-template matTabContent>
+                    
+                    <tpbr-viewer
+                        class="sxplr-d-none"
+                        [tpbr-concept]="{
+                            parcellation: view.parcellation,
+                            region: view.region
+                        }"
+                        [parcellation]="view.parcellation"
+                        [region]="view.region"
+                        tpbr-category
+                        #tpbrCategory="tpbrCategory">
+                    </tpbr-viewer>
+                    <ng-template [ngIf]="tpbrCategory.cateogryCollections$ | async | keyvalue | filterCategory : ['connectivity']" let-connectivity>
+                        <ng-template ngFor [ngForOf]="connectivity" let-conn>
+                            <ng-template [ngIf]="conn.value" let-connType>
+                                
+                                <sxplr-features-connectivity-browser
+                                    [region]="view.region"
+                                    [sxplr-features-connectivity-browser-template]="view.template"
+                                    [sxplr-features-connectivity-browser-parcellation]="view.parcellation"
+                                    [accordionExpanded]="true"
+                                    [types]="connType">
+                                </sxplr-features-connectivity-browser>
+                            </ng-template>
+                        </ng-template>
+                    </ng-template>
+                </ng-template>
+
+            </mat-tab>
+        </ng-template>
     </mat-tab-group>
 </ng-template>
+

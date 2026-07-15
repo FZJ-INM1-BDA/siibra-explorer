@@ -4,7 +4,7 @@ import { SAPI } from "../sapi";
 import { select, Store } from "@ngrx/store";
 import { atlasAppearance, atlasSelection, StateModule } from "src/state";
 import { combineLatest, of } from "rxjs";
-import { map, switchMap } from "rxjs/operators";
+import { map, switchMap, takeUntil } from "rxjs/operators";
 import { AngularMaterialModule } from "src/sharedModules";
 import { AvailableATPDirective } from "../sapi/core/availableATP.directive";
 import { GroupedParcellation, SapiViewsCoreParcellationModule } from "../sapiViews/core/parcellation";
@@ -20,11 +20,16 @@ import { SapiViewsCoreRichModule } from "../sapiViews/core/rich/module";
 import { SapiViewsCoreRegionModule } from "../sapiViews/core/region";
 import { SapiViewsUtilModule } from "../sapiViews";
 import { ShareModule } from "src/share";
-import { FindCmp } from "src/ui/find/find.component";
 import { PluginModule } from "src/plugin";
 import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.directive";
 import { ScreenshotModule } from "src/screenshot";
 import { ViewerModeDirective } from "src/util/directives/viewmode.directive";
+import { AllVersionsParcs } from "../sapiViews/core/parcellation/allVersions.pipe";
+import { DestroyDirective } from "src/util/directives/destroy.directive";
+import { OnlyShowNewestParc } from "../sapiViews/core/parcellation/onlyShowNewest.pipe";
+
+const allVersionsPipe = new AllVersionsParcs()
+const onlyShowNewestPipe = new OnlyShowNewestParc()
 
 @Component({
   selector: 'sxplr-status-bar',
@@ -46,7 +51,6 @@ import { ViewerModeDirective } from "src/util/directives/viewmode.directive";
     SapiViewsCoreRegionModule,
     SapiViewsUtilModule,
     ShareModule,
-    FindCmp,
     StateModule,
     PluginModule,
     ExperimentalFlagDirective,
@@ -55,6 +59,7 @@ import { ViewerModeDirective } from "src/util/directives/viewmode.directive";
   ],
   hostDirectives: [
     AvailableATPDirective,
+    DestroyDirective,
   ]
 })
 
@@ -64,11 +69,20 @@ export class StatusbarCmp {
   halfmode: "top" | "bottom" = "bottom"
 
   #atpDir = inject(AvailableATPDirective)
+  #ondestroy$ = inject(DestroyDirective).destroyed$
 
   DoiTemplate = DoiTemplate
 
-  constructor(private store: Store, private sapi: SAPI) {
+  allParcVersions: SxplrParcellation[] = []
+  currParcVerIdx: number = -1
 
+  constructor(private store: Store, private sapi: SAPI) {
+    this.view$.pipe(
+      takeUntil(this.#ondestroy$)
+    ).subscribe(v => {
+      this.allParcVersions = v.allParcVersions
+      this.currParcVerIdx = v.allParcVersions.findIndex(p => p.id === v?.selectedATP?.parcellation?.id)
+    })
   }
 
   #atlasAppearance$ = combineLatest([
@@ -138,6 +152,7 @@ export class StatusbarCmp {
       { allAvailableRegions, labelMappedRegionNames, leafRegions, branchRegions },
       selectedRegions,
     ]) => {
+      const allParcVersions = allVersionsPipe.transform(selectedATP.parcellation, parcellations)
       return {
         labels,
         selectedATP,
@@ -150,6 +165,8 @@ export class StatusbarCmp {
         selectedRegions,
         leafRegions,
         branchRegions,
+        allParcVersions,
+        parcIsVersioned: allParcVersions.length > 0,
       }
     })
   )
@@ -171,7 +188,7 @@ export class StatusbarCmp {
   }
 
   getSubParcellation(obj: GroupedParcellation): SxplrParcellation[] {
-    return obj.parcellations
+    return onlyShowNewestPipe.transform(obj.parcellations) 
   }
 
   selectRoi(roi: SxplrRegion){
@@ -208,6 +225,24 @@ export class StatusbarCmp {
         physical: true
       })
     )
+  }
+
+  formatVersionedParcLabel(idx: number): string{
+    if (!this.allParcVersions) {
+      return `unkonwn`
+    }
+    const p = this.allParcVersions[idx]
+    if (!p) {
+      return `Unknown`
+    }
+    return p.versionName || p.shortName || p.name
+  }
+  selectParcVersionIdx(idx: any): void {
+    const p = this.allParcVersions[idx]
+    if (!p) {
+      throw new Error(`${idx} not defined`)
+    }
+    this.selectATP("parcellationId", p.id)
   }
   
   #keyListenerConfigBase = {

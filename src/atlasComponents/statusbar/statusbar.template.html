@@ -81,7 +81,7 @@
                 menuData: {
                     current: selectedParcellation,
                     type: 'parcellationId',
-                    options: view.noGroupParcs,
+                    options: view.noGroupParcs | onlyShowNewest,
                     groupedOptions: view.groupParcs,
                     getSubMenu: getSubParcellation,
                     optionTemplate: parcellationOptTmpl
@@ -90,29 +90,44 @@
         </ng-template>
 
         <ng-template #parcSuffixTmpl>
+            <ng-template [ngIf]="view.parcIsVersioned">
 
-            <!-- parc version button -->
-            <ng-template [ngIf]="selectedParcellation | isVersioned : view.parcellations">
-                <ng-template [ngIf]="selectedParcellation | isNewest : view.parcellations" [ngIfThen]="newestTmpl"
-                    [ngIfElse]="notNewestTmpl">
+                <!-- stop propagating mouse events, to prevent popover from disappearing -->
+                <section class="versioned-parc-ctl"  iav-stop="mousedown mouseup click">
 
-                </ng-template>
+                    <!-- parc version button -->
+                    <ng-template [ngIf]="selectedParcellation | isNewest : view.parcellations" [ngIfThen]="newestTmpl"
+                        [ngIfElse]="notNewestTmpl">
 
-                <ng-template #newestTmpl>
-                    <span class="vbc-row-fixed disabled-button-container " [matTooltip]="view.labels.NEWEST_VERSION">
-                        <button mat-icon-button disabled>
-                            <mat-icon>whatshot</mat-icon>
+                    </ng-template>
+
+                    <ng-template #newestTmpl>
+                        <span class="versioned-parc-ctl-btn" [matTooltip]="view.labels.NEWEST_VERSION">
+                            <button mat-icon-button disabled>
+                                <mat-icon>whatshot</mat-icon>
+                            </button>
+                        </span>
+                    </ng-template>
+
+                    <ng-template #notNewestTmpl>
+                        <button class="versioned-parc-ctl-btn" mat-icon-button color="primary" (click)="gotoNewestParc()"
+                            [matTooltip]="view.labels.GOTO_NEWEST_VERSION">
+                            <mat-icon>update</mat-icon>
                         </button>
-                    </span>
-                </ng-template>
+                    </ng-template>
 
-                <ng-template #notNewestTmpl>
-                    <button mat-icon-button class="vbc-row-fixed" color="primary" (click)="gotoNewestParc()"
-                        [matTooltip]="view.labels.GOTO_NEWEST_VERSION">
-                        <mat-icon>update</mat-icon>
-                    </button>
-                </ng-template>
+                    <mat-slider showTickMarks
+                        [min]="0"
+                        [max]="view.allParcVersions.length - 1"
+                        [step]="1"
+                        [displayWith]="formatVersionedParcLabel.bind(this)"
+                        discrete>
+                        <input matSliderThumb [value]="currParcVerIdx" (valueChange)="selectParcVersionIdx($event)">
+                    </mat-slider>
+                </section>
+                <mat-divider></mat-divider>
             </ng-template>
+
 
             <!-- hide/unhide parc visibility tmpl -->
             <button mat-icon-button [sxplr-dialog]="DoiTemplate" [sxplr-dialog-size]="null" [sxplr-dialog-data]="{
@@ -123,7 +138,7 @@
                 }">
                 <mat-icon>info</mat-icon>
             </button>
-            <button mat-icon-button (click)="toggleParcellationVisibility()">
+            <button iav-stop="mousedown mouseup click" mat-icon-button (click)="toggleParcellationVisibility()">
                 <mat-icon>{{ view.parcellationVisible ? 'visibility' : 'visibility_off' }}</mat-icon>
             </button>
         </ng-template>
@@ -215,16 +230,6 @@
             </button>
         </ng-template>
 
-        <!-- <ng-template [ngTemplateOutlet]="rawBtn"
-            [ngTemplateOutletContext]="{
-                name: view.selectedRegions[0].name,
-                icon: 'check_box',
-                onclick: showHierarchyBtn.onClick.bind(showHierarchyBtn),
-            }"
-            [sxplr-dialog]="regionHierarchyTmpl">
-        </ng-template> -->
-
-        <!-- util: region directive -->
     </ng-template>
 
 
@@ -273,22 +278,19 @@
     <ng-template #parcellationOptTmpl let-parcellation let-hideVersionIcon="hideVersionIcon">
 
         <span>
-            {{ parcellation.shortName || parcellation.name }}
+            <ng-template [ngIf]="parcellation | isVersioned: view.parcellations" [ngIfElse]="nonVerNameTmpl">
+                {{ parcellation.collection || parcellation.shortName || parcellation.name }}
+            </ng-template>
+
+            <!-- julich brain big brain has collection, despite being not versioned -->
+            <ng-template #nonVerNameTmpl>
+                {{ parcellation.shortName || parcellation.name }}
+            </ng-template>
         </span>
 
         <ng-template [ngIf]="!hideVersionIcon">
-            <ng-template [ngIf]="parcellation | isVersioned : view.parcellations" [ngIfElse]="unVersionedParcTemplate">
-
-                <ng-template [ngIf]="parcellation | isNewest : view.parcellations" [ngIfElse]="notNewestTmpl">
-                    <mat-icon matTooltip="newest version" class="muted-3 small-icon">whatshot</mat-icon>
-                </ng-template>
-
-                <ng-template #notNewestTmpl>
-                    <mat-icon matTooltip="newer version available" class="muted-3 small-icon">update</mat-icon>
-                </ng-template>
-            </ng-template>
-
-            <ng-template #unVersionedParcTemplate>
+            <ng-template [ngIf]="parcellation | isVersioned : view.parcellations">
+                <mat-icon matTooltip="newer version available" class="muted-3 small-icon">update</mat-icon>
             </ng-template>
         </ng-template>
 
@@ -351,147 +353,152 @@
         </mat-card-actions>
     </ng-template>
 
-</ng-template>
+    <!-- button tmpl  -->
+    <ng-template #btnTmpl let-name="name" let-icon="icon" let-color="color" let-suffixTmpl="suffixTmpl" let-menuData="menuData">
+        <ng-template iav-media-query #media="iavMediaQuery" [ngIf]="(media.mediaBreakPoint$ | async) > 3"
+            [ngIfElse]="nameBtnTmpl">
+            <button mat-button
+                [color]="color || 'default'"
+                [matMenuTriggerFor]="selectATPMenu"
+                [matMenuTriggerData]="menuData | mergeObj : {
+                    suffixTmpl: suffixTmpl
+                }">
+                <mat-icon>{{ icon }}</mat-icon>
+            </button>
 
+        </ng-template>
+        <ng-template #nameBtnTmpl>
+            <button mat-button
+                [color]="color || 'default'"
+                [matMenuTriggerFor]="selectATPMenu"
+                [matMenuTriggerData]="menuData | mergeObj : {
+                    suffixTmpl: suffixTmpl
+                }">
+                {{ name }}
+            </button>
 
-<!-- button tmpl  -->
-<ng-template #btnTmpl let-name="name" let-icon="icon" let-color="color" let-suffixTmpl="suffixTmpl" let-menuData="menuData">
-    <ng-template iav-media-query #media="iavMediaQuery" [ngIf]="(media.mediaBreakPoint$ | async) > 3"
-        [ngIfElse]="nameBtnTmpl">
-        <button mat-button
-            [color]="color || 'default'"
-            [matMenuTriggerFor]="selectATPMenu"
-            [matMenuTriggerData]="menuData | mergeObj : {
-                suffixTmpl: suffixTmpl
-            }">
-            <mat-icon>{{ icon }}</mat-icon>
-        </button>
-
-    </ng-template>
-    <ng-template #nameBtnTmpl>
-        <button mat-button
-            [color]="color || 'default'"
-            [matMenuTriggerFor]="selectATPMenu"
-            [matMenuTriggerData]="menuData | mergeObj : {
-                suffixTmpl: suffixTmpl
-            }">
-            {{ name }}
-        </button>
-
-    </ng-template>
-
-</ng-template>
-
-<!-- raw button tmpl -->
-<ng-template #rawBtn let-name="name" let-icon="icon" let-onclick="onclick" let-color="color">
-    <ng-template iav-media-query #media="iavMediaQuery" [ngIf]="(media.mediaBreakPoint$ | async) > 3"
-        [ngIfElse]="nameBtnTmpl">
-        <button mat-button [color]="color || 'default'" (click)="onclick && onclick()">
-            <mat-icon>{{ icon }}</mat-icon>
-        </button>
-
-    </ng-template>
-    
-    <ng-template #nameBtnTmpl>
-        <button mat-button (click)="onclick && onclick()">
-            {{ name }}
-        </button>
-    </ng-template>
-
-</ng-template>
-
-
-<!-- menu tmpl to control popout menu -->
-<mat-menu #selectATPMenu="matMenu">
-    <ng-template matMenuContent
-        let-current="current"
-        let-options="options"
-        let-groupedOptions="groupedOptions"
-        let-type="type"
-        let-getSubMenu="getSubMenu"
-        let-optionTemplate="optionTemplate"
-        let-suffixTmpl="suffixTmpl">
-
-        <button *ngFor="let opt of (groupedOptions || [])" mat-menu-item class="menu-button"
-            [matMenuTriggerFor]="selectATPSubMenu" [matMenuTriggerData]="{
-                current: current, 
-                type: type,
-                options: getSubMenu(opt),
-                optionTemplate: optionTemplate
-            }">
-            <mat-icon fontSet="far"
-                [fontIcon]="(opt | parcellationGroupSelected : current) ? 'fa-circle' : 'fa-none'"></mat-icon>
-
-            <ng-template [ngIf]="optionTemplate" [ngIfElse]="defaultOptionTemplate">
-                <ng-template [ngTemplateOutlet]="optionTemplate" [ngTemplateOutletContext]="{
-                        $implicit: opt
-                    }">
-                </ng-template>
-            </ng-template>
-
-            <ng-template #defaultOptionTemplate>
-                <span>
-                    {{ opt.name }}
-                </span>
-            </ng-template>
-        </button>
-
-        <button *ngFor="let opt of options" mat-menu-item [matTooltip]="opt.shortName || opt.name"
-            (click)="selectATP(type, opt.id)" class="menu-button">
-            <mat-icon fontSet="fas" [fontIcon]="opt.id === current.id ? 'fa-circle' : 'fa-none'"></mat-icon>
-
-            <ng-template [ngIf]="optionTemplate" [ngIfElse]="defaultOptionTemplate">
-                <ng-template [ngTemplateOutlet]="optionTemplate" [ngTemplateOutletContext]="{
-                        $implicit: opt
-                    }">
-                </ng-template>
-            </ng-template>
-
-            <ng-template #defaultOptionTemplate>
-                <span>
-                    {{ opt.shortName || opt.name }}
-                </span>
-            </ng-template>
-        </button>
-
-        <ng-template [ngIf]="suffixTmpl">
-
-            <mat-divider></mat-divider>
-            <ng-template [ngTemplateOutlet]="suffixTmpl"></ng-template>
         </ng-template>
     </ng-template>
-</mat-menu>
 
-<!-- submenu tmpl to control popout submenu -->
-<mat-menu #selectATPSubMenu="matMenu">
-    <ng-template matMenuContent let-current="current" let-options="options" let-type="type"
-        let-optionTemplate="optionTemplate">
+    <!-- raw button tmpl -->
+    <ng-template #rawBtn let-name="name" let-icon="icon" let-onclick="onclick" let-color="color">
+        <ng-template iav-media-query #media="iavMediaQuery" [ngIf]="(media.mediaBreakPoint$ | async) > 3"
+            [ngIfElse]="nameBtnTmpl">
+            <button mat-button [color]="color || 'default'" (click)="onclick && onclick()">
+                <mat-icon>{{ icon }}</mat-icon>
+            </button>
 
-        <button *ngFor="let opt of options" mat-menu-item [matTooltip]="opt.shortName || opt.name"
-            (click)="selectATP(type, opt.id)" class="menu-button">
+        </ng-template>
+        
+        <ng-template #nameBtnTmpl>
+            <button mat-button (click)="onclick && onclick()">
+                {{ name }}
+            </button>
+        </ng-template>
 
-            <mat-icon fontSet="fas" [fontIcon]="opt.id === current.id ? 'fa-circle' : 'fa-none'"></mat-icon>
-
-
-            <ng-template [ngIf]="optionTemplate" [ngIfElse]="defaultOptionTemplate">
-                <ng-template [ngTemplateOutlet]="optionTemplate" [ngTemplateOutletContext]="{
-                        $implicit: opt
-                    }">
-                </ng-template>
-            </ng-template>
-
-            <ng-template #defaultOptionTemplate>
-                <span>
-                    {{ opt.shortName || opt.name }}
-                </span>
-            </ng-template>
-        </button>
     </ng-template>
-</mat-menu>
 
-<mat-menu #findMenu="matMenu">
-    <sxplr-find></sxplr-find>
-</mat-menu>
+    
+    <!-- menu tmpl to control popout menu -->
+    <mat-menu #selectATPMenu="matMenu">
+        <ng-template matMenuContent
+            let-current="current"
+            let-options="options"
+            let-groupedOptions="groupedOptions"
+            let-type="type"
+            let-getSubMenu="getSubMenu"
+            let-optionTemplate="optionTemplate"
+            let-suffixTmpl="suffixTmpl">
+
+            <button *ngFor="let opt of (groupedOptions || [])" mat-menu-item class="menu-button"
+                [matMenuTriggerFor]="selectATPSubMenu" [matMenuTriggerData]="{
+                    current: current, 
+                    type: type,
+                    options: getSubMenu(opt),
+                    optionTemplate: optionTemplate
+                }">
+                <mat-icon fontSet="far"
+                    [fontIcon]="(opt | parcellationGroupSelected : current) ? 'fa-circle' : 'fa-none'"></mat-icon>
+
+                <ng-template [ngIf]="optionTemplate" [ngIfElse]="defaultOptionTemplate">
+                    <ng-template [ngTemplateOutlet]="optionTemplate" [ngTemplateOutletContext]="{
+                            $implicit: opt
+                        }">
+                    </ng-template>
+                </ng-template>
+
+                <ng-template #defaultOptionTemplate>
+                    <span>
+                        {{ opt.name }}
+                    </span>
+                </ng-template>
+            </button>
+
+            <button *ngFor="let opt of options" mat-menu-item [matTooltip]="opt.shortName || opt.name"
+                (click)="selectATP(type, opt.id)" class="menu-button">
+                <mat-icon fontSet="fas" [fontIcon]="opt.id === current.id ? 'fa-circle' : 'fa-none'"></mat-icon>
+
+                <ng-template [ngIf]="optionTemplate" [ngIfElse]="defaultOptionTemplate">
+                    <ng-template [ngTemplateOutlet]="optionTemplate" [ngTemplateOutletContext]="{
+                            $implicit: opt
+                        }">
+                    </ng-template>
+                </ng-template>
+
+                <ng-template #defaultOptionTemplate>
+                    <span>
+                        {{ opt.shortName || opt.name }}
+                    </span>
+                </ng-template>
+            </button>
+
+            <ng-template [ngIf]="suffixTmpl">
+
+                <mat-divider></mat-divider>
+                <ng-template [ngTemplateOutlet]="suffixTmpl"></ng-template>
+            </ng-template>
+        </ng-template>
+    </mat-menu>
+
+    <!-- submenu tmpl to control popout submenu -->
+    <mat-menu #selectATPSubMenu="matMenu">
+        <ng-template matMenuContent let-current="current" let-options="options" let-type="type"
+            let-optionTemplate="optionTemplate">
+
+            <button *ngFor="let opt of options" mat-menu-item [matTooltip]="opt.shortName || opt.name"
+                (click)="selectATP(type, opt.id)" class="menu-button">
+
+                <ng-template [ngIf]="opt.id === current.id" [ngIfElse]="notSelTmpl">
+                    <mat-icon fontSet="fas" fontIcon="fa-circle"></mat-icon>
+                </ng-template>
+
+                <ng-template #notSelTmpl>
+                    <ng-template [ngIf]="view.allParcVersions | mapToProperty : 'id' | includes : opt.id " [ngIfElse]="blankTmpl">
+                        <mat-icon fontSet="far" fontIcon="fa-circle"></mat-icon>
+                    </ng-template>
+                    <ng-template #blankTmpl>
+                        <mat-icon fontSet="fas" fontIcon="fa-none"></mat-icon>
+                    </ng-template>
+                </ng-template>
+
+                <ng-template [ngIf]="optionTemplate" [ngIfElse]="defaultOptionTemplate">
+                    <ng-template [ngTemplateOutlet]="optionTemplate" [ngTemplateOutletContext]="{
+                            $implicit: opt
+                        }">
+                    </ng-template>
+                </ng-template>
+
+                <ng-template #defaultOptionTemplate>
+                    <span>
+                        {{ opt.shortName || opt.name }}
+                    </span>
+                </ng-template>
+            </button>
+        </ng-template>
+    </mat-menu>
+</ng-template>
+
+
 
 
 <mat-menu #shareMenu="matMenu">

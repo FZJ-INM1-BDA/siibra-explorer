@@ -12,6 +12,8 @@ import { ParcellationGroupSelectedPipe } from "./parcellationGroupSelected.pipe"
 import { IsGroupedParcellation } from "./isGroupedParcellation.pipe";
 import { ParcellationIsVersioned } from "./isVersioned.pipe";
 import { ParcellationIsNewest } from "./isNewest.pipe";
+import { AllVersionsParcs } from "./allVersions.pipe";
+import { OnlyShowNewestParc } from "./onlyShowNewest.pipe";
 
 @NgModule({
   imports: [
@@ -30,6 +32,8 @@ import { ParcellationIsNewest } from "./isNewest.pipe";
     IsGroupedParcellation,
     ParcellationIsVersioned,
     ParcellationIsNewest,
+    AllVersionsParcs,
+    OnlyShowNewestParc,
   ],
   exports: [
     FilterGroupedParcellationPipe,
@@ -38,6 +42,8 @@ import { ParcellationIsNewest } from "./isNewest.pipe";
     IsGroupedParcellation,
     ParcellationIsVersioned,
     ParcellationIsNewest,
+    AllVersionsParcs,
+    OnlyShowNewestParc,
   ],
   providers: [
   ]

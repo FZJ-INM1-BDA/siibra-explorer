@@ -81,7 +81,6 @@ export class VoiBboxDirective {
     if (!urls) {
       return
     }
-    console.log(urls)
     for (const url of urls){
       this.userLayerSvc.handleUserInput(url)
     }

@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Inject, QueryList, TemplateRef, ViewChildren, inject } from '@angular/core';
+import { AfterViewInit, Component, Inject, Input, QueryList, TemplateRef, ViewChildren, inject } from '@angular/core';
 import { select, Store } from '@ngrx/store';
 import { distinctUntilChanged, map, scan, shareReplay, switchMap, take, takeUntil } from 'rxjs/operators';
 import { IDS, SAPI } from 'src/atlasComponents/sapi';
@@ -27,6 +27,14 @@ const GEOMSVC_HOST = "https://geom-svc.apps.ebrains.eu"
   ]
 })
 export class EntryComponent extends TPBRCategoryDirective implements AfterViewInit {
+
+  #hideConn$ = new BehaviorSubject(true)
+
+  // default is show, so if hideConn is set, revert
+  @Input()
+  set hideConnectivity(flag: boolean) {
+    this.#hideConn$.next(flag)
+  }
 
   ondestroy$ = inject(DestroyDirective).destroyed$
 
@@ -251,6 +259,9 @@ export class EntryComponent extends TPBRCategoryDirective implements AfterViewIn
   )
 
   public showConnectivity$ = combineLatest([
+    this.#hideConn$.pipe(
+      map(flag => !flag))
+    ,
     this.selectedAtlas$.pipe(
       map(atlas => WHITELIST_CONNECTIVITY.SPECIES.includes(atlas?.species) && !BANLIST_CONNECTIVITY.SPECIES.includes(atlas?.species))
     ),

@@ -9,7 +9,7 @@ import {
   translateV3Entities
 } from "./translateV3"
 import { FeatureType, PathReturn, RouteParam, SapiRoute } from "./typeV3";
-import { BoundingBox, SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate, VoiFeature } from "./sxplrTypes";
+import { SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate } from "./sxplrTypes";
 import { parcBanList, speciesOrder } from "src/util/constants";
 
 export const useViewer = {
@@ -442,20 +442,6 @@ export class SAPI{
           })
         )
       )
-    )
-  }
-
-  public getVoiFeatures(bbox: BoundingBox): Observable<VoiFeature[]> {
-    /**
-     * FIXME iterate over all pages
-     */
-    return this.v3Get("/feature/Image", {
-      query: {
-        space_id: bbox.space?.id || bbox.spaceId,
-        bbox: JSON.stringify([bbox.minpoint, bbox.maxpoint]),
-      }
-    }).pipe(
-      switchMap(v => Promise.all(v.items.map(item => translateV3Entities.translateVoiFeature(item))))
     )
   }
 

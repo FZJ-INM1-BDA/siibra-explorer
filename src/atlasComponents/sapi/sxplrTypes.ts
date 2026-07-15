@@ -23,10 +23,11 @@ export type SxplrParcellation = {
   type: 'SxplrParcellation'
   id: string
   name: string
-  shortName: string
+  shortName?: string
   modality?: string
   prevId?: string
   collection?: string
+  versionName?: string
 } & Partial<AdditionalInfo>
 
 export type SxplrTemplate = {

@@ -36,3 +36,19 @@ sxplr-sapiviews-core-rich-regionshierarchy
 {
     flex: 1 1 0;
 }
+
+section.versioned-parc-ctl
+{
+    display: flex;
+    width: 100%;
+
+    & > .versioned-parc-ctl-btn
+    {
+        flex: 0 0 auto;
+    }
+
+    & > mat-slider
+    {
+        flex: 0 1 auto;
+    }
+}

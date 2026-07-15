@@ -91,9 +91,6 @@ export class TopMenuCmp {
     return this._ismobile
   }
 
-  @Input() public darktheme: boolean
-  @Input() public viewerLoaded: boolean
-
   public user$: Observable<any>
   public userBtnTooltip$: Observable<string>
 

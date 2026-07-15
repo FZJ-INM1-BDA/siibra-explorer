@@ -158,7 +158,7 @@
 <!-- default top left -->
 <ng-template #defaultMainContentTopLeft let-view="view">
   <ng-template sxplrExperimentalFlag [experimental]="true">
-  <sxplr-status-bar halfmode="top" class="pe-all"></sxplr-status-bar>
+  <sxplr-status-bar *ngIf="viewerLoaded" halfmode="top" class="pe-all"></sxplr-status-bar>
   </ng-template>
 </ng-template>
 
@@ -172,7 +172,7 @@
         <mat-card class="sxplr-m-1">
           <mat-card-header>
             <mat-card-title class="with-controls">
-              <span>Features</span>
+              <span>Finding</span>
               <button mat-icon-button
                 color="warn"
                 sxplr-view-mode="off">
@@ -182,6 +182,7 @@
           </mat-card-header>
           <mat-card-content>
             <feature-combined-view
+              [atlas]="view.selectedAtlas"
               [tprb]="{
                 template: view.selectedTemplate,
                 parcellation: view.selectedParcellation,
@@ -424,7 +425,7 @@
 <!-- default top right -->
 <ng-template #minDefaultMainContentTopRight>
   <ng-template sxplrExperimentalFlag [experimental]="true">
-  <top-menu-cmp [ismobile]="(media.mediaBreakPoint$ | async) > 3"></top-menu-cmp>
+  <top-menu-cmp *ngIf="viewerLoaded" [ismobile]="(media.mediaBreakPoint$ | async) > 3"></top-menu-cmp>
   </ng-template>
 </ng-template>
 
