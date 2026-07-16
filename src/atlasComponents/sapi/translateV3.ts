@@ -240,7 +240,7 @@ class TranslateV3 {
     // can be removed when https://jugit.fz-juelich.de/t.dickscheid/brainscapes-configurations/-/merge_requests/137 is merged and released to siibra-api
     const nameMappings: Record<string, string> = {
       "Multilevel Human Atlas": "Human Atlas",
-      "Monkey Atlas": "Macaques Atlas"
+      "Monkey Atlas": "Macaque Atlas"
     }
     const name = nameMappings[atlas.name] || atlas.name
     const replacedAtlas = {

@@ -5,6 +5,11 @@ import { getExportNehuba } from 'src/util/fn'
 import { computeDistance, NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
 import { NEHUBA_INSTANCE_INJTKN, takeOnePipe } from "../util";
 
+interface SliceView {
+  handleMouseMove(clientX: number, clientY: number): void
+  element: HTMLElement
+}
+
 @Directive({
   selector: '[iav-viewer-touch-interface]',
   exportAs: 'iavNehubaViewerTouch'
@@ -28,6 +33,17 @@ export class NehubaViewerTouchDirective implements OnDestroy{
 
   private nehubaUnit: NehubaViewerUnit
   private htmlElementIndexMap = new WeakMap<HTMLElement, number>()
+
+  #findSliceView(panelEl: HTMLElement): SliceView|undefined{
+    for (
+      const panel of Array.from(this.nehubaUnit?.nehubaViewer?.ngviewer?.display?.panels || []) as SliceView[]
+    ){
+      if ( panel.element === panelEl) {
+        return panel
+      }
+    }
+    return
+  }
   private findPanelIndex(panel: HTMLElement){
     if (!this.nehubaUnit) return null
     if (!this.htmlElementIndexMap.has(panel)) {
@@ -262,6 +278,26 @@ export class NehubaViewerTouchDirective implements OnDestroy{
         vec3.transformMat4(pos, pos, this.viewportToData[panelIndex])
 
         position.changed.dispatch()
+      }),
+      this.singleTouchStart$.pipe(
+        map(v => {
+          const target = v.touches[0].target
+          if (!(target instanceof HTMLElement)) {
+            return
+          }
+          const sliceView = this.#findSliceView(target)
+          if (!sliceView) {
+            return
+          }
+          return {
+            sliceView,
+            x: v.touches[0].clientX,
+            y: v.touches[0].clientY,
+          }
+        }),
+        filter(v => !!v)
+      ).subscribe(({ sliceView, x, y }) => {
+        sliceView.handleMouseMove(x, y)
       })
     )
   }
