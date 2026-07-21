@@ -433,6 +433,7 @@ class TranslateV3 {
       const obj: NgLayerSpec = {
         source: `precomputed://${url}`,
         legacySpecFlag: "old",
+        type: "image",
         transform,
         shader: getShaderFromMeta(meta),
         info,
@@ -767,6 +768,7 @@ class TranslateV3 {
         legacySpecFlag: "old",
         source: `precompmesh://${splitPrecompMeshVol[0]}`,
         transform,
+        type: "segmentation",
         auxMeshes: [{
           labelIndicies: [Number(splitPrecompMeshVol[1])],
           name: "Auxiliary mesh"

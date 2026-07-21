@@ -1,1 +1,1 @@
-export { TNgAnnotationAABBox, AnnotationLayer, TNgAnnotationPoint, TNgAnnotationLine, promiseNehubaViewer, getNehubaViewer } from "./annotation.service"
+export { TNgAnnotationAABBox, AnnotationLayer, TNgAnnotationPoint, TNgAnnotationLine, promiseNehubaViewer as promiseNgViewer, getNehubaViewer } from "./annotation.service"

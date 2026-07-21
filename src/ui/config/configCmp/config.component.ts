@@ -4,7 +4,7 @@ import { combineLatest, Observable, of, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, map, shareReplay, startWith, take, takeUntil } from 'rxjs/operators';
 import { isIdentityQuat } from 'src/viewerModule/nehuba/util';
 import { MatSlideToggleChange } from 'src/sharedModules/angularMaterial.exports'
-import { atlasSelection, userPreference, userInterface } from 'src/state';
+import { atlasSelection, userPreference, userInterface, atlasAppearance } from 'src/state';
 import { Z_TRAVERSAL_MULTIPLIER } from 'src/viewerModule/nehuba/layerCtrl.service/layerCtrl.util';
 import { FormControl, FormGroup } from '@angular/forms';
 import { DestroyDirective } from 'src/util/directives/destroy.directive';
@@ -55,6 +55,7 @@ export class ConfigComponent implements OnInit{
     SINGLE_PANEL: "SINGLE_PANEL",
     PIP_PANEL: "PIP_PANEL",
     V_ONE_THREE: "V_ONE_THREE",
+    V_SPLIT: "V_SPLIT",
   }
 
 
@@ -108,11 +109,15 @@ export class ConfigComponent implements OnInit{
   public view$ = combineLatest([
     this.store.pipe(
       select(userPreference.selectors.showTheme)
+    ),
+    this.store.pipe(
+      select(atlasAppearance.selectors.niiVolRender)
     )
   ]).pipe(
-    map(([ showTheme ]) => {
+    map(([ showTheme, niiVolRender ]) => {
       return {
-        showTheme
+        showTheme,
+        niiVolRender,
       }
     })
   )
@@ -270,6 +275,12 @@ export class ConfigComponent implements OnInit{
       userPreference.actions.setShowExperimental({
         flag: event.checked
       })
+    )
+  }
+
+  public toggleNiiVol(){
+    this.store.dispatch(
+      atlasAppearance.actions.toggleNiiVolRender()
     )
   }
 

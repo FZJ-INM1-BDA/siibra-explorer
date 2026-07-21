@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { createEffect } from "@ngrx/effects";
 import { select, Store } from "@ngrx/store";
 import { concat, forkJoin, from, merge, of } from "rxjs";
-import { switchMap, withLatestFrom, catchError, map, debounceTime, shareReplay, distinctUntilChanged, tap, pairwise, filter } from "rxjs/operators";
+import { switchMap, withLatestFrom, map, debounceTime, shareReplay, distinctUntilChanged, pairwise, filter } from "rxjs/operators";
 import { NgLayerSpec, NgPrecompMeshSpec, NgSegLayerSpec, SxplrAtlas, SxplrParcellation, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { SAPI } from "src/atlasComponents/sapi"
 import { atlasAppearance, atlasSelection, annotation } from "src/state";
@@ -20,15 +20,6 @@ export class LayerCtrlEffects {
     map(val => val as { atlas: SxplrAtlas, parcellation: SxplrParcellation, template: SxplrTemplate }),
   )
 
-
-  #pmapUrl: string
-  #cleanupUrl(){
-    if (!!this.#pmapUrl) {
-      URL.revokeObjectURL(this.#pmapUrl)
-      this.#pmapUrl = null
-    }
-  }
-
   onRegionSelect = createEffect(() => this.store.pipe(
     select(atlasAppearance.selectors.useViewer),
     switchMap(viewer => {
@@ -36,7 +27,6 @@ export class LayerCtrlEffects {
         customLayers: [{id: PMAP_LAYER_NAME}]
       })
       if (viewer !== "NEHUBA") {
-        this.#cleanupUrl()
         return of(rmPmapAction)
       }
       return this.store.pipe(
@@ -46,14 +36,21 @@ export class LayerCtrlEffects {
         ),
         withLatestFrom(this.#onATP$),
         // since region selection changed, pmap will definitely be removed. revoke the url resource.
-        tap(() => this.#cleanupUrl()),
         switchMap(([ regions, { parcellation, template } ]) => {
           if (regions.length !== 1) {
             return of(rmPmapAction)
           }
-          const addNewStateMap = this.sapi.getStatisticalMap(parcellation, template, regions[0]).pipe(
-            switchMap(({ buffer, meta }) => {
-              this.#pmapUrl = URL.createObjectURL(new Blob([buffer], {type: "application/octet-stream"}))
+
+          return from(this.sapi.getStatisticMapUrl(parcellation, template, regions[0])).pipe(
+            withLatestFrom(
+              this.store.pipe(
+                select(atlasAppearance.selectors.niiVolRender)
+              )
+            ),
+            switchMap(([url, niiVolRender]) => {
+              if (!url) {
+                return of(rmPmapAction)
+              }
               return of(
                 rmPmapAction,
                 atlasAppearance.actions.addCustomLayers({
@@ -61,25 +58,20 @@ export class LayerCtrlEffects {
                     legacySpecFlag: "old",
                     clType: "customlayer/nglayer",
                     id: PMAP_LAYER_NAME,
-                    source: `nifti://${this.#pmapUrl}`,
+                    source: `${url.toString()}|gzip:|nehuba-nifti:`,
                     shader: getShader({
                       colormap: "viridis",
-                      highThreshold: meta.max,
-                      lowThreshold: meta.min,
                       removeBg: true,
                     }),
                     type: 'image',
-                    opacity: 0.5
+                    opacity: 0.5,
+                    ...(niiVolRender? {volumeRendering: "on"} : {})
                   }]
                 })
               )
-            }),
-            catchError(() => of(rmPmapAction)),
+            })
           )
-          return concat(
-            of(rmPmapAction),
-            addNewStateMap,
-          )
+          
         })
       )
     })

@@ -126,19 +126,16 @@ export class AnnotationLayer {
     })
   }
  
-  #coupleToViewer(viewer: any, affine: number[][]){
-    const layerSpec = viewer.layerSpecification.getLayer(
-      this.name,
-      {
-        type: "annotation",
-        "annotationColor": this.color,
-        "annotations": [],
-        name: this.name,
-        transform: affine,
-      }
-    )
-    this.#layer = viewer.layerManager.addManagedLayer(layerSpec)
-    const mouseState = viewer.mouseState
+  #coupleToViewer(nehubaViewer: any, affine: number[][]){
+    const spec = {
+      type: "annotation",
+      "annotationColor": this.color,
+      "annotations": [],
+      name: this.name,
+      transform: affine,
+    }
+    this.#layer = nehubaViewer.addLayer(spec)
+    const mouseState = nehubaViewer.ngviewer.mouseState
     const res: () => void = mouseState.changed.add(() => {
       const payload = mouseState.active
       && !!mouseState.pickedAnnotationId
@@ -152,14 +149,8 @@ export class AnnotationLayer {
     })
     this.onDestroyCb.push(res)
 
-    // TODO registerdisposer seems to fire without the layer been removed
-    // Thus it cannot be relied upon for cleanup
-    // 
-    // _layer.layer.registerDisposer(() => {
-
-    // })
     NehubaLayerControlService.RegisterLayerName(this.name)
-    viewer.registerDisposer(() => {
+    nehubaViewer.ngviewer.registerDisposer(() => {
       this.dispose()
     })
   }
@@ -288,11 +279,11 @@ export class AnnotationLayer {
 }
 
 export function getNehubaViewer(){
-  const nehubaViewer = (window as any).nehubaViewer
-  if (nehubaViewer) {
-    return nehubaViewer
+  const viewer = (window as any).nehubaViewer
+  if (viewer) {
+    return viewer
   }
-  throw new Error(`window.nehubaViewer not defined`)
+  throw new Error(`window.viewer not defined`)
 }
 
 export async function promiseNehubaViewer(){

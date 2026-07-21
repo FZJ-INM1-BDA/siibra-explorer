@@ -7,14 +7,14 @@ import {map, switchMap, filter, shareReplay, pairwise, distinctUntilChanged, tak
 import { NehubaViewerUnit } from "src/viewerModule/nehuba";
 import { NEHUBA_INSTANCE_INJTKN } from "src/viewerModule/nehuba/util";
 import { AbsToolClass, ANNOTATION_EVENT_INJ_TOKEN, IAnnotationEvents, IAnnotationGeometry, INgAnnotationTypes, INJ_ANNOT_TARGET, TAnnotationEvent, ClassInterface, TCallbackFunction, TSands, TGeometryJson, TCallback, DESC_TYPE } from "./type";
-import { getExportNehuba, retry, switchMapWaitFor } from "src/util/fn";
+import { getExportNehuba, switchMapWaitFor } from "src/util/fn";
 import { Polygon } from "./poly";
 import { Line } from "./line";
 import { Point } from "./point";
 import { FilterAnnotationsBySpace } from "../filterAnnotationBySpace.pipe";
 import { MatSnackBar } from 'src/sharedModules/angularMaterial.exports'
 import { atlasSelection } from "src/state";
-import { AnnotationLayer, getNehubaViewer } from "src/atlasComponents/annotations";
+import { AnnotationLayer, promiseNgViewer } from "src/atlasComponents/annotations";
 import { translateV3Entities } from "src/atlasComponents/sapi/translateV3";
 import { HOVER_INTERCEPTOR_INJECTOR, HoverInterceptor, THoverConfig } from "src/util/injectionTokens";
 import { ToolCmpBase } from "./toolCmp.base";
@@ -501,13 +501,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
         if (!flag) {
           return
         }
-        const viewer = await retry(() => {
-          const viewer = getNehubaViewer()
-          if (viewer && (viewer?.layerManager?.managedLayers || []).length > 0) {
-            return viewer
-          }
-          throw new Error(`viewer not defined, or does not have any layers`)
-        }, { timeout: 160, retries: 100 })
+        const viewer = await promiseNgViewer()
 
         // if already annotated, skip
         if ( viewer[ANNOTATED_SYMBOL] ) {

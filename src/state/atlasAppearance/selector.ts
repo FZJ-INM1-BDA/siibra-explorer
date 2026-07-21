@@ -9,6 +9,16 @@ export const octantRemoval = createSelector(
   state => state.octantRemoval
 )
 
+export const meshRemovalIsFrozen = createSelector(
+  selectStore,
+  state => state.meshRemovalFrozen
+)
+
+export const niiVolRender = createSelector(
+  selectStore,
+  state => state.niftiVolRenderFlag
+)
+
 export const showDelineation = createSelector(
   selectStore,
   state => state.showDelineation

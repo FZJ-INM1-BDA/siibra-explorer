@@ -3,7 +3,7 @@ import { select, Store } from "@ngrx/store";
 import { combineLatest, EMPTY, fromEvent, merge, Observable, of, Subject, Subscription } from "rxjs";
 import { atlasSelection, userInterface } from "src/state";
 import { NehubaViewerUnit } from "../../nehubaViewer/nehubaViewer.component";
-import { NEHUBA_INSTANCE_INJTKN, takeOnePipe, getFourPanel, getHorizontalOneThree, getSinglePanel, getPipPanel, getVerticalOneThree } from "../../util";
+import { NEHUBA_INSTANCE_INJTKN, takeOnePipe, getFourPanel, getHorizontalOneThree, getSinglePanel, getPipPanel, getVerticalOneThree, getVSplit } from "../../util";
 import { QUICKTOUR_DESC, QUICKTOUR_DESC_MD, ARIA_LABELS, IDS, VALUES } from 'common/constants'
 import { IQuickTourData } from "src/ui/quickTour/constrants";
 import { debounceTime, distinctUntilChanged, filter, map, mapTo, shareReplay, switchMap, take, withLatestFrom } from "rxjs/operators";
@@ -433,6 +433,12 @@ export class NehubaLayoutOverlay implements OnDestroy{
           const newEl = getPipPanel(viewPanels)
           element.appendChild(newEl)
           break;
+        }
+        case "V_SPLIT": {
+          const element = removeExistingPanels()
+          const newEl = getVSplit(viewPanels)
+          element.appendChild(newEl)
+          break
         }
         default:
         }

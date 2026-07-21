@@ -54,7 +54,12 @@
             "styles": [
               "src/theme.scss",
               "src/overwrite.scss",
-              "src/extra_styles.css"
+              "src/extra_styles.css",
+              {
+                "input": "export-nehuba/dist/index.css",
+                "inject": false,
+                "bundleName": "vanillaMain"
+              }
             ],
             "scripts": [
               {

@@ -34,6 +34,7 @@ export type NehubaConfig = MetaV1Schema["https://schema.brainatlas.eu/github/hum
 type OldNgLayerSpec = {
   legacySpecFlag: 'old'
   source: string
+  type?: string
   transform: number[][]
   info?: {
     voxel: [number, number, number]
@@ -46,7 +47,7 @@ type OldNgLayerSpec = {
 
 type NewNgLayerSpec = {
   legacySpecFlag: 'new'
-  type: 'image'
+  type: string
   name: string
   blend: 'default' | 'additive'
   visible: boolean

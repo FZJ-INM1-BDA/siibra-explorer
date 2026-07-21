@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, OnDestroy, Output } f
 import { IViewer, TViewerEvent } from "../../viewer.interface";
 import { NehubaMeshService } from "../mesh.service";
 import { NehubaLayerControlService, SET_COLORMAP_OBS, SET_LAYER_VISIBILITY } from "../layerCtrl.service";
-import { EXTERNAL_LAYER_CONTROL, NG_LAYER_CONTROL, SET_SEGMENT_VISIBILITY } from "../layerCtrl.service/layerCtrl.util";
+import { EXTERNAL_LAYER_CONTROL, NEHUBA_HIDE_SLICES, NG_LAYER_CONTROL, SET_SEGMENT_VISIBILITY } from "../layerCtrl.service/layerCtrl.util";
 import { NehubaConfig } from "../config.service";
 import { SET_MESHES_TO_LOAD } from "../constants";
 
@@ -18,6 +18,11 @@ import { SET_MESHES_TO_LOAD } from "../constants";
     {
       provide: SET_MESHES_TO_LOAD,
       useFactory: (meshService: NehubaMeshService) => meshService.loadMeshes$,
+      deps: [ NehubaMeshService ]
+    },
+    {
+      provide: NEHUBA_HIDE_SLICES,
+      useFactory: (meshService: NehubaMeshService) => meshService.hideSlices$,
       deps: [ NehubaMeshService ]
     },
     {

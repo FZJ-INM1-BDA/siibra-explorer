@@ -150,15 +150,12 @@ export class PerspectiveViewSlider {
       shareReplay(1),
     )
 
-    private navPosition$: Observable<{real: [number, number, number], voxel: [number, number, number]}> = this.nehubaViewer$.pipe(
+    private navPosition$: Observable<{real: [number, number, number]}|null> = this.nehubaViewer$.pipe(
       switchMap(viewer => {
         if (!viewer) return of(null)
-        return combineLatest([
-          viewer.viewerPosInReal$,
-          viewer.viewerPosInVoxel$,
-        ]).pipe(
-          map(([ real, voxel ]) => {
-            return { real, voxel }
+        return viewer.viewerPosInReal$.pipe(
+          map(real => {
+            return { real }
           })
         )
       }),

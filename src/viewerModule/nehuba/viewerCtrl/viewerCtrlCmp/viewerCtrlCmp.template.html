@@ -20,6 +20,12 @@
         <i [matTooltip]="CONST.REMOVE_FRONTAL_OCTANT_HELPER_TEXT" class="fas fa-question"></i>
       </mat-slide-toggle>
 
+      
+      <ng-template sxplrExperimentalFlag [experimental]="true">
+      <mat-slide-toggle (change)="toggleFreezeMeshRemoval()" [checked]="view.meshRemovalIsFrozen">
+        Freeze mesh removal
+      </mat-slide-toggle>
+      </ng-template>
 
       <ng-template sxplrExperimentalFlag [experimental]="true">
 

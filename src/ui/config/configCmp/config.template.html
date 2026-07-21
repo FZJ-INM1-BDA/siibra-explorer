@@ -1,3 +1,5 @@
+<ng-template [ngIf]="view$ | async" let-view>
+  
 <mat-tab-group>
 
   <!-- hard ware -->
@@ -84,6 +86,12 @@
         [checked]="experimentalFlag$ | async"
         (change)="updateExperimentalFlag($event)">
         Experimental Flag
+      </mat-slide-toggle>
+
+      <mat-divider></mat-divider>
+      
+      <mat-slide-toggle (change)="toggleNiiVol()" [checked]="view.niiVolRender">
+        Nifti Volume Render  
       </mat-slide-toggle>
 
       <div class="mat-h2">
@@ -277,6 +285,23 @@
         }">
       </ng-template>
       
+      
+      <!-- v-split -->
+      <ng-template #vSplitPanelTmpl>
+        <layout-vertical-split class="d-block w-10em h-7em">
+          <div class="border chunky" cell-i></div>
+          <div class="border chunky" cell-ii></div>
+          <div class="border chunky" cell-iii></div>
+          <div class="border chunky" cell-iv></div>
+        </layout-vertical-split>
+      </ng-template>
+      <ng-template [ngTemplateOutlet]="panelModeBtnTmpl"
+        [ngTemplateOutletContext]="{
+          panelMode: panelModes.V_SPLIT,
+          previewTmpl: vSplitPanelTmpl
+        }">
+      </ng-template>
+      
     </div>
   </mat-tab>
   </ng-template>
@@ -300,3 +325,4 @@
   </ng-template>
 </mat-tab-group>
 
+</ng-template>
