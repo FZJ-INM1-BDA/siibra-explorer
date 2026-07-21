@@ -917,21 +917,21 @@ const noop = (_event: MouseEvent) => {
 const patchSliceViewPanel = (sliceViewPanel: any, exportNehuba: any, mulitplier: Float32Array) => {
 
   // patch draw calls to dispatch viewerportToData
-  const originalDraw = sliceViewPanel.draw
-  sliceViewPanel.draw = function(this) {
+  // const originalDraw = sliceViewPanel.draw
+  // sliceViewPanel.draw = function(this) {
 
-    if (this.sliceView) {
-      const viewportToDataEv = new CustomEvent('viewportToData', {
-        bubbles: true,
-        detail: {
-          viewportToData : this.sliceView.invViewMatrix,
-        },
-      })
-      this.element.dispatchEvent(viewportToDataEv)
-    }
+  //   if (this.sliceView) {
+  //     const viewportToDataEv = new CustomEvent('viewportToData', {
+  //       bubbles: true,
+  //       detail: {
+  //         viewportToData : this.sliceView.invViewMatrix,
+  //       },
+  //     })
+  //     this.element.dispatchEvent(viewportToDataEv)
+  //   }
 
-    originalDraw.call(this)
-  }
+  //   originalDraw.call(this)
+  // }
 
   // patch ctrl+wheel & shift+wheel
   const { navigationState } = sliceViewPanel

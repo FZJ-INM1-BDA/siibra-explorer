@@ -3,7 +3,6 @@ import { NehubaViewerContainerDirective } from './nehubaViewerInterface/nehubaVi
 import { NehubaViewerUnit } from "./nehubaViewer/nehubaViewer.component";
 import { CommonModule } from "@angular/common";
 import { NEHUBA_INSTANCE_INJTKN } from "./util";
-import { NehubaViewerTouchDirective } from "./nehubaViewerInterface/nehubaViewerTouch.directive";
 import { StoreModule } from "@ngrx/store";
 import { NEHUBA_VIEWER_FEATURE_KEY } from "./constants";
 import { reducer } from "./store";
@@ -65,13 +64,11 @@ import { SapiViewsUtilModule } from "src/atlasComponents/sapiViews";
   declarations: [
     NehubaViewerContainerDirective,
     NehubaViewerUnit,
-    NehubaViewerTouchDirective,
     NehubaGlueCmp,
     NehubaViewerContainer,
   ],
   exports: [
     NehubaViewerUnit,
-    NehubaViewerTouchDirective,
     NehubaGlueCmp,
   ],
   providers: [

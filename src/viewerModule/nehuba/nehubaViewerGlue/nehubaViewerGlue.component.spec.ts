@@ -13,7 +13,6 @@ import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR, UtilModule } from "src/ut
 import { WindowResizeModule } from "src/util/windowResize"
 import { NehubaLayerControlService } from "../layerCtrl.service"
 import { NehubaMeshService } from "../mesh.service"
-import { NehubaViewerTouchDirective } from "../nehubaViewerInterface/nehubaViewerTouch.directive"
 import { selectorAuxMeshes } from "../store"
 import { NehubaGlueCmp } from "./nehubaViewerGlue.component"
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service"
@@ -78,7 +77,6 @@ describe('> nehubaViewerGlue.component.ts', () => {
 
         // TODO this may introduce a lot more dep
         MockNehubaViewerContainerDirective,
-        NehubaViewerTouchDirective,
       ],
       providers: [
         /**
