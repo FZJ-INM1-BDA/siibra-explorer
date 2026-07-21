@@ -12,19 +12,9 @@ import { IColorMap, SET_COLORMAP_OBS, SET_LAYER_VISIBILITY } from "../layerCtrl.
  * import of nehuba js files moved to angular.json
  */
 import { EXTERNAL_LAYER_CONTROL, IExternalLayerCtl, INgLayerCtrl, NEHUBA_HIDE_SLICES, NG_LAYER_CONTROL, SET_SEGMENT_VISIBILITY, TNgLayerCtrl, Z_TRAVERSAL_MULTIPLIER } from "../layerCtrl.service/layerCtrl.util";
-import { Unit } from "../types";
 import { PeriodicSvc } from "src/util/periodic.service";
 import { ViewerInternalStateSvc, AUTO_ROTATE, TInteralStatePayload } from "src/viewerModule/viewerInternalState.service";
 import { NehubaConfig } from "../config.service";
-
-function translateUnit(unit: Unit) {
-  if (unit === "m") {
-    return 1e9
-  }
-
-  throw new Error(`Cannot translate unit: ${unit}`)
-}
-
 
 interface LayerLabelIndex {
   layer: {

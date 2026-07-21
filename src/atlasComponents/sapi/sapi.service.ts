@@ -569,33 +569,3 @@ export enum PARSE_TYPEDARRAY {
   CANVAS_COLORMAP_RGBA="CANVAS_COLORMAP_RGBA",
   RAW_ARRAY="RAW_ARRAY",
 }
-
-type ProcessTypedArrayResult = {
-  [PARSE_TYPEDARRAY.CANVAS_FORTRAN_RGBA]: {
-    input: null
-    output: {
-      type: PARSE_TYPEDARRAY
-      result: Uint8ClampedArray
-    }
-  }
-  [PARSE_TYPEDARRAY.CANVAS_COLORMAP_RGBA]: {
-    input?: {
-      colormap?: string
-      log?: boolean
-    }
-    output: {
-      type: PARSE_TYPEDARRAY
-      result: Uint8ClampedArray
-      max: number
-      min: number
-    }
-  }
-  [PARSE_TYPEDARRAY.RAW_ARRAY]: {
-    input: null
-    output: {
-      rawArray: number[][]
-      min: number
-      max: number
-    }
-  }
-}

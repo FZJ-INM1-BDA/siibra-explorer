@@ -134,7 +134,7 @@ describe('> nehubaViewer.component.ts', () => {
             }
           })
           tick(400)
-          expect(fixture.componentInstance.nehubaViewer.setMeshesToLoad).toHaveBeenCalledWith([1,2,3], { name: 'foo-bar' })
+          expect(fixture.componentInstance.nehubaViewer.setMeshesToLoad).toHaveBeenCalledWith([1,2,3], 'foo-bar')
         }))
       })
     })
@@ -168,6 +168,7 @@ describe('> nehubaViewer.component.ts', () => {
           ngviewer: {
             layerManager
           },
+          setSegmentsColors: () => {},
           dispose: () => {}
         }
 
@@ -319,6 +320,7 @@ describe('> nehubaViewer.component.ts', () => {
       beforeEach(() => {
         getLayerSpy.and.returnValue(fakeNewLayer)
         nehubaViewerSpy = {
+          setSegmentsColors: jasmine.createSpy(),
           dispose(){
 
           },
@@ -390,32 +392,16 @@ describe('> nehubaViewer.component.ts', () => {
         mainMap.set(ngId2, helloWorldMap)
 
         fixture.componentInstance['setColorMap'](mainMap)
+        expect(nehubaViewerSpy.setSegmentsColors).toHaveBeenCalledWith({
+          1: [100/255, 100/255, 100/255],
+          2: [200/255, 200/255, 200/255],
+        }, ngId1)
+        
+        expect(nehubaViewerSpy.setSegmentsColors).toHaveBeenCalledWith({
+          1: [10/255, 10/255, 10/255],
+          2: [20/255, 20/255, 20/255],
+        }, ngId2)
 
-        expect(getLayerByNameSpy).toHaveBeenCalledWith(ngId1)
-        expect(removeManagedLayerSpy).toHaveBeenCalledWith(fakeLayer)
-        expect(getLayerSpy).toHaveBeenCalledWith(ngId1, {
-          name: ngId1,
-          segmentColors: {
-            1: rgbToHex([100, 100, 100]),
-            2: rgbToHex([200, 200, 200]),
-          }
-        })
-        expect(addManagedLayerSpy).toHaveBeenCalledWith(fakeNewLayer)
-
-        expect(getLayerByNameSpy).toHaveBeenCalledWith(ngId2)
-        expect(removeManagedLayerSpy).toHaveBeenCalledWith(fakeLayer)
-        expect(getLayerSpy).toHaveBeenCalledWith(ngId2, {
-          name: ngId2,
-          segmentColors: {
-            1: rgbToHex([10, 10, 10]),
-            2: rgbToHex([20, 20, 20]),
-          }
-        })
-        expect(addManagedLayerSpy).toHaveBeenCalledWith(fakeNewLayer)
-
-        expect(posRestoreStateSpy).toHaveBeenCalledOnceWith(
-          [ 1.1, 2.2, 3.3 ]
-        )
       })
     })
 
