@@ -23,6 +23,14 @@ export const toggleOctantRemoval = createAction(
   `${nameSpace} toggleOctantRemoval`
 )
 
+export const toggleFreezeMeshRemoval = createAction(
+  `${nameSpace} toggleFreezeMeshRemoval`
+)
+
+export const toggleNiiVolRender = createAction(
+  `${nameSpace} toggleNiftiVolRender`
+)
+
 export const setShowDelineation = createAction(
   `${nameSpace} setShowDelineation`,
   props<{

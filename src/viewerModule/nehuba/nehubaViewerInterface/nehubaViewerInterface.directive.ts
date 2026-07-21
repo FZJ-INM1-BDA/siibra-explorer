@@ -168,6 +168,21 @@ export class NehubaViewerContainerDirective implements OnDestroy{
 
     this.subscriptions.push(
       this.store$.pipe(
+        select(atlasAppearance.selectors.meshRemovalIsFrozen),
+        switchMap(
+          switchMapWaitFor({
+            condition: () => !!this.nehubaViewerInstance,
+            interval: 160,
+            leading: true
+          })
+        )
+      ).subscribe(flag => {
+        const useNehubaPerspective = this.nehubaViewerInstance?.config?.layout?.useNehubaPerspective
+        if (useNehubaPerspective) {
+          useNehubaPerspective.lockMeshOcclusion = flag
+        }
+      }),
+      this.store$.pipe(
         select(userPreference.selectors.showTheme),
         switchMap(switchMapWaitFor({
           condition: () => !!this.nehubaViewerInstance?.nehubaViewer,

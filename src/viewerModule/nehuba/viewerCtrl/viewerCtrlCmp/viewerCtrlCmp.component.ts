@@ -32,14 +32,18 @@ export class ViewerCtrlCmp implements OnInit{
     ),
     this.store$.pipe(
       select(atlasAppearance.selectors.showAllSegMeshes)
+    ),
+    this.store$.pipe(
+      select(atlasAppearance.selectors.meshRemovalIsFrozen),
     )
   ]).pipe(
-    map(([ auxTransparent, octantRemoved, showAllMeshes ]) => {
+    map(([ auxTransparent, octantRemoved, showAllMeshes, meshRemovalIsFrozen ]) => {
       return {
         auxTransparent,
         octantRemoved,
         showAllMeshes,
-        CONST
+        meshRemovalIsFrozen,
+        CONST,
       }
     })
   )
@@ -123,6 +127,12 @@ export class ViewerCtrlCmp implements OnInit{
   public toggleOctantRemoval(){
     this.store$.dispatch(
       atlasAppearance.actions.toggleOctantRemoval()
+    )
+  }
+
+  public toggleFreezeMeshRemoval(){
+    this.store$.dispatch(
+      atlasAppearance.actions.toggleFreezeMeshRemoval()
     )
   }
 

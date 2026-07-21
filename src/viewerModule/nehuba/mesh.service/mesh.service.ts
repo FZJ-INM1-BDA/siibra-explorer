@@ -5,7 +5,7 @@ import { map, switchMap } from "rxjs/operators";
 import { IMeshesToLoad } from '../constants'
 import { selectorAuxMeshes } from "../store";
 import { LayerCtrlEffects } from "../layerCtrl.service/layerCtrl.effects";
-import { atlasAppearance, atlasSelection } from "src/state";
+import { atlasAppearance, atlasSelection, userInterface } from "src/state";
 import { BaseService } from "../base.service/base.service";
 import { IDS } from "src/atlasComponents/sapi"
 
@@ -161,5 +161,10 @@ export class NehubaMeshService implements OnDestroy {
       }
       return of(...meshesToLoad)
     })
+  )
+
+  hideSlices$ = this.store$.pipe(
+    select(userInterface.selectors.panelMode),
+    map(v => v === "V_SPLIT" ? ['slice2', 'slice3']: [])
   )
 }

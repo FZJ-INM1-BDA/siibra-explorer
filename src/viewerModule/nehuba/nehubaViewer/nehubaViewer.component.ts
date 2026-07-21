@@ -4,27 +4,17 @@ import { debounceTime, filter, scan, switchMap, take, distinctUntilChanged, debo
 import { LoggingService } from "src/logging";
 import { getExportNehuba, getUuid, switchMapWaitFor, waitFor } from "src/util/fn";
 import { deserializeSegment, NEHUBA_INSTANCE_INJTKN } from "../util";
-import { arrayOrderedEql, rgbToHex } from 'common/util'
+import { arrayOrderedEql } from 'common/util'
 import { IMeshesToLoad, SET_MESHES_TO_LOAD, PERSPECTIVE_ZOOM_FUDGE_FACTOR } from "../constants";
 import { IColorMap, SET_COLORMAP_OBS, SET_LAYER_VISIBILITY } from "../layerCtrl.service";
 
 /**
  * import of nehuba js files moved to angular.json
  */
-import { EXTERNAL_LAYER_CONTROL, IExternalLayerCtl, INgLayerCtrl, NG_LAYER_CONTROL, SET_SEGMENT_VISIBILITY, TNgLayerCtrl, Z_TRAVERSAL_MULTIPLIER } from "../layerCtrl.service/layerCtrl.util";
-import { NgCoordinateSpace, Unit } from "../types";
+import { EXTERNAL_LAYER_CONTROL, IExternalLayerCtl, INgLayerCtrl, NEHUBA_HIDE_SLICES, NG_LAYER_CONTROL, SET_SEGMENT_VISIBILITY, TNgLayerCtrl, Z_TRAVERSAL_MULTIPLIER } from "../layerCtrl.service/layerCtrl.util";
 import { PeriodicSvc } from "src/util/periodic.service";
 import { ViewerInternalStateSvc, AUTO_ROTATE, TInteralStatePayload } from "src/viewerModule/viewerInternalState.service";
 import { NehubaConfig } from "../config.service";
-
-function translateUnit(unit: Unit) {
-  if (unit === "m") {
-    return 1e9
-  }
-
-  throw new Error(`Cannot translate unit: ${unit}`)
-}
-
 
 interface LayerLabelIndex {
   layer: {
@@ -60,14 +50,12 @@ export const scanFn = (acc: LayerLabelIndex[], curr: LayerLabelIndex) => {
 
 export class NehubaViewerUnit implements OnDestroy {
 
-  #translateVoxelToReal: (voxels: number[]) => number[]
-
   public ngIdSegmentsMap: Record<string, number[]> = {}
 
   public viewerPosInVoxel$ = new BehaviorSubject<number[]>(null)
   public viewerPosInReal$ = new BehaviorSubject<[number, number, number]>(null)
   public mousePosInVoxel$ = new BehaviorSubject<[number, number, number]>(null)
-  public mousePosInReal$ = new BehaviorSubject<[number, number, number]>(null)
+  public mousePosInReal$ = new BehaviorSubject<[number, number, number]|null>(null)
 
   private exportNehuba: any
 
@@ -127,6 +115,7 @@ export class NehubaViewerUnit implements OnDestroy {
     private periodicSvc: PeriodicSvc,
     @Optional() @Inject(NEHUBA_INSTANCE_INJTKN) private nehubaViewer$: Subject<NehubaViewerUnit>,
     @Optional() @Inject(SET_MESHES_TO_LOAD) private injSetMeshesToLoad$: Observable<IMeshesToLoad>,
+    @Optional() @Inject(NEHUBA_HIDE_SLICES) private hideSlices$: Observable<string[]>,
     @Optional() @Inject(SET_COLORMAP_OBS) private setColormap$: Observable<IColorMap>,
     @Optional() @Inject(SET_LAYER_VISIBILITY) private layerVis$: Observable<string[]>,
     @Optional() @Inject(SET_SEGMENT_VISIBILITY) private segVis$: Observable<string[]>,
@@ -194,6 +183,21 @@ export class NehubaViewerUnit implements OnDestroy {
         payload: {}
       })
       this.internalStateNext = next
+    }
+
+    if (this.hideSlices$) {
+      this.ondestroySubscriptions.push(
+        this.hideSlices$.pipe(
+          switchMap(
+            switchMapWaitFor({
+              condition: () => !!this.config?.layout?.useNehubaPerspective,
+              interval: 160
+            })
+          )
+        ).subscribe((hideSlices: any) => {
+          this.config.layout.useNehubaPerspective.hideSlices = hideSlices
+        })
+      )
     }
 
     if (this.nehubaViewer$) {
@@ -400,7 +404,7 @@ export class NehubaViewerUnit implements OnDestroy {
           for (const layerLayerIndex of layersLabelIndex) {
             const { layer, labelIndicies } = layerLayerIndex
             totalMeshes += labelIndicies.length
-            this.nehubaViewer.setMeshesToLoad(labelIndicies, layer)
+            this.nehubaViewer.setMeshesToLoad(labelIndicies, layer.name)
           }
           this.totalMeshesToLoad.emit(totalMeshes)
         }),
@@ -439,12 +443,12 @@ export class NehubaViewerUnit implements OnDestroy {
     
     const { createNehubaViewer } = this.exportNehuba
 
-    this.nehubaViewer = createNehubaViewer(this.config, (err: string) => {
+    this.nehubaViewer = (window as any)['nehubaViewer'] = createNehubaViewer(this.config, (err: string) => {
       /* print in debug mode */
       this.log.warn(err)
     });
 
-    const viewer = this.nehubaViewer.ngviewer
+    const viewer = (window as any)['viewer'] = this.nehubaViewer.ngviewer
 
     /**
      * Hide all layers except the base layer (template)
@@ -452,8 +456,6 @@ export class NehubaViewerUnit implements OnDestroy {
      */
     const patchSliceview = async () => {
       
-      viewer.inputEventBindings.sliceView.set("at:wheel", "proxy-wheel")
-      viewer.inputEventBindings.sliceView.set("at:control+shift+wheel", "proxy-wheel-alt")
       await (async () => {
         let lenPanels = 0
 
@@ -463,7 +465,7 @@ export class NehubaViewerUnit implements OnDestroy {
           await new Promise(rs => setTimeout(rs, 150))
         }
       })()
-      viewer.inputEventBindings.sliceView.set("at:wheel", "proxy-wheel-1")
+      viewer.inputEventBindings.sliceView.set("at:shift+wheel", "proxy-wheel-1")
       viewer.inputEventBindings.sliceView.set("at:keyp", "proxy-wheel-1")
       viewer.inputEventBindings.sliceView.set("at:keyn", "proxy-wheel-1")
       viewer.inputEventBindings.sliceView.set("at:control+shift+wheel", "proxy-wheel-10")
@@ -475,10 +477,9 @@ export class NehubaViewerUnit implements OnDestroy {
     patchSliceview()
 
     this.newViewerInit()
-    window['nehubaViewer'] = this.nehubaViewer
 
     this.onDestroyCb.push(() => {
-      window['nehubaViewer'] = null
+      (window as any)['nehubaViewer'] = (window as any)['viewer'] = null
     })
   }
 
@@ -625,8 +626,7 @@ export class NehubaViewerUnit implements OnDestroy {
           ...(transform ? { transform } : {})
         }
         const indexToInsert = layerObj[key]?.meta?.insertIndex || 1
-        viewer.layerManager.addManagedLayer(
-          viewer.layerSpecification.getLayer(key, combined), indexToInsert)
+        this.nehubaViewer.addLayer(combined, key, indexToInsert)
 
         return layerObj[key]
       })
@@ -647,28 +647,15 @@ export class NehubaViewerUnit implements OnDestroy {
   public hideAllSeg() {
     if (!this.nehubaViewer) return
     for (const ngId in this.ngIdSegmentsMap) {
-      for (const idx of this.ngIdSegmentsMap[ngId]) {
-        this.nehubaViewer.hideSegment(idx, {
-          name: ngId,
-        })
-      }
-      this.nehubaViewer.showSegment(0, {
-        name: ngId,
-      })
+      this.nehubaViewer.showSegments([0], ngId)
     }
   }
 
   public showAllSeg() {
     if (!this.nehubaViewer) { return }
     for (const ngId in this.ngIdSegmentsMap) {
-      for (const idx of this.ngIdSegmentsMap[ngId]) {
-        this.nehubaViewer.showSegment(idx, {
-          name: ngId,
-        })
-      }
-      this.nehubaViewer.hideSegment(0, {
-        name: ngId,
-      })
+      const indices = this.ngIdSegmentsMap[ngId]
+      this.nehubaViewer.showSegments(indices, ngId)
     }
   }
 
@@ -704,28 +691,9 @@ export class NehubaViewerUnit implements OnDestroy {
 
     const newMap: Map<string, number[]> = array.reduce(reduceFn, new Map())
 
-    /**
-     * TODO
-     * ugh, ugly code. cleanify
-     */
-    /**
-     * TODO
-     * sometimes, ngId still happends to be undefined
-     */
     newMap.forEach((segs, ngId) => {
-      this.nehubaViewer.hideSegment(0, {
-        name: ngId,
-      })
-      segs.forEach(seg => {
-        this.nehubaViewer.showSegment(seg, {
-          name: ngId,
-        })
-      })
+      this.nehubaViewer.showSegments(segs, ngId)
     })
-  }
-
-  private vec3(pos: number[]) {
-    return this.exportNehuba.vec3.fromValues(...pos)
   }
 
   public setNavigationState(newViewerState: Partial<ViewerState>) {
@@ -757,7 +725,11 @@ export class NehubaViewerUnit implements OnDestroy {
       this.nehubaViewer.ngviewer.navigationState.pose.orientation.restoreState( orientation )
     }
     if ( position ) {
-      this.nehubaViewer.setPosition( this.vec3(position) , positionReal ? true : false )
+      if (!positionReal) {
+        console.warn(`positionReal not set to true has been deprecated. No-op.`)
+      } else {
+        this.nehubaViewer.setPosition(position)
+      }
     }
   }
 
@@ -815,6 +787,7 @@ export class NehubaViewerUnit implements OnDestroy {
   }
 
   public redraw(){
+    return
     this.nehubaViewer.redraw()
   }
 
@@ -841,38 +814,23 @@ export class NehubaViewerUnit implements OnDestroy {
       }),
 
       // nehubaViewer.navigationState.all emits every time a new layer is added or removed from the viewer
-      this.nehubaViewer.navigationState.all
-      .distinctUntilChanged((a, b) => {
-        const {
-          orientation: o1,
-          perspectiveOrientation: po1,
-          perspectiveZoom: pz1,
-          position: p1,
-          zoom: z1,
-        } = a
-        const {
-          orientation: o2,
-          perspectiveOrientation: po2,
-          perspectiveZoom: pz2,
-          position: p2,
-          zoom: z2,
-        } = b
+      // TODO 2026-07-17 Check if the above is still the case, after the nehuba rewrite catching up to latest neuroglancer
+      this.nehubaViewer.navigationState.all.subscribe((val: any) => {
+        const { orientation, perspectiveOrientation, perspectiveZoom, position, zoom } = val
+        
+        /**
+         * somewhat another fudge factor
+         * navigationState.all occassionally emits slice zoom and perspective zoom that maeks no sense
+         * filter those out
+         * 
+         * TODO find out why, and perhaps inform pavel about this
+         */
 
-        return [0, 1, 2, 3].every(idx => o1[idx] === o2[idx]) &&
-          [0, 1, 2, 3].every(idx => po1[idx] === po2[idx]) &&
-          pz1 === pz2 &&
-          [0, 1, 2].every(idx => p1[idx] === p2[idx]) &&
-          z1 === z2
-      })
-      /**
-       * somewhat another fudge factor
-       * navigationState.all occassionally emits slice zoom and perspective zoom that maeks no sense
-       * filter those out
-       * 
-       * TODO find out why, and perhaps inform pavel about this
-       */
-      .filter(val => !this.initNav && val?.perspectiveZoom > 10)
-      .subscribe(({ orientation, perspectiveOrientation, perspectiveZoom, position, zoom }) => {
+        this.initNav
+        
+        // if (perspectiveZoom > 10 && !this.initNav) {
+        //   return
+        // }
         const payload = {
           orientation : Array.from(orientation),
           perspectiveOrientation : Array.from(perspectiveOrientation),
@@ -880,6 +838,9 @@ export class NehubaViewerUnit implements OnDestroy {
           zoom,
           position: Array.from(position),
         } as any
+        
+        this.viewerPosInReal$.next(Array.from(position) as [number, number, number])
+
         this.viewerPositionChange.emit({
           ...payload,
           positionReal : true,
@@ -892,45 +853,10 @@ export class NehubaViewerUnit implements OnDestroy {
         })
       }),
 
-      this.nehubaViewer.navigationState.position.inVoxels
-        .filter(v => typeof v !== 'undefined' && v !== null)
-        .subscribe((v: Float32Array) => {
-          const coordInVoxel = Array.from(v)
-          this.viewerPosInVoxel$.next(coordInVoxel)
-          if (this.#translateVoxelToReal) {
-            
-            const coordInReal = this.#translateVoxelToReal(coordInVoxel)
-            this.viewerPosInReal$.next(coordInReal as [number, number, number])
-          }
-        }),
-
-      this.nehubaViewer.mousePosition.inVoxels
-        .filter((v: Float32Array) => typeof v !== 'undefined' && v !== null)
-        .subscribe((v: Float32Array) => {
-          const coordInVoxel = Array.from(v) as [number, number, number]
-          this.mousePosInVoxel$.next( coordInVoxel )
-          if (this.#translateVoxelToReal) {
-            
-            const coordInReal = this.#translateVoxelToReal(coordInVoxel)
-            this.mousePosInReal$.next( coordInReal as [number, number, number] )
-          }
-        }),
-
+      this.nehubaViewer.mouseOver.position.subscribe((pos: Float32Array|null) => {
+        this.mousePosInReal$.next( pos && Array.from(pos) as [number, number, number] )
+      }),
     )
-
-    const coordSpListener = this.nehubaViewer.ngviewer.coordinateSpace.changed.add(() => {
-      const coordSp = this.nehubaViewer.ngviewer.coordinateSpace.value as NgCoordinateSpace
-      if (coordSp.valid) {
-        this.#translateVoxelToReal = (coordInVoxel: number[]) => {
-          return coordInVoxel.map((voxel, idx) => (
-            translateUnit(coordSp.units[idx])
-            * coordSp.scales[idx]
-            * voxel
-          ))
-        }
-      }
-    })
-    this.nehubaViewer.ngviewer.registerDisposer(coordSpListener)
 
     if (this.initNav) {
       this.setNavigationState(this.initNav)
@@ -941,13 +867,14 @@ export class NehubaViewerUnit implements OnDestroy {
 
   private setColorMap(map: Map<string, Map<number, {red: number, green: number, blue: number}>>) {
     this.multiNgIdColorMap = map
-    const mainDict: Record<string, Record<number, string>> = {}
+
     for (const [ ngId, cMap ] of map.entries()) {
-      const nRecord: Record<number, string> = {}
+      const nRecord: Record<number, [number, number, number]> = {}
       for (const [ key, cm ] of cMap.entries()) {
-        nRecord[key] = rgbToHex([cm.red, cm.green, cm.blue])
+        nRecord[key] = [cm.red / 255, cm.green/255, cm.blue/255]
       }
-      mainDict[ngId] = nRecord
+
+      this.nehubaViewer.setSegmentsColors(nRecord, ngId)
 
       /**
        * n.b.
@@ -961,28 +888,6 @@ export class NehubaViewerUnit implements OnDestroy {
      * updating layer colormap seems to also mess up the position ()
      */
 
-    const layersManager = this.nehubaViewer.ngviewer.state.children.get("layers")
-    const position = this.nehubaViewer.ngviewer.state.children.get("position")
-    const prevPos = position.toJSON()
-    const layerJson = layersManager.toJSON()
-    const viewer = this.nehubaViewer.ngviewer
-
-    for (const layer of layerJson) {
-      if (layer.name in mainDict) {
-
-        // removes the segmentation layer, and adds one with the correct color map
-        // (this is actually how NG does it internally, clears all layers, and add them one by one)
-        const l = layersManager.layerManager.getLayerByName(layer.name)
-        layersManager.layerManager.removeManagedLayer(l)
-        layersManager.layerManager.addManagedLayer(
-          viewer.layerSpecification.getLayer(layer.name, {
-            ...layer,
-            segmentColors: mainDict[layer.name]
-          })
-        )
-        
-      }
-    }
 
     // n.b. must not use 
     //
@@ -998,7 +903,6 @@ export class NehubaViewerUnit implements OnDestroy {
     //   l.layer.restoreState(layer)
     // }
     
-    position.restoreState(prevPos)
     this.#triggerMeshLoad$.next(null)
   }
 }

@@ -159,6 +159,15 @@ export const getPipPanel = (panels: [HTMLElement, HTMLElement, HTMLElement, HTML
   return getFullViewPanel(panels)
 }
 
+export const getVSplit = (panels: [HTMLElement, HTMLElement, HTMLElement, HTMLElement]): HTMLDivElement => {
+  washPanels(panels)
+  const visibleRow = makeRow(panels[0], panels[3])
+  const invisibleRow = makeRow(panels[1], panels[2])
+  invisibleRow.style.flexBasis = '0%'
+  invisibleRow.className = ''
+  return makeCol(visibleRow, invisibleRow)
+}
+
 const getFullViewPanel = (panels: [HTMLElement, HTMLElement, HTMLElement, HTMLElement]): HTMLDivElement => {
 
   panels.forEach((panel, idx) => addTouchSideClasses(panel, idx, "SINGLE_PANEL"))

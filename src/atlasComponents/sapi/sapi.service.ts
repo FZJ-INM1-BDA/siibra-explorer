@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from '@angular/common/http';
-import { map, shareReplay, switchMap, tap } from "rxjs/operators";
-import { CachedFunction, getExportNehuba, noop } from "src/util/fn";
+import { map, shareReplay, switchMap, take, tap } from "rxjs/operators";
+import { CachedFunction, noop } from "src/util/fn";
 import { MatSnackBar } from 'src/sharedModules/angularMaterial.exports'
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 import { BehaviorSubject, forkJoin, from, Observable, of, Subject, throwError } from "rxjs";
@@ -375,52 +375,24 @@ export class SAPI{
     )
   }
 
-  public getStatisticalMap(parcellation: SxplrParcellation, template: SxplrTemplate, region: SxplrRegion) {
+  public async getStatisticMapUrl(parcellation: SxplrParcellation, template: SxplrTemplate, region: SxplrRegion): Promise<URL|null> {
+    const endpoint = await this.sapiEndpoint$.pipe(
+      take(1)
+    ).toPromise()
     const query = {
       parcellation_id: parcellation.id,
       region_id: region.name,
       space_id: template.id
     }
-    return this.sapiEndpoint$.pipe(
-      switchMap(endpoint => {
-        const _url = this.v3GetRoute("/map/statistical_map.nii.gz", {
-          query
-        })
-        const url = new URL(`${endpoint}${_url.path}`)
-        for (const key in _url.params) {
-          url.searchParams.set(key, _url.params[key].toString())
-        }
-        
-        return from((async () => {
-          const resp = await fetch(url)
-          const arraybuffer = await resp.arrayBuffer()
-          let outbuf: ArrayBuffer
-          try {
-            outbuf = (await getExportNehuba()).pako.inflate(arraybuffer).buffer
-          } catch (e) {
-            console.log("unpack error", e)
-            outbuf = arraybuffer
-          }
-      
-          const { result } = await this.workerSvc.sendMessage({
-            method: "PROCESS_NIFTI",
-            param: {
-              nifti: outbuf,
-            },
-            transfers: [outbuf],
-          })
-
-          const { meta, buffer } = result
-          return { meta, buffer } as {
-            meta: {
-              min: number
-              max: number
-            }
-            buffer: ArrayBuffer
-          }
-        })())
-      })
-    )
+    
+    const _url = this.v3GetRoute("/map/statistical_map.nii.gz", {
+      query
+    })
+    const url = new URL(`${endpoint}${_url.path}`)
+    for (const key in _url.params) {
+      url.searchParams.set(key, _url.params[key].toString())
+    }
+    return url
   }
 
   #parcIdToTmplMap = new Map<string, SxplrTemplate[]>()
@@ -573,87 +545,6 @@ export class SAPI{
   ){
   }
   
-  /**
-   * 
-   * @deprecated
-   * @param input 
-   * @param method 
-   * @param params 
-   * @returns 
-   */
-  async processNpArrayData<T extends keyof ProcessTypedArrayResult>(input: any /*SpyNpArrayDataModel*/, method: PARSE_TYPEDARRAY = PARSE_TYPEDARRAY.RAW_ARRAY, params: ProcessTypedArrayResult[T]['input'] = null): Promise<ProcessTypedArrayResult[T]['output']> {
-    return null
-    const supportedDtype = [
-      "uint8",
-      "int32",
-      "float32"
-    ]
-    const {
-      "x-channel": channel,
-      "x-width": width,
-      "x-height": height,
-      content,
-      dtype,
-      content_encoding: contentEncoding, 
-      content_type: contentType
-    } = input
-    
-    if (contentType !== "application/octet-stream") {
-      throw new Error(`sapi.service#decodeNpArrayDataModel error: expecting content_type to be "application/octet-stream", but is ${contentType}`)
-    }
-    if (contentEncoding !== "gzip; base64") {
-      throw new Error(`sapi.service#decodeNpArrayDataModel error: expecting content_encoding to be "gzip; base64", but is ${contentEncoding}`)
-    }
-    if (supportedDtype.indexOf(dtype) < 0) {
-      throw new Error(`sapi.service#decodeNpArrayDataModel error: expecting dtype to be in ${JSON.stringify(supportedDtype)}, but is ${dtype}`)
-    }
-
-    try {
-      const bin = atob(content)
-      const { pako } = await getExportNehuba()
-      const array = pako.inflate(bin)
-      let workerMsg: string
-      switch (method) {
-      case PARSE_TYPEDARRAY.CANVAS_FORTRAN_RGBA: {
-        workerMsg = "PROCESS_TYPED_ARRAY_F2RGBA"
-        break
-      }
-      case PARSE_TYPEDARRAY.CANVAS_COLORMAP_RGBA: {
-        workerMsg = "PROCESS_TYPED_ARRAY_CM2RGBA"
-        break
-      }
-      case PARSE_TYPEDARRAY.RAW_ARRAY: {
-        workerMsg = "PROCESS_TYPED_ARRAY_RAW"
-        break
-      }
-      default:{
-        throw new Error(`sapi.service#decodeNpArrayDataModel: method cannot be deciphered: ${method}`)
-      }
-      }
-      const { result } = await this.workerSvc.sendMessage({
-        method: workerMsg,
-        param: {
-          inputArray: array,
-          width,
-          height,
-          channel,
-          dtype,
-          processParams: params
-        },
-        transfers: [ array.buffer ]
-      })
-      const { buffer, outputArray, min, max } = result
-      return {
-        type: method,
-        result: buffer,
-        rawArray: outputArray,
-        min,
-        max
-      }
-    } catch (e) {
-      throw new Error(`sapi.service#decodeNpArrayDataModel error: ${e}`)
-    }
-  }
 }
 
 /**
@@ -663,34 +554,4 @@ export enum PARSE_TYPEDARRAY {
   CANVAS_FORTRAN_RGBA="CANVAS_FORTRAN_RGBA",
   CANVAS_COLORMAP_RGBA="CANVAS_COLORMAP_RGBA",
   RAW_ARRAY="RAW_ARRAY",
-}
-
-type ProcessTypedArrayResult = {
-  [PARSE_TYPEDARRAY.CANVAS_FORTRAN_RGBA]: {
-    input: null
-    output: {
-      type: PARSE_TYPEDARRAY
-      result: Uint8ClampedArray
-    }
-  }
-  [PARSE_TYPEDARRAY.CANVAS_COLORMAP_RGBA]: {
-    input?: {
-      colormap?: string
-      log?: boolean
-    }
-    output: {
-      type: PARSE_TYPEDARRAY
-      result: Uint8ClampedArray
-      max: number
-      min: number
-    }
-  }
-  [PARSE_TYPEDARRAY.RAW_ARRAY]: {
-    input: null
-    output: {
-      rawArray: number[][]
-      min: number
-      max: number
-    }
-  }
 }

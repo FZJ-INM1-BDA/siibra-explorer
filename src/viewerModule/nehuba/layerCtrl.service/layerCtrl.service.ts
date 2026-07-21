@@ -84,15 +84,16 @@ export class NehubaLayerControlService implements OnDestroy{
         
         for (const [ngId, labelRecord] of Object.entries(record)) {
           for (const [label, region] of Object.entries(labelRecord)) {
-            if (!region.color) continue
             /**
              * if custom color map is used, do *not* selectively paint selected region
              * custom color map can choose to subscribe to selected regions, and update the color map accordingly, 
              * if they wish to respect the selected regions
              */
-            const [ red, green, blue ] = usingCustomCM || selectedRegionNameSet.size === 0 || selectedRegionNameSet.has(region.name)
-              ? useCm.get(region) || [200, 200, 200]
-              : [255, 255, 255]
+            let red: number, green: number, blue: number
+            red = green = blue = 255
+            if (usingCustomCM || selectedRegionNameSet.size === 0 || selectedRegionNameSet.has(region.name)) {
+              [red, green, blue] = useCm.get(region) || [200, 200, 200]
+            }
             if (!returnVal[ngId]) {
               returnVal[ngId] = {}
             }

@@ -40,7 +40,7 @@ export type ThreeSurferCustomLabelLayer = {
 
 export type NewNgLayerOption = {
   legacySpecFlag: 'new'
-  type: 'image'
+  type: string
   name?: string
   blend: 'default' | 'additive'
   visible: boolean
@@ -68,7 +68,7 @@ export type OldNgLayerCustomLayer = {
   type?: string
 
   // annotation?: string // TODO what is this used for?
-} & NgLayerBase
+} & NgLayerBase & {volumeRendering?: "on" | null | "min" | "max"}
 
 export type NgLayerCustomLayer = NewNgLayerOption | OldNgLayerCustomLayer
 

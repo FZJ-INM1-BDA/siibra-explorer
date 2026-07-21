@@ -9,6 +9,7 @@ import { HorizontalOneThree } from "./layouts/h13/h13.component";
 import { PictureInPicturePanel } from "./layouts/pip/pip.component";
 import { SinglePanel } from "./layouts/single/single.component";
 import { VerticalOneThree } from "./layouts/v13/v13.component";
+import { VerticalSplit } from "./layouts/vsplit/vsplit.component";
 
 @NgModule({
   imports : [
@@ -25,6 +26,7 @@ import { VerticalOneThree } from "./layouts/v13/v13.component";
     SinglePanel,
     PictureInPicturePanel,
     VerticalOneThree,
+    VerticalSplit,
   ],
   exports : [
     BrowserAnimationsModule,
@@ -35,6 +37,7 @@ import { VerticalOneThree } from "./layouts/v13/v13.component";
     SinglePanel,
     PictureInPicturePanel,
     VerticalOneThree,
+    VerticalSplit,
   ],
 })
 

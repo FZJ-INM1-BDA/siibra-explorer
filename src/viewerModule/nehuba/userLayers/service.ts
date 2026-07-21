@@ -159,26 +159,41 @@ export class UserLayerService implements OnDestroy {
   }
 
   @RegisterSource(
-    async input => input instanceof File && input.name.endsWith(".nii")
+    async input => input instanceof File && (
+      input.name.endsWith(".nii")
+      || input.name.endsWith(".nii.gz")
+    )
   )
   async processNifti(file: File) {
-    const buf = await file.arrayBuffer()
-    return await this.#processUnpackedNiiBuf(buf, file)
-  }
+    const url = URL.createObjectURL(file)
+    const volFlag = await this.store$.pipe(
+      select(atlasAppearance.selectors.niiVolRender),
+      take(1)
+    ).toPromise()
 
-  @RegisterSource(
-    async input => input instanceof File && input.name.endsWith(".nii.gz")
-  )
-  async processNiiGz(file: File) {
-    const buf = await file.arrayBuffer()
-    try {
-      const { pako } = await getExportNehuba()
-      const outbuf = pako.inflate(buf).buffer
-      return await this.#processUnpackedNiiBuf(outbuf, file)
-    } catch (e) {
-      console.log("unpack error", e)
-      throw e
-    }
+    
+    const type = file.name.includes(".label.nii")
+    ? 'segmentation'
+    : 'image'
+    return [{
+      protocol: 'nehuba-nifti://',
+      url,
+      option: {
+        legacySpecFlag: "old",
+        type,
+        shader: getShader({
+          colormap: "magma",
+          opacity: 0.5,
+          lowThreshold: 0,
+          highThreshold: 1,
+        }),
+        ...(volFlag ? {volumeRendering: "on"} : {})
+      },
+      meta: {
+        filename: file.name,
+      },
+      cleanup: () => URL.revokeObjectURL(url)
+    }]
   }
 
   @RegisterSource(

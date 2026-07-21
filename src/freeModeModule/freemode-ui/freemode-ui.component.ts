@@ -108,7 +108,7 @@ export class FreeModeUIComponent {
     
     let buf = await file.arrayBuffer()
     if (file.name.toLowerCase().endsWith(".gz")) {
-      buf = pako.inflate(buf).buffer
+      buf = (await pako.inflateAsync(buf)).buffer
     }
     const { result } = await this.worker.sendMessage({
       method: "PROCESS_NIFTI",

@@ -6,6 +6,8 @@ export type AtlasAppearanceStore = {
   useViewer: UseViewer
   octantRemoval: boolean
   meshTransparency: number
+  meshRemovalFrozen: boolean
+  niftiVolRenderFlag: boolean
   showDelineation: boolean
   customLayers: CustomLayer[]
   showAllSegMeshes: boolean
@@ -14,6 +16,12 @@ export type AtlasAppearanceStore = {
 export const defaultState: AtlasAppearanceStore = {
   useViewer: null,
   octantRemoval: true,
+
+  // not yet encoded in URL
+  meshRemovalFrozen: false,
+  
+  // not yet encoded in URL
+  niftiVolRenderFlag: false,
   showDelineation: true,
   customLayers: [],
   meshTransparency: 1.0,
@@ -119,4 +127,22 @@ export const reducer = createReducer(
       }
     }
   ),
+  on(
+    actions.toggleFreezeMeshRemoval,
+    state => {
+      return {
+        ...state,
+        meshRemovalFrozen: !state.meshRemovalFrozen
+      }
+    }
+  ),
+  on(
+    actions.toggleNiiVolRender,
+    state => {
+      return {
+        ...state,
+        niftiVolRenderFlag: !state.niftiVolRenderFlag
+      }
+    }
+  )
 )

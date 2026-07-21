@@ -64,10 +64,13 @@ describe('> nehubaViewerInterface.directive.ts', () => {
 
       mockStore.overrideSelector(atlasAppearance.selectors.customLayers, [])
       mockStore.overrideSelector(atlasAppearance.selectors.octantRemoval, true)
+      mockStore.overrideSelector(atlasAppearance.selectors.meshRemovalIsFrozen, false)
+      
       mockStore.overrideSelector(atlasSelection.selectors.standaloneVolumes, [])
       mockStore.overrideSelector(atlasSelection.selectors.navigation, null)
       mockStore.overrideSelector(userPreference.selectors.useAnimation, false)
       mockStore.overrideSelector(userPreference.selectors.showTheme, null)
+      
     })
 
     it('> can be inited', () => {

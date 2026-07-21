@@ -32,7 +32,8 @@ const PANEL_MODE_DICT: Record<userInterface.PanelMode, number> = {
   "PIP_PANEL": 2,
   "H_ONE_THREE": 3,
   "V_ONE_THREE": 4,
-  "SINGLE_PANEL": 5
+  "SINGLE_PANEL": 5,
+  "V_SPLIT": 6,
 }
 
 const PANEL_MODE_DECODE = (() => {

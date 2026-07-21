@@ -330,12 +330,13 @@ export function getNehubaConfig(space: SxplrTemplate): NehubaConfig {
     ? {"color":[0.5,0.5,1,0.2], "translate": centerTranslate}
     : {"color":[0,0,0.5,0.15], "translate": centerTranslate}
   const drawZoomLevels = darkTheme
-    ? {"cutOff":150000 * scale }
-    : {"cutOff":200000 * scale,"color":[0.5,0,0,0.15] }
+    ? {"cutOff":150000 * scale, min: 150000 * scale * 100000}
+    : {"cutOff":200000 * scale, min: 150000 * scale * 100000, "color":[0.5,0,0,0.15] }
 
   // enable surface parcellation
   // otherwise, on segmentation selection, the unselected meshes will also be invisible
   const surfaceParcellation = space?.id === 'minds/core/referencespace/v1.0.0/7f39f7be-445b-47c0-9791-e971c0b6d992'
+  console.log("nehuba config")
   return {
     "configName": "",
     "globals": {

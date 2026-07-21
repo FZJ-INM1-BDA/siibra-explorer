@@ -137,7 +137,7 @@ export const processJsonLd = (json: { [key: string]: any }): Observable<IMessagi
     }
     const { pako, mat3, vec3 } = await getExportNehuba()
     if (isGzipped) {
-      data = pako.inflate(data)
+      data = await pako.inflateAsync(data)
     }
     let output = ``
     for (let i = 0; i < data.length; i++) {

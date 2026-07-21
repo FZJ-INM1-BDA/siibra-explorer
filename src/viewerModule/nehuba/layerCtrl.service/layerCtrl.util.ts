@@ -74,6 +74,7 @@ export const NG_LAYER_CONTROL = new InjectionToken('NG_LAYER_CONTROL')
 export const Z_TRAVERSAL_MULTIPLIER = new InjectionToken<Observable<number>>('Z_TRAVERSAL_MULTIPLIER')
 export const CURRENT_TEMPLATE_DIM_INFO = new InjectionToken<Observable<TemplateInfo>>('CURRENT_TEMPLATE_DIM_INFO')
 export const EXTERNAL_LAYER_CONTROL = new InjectionToken<IExternalLayerCtl>("EXTERNAL_LAYER_CONTROL")
+export const NEHUBA_HIDE_SLICES = new InjectionToken("NEHUBA_HIDE_SLICES")
 
 export type TemplateInfo = {
   transform: number[][]
