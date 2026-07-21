@@ -30,7 +30,10 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '16.x'
-    - run: npm i
+        
+    # --force flag is required as current version of zone.js is not compatible with 
+    # newest version of nehuba and neuroglancer
+    - run: npm i --force
     - run: npm run lint
 
   frontend:
