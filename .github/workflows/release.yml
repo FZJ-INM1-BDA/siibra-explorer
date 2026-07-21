@@ -41,11 +41,13 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '16.x'
-        
+
+    # --force flag is required as current version of zone.js is not compatible with 
+    # newest version of nehuba and neuroglancer
     - name: Build & zip assets
       run: |
         STRICT_LOCAL=true node ./src/environments/parseEnv.js
-        npm i && npm run build
+        npm i --force && npm run build
         zip -r siibra-explorer-${{ needs.check-version.outputs.package-version }}.zip ./dist
     - name: Attach built as release asset
       id: upload-release-asset 
