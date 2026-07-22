@@ -60,7 +60,10 @@ To run a frontend dev server, run:
 ```bash
 $ git clone https://github.com/FZJ-INM1-BDA/siibra-explorer
 $ cd siibra-explorer
-$ npm i
+
+# --force flag is required as current version of zone.js is not compatible with 
+# newest version of nehuba and neuroglancer
+$ npm i --force
 $ npm start
 ```
 

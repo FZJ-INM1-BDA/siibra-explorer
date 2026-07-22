@@ -261,6 +261,7 @@ export function getPositionOrientation(mat4: any, vec3: any, quat: any, affine: 
   quat.rotateZ(orientation, orientation, Math.PI)
 
   let position: number[]
+  console.log("dimensions", dimensions)
   if (dimensions) {
     const start = vec3.transformMat4(vec3.create(), vec3.fromValues(0, 0, 0), affine)
     const end = vec3.transformMat4(vec3.create(), vec3.fromValues(...dimensions), affine)

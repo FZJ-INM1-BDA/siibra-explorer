@@ -187,17 +187,22 @@ export class NgLayerCtrlCmp implements OnChanges, OnDestroy{
     const m = mat4.fromValues(...this.transform.flatMap(v => v))
     mat4.transpose(m, m)
 
-    let position: number[]
-    let orientation: number[]
+    let position: number[]|undefined = undefined
+    let orientation: Float32Array|number[]|undefined = undefined
 
     // if best viewpoints are defined, use best viewpoints first
-    const enclosed = (this.meta?.bestViewPoints || []).filter(isEnclosed).find(v => v.points.length >= 3)
+    const enclosed = (this.meta?.bestViewPoints || []).filter(isEnclosed).find(v => v.points && v.points.length >= 3)
 
     if (enclosed) {
       const curr = vec3.fromValues(...this.currentPositionMm)
-      const pt1 = vec3.fromValues(...enclosed.points[0].value)
-      const pt0 = vec3.fromValues(...enclosed.points[1].value)
-      const pt2 = vec3.fromValues(...enclosed.points[2].value)
+      const pt1 = enclosed.points?.[0].value && vec3.fromValues(...enclosed.points[0].value)
+      const pt0 = enclosed.points?.[1].value && vec3.fromValues(...enclosed.points[1].value)
+      const pt2 = enclosed.points?.[2].value && vec3.fromValues(...enclosed.points[2].value)
+
+      if (!pt1 || !pt0 || !pt2) {
+        return
+      }
+
       vec3.sub(pt1, pt1, pt0)
       vec3.sub(pt2, pt2, pt0)
 
@@ -214,7 +219,7 @@ export class NgLayerCtrlCmp implements OnChanges, OnDestroy{
       const cross = vec3.cross(vec3.create(), z0, pt1)
       const w = Math.sqrt(2) + vec3.dot(z0, pt1)
 
-      orientation = quat.set(quat.create(), ...cross, w)
+      orientation = quat.set(quat.create(), ...cross, w) as Float32Array
       quat.normalize(orientation, orientation)
       orientation = Array.from(orientation)
 
@@ -234,7 +239,7 @@ export class NgLayerCtrlCmp implements OnChanges, OnDestroy{
        * also caches the closes point
        */
       const ipdCoord = vec3.add(vec3.create(), pt0, inPlaneDisplacement)
-      const allPoints = enclosed.points.map(v => vec3.fromValues(...v.value))
+      const allPoints = (enclosed.points || []).map(v => v.value && vec3.fromValues(...v.value)).filter(v => !!v)
       let sum = 0
       let minDist: number = Number.POSITIVE_INFINITY
       let pos: any
@@ -263,6 +268,9 @@ export class NgLayerCtrlCmp implements OnChanges, OnDestroy{
         : pos
       vec3.scale(resultant, resultant, 1e6)
       position = Array.from(resultant)
+      
+      // temporary fix to best viewpoint not correct
+      position[1] -= 10
     }
 
     if (!!this.info && (!position || !orientation)) {
@@ -270,6 +278,7 @@ export class NgLayerCtrlCmp implements OnChanges, OnDestroy{
       const scale = scales[0]
       const sizeInNm = [0, 1, 2].map(idx => scale.size[idx] * scale.resolution[idx])
       const _m = Array.from(m) as number[]
+
       const _value = getPositionOrientation(mat4, vec3, quat, [_m.slice(0, 4), _m.slice(4, 8), _m.slice(8, 12), _m.slice(12, 16)], sizeInNm);
       if (!position) {
         position = Array.from(_value.position)
@@ -283,14 +292,13 @@ export class NgLayerCtrlCmp implements OnChanges, OnDestroy{
       const _value = getPositionOrientation(mat4, vec3, quat, this.transform)
       orientation = Array.from(_value.orientation)
     }
-    
-
     this.store.dispatch(
       atlasSelection.actions.navigateTo({
         navigation: {
-          orientation,
+          orientation: orientation as number[],
           position,
         },
+        physical: true,
         animation: true
       })
     )
