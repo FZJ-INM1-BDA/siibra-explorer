@@ -55,7 +55,7 @@ jobs:
         if [[ "$BRANCH_NAME" == 'dev' ]]
         then
 
-        echo "DEPLOY_FILE=siibra-sxplr/siibra-explorer/values/dev.yaml" >> "$GITHUB_OUTPUT"
+        echo "DEPLOY_FILE=siibra-explorer/siibra-explorer/values/dev.yaml" >> "$GITHUB_OUTPUT"
         cat > /tmp/delta.yaml << EOF
         podAnnotations:
           image-digest: "h-$GIT_DIGEST"
@@ -69,7 +69,7 @@ jobs:
         if [[ "$BRANCH_NAME" == 'staging' ]]
         then
 
-        echo "DEPLOY_FILE=siibra-sxplr/siibra-explorer/values/rc.yaml" >> "$GITHUB_OUTPUT"
+        echo "DEPLOY_FILE=siibra-explorer/siibra-explorer/values/rc.yaml" >> "$GITHUB_OUTPUT"
         cat > /tmp/delta.yaml << EOF
         podAnnotations:
           image-digest: "h-$GIT_DIGEST"
@@ -83,7 +83,7 @@ jobs:
         if [[ "$BRANCH_NAME" == 'master' ]]
         then
 
-        echo "DEPLOY_FILE=siibra-sxplr/siibra-explorer/values/prod.yaml" >> "$GITHUB_OUTPUT"
+        echo "DEPLOY_FILE=siibra-explorer/siibra-explorer/values/prod.yaml" >> "$GITHUB_OUTPUT"
         cat > /tmp/delta.yaml << EOF
         image:
           tag: "$SXPLR_VERSION"
