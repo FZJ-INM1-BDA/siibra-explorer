@@ -46,6 +46,7 @@ nav:
     - Plugin API: "advanced/api/README.md"
 
   - Release notes:
+    - v2.14.35: 'releases/v2.14.35.md'
     - v2.14.34: 'releases/v2.14.34.md'
     - v2.14.33: 'releases/v2.14.33.md'
     - v2.14.32: 'releases/v2.14.32.md'
