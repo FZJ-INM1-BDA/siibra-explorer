@@ -52,7 +52,7 @@ jobs:
         if [[ "$BRANCH_NAME" == 'dev' ]]
         then
 
-        echo "DEPLOY_FILE=siibra-sxplr/siibra-explorer/values/dev.yaml" >> "$GITHUB_OUTPUT"
+        echo "DEPLOY_FILE=siibra-explorer/siibra-explorer/values/dev.yaml" >> "$GITHUB_OUTPUT"
           
         cat > /tmp/delta.yaml << EOF
         image:
