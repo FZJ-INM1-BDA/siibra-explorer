@@ -1,4 +1,4 @@
-name: '[ci/cd] build docker image/trigger deploy/check VIP urls'
+name: '[cd] build docker image/trigger deploy/check VIP urls'
 
 on:
   push:

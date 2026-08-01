@@ -29,7 +29,7 @@
   
   const pathToIndexHtml = path.join(
     __dirname,
-    '../../dist/aot/index.html'
+    '../../dist/aot/browser/index.html'
   )
   
   const indexHtml = fs.readFileSync(
