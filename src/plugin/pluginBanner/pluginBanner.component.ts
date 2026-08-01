@@ -77,7 +77,7 @@ export class PluginBannerUI {
       this.userLayerSvc.handleUserInput(iframeUrl)
       return
       /* eslint-disable-next-line no-empty */
-    } catch (e) {
+    } catch {
 
     }
     this.#thirdpartyPlugin$.next({

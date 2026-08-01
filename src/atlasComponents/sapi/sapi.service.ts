@@ -99,7 +99,7 @@ export class SAPI{
         new Promise<string>((_, rj) => setTimeout(() => rj(`10s timeout`), 10000))
       ])
       return url
-    } catch (e) {
+    } catch {
 
       try {
         const url = await Promise.race([
@@ -118,7 +118,7 @@ export class SAPI{
           new Promise<string>((_, rj) => setTimeout(() => rj(`5s timeout`), 5000))
         ])
         return url
-      } catch (e) {
+      } catch {
         throw new Error(`No usabe siibra-api endpoints found. Tried: ${mainEndpoint}, ${backupEndpoints.join(",")}`)
       }
     }

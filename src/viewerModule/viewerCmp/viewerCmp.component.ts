@@ -389,7 +389,7 @@ export class ViewerCmp {
             confirmOnly: true
           })
         // eslint-disable-next-line no-empty
-        } catch (e) {
+        } catch {
 
         }
       }

@@ -498,7 +498,9 @@ export class NehubaViewerUnit implements OnDestroy {
     while (this.onDestroyCb.length > 0) {
       this.onDestroyCb.pop()()
     }
-    this.nehubaViewer && this.nehubaViewer.dispose()
+    if (this.nehubaViewer) {
+      this.nehubaViewer.dispose()
+    }
   }
 
   private onDestroyCb: Array<() => void> = []
@@ -826,7 +828,6 @@ export class NehubaViewerUnit implements OnDestroy {
          * TODO find out why, and perhaps inform pavel about this
          */
 
-        this.initNav
         
         // if (perspectiveZoom > 10 && !this.initNav) {
         //   return

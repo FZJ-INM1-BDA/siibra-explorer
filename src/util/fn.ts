@@ -14,7 +14,7 @@ export async function retry<T>(fn: () => T, config={timeout: 1000, retries:3}){
     retryNo ++
     try {
       return await fn()
-    } catch (e) {
+    } catch {
       console.warn(`fn failed, retry after ${timeout} milliseconds`)
       await (() => new Promise(rs => setTimeout(rs, timeout)))()
     }

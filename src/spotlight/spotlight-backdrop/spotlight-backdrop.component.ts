@@ -31,7 +31,9 @@ export class SpotlightBackdropComponent {
 
   @HostListener('click', ['$event'])
   clickHandler(ev: MouseEvent){
-    this.slService && this.slService.onClick.next(ev)
+    if (this.slService) {
+      this.slService.onClick.next(ev)
+    }
   }
 
   constructor(

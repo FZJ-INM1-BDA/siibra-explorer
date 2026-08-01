@@ -1,7 +1,7 @@
 module.exports = {
   root: true,
   parser: '@typescript-eslint/parser',
-  plugins: ['@typescript-eslint'],
+  plugins: ['@typescript-eslint', '@stylistic'],
   extends: ["eslint:recommended", "plugin:@typescript-eslint/eslint-recommended", "plugin:@typescript-eslint/recommended"],
   rules: {
     "@typescript-eslint/no-empty-interface": "off",
@@ -9,7 +9,7 @@ module.exports = {
     "@typescript-eslint/interface-name-prefix": [0],
     "semi": "off",
     "indent": "off",
-    "@typescript-eslint/member-delimiter-style": [2, {
+    "@stylistic/member-delimiter-style": [2, {
       "multiline": {
         "delimiter": "none",
         "requireLast": true

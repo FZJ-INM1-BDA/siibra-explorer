@@ -35,7 +35,7 @@ export class SapiViewsCoreSpaceBoundingBox implements OnChanges{
           [number, number, number],
         ] = JSON.parse(val)
         this._bbox = [min, max]
-      } catch (e) {
+      } catch {
         console.warn(`Parse bbox input error`)
       }
       return

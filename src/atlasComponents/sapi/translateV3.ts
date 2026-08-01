@@ -728,7 +728,7 @@ class TranslateV3 {
         return resp.json()
       }
     // eslint-disable-next-line no-empty
-    } catch (e) {
+    } catch {
       
     }
     

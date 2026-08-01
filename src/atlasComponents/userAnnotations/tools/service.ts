@@ -225,7 +225,9 @@ export class ModularUserAnnotationToolService implements OnDestroy{
       target,
       editCmp,
       onDestoryCallBack: () => {
-        newTool.ngOnDestroy && newTool.ngOnDestroy()
+        if (newTool.ngOnDestroy) {
+          newTool.ngOnDestroy()
+        }
         this.managedAnnotationsStream$.next({
           annotations: [],
           tool: name

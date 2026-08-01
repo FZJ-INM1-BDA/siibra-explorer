@@ -53,7 +53,7 @@ export class PriorityHttpInterceptor implements HttpInterceptor{
       try {
         const { detail } = JSON.parse(err.error.message)
         return detail as string
-      } catch (e) {
+      } catch {
         return err.error.message as string
       }
     }

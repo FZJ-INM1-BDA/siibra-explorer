@@ -297,7 +297,7 @@ export class SxplrAnnotToolsDirective {
       for (const ann of managedAnnotations) {
         ann.remove()
       }
-    } catch (e) {
+    } catch {
       // aborted
     }
   }

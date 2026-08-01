@@ -258,13 +258,13 @@ export class ConnectivityBrowserComponent implements OnChanges {
   selectedDataset: PathReturn<"/feature/RegionalConnectivity/{feature_id}">
 
   public ngOnChanges(changes: SimpleChanges): void {
-    const { parcellation, types } = changes
+    const { parcellation, types: changesTypes } = changes
     if (parcellation) {
       this.parcellation$.next(parcellation.currentValue)
     }
-    if (types) [
-      this.types$.next(types.currentValue)
-    ]
+    if (changesTypes) {
+      this.types$.next(changesTypes.currentValue)
+    }
   }
 
   removeCustomLayer() {

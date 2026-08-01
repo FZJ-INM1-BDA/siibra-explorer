@@ -327,7 +327,7 @@ export class NehubaViewerContainerDirective implements OnDestroy{
             const { name = `layer-${idx}`, layer } = await processStandaloneVolume(volumes[idx])
             copiedNehubaConfig.dataset.initialNgState.layers[name] = layer
             forceShowLayerNames.push(name)
-          }catch(e) {
+          } catch {
             // TODO catch error
           }
         }

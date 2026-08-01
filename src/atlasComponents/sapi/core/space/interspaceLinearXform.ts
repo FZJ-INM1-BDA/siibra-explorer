@@ -1,8 +1,6 @@
-const VALID_XFORM_SRC = ["LENS_ABA", "CCF_V2_5", "QUICKNII_ABA", "MNI152", "CYRIL_PTCLD", "QUICKNII_WAXHOLM"] as const
-const VALID_XFORM_DST = ["NEHUBA"] as const
 
-export type TVALID_LINEAR_XFORM_SRC = typeof VALID_XFORM_SRC[number]
-export type TVALID_LINEAR_XFORM_DST = typeof VALID_XFORM_DST[number]
+export type TVALID_LINEAR_XFORM_SRC = "LENS_ABA"| "CCF_V2_5"| "QUICKNII_ABA"| "MNI152"| "CYRIL_PTCLD"| "QUICKNII_WAXHOLM"
+export type TVALID_LINEAR_XFORM_DST = "NEHUBA"
 
 type TLinearXform = number[][]
 

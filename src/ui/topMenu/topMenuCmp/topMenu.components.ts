@@ -145,7 +145,9 @@ export class TopMenuCmp {
   }
 
   public openTmplWithDialog(tmpl: TemplateRef<any>, overwriteConfig?: Partial<MatDialogConfig>) {
-    this.dialogRef && this.dialogRef.close()
+    if (this.dialogRef) {
+      this.dialogRef.close()
+    }
 
     if (tmpl) {
       this.dialogRef = this.dialog.open(tmpl, {

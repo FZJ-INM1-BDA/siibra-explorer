@@ -173,7 +173,7 @@ export class AnnotationLayer {
         this.#layer.manager.layerManager.removeManagedLayer(this.#layer)
       }
     // eslint-disable-next-line no-empty
-    } catch (e) {
+    } catch {
       // errors if viewer is disposed first, which trigger layer.dispose() called
     }
     this.#layer = null
@@ -289,7 +289,7 @@ export function getNehubaViewer(){
 export async function promiseNehubaViewer(){
   try {
     return getNehubaViewer()
-  } catch (e) {
+  } catch {
     return await retry(() => getNehubaViewer(), { timeout: 160, retries: 1e10 })
   } 
 }

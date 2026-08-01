@@ -137,7 +137,7 @@ export class QuickTourService {
       const slide = this.slides.get(index)
       this.currActiveSlide = slide
       this.currentTip$.next(slide)
-    } catch (_e) {
+    } catch {
       console.warn(`cannot find slide with index ${index}`)
     }
   }

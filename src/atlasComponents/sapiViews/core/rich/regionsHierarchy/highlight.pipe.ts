@@ -16,7 +16,7 @@ export class HighlightPipe implements PipeTransform {
       let regex: RegExp
       try {
         regex = new RegExp(highlight, 'i')
-      } catch (e) {
+      } catch {
         // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions#escaping
         // CC0 or MIT
         regex = new RegExp(highlight.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))

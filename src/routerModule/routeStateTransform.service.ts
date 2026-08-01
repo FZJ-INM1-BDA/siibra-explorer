@@ -241,7 +241,7 @@ export class RouteStateTransformSvc {
         const labelIndicies: number[] = json[ngId].split(separator).map((n: string) => {
           try {
             return decodeToNumber(n)
-          } catch (e) {
+          } catch {
             /**
              * TODO poisonsed encoded char, send error message
              */
@@ -361,7 +361,7 @@ export class RouteStateTransformSvc {
       returnState["[state.atlasSelection]"].standAloneVolumes = parsedArr
       returnState["[state.atlasSelection]"].navigation = parsedNavObj
       return returnState
-    } catch (e) {
+    } catch {
       // if any error occurs, parse rest per normal
     }
 
@@ -374,7 +374,7 @@ export class RouteStateTransformSvc {
         const feature = await this.sapi.getV3FeatureDetailWithId(decodedFeatId).toPromise()
         returnState["[state.userInteraction]"].selectedFeature = feature
       }
-    } catch (e) {
+    } catch {
       console.error(`fetching selected feature error`)
     }
 
