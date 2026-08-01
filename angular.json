@@ -186,8 +186,11 @@
           }
         },
         "test": {
-          "builder": "@angular-devkit/build-angular:karma",
+          "builder": "@angular-builders/custom-webpack:karma",
           "options": {
+            "customWebpackConfig": {
+              "path": "./spec/webpack.config.js"
+            },
             "main": "spec/test.ts",
             "tsConfig": "tsconfig.spec.json",
             "karmaConfig": "spec/karma.conf.js",

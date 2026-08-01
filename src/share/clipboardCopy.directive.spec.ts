@@ -1,5 +1,5 @@
 import { Component } from "@angular/core";
-import { async, TestBed } from "@angular/core/testing";
+import { waitForAsync, TestBed } from "@angular/core/testing";
 import { AngularMaterialModule } from "src/sharedModules";
 import { ClipboardCopy } from "./clipboardCopy.directive";
 import { By } from "@angular/platform-browser";
@@ -18,7 +18,7 @@ const dummyClipBoard = {
 }
 
 describe('clipboardCopy.directive.ts', () => {
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
         AngularMaterialModule
@@ -38,7 +38,7 @@ describe('clipboardCopy.directive.ts', () => {
     // not yet compiled!
   }))
 
-  it('should be able to test directive', async(() => {
+  it('should be able to test directive', waitForAsync(() => {
     TestBed.overrideComponent(TestCmp, {
       set: {
         template: '<div iav-clipboard-copy></div>'
@@ -50,7 +50,7 @@ describe('clipboardCopy.directive.ts', () => {
     expect(directive).not.toBeNull()
   }))
 
-  it('if copytarget is not defined, window.location.href will be copied', async(() => {
+  it('if copytarget is not defined, window.location.href will be copied', waitForAsync(() => {
     
     const testPath = 'http://TESTHOST/TESTPATH'
     const spy = spyOn(ClipboardCopy, 'getWindowLocationHref').and.returnValue(testPath)

@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common"
-import { TestBed, async } from "@angular/core/testing"
+import { TestBed, waitForAsync } from "@angular/core/testing"
 import { MAT_DIALOG_DATA } from "src/sharedModules/angularMaterial.exports"
 import { AngularMaterialModule } from "src/sharedModules"
 import { ComponentsModule } from "../components.module"
@@ -9,7 +9,7 @@ describe('> confirmDialog.component.spec.ts', () => {
 
   describe('> ConfirmDialogComponent', () => {
     let matDialogData = {}
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
       TestBed.configureTestingModule({
         imports: [
           AngularMaterialModule,
