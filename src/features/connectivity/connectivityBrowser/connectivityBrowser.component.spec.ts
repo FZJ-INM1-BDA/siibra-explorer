@@ -7,9 +7,10 @@ import {MockStore, provideMockStore} from "@ngrx/store/testing";
 import {Observable, of} from "rxjs";
 import {SAPI} from "src/atlasComponents/sapi";
 import {AngularMaterialModule} from "src/sharedModules";
-import { HttpClientTestingModule, HttpTestingController } from "@angular/common/http/testing";
+import { HttpTestingController, provideHttpClientTesting } from "@angular/common/http/testing";
 import { SxplrAtlas, SxplrParcellation } from "src/atlasComponents/sapi/sxplrTypes";
 import { UtilModule } from "src/util";
+import { provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
 
 /**
  * injecting databrowser module is bad idea
@@ -70,8 +71,14 @@ describe('ConnectivityComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
+            declarations: [
+                ConnectivityBrowserComponent,
+                DummyDirective,
+            ],
+            schemas: [
+                CUSTOM_ELEMENTS_SCHEMA,
+            ],
             imports: [
-                HttpClientTestingModule,
                 AngularMaterialModule,
                 UtilModule,
             ],
@@ -87,15 +94,10 @@ describe('ConnectivityComponent', () => {
                         getParcDetail: jasmine.createSpy('getParcDetail'),
                         getParcRegions: jasmine.createSpy('getParcRegions'),
                     }
-                }
-            ],
-            declarations: [
-                ConnectivityBrowserComponent,
-                DummyDirective,
-            ],
-            schemas: [
-                CUSTOM_ELEMENTS_SCHEMA,
-            ],
+                },
+                provideHttpClient(withInterceptorsFromDi()),
+                provideHttpClientTesting()
+            ]
         }).compileComponents()
         httpTestingController = TestBed.inject(HttpTestingController);
     });

@@ -1,7 +1,8 @@
 import { InterSpaceCoordXformSvc, VALID_TEMPLATE_SPACE_NAMES } from './interSpaceCoordXform.service'
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing'
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing'
 import { TestBed, fakeAsync, tick } from '@angular/core/testing'
 import { GET_ATTR_TOKEN } from 'src/util/constants'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 describe('InterSpaceCoordXformSvc.service.spec.ts', () => {
   describe('InterSpaceCoordXformSvc', () => {
@@ -9,19 +10,19 @@ describe('InterSpaceCoordXformSvc.service.spec.ts', () => {
     const defaultUrl = 'https://hbp-spatial-backend.apps.hbp.eu/v1/transform-points'
     beforeEach(() => {
       TestBed.configureTestingModule({
-        imports: [
-          HttpClientTestingModule
-        ],
-        providers: [
-          InterSpaceCoordXformSvc,
-          {
+    imports: [],
+    providers: [
+        InterSpaceCoordXformSvc,
+        {
             provide: GET_ATTR_TOKEN,
             useFactory: () => {
-              return () => attr
+                return () => attr;
             }
-          }
-        ]
-      })
+        },
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting()
+    ]
+})
     })
 
     afterEach(() => {

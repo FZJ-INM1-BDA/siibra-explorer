@@ -1,40 +1,34 @@
-// Included to include a copy of vanilla nehuba
-import '!!file-loader?context=third_party&name=vanilla.html!third_party/vanilla.html'
-import '!!file-loader?context=third_party&name=vanilla_styles.css!third_party/styles.css'
-import '!!file-loader?context=third_party&name=preinit_vanilla.html!third_party/preinit_vanilla.html'
-
 /**
-* Catching Safari 10 bug:
-* 
-* https://bugs.webkit.org/show_bug.cgi?id=171041
-*
-* moved to angular.json
-* look for  
-* - third_party/catchSyntaxError.js
-* - third_party/syntaxError.js
-*/
-
-
-import '!!file-loader?context=src/res&name=icons/iav-icons.css!src/res/icons/iav-icons.css'
-import '!!file-loader?context=src/res&name=icons/iav-icons.ttf!src/res/icons/iav-icons.ttf'
-import '!!file-loader?context=src/res&name=icons/iav-icons.woff!src/res/icons/iav-icons.woff'
-import '!!file-loader?context=src/res&name=icons/iav-icons.svg!src/res/icons/iav-icons.svg'
-
-/**
- * version css
+ * The following artefacts, previously emitted here via webpack's file-loader,
+ * are now copied into the build output (and served by the dev server) as
+ * `assets` / `styles` entries in angular.json (the esbuild `application`
+ * builder does not support inline `!!file-loader!` imports):
+ *
+ * - a copy of vanilla nehuba:
+ *   - third_party/vanilla.html         -> vanilla.html
+ *   - third_party/preinit_vanilla.html -> preinit_vanilla.html
+ *   - third_party/styles.css           -> vanilla_styles.css  (styles bundle)
+ * - iav icon font:
+ *   - src/res/icons/iav-icons.{css,ttf,woff,svg} -> icons/iav-icons.*
+ * - version css:
+ *   - src/version.css                  -> version.css
+ *
+ * Catching Safari 10 bug (https://bugs.webkit.org/show_bug.cgi?id=171041) is
+ * also handled in angular.json; look for third_party/catchSyntaxError.js.
  */
-import '!!file-loader?name=version.css!src/version.css'
 
 import 'zone.js'
 import { enableProdMode } from '@angular/core';
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic'
 import { MainModule } from './main.module';
+import { injectExternalScripts } from './injectExternalScripts'
 
 import { environment } from 'src/environments/environment'
 const { PRODUCTION, VERSION, GIT_HASH } = environment
 if (PRODUCTION) enableProdMode()
 console.log(`Siibra Explorer: ${VERSION}::${GIT_HASH}`)
 
+injectExternalScripts()
 
 platformBrowserDynamic().bootstrapModule(MainModule)

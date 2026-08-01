@@ -1,7 +1,7 @@
 import { NgModule } from "@angular/core";
 import { AngularMaterialModule } from "src/sharedModules";
 import { ClipboardCopy } from "./clipboardCopy.directive";
-import { HttpClientModule } from "@angular/common/http";
+import { provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
 import { SaneUrl } from "./saneUrl/saneUrl.component";
 import { CommonModule } from "@angular/common";
 import { ReactiveFormsModule, FormsModule } from "@angular/forms";
@@ -14,7 +14,6 @@ import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.di
 @NgModule({
   imports: [
     AngularMaterialModule,
-    HttpClientModule,
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
@@ -33,7 +32,10 @@ import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.di
     SaneUrl,
     ShareSheetComponent,
     ShareDirective,
-  ]
+  ],
+  providers: [
+    provideHttpClient(withInterceptorsFromDi()),
+  ],
 })
 
-export class ShareModule{}
+export class ShareModule { }

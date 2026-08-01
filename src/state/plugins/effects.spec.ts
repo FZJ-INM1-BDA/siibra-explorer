@@ -1,5 +1,5 @@
 import { fakeAsync, TestBed, tick } from "@angular/core/testing";
-import { HttpClientModule, HTTP_INTERCEPTORS, HttpInterceptor, HttpRequest, HttpHandler, HttpEvent, HttpResponse, HttpHeaders } from "@angular/common/http";
+import { HTTP_INTERCEPTORS, HttpInterceptor, HttpRequest, HttpHandler, HttpEvent, HttpResponse, HttpHeaders } from "@angular/common/http";
 import { Effects } from "./effects";
 import { Observable, of } from "rxjs";
 import { Action } from "@ngrx/store";

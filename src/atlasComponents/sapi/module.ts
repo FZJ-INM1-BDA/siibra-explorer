@@ -1,6 +1,6 @@
 import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http";
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
 import { DebugHttpInterceptor as _DebugHttpInterceptor, PriorityHttpInterceptor } from "src/util/priority";
 import { AngularMaterialModule } from "src/sharedModules";
 import { DARKTHEME } from "src/util/injectionTokens";
@@ -13,14 +13,11 @@ import { IDS } from "./constants";
 import { combineLatest, of } from "rxjs";
 
 @NgModule({
+  declarations: [],
+  exports: [],
   imports: [
     CommonModule,
-    HttpClientModule,
-    AngularMaterialModule,
-  ],
-  declarations: [
-  ],
-  exports: [
+    AngularMaterialModule
   ],
   providers: [
     // {
@@ -67,7 +64,8 @@ import { combineLatest, of } from "rxjs";
         })
       ),
       deps: [ Store ]
-    }
+    },
+    provideHttpClient(withInterceptorsFromDi()),
   ]
 })
 export class SAPIModule{}

@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { HttpClientModule } from "@angular/common/http";
+import { provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
 import { NgModule } from "@angular/core";
 import { LoggingModule } from "src/logging";
 import { AngularMaterialModule } from "src/sharedModules";
@@ -19,7 +19,6 @@ import { MarkdownModule } from "src/components/markdown";
     LoggingModule,
     UtilModule,
     AngularMaterialModule,
-    HttpClientModule,
     ExperimentalFlagDirective,
     DialogModule,
     FileInputModule,
@@ -33,6 +32,6 @@ import { MarkdownModule } from "src/components/markdown";
   exports: [
     PluginBannerUI,
   ],
-  providers: []
+  providers: [provideHttpClient(withInterceptorsFromDi())]
 })
 export class PluginModule{}

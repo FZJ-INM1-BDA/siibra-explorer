@@ -1,12 +1,9 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core'
 import { environment } from 'src/environments/environment'
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const { default: info } = require('!!raw-loader!../data/info.md')
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const { default: readmore } = require('!!raw-loader!../data/readmore.md')
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const { default: matomoInfo } = require('!!raw-loader!../data/aboutMatomo.md')
+import info from '../data/info.md'
+import readmore from '../data/readmore.md'
+import matomoInfo from '../data/aboutMatomo.md'
 
 @Component({
   selector: 'cookie-agreement',

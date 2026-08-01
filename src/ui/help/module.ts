@@ -8,7 +8,7 @@ import { HelpOnePager } from "./helpOnePager/helpOnePager.component";
 import { QuickTourModule } from "src/ui/quickTour/module";
 import { HowToCite } from "./howToCite/howToCite.component";
 import { StrictLocalModule } from "src/strictLocal";
-import { HttpClientModule } from "@angular/common/http";
+import { provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
 import { ShareModule } from "src/share";
 
 @NgModule({
@@ -19,8 +19,6 @@ import { ShareModule } from "src/share";
     UtilModule,
     QuickTourModule,
     StrictLocalModule,
-    HttpClientModule,
-
     ShareModule,
   ],
   declarations: [
@@ -31,6 +29,9 @@ import { ShareModule } from "src/share";
   exports: [
     AboutCmp,
     HelpOnePager,
+  ],
+  providers: [
+    provideHttpClient(withInterceptorsFromDi()),
   ]
 })
 

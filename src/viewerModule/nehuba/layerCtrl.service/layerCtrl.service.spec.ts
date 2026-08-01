@@ -9,7 +9,7 @@ import {
 import { LayerCtrlEffects } from "./layerCtrl.effects"
 import { NEVER } from "rxjs"
 import { RouterService } from "src/routerModule/router.service"
-import { HttpClientModule } from "@angular/common/http"
+import { provideHttpClient, withInterceptorsFromDi } from "@angular/common/http"
 import { BaseService } from "../base.service/base.service"
 
 describe('> layerctrl.service.ts', () => {
@@ -17,9 +17,7 @@ describe('> layerctrl.service.ts', () => {
     let mockStore: MockStore
     beforeEach(() => {
       TestBed.configureTestingModule({
-        imports:[
-          HttpClientModule,
-        ],
+        imports: [],
         providers: [
           {
             provide: RouterService,
@@ -41,7 +39,8 @@ describe('> layerctrl.service.ts', () => {
               selectedATPR$: NEVER,
               completeNgIdLabelRegionMap$: NEVER,
             }
-          }
+          },
+          provideHttpClient(withInterceptorsFromDi()),
         ]
       })
 
@@ -65,7 +64,7 @@ describe('> layerctrl.service.ts', () => {
         describe('> template/parc has no aux meshes', () => {
 
           it('> calls getMultiNgIdsRegionsLabelIndexMapReturn', () => {
-            
+
           })
 
           it('> emitted value is as expected', fakeAsync(() => {
@@ -80,7 +79,7 @@ describe('> layerctrl.service.ts', () => {
 
           })
 
-          it('> should inherit values from tmpl and parc',  fakeAsync(() => {
+          it('> should inherit values from tmpl and parc', fakeAsync(() => {
 
           }))
 
@@ -101,7 +100,7 @@ describe('> layerctrl.service.ts', () => {
           2: { red: 255, green: 255, blue: 255 },
         }
       }
-    
+
       describe('> overwriteColorMap$ firing', () => {
         beforeEach(() => {
         })
@@ -127,11 +126,11 @@ describe('> layerctrl.service.ts', () => {
     })
 
     describe('> segmentVis$', () => {
-      const region1= {
+      const region1 = {
         ngId: 'ngid',
         labelIndex: 1
       }
-      const region2= {
+      const region2 = {
         ngId: 'ngid',
         labelIndex: 2
       }
@@ -153,7 +152,7 @@ describe('> layerctrl.service.ts', () => {
 
         it('> if clearflag is true, then return []', () => {
 
-        })        
+        })
       })
 
       describe('> if non mixable layer exist', () => {
@@ -170,7 +169,7 @@ describe('> layerctrl.service.ts', () => {
 
         describe('> if clear flag is set', () => {
           beforeEach(() => {
-            
+
           })
 
           it('> default, should return []', () => {
@@ -184,7 +183,7 @@ describe('> layerctrl.service.ts', () => {
     })
 
     describe('> ngLayersController$', () => {
-      
+
     })
   })
 })

@@ -19,9 +19,9 @@
   "author": "FZJ-INM1-BDA <inm1-bda@fz-juelich.de>",
   "license": "apache-2.0",
   "devDependencies": {
-    "@angular-devkit/build-angular": "^16.2.16",
-    "@angular/cli": "^16.2.16",
-    "@angular/compiler-cli": "^16.2.12",
+    "@angular-devkit/build-angular": "^18.2.21",
+    "@angular/cli": "^18.2.21",
+    "@angular/compiler-cli": "^18.2.14",
     "@babel/core": "^7.17.5",
     "@types/jasmine": "~3.8.0",
     "@types/node": "^12.11.1",
@@ -36,22 +36,22 @@
     "karma-coverage": "~2.0.3",
     "karma-jasmine": "~4.0.0",
     "karma-jasmine-html-reporter": "~1.7.0",
-    "typescript": "^4.9.3"
+    "typescript": "~5.4"
   },
   "dependencies": {
-    "@angular/animations": "^16.2.12",
-    "@angular/cdk": "^16.2.14",
-    "@angular/common": "^16.2.12",
-    "@angular/compiler": "^16.2.12",
-    "@angular/core": "^16.2.12",
-    "@angular/forms": "^16.2.12",
-    "@angular/material": "^16.2.14",
-    "@angular/platform-browser": "^16.2.12",
-    "@angular/platform-browser-dynamic": "^16.2.12",
-    "@angular/router": "^16.2.12",
-    "@ngrx/component-store": "^16.3.0",
-    "@ngrx/effects": "^16.3.0",
-    "@ngrx/store": "^16.3.0",
+    "@angular/animations": "^18.2.14",
+    "@angular/cdk": "^18.2.14",
+    "@angular/common": "^18.2.14",
+    "@angular/compiler": "^18.2.14",
+    "@angular/core": "^18.2.14",
+    "@angular/forms": "^18.2.14",
+    "@angular/material": "^18.2.14",
+    "@angular/platform-browser": "^18.2.14",
+    "@angular/platform-browser-dynamic": "^18.2.14",
+    "@angular/router": "^18.2.14",
+    "@ngrx/component-store": "^18.1.1",
+    "@ngrx/effects": "^18.1.1",
+    "@ngrx/store": "^18.1.1",
     "acorn": "^8.4.1",
     "export-nehuba": "^0.2.0-dev15",
     "file-loader": "^6.2.0",
@@ -64,6 +64,7 @@
     "showdown": "^2.0.0",
     "three-surfer": "0.0.18",
     "tslib": "^2.3.0",
-    "zone.js": "^0.14.10"
+    "zone.js": "^0.14.10",
+    "@ngrx/operators": "^18.0.0"
   }
 }

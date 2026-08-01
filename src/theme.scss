@@ -6,21 +6,21 @@
 $themes: "default", "ebrains";
 $themes-map: (
   "default": (
-    "primary": mat.define-palette(mat.$light-green-palette, 400),
-    "accent": mat.define-palette(mat.$amber-palette, A200, A100, A400),
-    "warn": mat.define-palette(mat.$red-palette),
+    "primary": mat.m2-define-palette(mat.$m2-light-green-palette, 400),
+    "accent": mat.m2-define-palette(mat.$m2-amber-palette, A200, A100, A400),
+    "warn": mat.m2-define-palette(mat.$m2-red-palette),
   ),
   "ebrains": (
-    "primary": mat.define-palette(mat.$green-palette, 400),
-    "accent": mat.define-palette(mat.$yellow-palette, A200, A100, A400),
-    "warn": mat.define-palette(mat.$red-palette),
+    "primary": mat.m2-define-palette(mat.$m2-green-palette, 400),
+    "accent": mat.m2-define-palette(mat.$m2-yellow-palette, A200, A100, A400),
+    "warn": mat.m2-define-palette(mat.$m2-red-palette),
   )
 );
 
-$typographic-config: mat.define-typography-config();
+$typographic-config: mat.m2-define-typography-config();
 
 @mixin custom-cmp($theme) {
-  $color-config: mat.get-color-config($theme);
+  $color-config: mat.m2-get-color-config($theme);
 
   $foreground: map-get($theme, foreground);
   $background: map-get($theme, background);
@@ -29,7 +29,7 @@ $typographic-config: mat.define-typography-config();
   $accent: map-get($color-config, accent);
   $warn: map-get($color-config, warn);
 
-  color: mat.get-color-from-palette($foreground, text);
+  color: mat.m2-get-color-from-palette($foreground, text);
 
   [sxplr-custom-cmp],
   .sxplr-custom-cmp
@@ -68,42 +68,42 @@ $typographic-config: mat.define-typography-config();
     &[bg],
     &.bg
     {
-      background-color: mat.get-color-from-palette($background, background);
+      background-color: mat.m2-get-color-from-palette($background, background);
     }
 
     &[darker-bg],
     &.darker-bg
     {
-      background-color: mat.get-color-from-palette($background, background);
+      background-color: mat.m2-get-color-from-palette($background, background);
     }
 
     &[text],
     &.text
     {
-      color: mat.get-color-from-palette($foreground, text);
+      color: mat.m2-get-color-from-palette($foreground, text);
     }
     &[primary],
     &.primary
     {
-      color: mat.get-color-from-palette($primary, 500);
+      color: mat.m2-get-color-from-palette($primary, 500);
     }
 
     &[accent],
     &.accent
     {
-      color: mat.get-color-from-palette($accent, 500);
+      color: mat.m2-get-color-from-palette($accent, 500);
     }
 
     &[warn],
     &.warn
     {
-      color: mat.get-color-from-palette($warn, 500);
+      color: mat.m2-get-color-from-palette($warn, 500);
     }
 
     &.input
     {
-      background-color: mat.get-color-from-palette($background, card);
-      color: mat.get-color-from-palette($foreground, secondary-text);
+      background-color: mat.m2-get-color-from-palette($background, card);
+      color: mat.m2-get-color-from-palette($foreground, secondary-text);
       border: none;
       border-bottom: solid 1px rgba(128,128,128,0.9);
       padding: 0.5rem 1.25rem 0.25rem;
@@ -114,7 +114,7 @@ $typographic-config: mat.define-typography-config();
 @each $theme in $themes {
   $palette-map: map-get($themes-map, $theme);
   
-  $sxplr-light-theme: mat.define-light-theme((
+  $sxplr-light-theme: mat.m2-define-light-theme((
     color: (
       primary: map-get($palette-map, "primary"),
       accent: map-get($palette-map, "accent"),
@@ -125,7 +125,7 @@ $typographic-config: mat.define-typography-config();
   ));
   
   // Define a dark theme
-  $sxplr-dark-theme: mat.define-dark-theme((
+  $sxplr-dark-theme: mat.m2-define-dark-theme((
     color: (
       primary: map-get($palette-map, "primary"),
       accent: map-get($palette-map, "accent"),

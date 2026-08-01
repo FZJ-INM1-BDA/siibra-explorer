@@ -7,6 +7,7 @@
     "**/*.stories.*"
   ],
   "files": [
-    "src/main-aot.ts"
+    "src/main-aot.ts",
+    "src/declaration.d.ts"
   ]
 }

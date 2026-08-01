@@ -8,7 +8,7 @@ import { ComponentsModule } from "./components/components.module";
 import { LayoutModule } from "./layouts/layout.module";
 import { UIModule } from "./ui/ui.module";
 
-import { HttpClientModule } from "@angular/common/http";
+import { provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
 import { AtlasWorkerService } from "./atlasViewer/atlasViewer.workerService.service";
 import { WINDOW_MESSAGING_HANDLER_TOKEN } from 'src/messaging/types'
 
@@ -62,7 +62,6 @@ import { SxplrOverlaySvc } from './components/overlay';
     ComponentsModule,
     DragDropModule,
     UIModule,
-
     AngularMaterialModule,
     UtilModule,
     WidgetModule,
@@ -75,7 +74,6 @@ import { SxplrOverlaySvc } from './components/overlay';
     KgTosModule,
     QuickTourModule,
     FreeModeModule,
-    
     EffectsModule.forRoot([
       ...getStoreEffects(),
       LayerCtrlEffects,
@@ -83,7 +81,6 @@ import { SxplrOverlaySvc } from './components/overlay';
       ViewerCommonEffects,
     ]),
     RootStoreModule,
-    HttpClientModule,
     KCodeModule,
   ],
   declarations: [
@@ -222,7 +219,6 @@ import { SxplrOverlaySvc } from './components/overlay';
       provide: APP_INITIALIZER,
       useFactory: (sapi: SAPI, getAttr: GetAttr) => {
         const overwriteSapiUrl = getAttr(CONST.OVERWRITE_SAPI_ENDPOINT_ATTR)
-        
         const { SIIBRA_API_ENDPOINTS } = environment
         const endpoints = (overwriteSapiUrl && [ overwriteSapiUrl ]) || SIIBRA_API_ENDPOINTS.split(',')
         return async () => {
@@ -246,6 +242,7 @@ import { SxplrOverlaySvc } from './components/overlay';
       deps: [ LblEventSvc ]
     },
     LblEventSvc,
+    provideHttpClient(withInterceptorsFromDi()),
   ],
   bootstrap: [
     AtlasViewer,

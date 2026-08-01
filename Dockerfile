@@ -32,9 +32,7 @@ WORKDIR /iv
 COPY ./package.json /iv/
 COPY ./package-lock.json /iv/
 
-# --force flag is required as current version of zone.js is not compatible with 
-# newest version of nehuba and neuroglancer
-RUN npm i --force
+RUN npm i
 
 COPY . /iv/
 

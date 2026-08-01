@@ -8,7 +8,7 @@ import { LayerCtrlEffects } from "../layerCtrl.service/layerCtrl.effects"
 import { NEVER, of, pipe } from "rxjs"
 import { mapTo } from "rxjs/operators"
 import { selectorAuxMeshes } from "../store"
-import { HttpClientModule } from "@angular/common/http"
+import { provideHttpClient, withInterceptorsFromDi } from "@angular/common/http"
 import { BaseService } from "../base.service/base.service"
 
 
@@ -20,7 +20,7 @@ const fits2 = {
 } as SxplrRegion
 const auxMesh = {
   "@id": 'bla',
-  labelIndicies: [1,2,3],
+  labelIndicies: [1, 2, 3],
   name: 'bla',
   ngId: 'bla',
   rgb: [255, 255, 255] as [number, number, number],
@@ -29,8 +29,8 @@ const auxMesh = {
 }
 
 describe('> mesh.service.ts', () => {
-  
-  
+
+
   let getATPSpy: jasmine.Spy = jasmine.createSpy('distinctATP')
 
   const mockAtlas = {
@@ -57,15 +57,13 @@ describe('> mesh.service.ts', () => {
   })
 
   afterEach(() => {
-    
+
     getATPSpy.calls.reset()
   })
   describe('> NehubaMeshService', () => {
     beforeEach(() => {
       TestBed.configureTestingModule({
-        imports: [
-          HttpClientModule,
-        ],
+        imports: [],
         providers: [
           provideMockStore(),
           NehubaMeshService,
@@ -80,7 +78,8 @@ describe('> mesh.service.ts', () => {
             useValue: {
               completeNgIdLabelRegionMap$: NEVER
             }
-          }
+          },
+          provideHttpClient(withInterceptorsFromDi())
         ]
       })
     })
@@ -108,7 +107,7 @@ describe('> mesh.service.ts', () => {
           }
         })
         const mockStore = TestBed.inject(MockStore)
-        
+
         mockStore.overrideSelector(atlasSelection.selectors.selectedTemplate, {} as any)
         mockStore.overrideSelector(atlasSelection.selectors.selectedParcellation, {} as any)
         mockStore.overrideSelector(atlasAppearance.selectors.showAllSegMeshes, false)
@@ -137,13 +136,13 @@ describe('> mesh.service.ts', () => {
                   layer: {
                     name: ngId
                   },
-                  labelIndicies:[]
+                  labelIndicies: []
                 },
                 b: {
                   layer: {
                     name: ngId2
                   },
-                  labelIndicies:[]
+                  labelIndicies: []
                 },
                 c: {
                   layer: {
@@ -162,7 +161,7 @@ describe('> mesh.service.ts', () => {
             mockStore.overrideSelector(atlasSelection.selectors.selectedRegions, [fits1])
           })
           it("> shows both shown mesh and aux mesh", () => {
-            
+
             const service = TestBed.inject(NehubaMeshService)
             expect(
               service.loadMeshes$
@@ -172,7 +171,7 @@ describe('> mesh.service.ts', () => {
                   layer: {
                     name: ngId
                   },
-                  labelIndicies: [ labelIndex ]
+                  labelIndicies: [labelIndex]
                 },
                 b: {
                   layer: {
@@ -206,7 +205,7 @@ describe('> mesh.service.ts', () => {
           })
 
           it("> load all meshes", () => {
-            
+
             const service = TestBed.inject(NehubaMeshService)
             expect(
               service.loadMeshes$
@@ -216,13 +215,13 @@ describe('> mesh.service.ts', () => {
                   layer: {
                     name: ngId
                   },
-                  labelIndicies: [ labelIndex ]
+                  labelIndicies: [labelIndex]
                 },
                 b: {
                   layer: {
                     name: ngId2,
                   },
-                  labelIndicies: [ labelIndex2 ]
+                  labelIndicies: [labelIndex2]
                 }
               })
             )
@@ -247,13 +246,13 @@ describe('> mesh.service.ts', () => {
                   layer: {
                     name: ngId
                   },
-                  labelIndicies: [ labelIndex ]
+                  labelIndicies: [labelIndex]
                 },
                 b: {
                   layer: {
                     name: ngId2,
                   },
-                  labelIndicies: [  ]
+                  labelIndicies: []
                 }
               })
             )

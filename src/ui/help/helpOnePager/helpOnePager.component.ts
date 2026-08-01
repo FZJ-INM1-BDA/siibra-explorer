@@ -1,8 +1,7 @@
 import { Component } from "@angular/core";
 import { ARIA_LABELS } from 'common/constants'
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const { default: QUICK_STARTER } = require('!!raw-loader!common/helpOnePager.md')
+import QUICK_STARTER from 'common/helpOnePager.md'
 
 @Component({
   selector: 'help-one-pager',

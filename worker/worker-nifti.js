@@ -478,6 +478,12 @@
   }
 
   exports.nifti = {
+
+    /**
+     * @deprecated
+     * @param {*} buf 
+     * @returns 
+     */
     convert: buf => {
       
       const is1 = isNifti1(buf)

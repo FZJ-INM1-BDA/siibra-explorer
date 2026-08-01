@@ -1,6 +1,6 @@
 import { Directive, HostListener, Inject, Input } from "@angular/core";
 import { TZipFileConfig } from "./type";
-import * as JSZip from "jszip";
+import JSZip from "jszip";
 import { DOCUMENT } from "@angular/common";
 import { isObservable, Observable } from "rxjs";
 import { take } from "rxjs/operators";

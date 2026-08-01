@@ -3,7 +3,7 @@ import { ComponentsModule } from "src/components/components.module";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { LayoutModule } from "src/layouts/layout.module";
 import { ScrollingModule } from "@angular/cdk/scrolling"
-import { HttpClientModule } from "@angular/common/http";
+import { provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
 import { AngularMaterialModule } from 'src/sharedModules'
 import { UtilModule } from "src/util";
 import { ShareModule } from "src/share";
@@ -13,9 +13,9 @@ import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { HANDLE_SCREENSHOT_PROMISE, TypeHandleScrnShotPromise } from "../screenshot";
 
 @NgModule({
+  exports: [],
   imports: [
     BrowserAnimationsModule,
-    HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
     LayoutModule,
@@ -35,7 +35,6 @@ import { HANDLE_SCREENSHOT_PROMISE, TypeHandleScrnShotPromise } from "../screens
       useValue: ((param) => {
         const ngCanvas: HTMLCanvasElement = document.querySelector('#neuroglancer-container canvas')
         const threeSurferCanvas: HTMLCanvasElement = document.querySelector('three-surfer-glue-cmp canvas')
-        
         if (threeSurferCanvas) {
           const tsViewer = window['tsViewer']
           tsViewer.renderer.render(tsViewer.scene, tsViewer.camera)
@@ -47,7 +46,6 @@ import { HANDLE_SCREENSHOT_PROMISE, TypeHandleScrnShotPromise } from "../screens
         if (!canvas) {
           return Promise.reject(`element '#neuroglancer-container canvas' or 'three-surfer-glue-cmp canvas' not found`)
         }
-        
         if (!param) {
           return new Promise(rs => {
             canvas.toBlob(blob => {
@@ -91,9 +89,8 @@ import { HANDLE_SCREENSHOT_PROMISE, TypeHandleScrnShotPromise } from "../screens
           }, 'image/png')
         })
       }) as TypeHandleScrnShotPromise
-    }
-  ],
-  exports: [
+    },
+    provideHttpClient(withInterceptorsFromDi()),
   ]
 })
 

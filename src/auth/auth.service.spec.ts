@@ -1,16 +1,15 @@
-import { HttpClientTestingModule, HttpTestingController } from "@angular/common/http/testing"
+import { HttpTestingController, provideHttpClientTesting } from "@angular/common/http/testing"
 import { APP_INITIALIZER } from "@angular/core"
 import { TestBed } from "@angular/core/testing"
 import { hot } from "jasmine-marbles"
 import { AuthService } from "./auth.service"
+import { provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
 
 describe('>auth.service.ts', () => {
   describe('> AuthService', () => {
     beforeEach(() => {
       TestBed.configureTestingModule({
-        imports: [
-          HttpClientTestingModule
-        ],
+        imports: [],
         providers: [
           AuthService,
           {
@@ -20,8 +19,10 @@ describe('>auth.service.ts', () => {
               return () => Promise.resolve()
             },
             multi: true,
-            deps: [ AuthService ]
-          }
+            deps: [AuthService]
+          },
+          provideHttpClient(withInterceptorsFromDi()),
+          provideHttpClientTesting(),
         ]
       })
     })
