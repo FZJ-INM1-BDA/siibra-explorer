@@ -30,6 +30,7 @@
         <ng-template [ngTemplateOutlet]="btnTmpl" [ngTemplateOutletContext]="{
                 name: selectedAtlas.name,
                 icon: 'face',
+                category: 'species',
                 menuData: {
                     current: selectedAtlas,
                     type: 'atlasId',
@@ -46,6 +47,7 @@
         <ng-template [ngTemplateOutlet]="btnTmpl" [ngTemplateOutletContext]="{
                 name: selectedTemplate.shortName || selectedTemplate.name,
                 icon: 'view_in_ar',
+                category: 'space',
                 suffixTmpl: tmplSuffixTmpl,
                 menuData: {
                     current: selectedTemplate,
@@ -69,6 +71,11 @@
         </ng-template>
     </ng-template>
 
+    
+    <mat-divider vertical class="statsbar-vert-divider"></mat-divider>
+
+    <sxplr-nav class="sxplr-ml-2"></sxplr-nav>
+
 
     <mat-divider vertical class="statsbar-vert-divider"></mat-divider>
 
@@ -78,6 +85,7 @@
                 name: selectedParcellation.shortName || selectedParcellation.name,
                 icon: 'map',
                 suffixTmpl: parcSuffixTmpl,
+                category: 'parcellation',
                 menuData: {
                     current: selectedParcellation,
                     type: 'parcellationId',
@@ -173,7 +181,7 @@
         <ng-template [ngTemplateOutlet]="btnTmpl" [ngTemplateOutletContext]="{
             name: view.selectedRegions[0].name,
             icon: 'account_tree',
-            color: 'primary',
+            category: 'region',
             suffixTmpl: singleRegionSuffixTmpl,
             menuData: {
                 current: null,
@@ -237,6 +245,7 @@
         
         <ng-template [ngTemplateOutlet]="rawBtn"
             [ngTemplateOutletContext]="{
+                category: 'regions',
                 name: view.selectedRegions.length + ' selected regions',
                 icon: 'check_box',
                 onclick: showHierarchyBtn.onClick.bind(showHierarchyBtn),
@@ -244,24 +253,22 @@
             [sxplr-dialog]="regionHierarchyTmpl">
         </ng-template>
 
-        <button mat-icon-button
-            [matTooltip]="view.labels.COPY_REGION_NAMES"
-            [iav-clipboard-copy]="view.selectedRegions | mapToProperty : 'name' | json"
-            >
-            <mat-icon>content_copy</mat-icon>
-        </button>
-        
-        <button mat-icon-button
-            color="warn"
-            (click)="clearRoi()"
-            [matTooltip]="view.labels.CLEAR_SELECTED_REGION">
-            <mat-icon>clear</mat-icon>
-        </button>
+        <div class="tmp-icon-button-container">
+            <button mat-icon-button
+                [matTooltip]="view.labels.COPY_REGION_NAMES"
+                [iav-clipboard-copy]="view.selectedRegions | mapToProperty : 'name' | json"
+                >
+                <mat-icon>content_copy</mat-icon>
+            </button>
+            
+            <button mat-icon-button
+                color="warn"
+                (click)="clearRoi()"
+                [matTooltip]="view.labels.CLEAR_SELECTED_REGION">
+                <mat-icon>clear</mat-icon>
+            </button>
+        </div>
     </ng-template>
-
-    <mat-divider vertical class="statsbar-vert-divider sxplr-ml-2 sxplr-mr-2"></mat-divider>
-
-    <sxplr-nav></sxplr-nav>
 
 
     <mat-divider vertical class="statsbar-vert-divider sxplr-ml-2 sxplr-mr-2"></mat-divider>
@@ -328,13 +335,16 @@
             </ng-template>
         </sxplr-sapiviews-core-rich-regionlistsearch>
         
-        <button mat-icon-button
-            [sxplr-dialog]="regionHierarchyTmpl"
-            [matTooltip]="view.labels.REGION_HIERARCHY"
-            sxplr-dialog-size="xl"
-            #showHierarchyBtn="sxplrDialog">
-            <mat-icon>account_tree</mat-icon>
-        </button>
+        <div class="tmp-icon-button-container">
+
+            <button mat-icon-button
+                [sxplr-dialog]="regionHierarchyTmpl"
+                [matTooltip]="view.labels.REGION_HIERARCHY"
+                sxplr-dialog-size="xl"
+                #showHierarchyBtn="sxplrDialog">
+                <mat-icon>account_tree</mat-icon>
+            </button>
+        </div>
     </ng-template>
 
     <!-- region hierarchy tmpl -->
@@ -354,7 +364,7 @@
     </ng-template>
 
     <!-- button tmpl  -->
-    <ng-template #btnTmpl let-name="name" let-icon="icon" let-color="color" let-suffixTmpl="suffixTmpl" let-menuData="menuData">
+    <ng-template #btnTmpl let-category="category" let-name="name" let-icon="icon" let-color="color" let-suffixTmpl="suffixTmpl" let-menuData="menuData">
         <ng-template iav-media-query #media="iavMediaQuery" [ngIf]="(media.mediaBreakPoint$ | async) > 3"
             [ngIfElse]="nameBtnTmpl">
             <button mat-button
@@ -374,14 +384,15 @@
                 [matMenuTriggerData]="menuData | mergeObj : {
                     suffixTmpl: suffixTmpl
                 }">
-                {{ name }}
+                <div *ngIf="category" class="category-text">{{category}}</div>
+                <div>{{ name }}</div>
             </button>
 
         </ng-template>
     </ng-template>
 
     <!-- raw button tmpl -->
-    <ng-template #rawBtn let-name="name" let-icon="icon" let-onclick="onclick" let-color="color">
+    <ng-template #rawBtn let-category="category" let-name="name" let-icon="icon" let-onclick="onclick" let-color="color">
         <ng-template iav-media-query #media="iavMediaQuery" [ngIf]="(media.mediaBreakPoint$ | async) > 3"
             [ngIfElse]="nameBtnTmpl">
             <button mat-button [color]="color || 'default'" (click)="onclick && onclick()">
@@ -392,7 +403,8 @@
         
         <ng-template #nameBtnTmpl>
             <button mat-button (click)="onclick && onclick()">
-                {{ name }}
+                <div *ngIf="category" class="category-text">{{category}}</div>
+                <div>{{ name }}</div>
             </button>
         </ng-template>
 

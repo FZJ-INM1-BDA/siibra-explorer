@@ -52,3 +52,18 @@ section.versioned-parc-ctl
         flex: 0 1 auto;
     }
 }
+
+.category-text
+{
+    opacity: 0.5;
+    font-size: 80%;
+    text-align: start;
+}
+
+.tmp-icon-button-container
+{
+    display: inline-flex;
+    height: 0;
+    overflow: visible;
+    align-items: center;
+}

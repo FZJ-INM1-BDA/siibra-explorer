@@ -10,10 +10,10 @@
 
     <ng-template #contentTmpl>
         <ng-template [ngIf]="view.useViewer === 'nehuba'">
-            
-                <form [formGroup]="navigationCtlForm">
+                <div class="label">coordinates (mm)</div>
+                <form name="coordinate-form" [formGroup]="navigationCtlForm">
                     <ng-template ngFor [ngForOf]="['x', 'y', 'z']" let-axis>
-                        <input class="sxplr-custom-cmp input"
+                        <input class="sxplr-custom-cmp immersive-input"
                             type="text"
                             [formControlName]="axis"
                             (paste)="onPaste($event)"
@@ -26,6 +26,7 @@
     <ng-template #directTmpl>
         <ng-template [ngTemplateOutlet]="contentTmpl"></ng-template>
         <button mat-icon-button
+            class="copy-btn"
             [matTooltip]="view.labels.COPY_CURRENT_POSITION"
             [iav-clipboard-copy]="view.positionMm | addUnitAndJoin : 'mm'">
             <mat-icon>content_copy</mat-icon>

@@ -1,17 +1,40 @@
 :host
 {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
+    display: inline-grid;
+    grid-template-rows: 1.1rem 1.8rem;
+    grid-template-columns: auto auto auto auto;
 }
 
 input
 {
-    width: 6.5rem;
+    width: 4rem;
 }
 
 form
 {
     display: flex;
     flex-direction: row;
+    
+    grid-column-start: 1;
+    grid-column-end: 3;
+    grid-row-start: 2;
+}
+
+.label
+{
+    opacity: 0.5;
+    font-size: 80%;
+    letter-spacing: 1.25px;
+
+    flex: 0 0 100%;
+    grid-column-start: 1;
+    grid-column-end: 4;
+    grid-row-start: 1;
+}
+
+.copy-btn
+{
+    grid-row-start: 1;
+    grid-row-end: 3;
+    grid-column-start: 4;
 }
