@@ -10,7 +10,7 @@ import { DestroyDirective } from "src/util/directives/destroy.directive";
 import { MatAutocompleteTrigger } from "@angular/material/autocomplete";
 
 const filterRegionViaSearch = (searchTerm: string) => (region:SxplrRegion) => {
-  return region.name.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase())
+  return searchTerm.split(" ").every(term => region.name.toLocaleLowerCase().includes(term))
 }
 
 function getSortFn(searchTerm: string){
