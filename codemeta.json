@@ -100,7 +100,7 @@
         "python 3",
         "typescript"
     ],
-    "schema:releaseNotes": "# v2.14.36\n\n## Feature\n\n- (experimental): render pointcloud KDE & points from geometry service\n- allow overlay layer to be configured to show underlying segment\n",
+    "schema:releaseNotes": "# v2.14.36\n\n## Feature\n\n- (experimental): render pointcloud KDE & points from geometry service\n- allow overlay layer to be configured to show underlying segment\n- region quick search prefers region name that case matches the search term\n\n",
     "runtimePlatform": "docker",
     "version": "2.14.36",
     "contIntegration": "https://github.com/FZJ-INM1-BDA/siibra-explorer/actions",

@@ -13,6 +13,17 @@ const filterRegionViaSearch = (searchTerm: string) => (region:SxplrRegion) => {
   return region.name.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase())
 }
 
+function getSortFn(searchTerm: string){
+  return (a: SxplrRegion, b: SxplrRegion) => {
+    const aCaseMatch = a.name.includes(searchTerm)
+    const bCaseMatch = b.name.includes(searchTerm)
+    if (aCaseMatch !== bCaseMatch) {
+      return aCaseMatch ? -1 : 1
+    }
+    return a.name.localeCompare(b.name)
+  }
+}
+
 type RegionExtra = {
   extra: {
     showMore?: true
@@ -127,7 +138,9 @@ export class SapiViewsCoreRichRegionListSearch {
       } else {
         searchString = searchTerm.name
       }
-      return regions.filter(filterRegionViaSearch(searchString))
+      return regions
+        .filter(filterRegionViaSearch(searchString))
+        .sort(getSortFn(searchString))
     })
   )
 
