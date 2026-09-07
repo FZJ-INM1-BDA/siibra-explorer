@@ -1,5 +1,5 @@
 <mat-form-field
-  *ngIf="!rawflag; else rawTmpl"
+  *ngIf="!newUI; else newUITmpl"
   class="sxplr-w-100"
   subscriptSizing="dynamic"
   floatLabel="auto">
@@ -23,16 +23,21 @@
 
 </mat-form-field>
 
-<ng-template #rawTmpl>
-  <input
-    class="sxplr-custom-cmp input"
-    [placeholder]="currentSearch || 'Search for regions'"
-    #trigger="matAutocompleteTrigger"
-    type="text"
-    name="searchTerm"
-    [attr.aria-label]="ARIA_LABELS.TEXT_INPUT_SEARCH_REGION"
-    [formControl]="searchFormControl"
-    [matAutocomplete]="auto">
+<ng-template #newUITmpl>
+  <div class="new-ui-container">
+
+    <div class="label">search region</div>
+    
+    <input
+      class="sxplr-custom-cmp immersive-input"
+      [placeholder]="currentSearch || 'Search for regions'"
+      #trigger="matAutocompleteTrigger"
+      type="text"
+      name="searchTerm"
+      [attr.aria-label]="ARIA_LABELS.TEXT_INPUT_SEARCH_REGION"
+      [formControl]="searchFormControl"
+      [matAutocomplete]="auto">
+  </div>
 </ng-template>
 
 <mat-autocomplete

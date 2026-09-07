@@ -308,7 +308,7 @@
         
         <sxplr-sapiviews-core-rich-regionlistsearch
             class="sxplr-ml-2"
-            [rawflag]="true"
+            [newUI]="true"
             [sxplr-sapiviews-core-rich-regionlistsearch-regions]="view.allAvailableRegions"
             (sxplr-sapiviews-core-rich-regionlistsearch-region-select)="view.labelMappedRegionNames.includes($event.name)
             ? selectRoi($event)

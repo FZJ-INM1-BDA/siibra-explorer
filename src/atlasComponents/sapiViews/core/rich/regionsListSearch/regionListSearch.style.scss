@@ -1,0 +1,38 @@
+:host
+{
+    max-height: 36px;
+    // TODO fix hardcoded margin-top
+    margin-top:-12px;
+}
+
+.search-suffix
+{
+    display: inline-flex;
+    flex-wrap: nowrap;
+}
+
+.new-ui-container
+{
+    display: inline-grid;
+    grid-template-rows: 1.1rem 1.8rem;
+    grid-template-columns: auto auto auto auto;
+
+    &> .label
+    {
+        opacity: 0.5;
+        font-size: 80%;
+        letter-spacing: 1.25px;
+
+        flex: 0 0 100%;
+        grid-column-start: 1;
+        grid-column-end: 4;
+        grid-row-start: 1;
+    }
+
+    &> input
+    {   
+        grid-column-start: 1;
+        grid-column-end: 3;
+        grid-row-start: 2;
+    }
+}

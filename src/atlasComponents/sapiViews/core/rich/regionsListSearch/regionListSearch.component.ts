@@ -32,7 +32,7 @@ function filterGetIsNotExtra(input: SxplrRegion|string|RegionExtra): input is Sx
   selector: `sxplr-sapiviews-core-rich-regionlistsearch`,
   templateUrl: './regionListSearch.template.html',
   styleUrls: [
-    `./regionListSearch.style.css`
+    `./regionListSearch.style.scss`
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   exportAs: "sapiRegionListSearch",
@@ -44,7 +44,7 @@ function filterGetIsNotExtra(input: SxplrRegion|string|RegionExtra): input is Sx
 export class SapiViewsCoreRichRegionListSearch {
 
   @Input()
-  rawflag: boolean = false
+  newUI: boolean = false
 
   readonly #ondestroy$ = inject(DestroyDirective).destroyed$
 
