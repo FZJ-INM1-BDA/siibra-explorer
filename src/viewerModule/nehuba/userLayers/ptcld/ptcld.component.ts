@@ -2,7 +2,7 @@ import { CommonModule } from "@angular/common";
 import { Component, inject, Input } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { concat, from, of } from "rxjs";
-import { debounceTime, distinctUntilChanged, map, shareReplay, switchMap, take, takeUntil, tap } from "rxjs/operators";
+import { debounceTime, distinctUntilChanged, map, shareReplay, switchMap, takeUntil } from "rxjs/operators";
 import { AnnotationLayer, TNgAnnotationPoint } from "src/atlasComponents/annotations";
 import { IDS } from "src/atlasComponents/sapi";
 import { atlasSelection } from "src/state";

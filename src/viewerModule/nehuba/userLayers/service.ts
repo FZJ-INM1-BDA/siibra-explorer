@@ -276,7 +276,7 @@ export class UserLayerService implements OnDestroy {
           fname
         }
       },
-      cleanup: () => {},
+      cleanup: noop,
       protocol: 'precomputed://',
       url: kdeBaseUrl,
       option: {
