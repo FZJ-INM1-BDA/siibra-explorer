@@ -9,6 +9,7 @@ type NgLayerBase = {
   id: string
   clType: 'customlayer/nglayer' | 'baselayer/nglayer'
   sxplrAnnotations?: Record<string, string>
+  meta?: Record<string, any>
 } & CustomLayerBase
 
 // n.b. custom colormap *only* works if the region has color attribute defined.

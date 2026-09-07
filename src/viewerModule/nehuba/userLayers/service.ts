@@ -31,12 +31,12 @@ type Meta = {
   filename: string
   min?: number
   max?: number
-}
+} & Record<string, any>
 
 const OVERLAY_LAYER_KEY = "x-overlay-layer"
 const OVERLAY_LAYER_PROTOCOL = `${OVERLAY_LAYER_KEY}://`
 const SUPPORTED_PREFIX = ["nifti://", "precomputed://", "zarr://", "n5://", "swc://", "deepzoom://"] as const
-
+const INGSVC_PTCLD = "ingsvc-ptcld://"
 type ValidProtocol = typeof SUPPORTED_PREFIX[number]
 type ValidInputTypes = File|string
 
@@ -229,8 +229,6 @@ export class UserLayerService implements OnDestroy {
         }
       }
 
-      console.log(splitAcc.length)
-
       const id = "csv-layer-annot"
     
       const layer = new AnnotationLayer("csv-layer-annot")
@@ -254,6 +252,46 @@ export class UserLayerService implements OnDestroy {
       throw e
     }
   }
+
+  @RegisterSource(
+    async input => typeof input === "string" && input.startsWith(INGSVC_PTCLD)
+  )
+  async processIngSvcPtCld(input: string){
+
+    const GEOMSVC_HOST = "https://geom-svc.apps.ebrains.eu"
+    const trimmedInput = input.slice(INGSVC_PTCLD.length)
+    
+    const [ bucketname, ...fnames ] = trimmedInput.split("/")
+    const fname = fnames.join("/")
+    
+    const kdeBaseUrl = `${GEOMSVC_HOST}/ptcld/${bucketname}/${fname}/kde`
+
+    const meta = await (await fetch(`${kdeBaseUrl}/meta.json`)).json()
+    
+    return {
+      meta: {
+        filename: `ebrains object ${bucketname}/${fname}`,
+        ptcld: {
+          bucketname,
+          fname
+        }
+      },
+      cleanup: () => {},
+      protocol: 'precomputed://',
+      url: kdeBaseUrl,
+      option: {
+        legacySpecFlag: "old",
+        shader: getShader({ colormap: "magma" }),
+        type: "image",
+        transform: meta.transform
+      }
+    }
+  }
+  /**
+   * 
+   * http://localhost:8080/#/a:juelich:iav:atlas:v1.0.0:2/t:minds:core:referencespace:v1.0.0:265d32a0-3d84-40a5-926f-bf89f68212b9/p:minds:core:parcellationatlas:v1.0.0:05655b58-3b6f-49db-b285-64b5a0276f83/@:0.0.0.-W000.._eCwg.2-FUe3._-s_W.2_evlu..kxW..7jaA.6VrJ.4cDd~..5Bj/vs:v2-ff011b0b/x-overlay-layer:ingsvc-ptcld:%2F%2Ftest-sept-22%2F2026-09-02-ptcld-test
+   * ingsvc-ptcld:%2F%2Ftest-sept-22%2F2026-09-02-ptcld-test
+   */
 
   @RegisterSource(
     async input => typeof input === "string" && input.startsWith(OVERLAY_LAYER_PROTOCOL)
@@ -337,6 +375,7 @@ export class UserLayerService implements OnDestroy {
         transform: meta?.transform || transform,
         shader: getShaderFromMeta(meta),
         opacity: getOpacityFromMeta(meta),
+        meta,
       },
       protocol,
       url,

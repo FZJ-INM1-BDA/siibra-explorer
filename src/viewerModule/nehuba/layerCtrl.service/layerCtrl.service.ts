@@ -241,7 +241,15 @@ export class NehubaLayerControlService implements OnDestroy{
      * if layer contains non mixable layer
      */
     this.customLayers$.pipe(
-      map(layers => layers.filter(l => l.clType === "customlayer/nglayer").length > 0),
+      map(layers => {
+        const nonMixableLayers = layers
+          .filter(l => (
+            l.clType === "customlayer/nglayer"
+            // check translateV3.ts, as it overrides meta.json
+            && !(l.meta?.['https://schema.brainatlas.eu/github/fzj-inm1-bda/siibra-explorer']?.['RFC_showParcellation'])
+          ))
+        return nonMixableLayers.length > 0
+      }),
     ),
   ]).pipe(
     switchMap(( [ selectedRegions, customMapExists, nonmixableLayerExists ] ) => this.completeNgIdLabelRegionMap$.pipe(
