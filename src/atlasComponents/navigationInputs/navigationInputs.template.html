@@ -10,16 +10,27 @@
 
     <ng-template #contentTmpl>
         <ng-template [ngIf]="view.useViewer === 'nehuba'">
-                <div class="label">coordinates (mm)</div>
-                <form name="coordinate-form" [formGroup]="navigationCtlForm">
-                    <ng-template ngFor [ngForOf]="['x', 'y', 'z']" let-axis>
-                        <input class="sxplr-custom-cmp immersive-input"
-                            type="text"
-                            [formControlName]="axis"
-                            (paste)="onPaste($event)"
-                            sxplr-on-focus-select>
-                    </ng-template>
-                </form>
+            <div class="label">
+                <ng-template sxplrExperimentalFlag [experimental]="false">
+                coordinates (mm)
+                </ng-template>
+            </div>
+            
+            <form name="coordinate-form" [formGroup]="navigationCtlForm">
+                <ng-template ngFor [ngForOf]="['x', 'y', 'z']" let-axis>
+                    <input class="sxplr-custom-cmp immersive-input"
+                        type="text"
+                        [formControlName]="axis"
+                        (paste)="onPaste($event)"
+                        sxplr-on-focus-select>
+                </ng-template>
+            </form>
+
+            <ng-template sxplrExperimentalFlag [experimental]="true">
+            <span class="text-muted">
+                mm
+            </span>
+            </ng-template>
         </ng-template>
     </ng-template>
 

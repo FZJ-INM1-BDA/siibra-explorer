@@ -157,9 +157,7 @@
 <!-- top left -->
 <!-- default top left -->
 <ng-template #defaultMainContentTopLeft let-view="view">
-  <ng-template sxplrExperimentalFlag [experimental]="true">
   <sxplr-status-bar *ngIf="viewerLoaded" halfmode="top" class="pe-all"></sxplr-status-bar>
-  </ng-template>
 </ng-template>
 
 
@@ -424,9 +422,7 @@
 <!-- top right -->
 <!-- default top right -->
 <ng-template #minDefaultMainContentTopRight>
-  <ng-template sxplrExperimentalFlag [experimental]="true">
   <top-menu-cmp *ngIf="viewerLoaded" [ismobile]="(media.mediaBreakPoint$ | async) > 3"></top-menu-cmp>
-  </ng-template>
 </ng-template>
 
 <!-- viewer tmpl -->

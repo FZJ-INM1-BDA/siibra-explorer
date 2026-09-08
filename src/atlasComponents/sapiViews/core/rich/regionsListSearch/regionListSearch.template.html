@@ -25,18 +25,35 @@
 
 <ng-template #newUITmpl>
   <div class="new-ui-container">
-
-    <div class="label">search region</div>
+    <div class="label">
+      <ng-template sxplrExperimentalFlag [experimental]="false">
+      search region
+      </ng-template>
+    </div>
     
+    <ng-template sxplrExperimentalFlag [experimental]="true">
     <input
       class="sxplr-custom-cmp immersive-input"
-      [placeholder]="currentSearch || 'Search for regions'"
+      [placeholder]="currentSearch || 'quick search (e.g. v1)'"
       #trigger="matAutocompleteTrigger"
       type="text"
       name="searchTerm"
       [attr.aria-label]="ARIA_LABELS.TEXT_INPUT_SEARCH_REGION"
       [formControl]="searchFormControl"
       [matAutocomplete]="auto">
+    </ng-template>
+    
+    <ng-template sxplrExperimentalFlag [experimental]="false">
+    <input
+      class="sxplr-custom-cmp immersive-input"
+      [placeholder]="currentSearch || 'e.g. v1'"
+      #trigger="matAutocompleteTrigger"
+      type="text"
+      name="searchTerm"
+      [attr.aria-label]="ARIA_LABELS.TEXT_INPUT_SEARCH_REGION"
+      [formControl]="searchFormControl"
+      [matAutocomplete]="auto">
+    </ng-template>
   </div>
 </ng-template>
 

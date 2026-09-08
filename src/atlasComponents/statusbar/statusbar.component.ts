@@ -27,6 +27,7 @@ import { ViewerModeDirective } from "src/util/directives/viewmode.directive";
 import { AllVersionsParcs } from "../sapiViews/core/parcellation/allVersions.pipe";
 import { DestroyDirective } from "src/util/directives/destroy.directive";
 import { OnlyShowNewestParc } from "../sapiViews/core/parcellation/onlyShowNewest.pipe";
+import { AtlasViewerRouterModule } from "src/routerModule";
 
 const allVersionsPipe = new AllVersionsParcs()
 const onlyShowNewestPipe = new OnlyShowNewestParc()
@@ -56,7 +57,8 @@ const onlyShowNewestPipe = new OnlyShowNewestParc()
     ExperimentalFlagDirective,
     ScreenshotModule,
     ViewerModeDirective,
-  ],
+    AtlasViewerRouterModule
+],
   hostDirectives: [
     AvailableATPDirective,
     DestroyDirective,

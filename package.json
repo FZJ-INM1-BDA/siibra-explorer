@@ -65,7 +65,7 @@
     "raw-loader": "^4.0.2",
     "rxjs": "~6.6.0",
     "showdown": "^2.0.0",
-    "three-surfer": "0.0.18",
+    "three-surfer": "^0.0.19",
     "tslib": "^2.3.0",
     "zone.js": "^0.14.10"
   }

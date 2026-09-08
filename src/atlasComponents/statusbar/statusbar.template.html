@@ -1,5 +1,5 @@
 <ng-template [ngIf]="view$ | async" let-view>
-    <ng-template sxplrExperimentalFlag [experimental]="halfmode === 'top'">
+    <ng-template [ngIf]="halfmode === 'top'">
     <button mat-icon-button
         [color]="(viewMode.viewerMode$ | async) === 'focusview:feature' ? 'primary': 'default'"
         sxplr-view-mode="toggle"
@@ -71,11 +71,7 @@
         </ng-template>
     </ng-template>
 
-    
-    <mat-divider vertical class="statsbar-vert-divider"></mat-divider>
-
     <sxplr-nav class="sxplr-ml-2"></sxplr-nav>
-
 
     <mat-divider vertical class="statsbar-vert-divider"></mat-divider>
 
@@ -152,9 +148,9 @@
         </ng-template>
     </ng-template>
 
-    <mat-divider vertical class="statsbar-vert-divider"></mat-divider>
-
     <!-- region(s) -->
+
+    <div class="spacer sxplr-ml-2"></div>
     
     <ng-template [ngIf]="view.selectedRegions.length == 0">
         <ng-template iav-media-query #media="iavMediaQuery"
@@ -178,10 +174,10 @@
     </ng-template>
     
     <ng-template [ngIf]="view.selectedRegions.length == 1">
+        <ng-template sxplrExperimentalFlag [experimental]="true">
         <ng-template [ngTemplateOutlet]="btnTmpl" [ngTemplateOutletContext]="{
             name: view.selectedRegions[0].name,
             icon: 'account_tree',
-            category: 'region',
             suffixTmpl: singleRegionSuffixTmpl,
             menuData: {
                 current: null,
@@ -189,8 +185,24 @@
                 options: []
             }
         }">
-
         </ng-template>
+        </ng-template>
+        
+        <ng-template sxplrExperimentalFlag [experimental]="false">
+        <ng-template [ngTemplateOutlet]="btnTmpl" [ngTemplateOutletContext]="{
+            name: view.selectedRegions[0].name,
+            category: 'region',
+            icon: 'account_tree',
+            suffixTmpl: singleRegionSuffixTmpl,
+            menuData: {
+                current: null,
+                type: null,
+                options: []
+            }
+        }">
+        </ng-template>
+        </ng-template>
+
         <ng-template #singleRegionSuffixTmpl>
             <div sxplr-sapiviews-core-region
                 class="vbc-row-fixed"
@@ -243,17 +255,11 @@
 
     <ng-template [ngIf]="view.selectedRegions.length > 1">
         
-        <ng-template [ngTemplateOutlet]="rawBtn"
-            [ngTemplateOutletContext]="{
-                category: 'regions',
-                name: view.selectedRegions.length + ' selected regions',
-                icon: 'check_box',
-                onclick: showHierarchyBtn.onClick.bind(showHierarchyBtn),
-            }"
-            [sxplr-dialog]="regionHierarchyTmpl">
-        </ng-template>
+        <ng-template #multiRegionSuffixTmpl>
+            <button mat-icon-button [sxplr-dialog]="regionHierarchyTmpl">
+                <mat-icon>account_tree</mat-icon>
+            </button>
 
-        <div class="tmp-icon-button-container">
             <button mat-icon-button
                 [matTooltip]="view.labels.COPY_REGION_NAMES"
                 [iav-clipboard-copy]="view.selectedRegions | mapToProperty : 'name' | json"
@@ -267,16 +273,43 @@
                 [matTooltip]="view.labels.CLEAR_SELECTED_REGION">
                 <mat-icon>clear</mat-icon>
             </button>
-        </div>
+        </ng-template>
+
+        
+        <ng-template sxplrExperimentalFlag [experimental]="true">
+        <ng-template  [ngTemplateOutlet]="btnTmpl" [ngTemplateOutletContext]="{
+            name: '(' + view.selectedRegions.length + ' selected regions)',
+            icon: 'account_tree',
+            suffixTmpl: multiRegionSuffixTmpl,
+            menuData: {
+                current: null,
+                type: null,
+                options: []
+            }
+        }">
+        </ng-template>
+
+        </ng-template>
+        
+        <ng-template sxplrExperimentalFlag [experimental]="false">
+        <ng-template  [ngTemplateOutlet]="btnTmpl" [ngTemplateOutletContext]="{
+            name: '(' + view.selectedRegions.length + ' selected regions)',
+            category: 'regions',
+            icon: 'account_tree',
+            suffixTmpl: multiRegionSuffixTmpl,
+            menuData: {
+                current: null,
+                type: null,
+                options: []
+            }
+        }">
+        </ng-template>
+        </ng-template>
+
     </ng-template>
 
 
     <mat-divider vertical class="statsbar-vert-divider sxplr-ml-2 sxplr-mr-2"></mat-divider>
-    </ng-template>
-
-    <ng-template sxplrExperimentalFlag [experimental]="false">
-    <div class="spacer"></div>
-    <top-menu-cmp [rawflag]="true"></top-menu-cmp>
     </ng-template>
 
     <!-- end structural htmls -->
@@ -384,7 +417,7 @@
                 [matMenuTriggerData]="menuData | mergeObj : {
                     suffixTmpl: suffixTmpl
                 }">
-                <div *ngIf="category" class="category-text">{{category}}</div>
+                <div class="category-text">{{category || '&nbsp;'}}</div>
                 <div>{{ name }}</div>
             </button>
 
@@ -403,7 +436,7 @@
         
         <ng-template #nameBtnTmpl>
             <button mat-button (click)="onclick && onclick()">
-                <div *ngIf="category" class="category-text">{{category}}</div>
+                <div class="category-text">{{category||'&nbsp;'}}</div>
                 <div>{{ name }}</div>
             </button>
         </ng-template>
@@ -509,8 +542,6 @@
         </ng-template>
     </mat-menu>
 </ng-template>
-
-
 
 
 <mat-menu #shareMenu="matMenu">

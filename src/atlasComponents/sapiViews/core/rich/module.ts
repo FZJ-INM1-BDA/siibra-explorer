@@ -11,6 +11,7 @@ import { SapiViewsCoreRichRegionsHierarchy } from "./regionsHierarchy/regionsHie
 import { SapiViewsCoreRichRegionListSearch } from "./regionsListSearch/regionListSearch.component";
 import { SapiViewsCoreRichRegionListTemplateDirective } from "./regionsListSearch/regionListSearchTmpl.directive";
 import { DialogModule } from "src/ui/dialogInfo";
+import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.directive";
 
 @NgModule({
   imports: [
@@ -22,6 +23,7 @@ import { DialogModule } from "src/ui/dialogInfo";
     SapiViewsUtilModule,
     UtilModule,
     DialogModule,
+    ExperimentalFlagDirective,
   ],
   declarations: [
     SapiViewsCoreRichRegionListSearch,

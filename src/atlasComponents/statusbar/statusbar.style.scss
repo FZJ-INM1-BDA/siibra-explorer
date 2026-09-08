@@ -32,10 +32,6 @@ sxplr-sapiviews-core-rich-regionshierarchy
     padding: 0 0 0.4rem 0;
 }
 
-.spacer
-{
-    flex: 1 1 0;
-}
 
 section.versioned-parc-ctl
 {
@@ -66,4 +62,16 @@ section.versioned-parc-ctl
     height: 0;
     overflow: visible;
     align-items: center;
+}
+
+sxplr-sapiviews-core-rich-regionlistsearch
+{
+    min-width: 16rem;
+}
+
+
+.spacer
+{
+    display: inline-block;
+    width: 0;
 }

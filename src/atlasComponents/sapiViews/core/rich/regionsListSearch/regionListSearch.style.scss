@@ -14,8 +14,8 @@
 .new-ui-container
 {
     display: inline-grid;
-    grid-template-rows: 1.1rem 1.8rem;
-    grid-template-columns: auto auto auto auto;
+    grid-template-rows: 1.25rem 1.75rem;
+    grid-template-columns: auto auto auto auto auto;
 
     &> .label
     {
@@ -25,14 +25,14 @@
 
         flex: 0 0 100%;
         grid-column-start: 1;
-        grid-column-end: 4;
+        grid-column-end: 5;
         grid-row-start: 1;
     }
 
     &> input
     {   
         grid-column-start: 1;
-        grid-column-end: 3;
+        grid-column-end: 5;
         grid-row-start: 2;
     }
 }
