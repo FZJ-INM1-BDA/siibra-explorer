@@ -10,6 +10,7 @@ import { AngularMaterialModule } from "src/sharedModules";
 import { IconComponent } from "src/sharedModules/icon";
 import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.directive";
 import { PtcldUI } from "../ptcld/ptcld.component";
+import { FiberUI } from "../fiber/fiber.component";
 
 export type UserLayerInfoData = {
   layerName: string
@@ -35,6 +36,7 @@ export type UserLayerInfoData = {
     IconComponent,
     ExperimentalFlagDirective,
     PtcldUI,
+    FiberUI,
   ],
   schemas: [
     CUSTOM_ELEMENTS_SCHEMA,

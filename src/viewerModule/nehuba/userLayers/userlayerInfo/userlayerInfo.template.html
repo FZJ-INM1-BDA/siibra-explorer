@@ -1,3 +1,4 @@
+<ng-template [ngIf]="!data.meta!.fiber">
 <ng-template [ngIf]="view$ | async" [ngIfElse]="spinnerTmpl" let-view>
 
   <div class="sxplr-d-flex sxplr-custom-cmp">
@@ -68,6 +69,7 @@
     </ul>
   </ng-template>
 </ng-template>
+</ng-template>
 
 <ng-template #spinnerTmpl>
   <div>
@@ -81,6 +83,16 @@
     [bucketname]="ptcld.bucketname"
     [fname]="ptcld.fname">
   </ptcld-ui>
+</ng-template>
+</ng-template>
+
+<ng-template sxplrExperimentalFlag [experimental]="true">
+<ng-template [ngIf]="data.meta?.fiber" let-fiber>
+  <geomsvc-fiber
+    [bucketname]="fiber.bucketname"
+    [fname]="fiber.fname"
+    >
+  </geomsvc-fiber>
 </ng-template>
 </ng-template>
 

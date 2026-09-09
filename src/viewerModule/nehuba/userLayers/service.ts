@@ -37,6 +37,7 @@ const OVERLAY_LAYER_KEY = "x-overlay-layer"
 const OVERLAY_LAYER_PROTOCOL = `${OVERLAY_LAYER_KEY}://`
 const SUPPORTED_PREFIX = ["nifti://", "precomputed://", "zarr://", "n5://", "swc://", "deepzoom://"] as const
 const INGSVC_PTCLD = "ingsvc-ptcld://"
+const INGSVC_FIBER = "ingsvc-fiber://"
 type ValidProtocol = typeof SUPPORTED_PREFIX[number]
 type ValidInputTypes = File|string
 
@@ -250,6 +251,26 @@ export class UserLayerService implements OnDestroy {
     } catch (e) {
       console.log("error", e)
       throw e
+    }
+  }
+
+  
+  @RegisterSource(
+    async input => typeof input === "string" && input.startsWith(INGSVC_FIBER)
+  )
+  async processIngSvcFiber(input: string){
+    
+    const trimmedInput = input.slice(INGSVC_FIBER.length)
+    
+    const [ bucketname, ...fnames ] = trimmedInput.split("/")
+    const fname = fnames.join("/")
+    
+    return {
+      meta: {
+        filename: `fiber`,
+        fiber: { bucketname, fname }
+      },
+      cleanup: noop,
     }
   }
 
