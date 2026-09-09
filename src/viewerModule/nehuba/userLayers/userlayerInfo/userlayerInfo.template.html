@@ -77,23 +77,19 @@
   </div>
 </ng-template>
 
-<ng-template sxplrExperimentalFlag [experimental]="true">
 <ng-template [ngIf]="data.meta?.ptcld" let-ptcld>
   <ptcld-ui
     [bucketname]="ptcld.bucketname"
     [fname]="ptcld.fname">
   </ptcld-ui>
 </ng-template>
-</ng-template>
 
-<ng-template sxplrExperimentalFlag [experimental]="true">
 <ng-template [ngIf]="data.meta?.fiber" let-fiber>
   <geomsvc-fiber
     [bucketname]="fiber.bucketname"
     [fname]="fiber.fname"
     >
   </geomsvc-fiber>
-</ng-template>
 </ng-template>
 
 <ng-template #ngLayerController let-onlyOpacity="onlyOpacity">
