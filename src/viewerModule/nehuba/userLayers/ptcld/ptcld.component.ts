@@ -56,10 +56,7 @@ export class PtcldUI {
     }
   }
 
-  #annLayer = AnnotationLayer.Get(
-    PTCLD_CONST,
-    "#ffcc00"
-  )
+  #annLayer: AnnotationLayer|undefined
 
   #currAnnotIds: string[] = []
 
@@ -122,12 +119,6 @@ export class PtcldUI {
       if (typeof count !== "number") {
         return
       }
-
-      // cleanup
-      for (const id of this.#currAnnotIds){
-        await this.#annLayer?.removeAnnotation({id})
-      }
-      this.#currAnnotIds = []
       
       
       if (!count) {
@@ -145,6 +136,14 @@ export class PtcldUI {
       url.searchParams.set("bbox_min", vp.minpoint.join(","))
       url.searchParams.set("bbox_max", vp.maxpoint.join(","))
       const arrOfArr = await (await fetch(url)).arrayBuffer()
+      
+      // cleanup
+      this.#annLayer?.dispose()
+      this.#annLayer = AnnotationLayer.Get(
+        PTCLD_CONST,
+        "#ffcc00"
+      )
+
       const f32arr = new Float32Array(arrOfArr)
 
       if (f32arr.length % 3 !== 0) {
@@ -168,7 +167,6 @@ export class PtcldUI {
         annots.push(pt)
       }
 
-      this.#currAnnotIds = annots.map(v => v.id)
       await this.#annLayer?.addAnnotation(annots)
       
     })
