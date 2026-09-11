@@ -4,7 +4,6 @@ import { StopPropagationDirective } from "./directives/stopPropagation.directive
 import { SafeResourcePipe } from "./pipes/safeResource.pipe";
 import { CaptureClickListenerDirective } from "./directives/captureClickListener.directive";
 import { NmToMm } from "./pipes/nmToMm.pipe";
-import { SwitchDirective } from "./directives/switch.directive";
 import { LayoutModule } from "@angular/cdk/layout";
 import { MapToPropertyPipe } from "./pipes/mapToProperty.pipe";
 import { ClickOutsideDirective } from "src/util/directives/clickOutside.directive";
@@ -38,7 +37,6 @@ import { ConcatPipe } from "./pipes/concat.pipe";
     SafeResourcePipe,
     CaptureClickListenerDirective,
     NmToMm,
-    SwitchDirective,
     MapToPropertyPipe,
     ClickOutsideDirective,
     GetNthElementPipe,
@@ -63,7 +61,6 @@ import { ConcatPipe } from "./pipes/concat.pipe";
     SafeResourcePipe,
     CaptureClickListenerDirective,
     NmToMm,
-    SwitchDirective,
     MapToPropertyPipe,
     ClickOutsideDirective,
     GetNthElementPipe,

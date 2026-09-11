@@ -16,7 +16,7 @@ import { SANDS_TYPE, TFace, TSandsPoint, getCoord, isSandsPoint } from "src/util
 import { DestroyDirective } from "src/util/directives/destroy.directive";
 import { generalActionError } from "src/state/actions";
 import { enLabels } from "src/uiLabels";
-import { MatDialog, MatDialogRef, MatSnackBar } from "src/sharedModules";
+import { MatDialog, MatSnackBar } from "src/sharedModules";
 import { ModularUserAnnotationToolService } from "src/atlasComponents/userAnnotations/tools/service";
 import { Point } from "src/atlasComponents/userAnnotations/tools/point";
 import { DoiTemplate } from "src/ui/doi/doi.component";
@@ -460,31 +460,6 @@ export class ViewerCmp {
       this.ctxMenuSvc.deregister(cb)
     })
 
-    let openFeatureDialog: () => MatDialogRef<any> = null
-
-    this.store$.pipe(
-      select(userInteraction.selectors.selectedFeature),
-      distinctUntilChanged((o, n) => o?.id === n?.id),
-    ).subscribe(feature => {
-      if (!!openFeatureDialog) {
-        this.dialogSvc.deregisterAndCloseRestorableDialog(openFeatureDialog)
-        openFeatureDialog = null
-      }
-      
-      if (!!feature){
-        openFeatureDialog = () => this.dialog.open(this.focusFeatureDialog, {
-          data: {
-            feature
-          },
-          width: '75vw',
-          maxHeight: '90vh',
-        })
-        this.dialogSvc.registerAndOpenRestorableDialog(
-          openFeatureDialog,
-          () => this.clearShownFeature()
-        )
-      }
-    })
 
     this.store$.pipe(
       select(atlasSelection.selectors.viewerMode)

@@ -20,6 +20,7 @@ import { AtlasDownloadModule } from "src/atlas-download/atlas-download.module";
 import { ShareModule } from "src/share";
 import { SxplrWarningsDirective } from "../warnings/warnings.directive";
 import { SxplrTriggers } from "src/util/directives/trigger.directive";
+import { StopPropagationSADirective } from "src/util/directives/stopPropagation.standalone.directive";
 
 
 @NgModule({
@@ -44,7 +45,8 @@ import { SxplrTriggers } from "src/util/directives/trigger.directive";
     ShareModule,
     SxplrWarningsDirective,
     SxplrTriggers,
-  ],
+    StopPropagationSADirective
+],
   declarations: [
     TopMenuCmp
   ],

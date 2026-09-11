@@ -1,0 +1,182 @@
+<section class="nav-bar">
+    <button mat-icon-button
+        class="sxplr-pe-all"
+        sxplr-switch
+        #searchSwitch="sxplrSwitch"
+        [color]="(searchSwitch.switchState$ | async) ? 'primary' : 'default'"
+        (click)="searchSwitch.toggle()"
+        >
+        <mat-icon>search</mat-icon>
+    </button>
+    <button mat-icon-button
+        class="sxplr-pe-all"
+        sxplr-switch
+        #drawSwitch="sxplrSwitch"
+        [color]="(drawSwitch.switchState$ | async) ? 'primary' : 'default'"
+        (click)="drawSwitch.toggle()"
+        >
+        <mat-icon>draw</mat-icon>
+    </button>
+    <button mat-icon-button
+        class="sxplr-pe-all"
+        [matMenuTriggerFor]="shareMenu">
+        <mat-icon>share</mat-icon>
+    </button>
+    <button mat-icon-button
+        class="sxplr-pe-all"
+        [matMenuTriggerFor]="toolMenu">
+        <mat-icon>widgets</mat-icon>
+    </button>
+
+    <div class="collapser sxplr-pe-none"
+        [ngClass]="{
+            'collapsed': bannerCollapsed.switchState$ | async
+        }">
+
+        <button mat-raised-button
+            sxplr-switch
+            #bannerCollapsed="sxplrSwitch"
+            class="sxplr-pe-all"
+            color="primary"
+            (click)="bannerCollapsed.toggle()">
+            <mat-icon>{{ (bannerCollapsed.switchState$ | async) ? 'chevron_right' : 'chevron_left'}}</mat-icon>
+        </button>
+    </div>
+    
+
+</section>
+
+<section class="content"
+    [ngClass]="{
+        'collapsed': bannerCollapsed.switchState$ | async
+    }">
+    
+
+    <ng-template [ngIf]="view$ | async" let-view>
+        <section *ngIf="view.selectedFeature" class="sxplr-pe-all mat-elevation-z4 my-card sxplr-custom-cmp bg">
+            <h5>
+                <span>Feature</span>
+                
+                <button mat-icon-button
+                    color="warn"
+                    (click)="clearSelectedFeature()">
+                    <mat-icon>close</mat-icon>
+                </button>
+            </h5>
+            
+            <mat-divider></mat-divider>
+            
+            <sxplr-feature-simple-single  [feature]="view.selectedFeature"></sxplr-feature-simple-single>
+        </section>
+    </ng-template>
+
+    <ng-template [ngIf]="searchSwitch.switchState$ | async">
+        <section class="sxplr-pe-all mat-elevation-z4 my-card sxplr-custom-cmp bg">
+            <h5>
+                <span>Finding</span>
+                
+                <button mat-icon-button
+                    color="warn"
+                    (click)="searchSwitch.close()">
+                    <mat-icon>close</mat-icon>
+                </button>
+            </h5>
+
+            <mat-divider></mat-divider>
+
+            <ng-template [ngIf]="view$ | async" let-view>
+                <feature-combined-view
+                    [atlas]="view.selectedAtlas"
+                    [tprb]="{
+                    template: view.selectedTemplate,
+                    parcellation: view.selectedParcellation,
+                    region: view.selectedRegions.length == 1 ? view.selectedRegions[0] : null,
+                    bbox: view.currentViewport && [view.currentViewport.minpoint, view.currentViewport.maxpoint],
+                    point: view.currentViewport && view.currentViewport.center
+                    }">
+                </feature-combined-view>
+            </ng-template>
+        </section>
+    </ng-template>
+
+    <ng-template [ngIf]="drawSwitch.switchState$ | async">
+        <section class="sxplr-pe-all mat-elevation-z4 my-card sxplr-custom-cmp bg">
+            <h5>
+                <span>Annotating</span>
+                
+                <button mat-icon-button
+                    color="warn"
+                    (click)="drawSwitch.close()">
+                    <mat-icon>close</mat-icon>
+                </button>
+            </h5>
+            <mat-divider></mat-divider>
+            <sxplr-annotate></sxplr-annotate>
+        </section>
+    </ng-template>
+</section>
+
+ 
+<mat-menu #shareMenu="matMenu">
+    <mat-action-list>
+        <button mat-list-item
+            screenshot-switch>
+            <mat-icon matListItemIcon>screenshot_monitor</mat-icon>
+            <span matListItemTitle>Screenshot part/all of this view</span>
+        </button>
+        <button mat-list-item
+            sxplr-stop="click mousedown mouseup"
+            sxplrAtlasDownload
+            #dl="atlasDlDct"
+            [disabled]="(dl.busy$ | async)"
+            >
+            <mat-icon matListItemIcon
+                [ngClass]="{
+                    'spinning': dl.busy$ | async
+                }">
+                {{ (dl.busy$ | async) ? 'loop' : 'download' }}
+            </mat-icon>
+            <span matListItemTitle>Download this view</span>
+        </button>
+        <button mat-list-item
+            sxplr-stop="click mousedown mouseup"
+            iav-clipboard-copy>
+            <mat-icon matListItemIcon>content_copy</mat-icon>
+            <span matListItemTitle>Copy link to this view</span>
+        </button>
+        <button mat-list-item
+            [sxplr-dialog]="saneUrlTmpl"
+            iav-state-aggregator
+            #stateAggregator="iavStateAggregator">
+            <mat-icon matListItemIcon>link</mat-icon>
+            <span matListItemTitle>Create shortlink of this view</span>
+        </button>
+        
+        <ng-template #saneUrlTmpl>
+            <mat-dialog-content>
+                <iav-sane-url [stateTobeSaved]="stateAggregator.jsonifiedState$ | async">
+                </iav-sane-url>
+            </mat-dialog-content>
+        </ng-template>
+    </mat-action-list>
+</mat-menu>
+
+<mat-menu #toolMenu="matMenu">
+
+    <ng-template sxplrExperimentalFlag [experimental]="true">
+    <mat-action-list>
+        <button mat-list-item
+            sxplr-view-mode="toggle"
+            sxplr-view-mode-target="key frame"
+            [matTooltip]="'Animate viewer state between keyframes'">
+            <mat-icon matListItemIcon>play_arrow</mat-icon>
+            <span matListItemTitle>
+                KeyFrames
+            </span>
+        </button>
+    </mat-action-list>
+    <mat-divider></mat-divider>
+    </ng-template>
+
+    <plugin-banner></plugin-banner>
+</mat-menu>

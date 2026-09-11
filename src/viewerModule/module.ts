@@ -51,6 +51,7 @@ import { AnnotateCmp } from "src/ui/annotate/annotate.component";
 import { ViewerModeDirective } from "src/util/directives/viewmode.directive";
 import { TopMenuModule } from "src/ui/topMenu/module";
 import { FeatureCombinedViewCmp } from "src/features/combinedView/combinedView.component";
+import { ToolbarCmp } from "src/atlasComponents/toolbar/toolbar.component";
 
 @NgModule({
   imports: [
@@ -87,6 +88,7 @@ import { FeatureCombinedViewCmp } from "src/features/combinedView/combinedView.c
     AvailableATPDirective,
     NeighbourOverlay,
     StatusbarCmp,
+    ToolbarCmp,
     AnnotateCmp,
     ViewerModeDirective,
     TopMenuModule,

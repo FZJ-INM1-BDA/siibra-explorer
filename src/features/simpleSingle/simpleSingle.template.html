@@ -1,0 +1,147 @@
+<ng-template [ngIf]="view$ | async" let-view [ngIfElse]="loadingTmpl">
+    <section class="content">
+        <h6>
+            {{ view.name }}
+        </h6>
+    </section>
+
+    <mat-divider></mat-divider>
+
+    <mat-tab-group *ngIf="view.plotly || view.voi" class="feature-body">
+        <mat-tab *ngIf="view.plotly; let plotly" label="Visualization">
+            <ng-template matTabContent>
+                <sxplr-plotly-component
+                    (plotly-label-clicked)="navigateToRegionByName($event)"
+                    [plotly-json]="plotly">
+                </sxplr-plotly-component>
+            </ng-template>
+        </mat-tab>
+        <mat-tab *ngIf="view.voi; let voi" label="Volume Control">
+            
+            
+            <ng-layer-ctl
+                [ng-layer-ctl-name]="voi.ngVolume.url"
+                [ng-layer-ctl-format]="voi.ngVolume.format"
+                [ng-layer-ctl-src]="voi.ngVolume.url"
+                [ng-layer-ctl-transform]="voi.ngVolume.transform"
+                [ng-layer-ctl-info]="voi.ngVolume.info"
+                [ng-layer-ctl-opacity]="1.0"
+                [ng-layer-ctl-meta]="voi.ngVolume.meta"
+                [ng-layer-ctl-show]="true">
+            </ng-layer-ctl>
+
+            <mat-form-field class="flex-grow-3">
+                <mat-label>
+                    Visualize with a model
+                </mat-label>
+                <mat-select #vizSelect="matSelect">
+                    <mat-option disabled selected>Select a model</mat-option>
+                    <mat-option
+                        *ngFor="let aVoi of view.additionalVois"
+                        [value]="aVoi.id">
+                        {{ aVoi.name }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+
+                  
+            <ng-template ngFor [ngForOf]="view.additionalVois" let-aVoi>
+                <ng-template [ngIf]="aVoi.id === vizSelect.value">
+                    <button mat-icon-button
+                        [matTooltip]="labels.DETAILS"
+                        [sxplr-dialog]="DoiTemplate"
+                        [sxplr-dialog-size]="null"
+                        [sxplr-dialog-data]="{
+                            title: aVoi.name,
+                            desc: aVoi.desc,
+                            contributors: aVoi.contributors | dedup, 
+                            actions: aVoi.link | mapToProperty : 'href' | dedup
+                        }">
+                        <mat-icon>info</mat-icon>
+                    </button>
+                </ng-template>
+            </ng-template>
+            <button mat-icon-button color="warn"
+                (click)="vizSelect.value = null"
+                [disabled]="!vizSelect.value">
+                <mat-icon>clear</mat-icon>
+            </button>
+                  
+            <ng-template ngFor [ngForOf]="view.additionalVois" let-aVoi>
+                <ng-template [ngIf]="aVoi.id === vizSelect.value">
+                    <mat-divider></mat-divider>
+                    <ng-layer-ctl
+                        [ng-layer-ctl-name]="SXPLR_PREFIX + aVoi.ngVolume.url"
+                        [ng-layer-ctl-src]="aVoi.ngVolume.url"
+                        [ng-layer-ctl-transform]="aVoi.ngVolume.transform"
+                        [ng-layer-ctl-meta]="aVoi.ngVolume.meta"
+                        [ng-layer-ctl-insert-index]="aVoi.ngVolume.insertIndex"
+                        [ng-layer-ctl-opacity]="1.0">
+                    </ng-layer-ctl>
+                </ng-template>
+            </ng-template>
+        </mat-tab>
+    </mat-tab-group>
+
+    <mat-divider></mat-divider>
+
+    <button mat-icon-button
+        matTooltip="more info"
+        [sxplr-dialog]="fullTmpl">
+        <mat-icon>info</mat-icon>
+    </button>
+    
+    <!-- doi -->
+    <ng-template ngFor [ngForOf]="view.links" let-url>
+        <a [href]="url.href"
+            target="_blank"    
+            class="no-hover"
+            mat-icon-button
+            [matTooltip]="url.text || url.href">
+            <mat-icon fontSet="ai" fontIcon="ai-doi"></mat-icon>
+        </a>
+    </ng-template>
+        
+    <!-- additional links -->
+    <ng-template ngFor [ngForOf]="view.additionalLinks" let-url>
+        <a [href]="url"
+            target="_blank"
+            class="no-hover"
+            mat-icon-button
+            [matTooltip]="url">
+            <mat-icon fontSet="ai" fontIcon="ai-doi"></mat-icon>
+        </a>
+    </ng-template>
+
+    <!-- download -->
+     
+    <a [href]="view.downloadLink"
+        target="_blank"
+        class="no-hover"
+        mat-icon-button
+        matTooltip="download">
+        <mat-icon>download</mat-icon>
+    </a>
+    
+    <ng-template #descTmpl>
+        <markdown-dom [markdown]="view.desc"></markdown-dom>
+    </ng-template>
+
+    <ng-template #fullTmpl>
+        <mat-dialog-content>
+            <sxplr-feature-view [feature]="exportedFeature$ | async"></sxplr-feature-view>
+        </mat-dialog-content>
+        
+        <mat-dialog-actions align="end">
+            <button mat-button mat-dialog-close>
+                Close
+            </button>
+        </mat-dialog-actions>
+    </ng-template>
+</ng-template>
+
+<ng-template #loadingTmpl>
+    <section class="loading">
+        <mat-icon class="spinning">loop</mat-icon>
+    </section>
+</ng-template>

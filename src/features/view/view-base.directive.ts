@@ -36,7 +36,9 @@ export class FeatureViewBase {
 
   busy$ = new BehaviorSubject<boolean>(false)
 
+  
   #feature$ = new BehaviorSubject<Feature|SimpleCompoundFeature>(null)
+  exportedFeature$ = this.#feature$.asObservable()
   @Input()
   set feature(val: Feature|SimpleCompoundFeature) {
     this.#feature$.next(val)

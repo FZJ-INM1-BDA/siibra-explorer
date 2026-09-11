@@ -2,17 +2,18 @@ import { Directive, Input, Output, EventEmitter } from "@angular/core";
 import { BehaviorSubject } from "rxjs";
 
 @Directive({
-  selector: '[iav-switch]',
-  exportAs: 'iavSwitch'
+  selector: '[sxplr-switch]',
+  exportAs: 'sxplrSwitch',
+  standalone: true
 })
-export class SwitchDirective{
+export class SwitchDirective {
 
   switchState: boolean = false
 
-  @Input('iav-switch-delay') delay: number = 0
-  @Output('iav-switch-event') eventemitter: EventEmitter<boolean> = new EventEmitter()
+  @Input('sxplr-switch-delay') delay: number = 0
+  @Output('sxplr-switch-event') eventemitter: EventEmitter<boolean> = new EventEmitter()
   
-  @Input('iav-switch-state')
+  @Input('sxplr-switch-state')
   set setSwitchState(val: boolean) {
     this.switchState = val
     this.emit()

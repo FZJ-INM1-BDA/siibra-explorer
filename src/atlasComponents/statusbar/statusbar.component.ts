@@ -1,8 +1,8 @@
 import { CommonModule } from "@angular/common";
-import { Component, inject, Input } from "@angular/core";
+import { Component, inject } from "@angular/core";
 import { SAPI } from "../sapi";
 import { select, Store } from "@ngrx/store";
-import { atlasAppearance, atlasSelection, StateModule } from "src/state";
+import { atlasAppearance, atlasSelection } from "src/state";
 import { combineLatest, of } from "rxjs";
 import { map, switchMap, takeUntil } from "rxjs/operators";
 import { AngularMaterialModule } from "src/sharedModules";
@@ -20,10 +20,8 @@ import { SapiViewsCoreRichModule } from "../sapiViews/core/rich/module";
 import { SapiViewsCoreRegionModule } from "../sapiViews/core/region";
 import { SapiViewsUtilModule } from "../sapiViews";
 import { ShareModule } from "src/share";
-import { PluginModule } from "src/plugin";
 import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.directive";
 import { ScreenshotModule } from "src/screenshot";
-import { ViewerModeDirective } from "src/util/directives/viewmode.directive";
 import { AllVersionsParcs } from "../sapiViews/core/parcellation/allVersions.pipe";
 import { DestroyDirective } from "src/util/directives/destroy.directive";
 import { OnlyShowNewestParc } from "../sapiViews/core/parcellation/onlyShowNewest.pipe";
@@ -52,11 +50,8 @@ const onlyShowNewestPipe = new OnlyShowNewestParc()
     SapiViewsCoreRegionModule,
     SapiViewsUtilModule,
     ShareModule,
-    StateModule,
-    PluginModule,
     ExperimentalFlagDirective,
     ScreenshotModule,
-    ViewerModeDirective,
     AtlasViewerRouterModule
 ],
   hostDirectives: [
@@ -67,8 +62,6 @@ const onlyShowNewestPipe = new OnlyShowNewestParc()
 
 export class StatusbarCmp {
 
-  @Input()
-  halfmode: "top" | "bottom" = "bottom"
 
   #atpDir = inject(AvailableATPDirective)
   #ondestroy$ = inject(DestroyDirective).destroyed$

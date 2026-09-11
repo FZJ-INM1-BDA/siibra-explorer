@@ -13,7 +13,8 @@
                 <div class="tool-container vbc-row-fixed">
                     <mat-button-toggle-group
                         [value]="annotToolDir.selectedTool$ | async | getProperty : 'name'"
-                        (valueChange)="annotToolDir.selectToolByName($event)">
+                        (valueChange)="annotToolDir.selectToolByName($event)"
+                        [hideSingleSelectionIndicator]="true">
                         <ng-template ngFor [ngForOf]="keyval.value" let-tool>
                             <mat-button-toggle
                                 [matTooltip]="tool.name"

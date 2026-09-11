@@ -29,6 +29,8 @@ import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.di
 import { FeatureViewBase } from "./view/view-base.directive";
 import { ExperimentalService } from "src/experimental/experimental.service";
 import { TPBRCategoryDirective } from "./tpbrCategory.directive";
+import { SimpleSingleFeatureCmp } from "./simpleSingle/simpleSingle.component";
+import { NgLayerCtrlCmp } from "src/viewerModule/nehuba/nehubaViewerInterface/ngLayerCtl/ngLayerCtrl.component";
 
 @NgModule({
   imports: [
@@ -52,6 +54,7 @@ import { TPBRCategoryDirective } from "./tpbrCategory.directive";
     TPBRViewCmp,
     CodeSnippet,
     ExperimentalFlagDirective,
+    NgLayerCtrlCmp,
   ],
   declarations: [
     EntryComponent,
@@ -67,6 +70,7 @@ import { TPBRCategoryDirective } from "./tpbrCategory.directive";
     GroupFeaturesToName,
     GroupFeatureTallyPipe,
     TPBRCategoryDirective,
+    SimpleSingleFeatureCmp,
   ],
   exports: [
     EntryComponent,
@@ -76,6 +80,7 @@ import { TPBRCategoryDirective } from "./tpbrCategory.directive";
     ListDirective,
     TPBRCategoryDirective,
     FilterCategoriesPipe,
+    SimpleSingleFeatureCmp,
   ],
   providers: [
     {

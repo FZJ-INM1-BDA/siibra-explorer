@@ -1,0 +1,96 @@
+:host
+{
+    overflow: hidden;
+    
+    position: relative;
+    display: inline-flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    
+    > .nav-bar
+    {
+        flex: 0 0 auto;
+        
+    }
+    > .content
+    {
+        flex: 1 1 auto;
+        overflow-y: auto;
+
+    }
+}
+
+.content
+{
+    position: relative;
+    transition: all ease-in-out 160ms;
+
+    &.collapsed
+    {
+        transform: translateX(-90%);
+    }
+}
+
+.nav-bar
+{
+    position: relative;
+    
+
+    > .collapser
+    {
+        position: absolute;
+        bottom: -6rem;
+        right: 0;
+        z-index: 10;
+
+        margin-right: -2rem;
+
+        &.collapsed
+        {
+            mat-icon
+            {
+                transform: translateX(1rem);
+            }
+        }
+        &:not(.collapsed)
+        {
+            mat-icon
+            {
+                transform: translateX(-1rem);
+            }
+        }
+
+        
+        transition: all ease-in-out 160ms;
+        &.collapsed
+        {
+            transform: translateX(-90%);
+        }
+
+        width: 100%;
+        display: flex;
+        flex-direction: row-reverse;
+    }
+}
+
+
+.my-card
+{
+    margin: 0.5rem 0.25rem;
+    border-radius: 4px;
+    > h5
+    {
+        margin: 0 1rem;
+        display: flex;
+        align-items: center;
+
+        > span
+        {
+            flex: 1 1 auto;
+        }
+        > button
+        {
+            flex: 0 0 auto;
+        }
+    }
+}
