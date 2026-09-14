@@ -18,7 +18,6 @@ import { ClickInterceptor, CLICK_INTERCEPTOR_INJECTOR, UtilModule } from "src/ut
 import { SpotLightModule } from 'src/spotlight/spot-light.module'
 import { TryMeComponent } from "./ui/tryme/tryme.component";
 import { InterSpaceCoordXformSvc } from "src/atlasComponents/sapi/core/space/interSpaceCoordXform.service";
-import { WidgetModule } from 'src/widget';
 import { PluginModule } from './plugin/plugin.module';
 import { LoggingModule } from './logging/logging.module';
 import { AuthService } from './auth'
@@ -64,7 +63,6 @@ import { SxplrOverlaySvc } from './components/overlay';
     UIModule,
     AngularMaterialModule,
     UtilModule,
-    WidgetModule,
     PluginModule,
     LoggingModule,
     MesssagingModule,

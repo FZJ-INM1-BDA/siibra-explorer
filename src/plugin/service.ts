@@ -1,26 +1,28 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable, Injector, NgZone } from "@angular/core";
-import { WIDGET_PORTAL_TOKEN } from "src/widget/constants";
-import { WidgetService } from "src/widget/service";
-import { WidgetPortal } from "src/widget/widgetPortal/widgetPortal.component";
 import { setPluginSrc, SET_PLUGIN_NAME } from "./const";
 import { PluginPortal } from "./pluginPortal/pluginPortal.component";
 import { environment } from "src/environments/environment"
 import { catchError, startWith } from "rxjs/operators";
 import { of } from "rxjs";
+import { ToolbarWidgetSvc } from "src/atlasComponents/toolbarWidget/toolbarWidget.service";
+import { ToolbarWidget } from "src/atlasComponents/toolbarWidget/toolbarWidget.component";
+import { SxplrSnackBarSvc } from "src/components";
+import { RM_TOOLBAR_WIDGET, TOOLBAR_PORTAL_TOKEN } from "src/atlasComponents/toolbarWidget/consts";
 
 @Injectable({
   providedIn: 'root'
 })
 export class PluginService {
-  loadedPlugins: string[] = []
-  srcWidgetMap = new Map<string, WidgetPortal<PluginPortal>>()
+  #srcWidgetMap = new Map<string, ToolbarWidget<PluginPortal>>()
+  #widgetSrcMap = new Map<ToolbarWidget<PluginPortal>, string>()
   
   constructor(
-    private wSvc: WidgetService,
+    private wSvc: ToolbarWidgetSvc,
     private injector: Injector,
     private zone: NgZone,
-    private http: HttpClient
+    private http: HttpClient,
+    private snackbar: SxplrSnackBarSvc,
   ){}
 
   pluginManifests$ = this.http.get<{
@@ -33,41 +35,54 @@ export class PluginService {
   )
 
   async launchPlugin(htmlSrc: string){
-    if (this.loadedPlugins.includes(htmlSrc)) return
+    if (this.#srcWidgetMap.has(htmlSrc)) {
+      this.snackbar.open({
+        message: `Plugin already launched!`
+      })
+      return
+    }
     const injector = Injector.create({
       providers: [{
-        provide: WIDGET_PORTAL_TOKEN,
+        provide: TOOLBAR_PORTAL_TOKEN,
         useValue: setPluginSrc(htmlSrc, {})
       }, {
         provide: SET_PLUGIN_NAME,
         useValue: (inst: PluginPortal, pluginName: string) => this.setPluginName(inst, pluginName)
-      }],
+      },
+      {
+        provide: RM_TOOLBAR_WIDGET,
+        useValue: (cmp: ToolbarWidget<PluginPortal>) => this.rmPlugin(cmp)
+      }
+    ],
       parent: this.injector
     })
     const wdg = this.wSvc.addNewWidget(PluginPortal, injector)
-    this.srcWidgetMap.set(htmlSrc, wdg)
+    this.#widgetSrcMap.set(wdg, htmlSrc)
+    this.#srcWidgetMap.set(htmlSrc, wdg)
+    
   }
 
   setPluginName(plg: PluginPortal, name: string) {
-    
-    if (!this.srcWidgetMap.has(plg.src)) {
+    if (!this.#srcWidgetMap.has(plg.src)) {
       console.warn(`cannot find plg.src ${plg.src}`)
       return
     }
-    const wdg = this.srcWidgetMap.get(plg.src)
-    this.zone.run(() => wdg.name = name)
+    const wdg = this.#srcWidgetMap.get(plg.src)
+    this.zone.run(() => {
+      if (wdg) {
+        wdg.name = name
+      }
+    })
   }
 
-  rmPlugin(plg: PluginPortal){
-    this.loadedPlugins = this.loadedPlugins.filter(plgSrc => plgSrc !== plg.src)
-
-    if (!this.srcWidgetMap.has(plg.src)) {
-      console.warn(`cannot find plg.src ${plg.src}`)
+  rmPlugin(wdgt: ToolbarWidget<PluginPortal>){
+    this.wSvc.rmWidget(wdgt)
+    const htmlSrc = this.#widgetSrcMap.get(wdgt)
+    this.#widgetSrcMap.delete(wdgt)
+    if (!htmlSrc){
       return
     }
-    const wdg = this.srcWidgetMap.get(plg.src)
-    this.srcWidgetMap.delete(plg.src)
+    this.#srcWidgetMap.delete(htmlSrc)
 
-    this.wSvc.rmWidget(wdg)
   }
 }

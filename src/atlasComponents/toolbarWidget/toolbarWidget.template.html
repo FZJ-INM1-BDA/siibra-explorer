@@ -1,0 +1,20 @@
+<section class="sxplr-pe-all mat-elevation-z4 my-card sxplr-custom-cmp bg">
+    <h5>
+        <span>plugin
+            <ng-template [ngIf]="name$ | async" let-pname>
+                : {{ pname }}
+            </ng-template>
+        </span>
+        <button mat-icon-button color="warn"
+            (click)="exit && exit(this)">
+            <mat-icon>close</mat-icon>
+        </button>
+    </h5>
+    <mat-divider></mat-divider>
+    
+    <ng-template [ngIf]="portal">
+        <ng-template [cdkPortalOutlet]="portal">
+
+        </ng-template>
+    </ng-template>
+</section>

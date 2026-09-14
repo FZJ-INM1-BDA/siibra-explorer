@@ -4,8 +4,8 @@ import { map, scan, share, startWith, take, filter } from "rxjs/operators";
 import { BoothVisitor, JRPCRequest, JRPCSuccessResp, ListenerChannel } from "src/api/jsonrpc";
 import { ApiBoothEvents, ApiService, BroadCastingApiEvents, HeartbeatEvents, namespace } from "src/api/service";
 import { getUuid } from "src/util/fn";
-import { WIDGET_PORTAL_TOKEN } from "src/widget/constants";
 import { getPluginSrc, SET_PLUGIN_NAME } from "../const";
+import { TOOLBAR_PORTAL_TOKEN } from "src/atlasComponents/toolbarWidget/consts";
 
 /**
  * sandbox attribute must be set statically
@@ -47,7 +47,7 @@ export class PluginPortal implements AfterViewInit, OnDestroy, ListenerChannel{
     private apiService: ApiService,
     public vcr: ViewContainerRef,
     @Optional() @Inject(SET_PLUGIN_NAME) private setPluginName: (inst: unknown, pluginName: string) => void,
-    @Optional() @Inject(WIDGET_PORTAL_TOKEN) portalData: Record<string, string>
+    @Optional() @Inject(TOOLBAR_PORTAL_TOKEN) portalData: Record<string, string>
   ){
     if (portalData){
       this.src = getPluginSrc(portalData)

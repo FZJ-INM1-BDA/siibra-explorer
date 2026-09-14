@@ -10,14 +10,7 @@
     display: grid;
 }
 
-.filename-container
+:host
 {
-    flex: 1 1 auto;
-}
-
-button[mat-icon-button]
-{
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    overflow-x: auto;
 }

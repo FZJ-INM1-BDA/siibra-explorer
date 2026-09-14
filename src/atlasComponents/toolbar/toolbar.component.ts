@@ -18,6 +18,8 @@ import { AnnotateCmp } from "src/ui/annotate/annotate.component";
 import { DialogModule } from "src/ui/dialogInfo";
 import { StopPropagationSADirective } from "src/util/directives/stopPropagation.standalone.directive";
 import { SwitchDirective } from "src/util/directives/switch.directive";
+import { ToolbarWidgetHost } from "../toolbarWidget/toolbarWidgetHost.directive";
+import { KeyFrameModule } from "src/keyframesModule/module";
 
 @Component({
   selector: 'sxplr-tool-bar',
@@ -41,7 +43,9 @@ import { SwitchDirective } from "src/util/directives/switch.directive";
     AtlasDownloadModule,
     StopPropagationSADirective,
     FeatureModule,
-  ]
+    ToolbarWidgetHost,
+    KeyFrameModule,
+  ],
 })
 
 export class ToolbarCmp {
@@ -57,9 +61,12 @@ export class ToolbarCmp {
     ),
     this.store.pipe(
       select(userInteraction.selectors.selectedFeature)
+    ),
+    this.store.pipe(
+      select(atlasSelection.selectors.viewerMode)
     )
   ]).pipe(
-    map(([ ATP, selectedRegions, currentViewport, selectedFeature ]) => {
+    map(([ ATP, selectedRegions, currentViewport, selectedFeature, viewerMode ]) => {
       return {
         selectedAtlas: ATP?.atlas,
         selectedTemplate: ATP?.template,
@@ -67,6 +74,7 @@ export class ToolbarCmp {
         selectedRegions: selectedRegions,
         currentViewport,
         selectedFeature,
+        viewerMode,
       }
     }),
     shareReplay(1),
@@ -79,6 +87,12 @@ export class ToolbarCmp {
   clearSelectedFeature(){
     this.store.dispatch(
       userInteraction.actions.clearShownFeature()
+    )
+  }
+
+  clearSpecialViewMode(){
+    this.store.dispatch(
+      atlasSelection.actions.clearViewerMode()
     )
   }
 }

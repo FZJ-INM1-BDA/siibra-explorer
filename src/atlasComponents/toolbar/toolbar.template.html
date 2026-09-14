@@ -114,6 +114,27 @@
             <sxplr-annotate></sxplr-annotate>
         </section>
     </ng-template>
+
+    <section>
+        <toolbar-widget-host></toolbar-widget-host>
+    </section>
+
+    <ng-template [ngIf]="view$ | async" let-view>
+        <section *ngIf="view.viewerMode === 'key frame'"
+            class="sxplr-pe-all mat-elevation-z4 my-card sxplr-custom-cmp bg">
+
+            <h5>
+                <span>Key Frame</span>
+                <button mat-icon-button
+                    color="warn"
+                    (click)="clearSpecialViewMode()">
+                    <mat-icon>close</mat-icon>
+                </button>
+            </h5>
+            <mat-divider></mat-divider>
+            <key-frame-controller></key-frame-controller>
+        </section>
+    </ng-template>
 </section>
 
  
@@ -166,8 +187,7 @@
     <ng-template sxplrExperimentalFlag [experimental]="true">
     <mat-action-list>
         <button mat-list-item
-            sxplr-view-mode="toggle"
-            sxplr-view-mode-target="key frame"
+            key-frame-play-now="on"
             [matTooltip]="'Animate viewer state between keyframes'">
             <mat-icon matListItemIcon>play_arrow</mat-icon>
             <span matListItemTitle>

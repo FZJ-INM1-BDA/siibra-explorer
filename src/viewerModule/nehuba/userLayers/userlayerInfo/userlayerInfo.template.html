@@ -1,71 +1,31 @@
 <ng-template [ngIf]="view$ | async" [ngIfElse]="spinnerTmpl" let-view>
 
-  <div class="sxplr-d-flex sxplr-custom-cmp">
-
-    <div class="ml-2 text-truncate v-center-text-span text filename-container"
-      [matTooltip]="data.filename || 'unknown filename'">
-      <i class="fas fa-file"></i>
-      <span>
-        {{ data.filename }}
-      </span>
-    </div>
-
-    <div>
-      <ng-template [ngIf]="!view.showMore && !view.compact">
-        <ng-template [ngTemplateOutlet]="ngLayerController" [ngTemplateOutletContext]="{ onlyOpacity: true }">
-        </ng-template>
-      </ng-template>
-    </div>
-
+  <mat-action-list>
+    <button *ngIf="data.filename"
+      
+      mat-list-item>
+      <!-- <mat-icon mat-list-item-icon>
+        <mat-icon>file</mat-icon>
+      </mat-icon> -->
+      <span mat-list-item-title>{{ data.filename }}</span>
+    </button>
+    
     <ng-template [ngIf]="data.actions" let-actions>
       <ng-template ngFor [ngForOf]="actions" let-action>
-        <button mat-icon-button
-          (click)="action.action()">
-          <sxplr-icon
-            [icon]="action">
+        <button mat-list-item-icon (click)="action.action()">
+          <sxplr-icon mat-list-item-icon [icon]="action">
           </sxplr-icon>
+          <span mat-list-item-title>{{ action }}</span>
         </button>
       </ng-template>
     </ng-template>
-  
-    <ng-template [ngIf]="data.warning.length > 0">
-      <button mat-icon-button
-        [matTooltip]="data.warning.length +  ' messages on user layer.'"
-        color="warn"
-        (click)="toggleShowMore()">
-        <i class="fas fa-exclamation-triangle"></i>
-      </button>
-    </ng-template>
 
-    <button
-      [matTooltip]="ARIA_LABELS.VOLUME_TUNING_EXPAND"
-      mat-icon-button
-      [color]="view.showMore ? 'primary' : 'basic'"
-      (click)="toggleShowMore()">
-      <i class="fas fa-sliders-h"></i>
-    </button>
-  
-    <button
-      [matTooltip]="ARIA_LABELS.CLOSE"
-      color="warn"
-      mat-icon-button
-      mat-dialog-close>
-      <i class="fas fa-trash"></i>
-    </button>
-  
-  </div>
+  </mat-action-list>
 
-  <div *ngIf="view.compact || view.showMore"
-    class="sxplr-d-block sxplr-custom-cmp darker-bg overflow-hidden">
-    <ng-template [ngTemplateOutlet]="ngLayerController" [ngTemplateOutletContext]="{ onlyOpacity: !view.showMore }">
-    </ng-template>
-  </div>
+  <ng-template [ngTemplateOutlet]="ngLayerController" [ngTemplateOutletContext]="{
+    onlyOpacity: false
+  }">
 
-
-  <ng-template [ngIf]="view.showMore">
-    <ul class="sxplr-custom-cmp text sxplr-custom-cmp darker-bg">
-      <li *ngFor="let warn of data.warning">{{ warn }}</li>
-    </ul>
   </ng-template>
 </ng-template>
 

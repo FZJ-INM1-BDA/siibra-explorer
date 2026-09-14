@@ -1,4 +1,4 @@
-import { Injectable, OnDestroy } from "@angular/core"
+import { Injectable, Injector, OnDestroy } from "@angular/core"
 import { select, Store } from "@ngrx/store"
 import { forkJoin, from, Subscription } from "rxjs"
 import { distinctUntilChanged, filter, map, take, pairwise } from "rxjs/operators"
@@ -16,13 +16,17 @@ import { translateV3Entities } from "src/atlasComponents/sapi/translateV3"
 import { MetaV1Schema } from "src/atlasComponents/sapi/typeV3"
 import { AnnotationLayer } from "src/atlasComponents/annotations"
 import { rgbToHex } from 'common/util'
-import { MatSnackBar } from "src/sharedModules/angularMaterial.exports"
+import { MAT_DIALOG_DATA, MatSnackBar } from "src/sharedModules/angularMaterial.exports"
 import { arrayEqual } from "src/util/array"
 import { atlasSelection } from "src/state"
 import { Action } from "src/util/types"
 import { getPositionOrientation } from "../util"
 import { VOXEL_SIZE_MAP } from "../constants"
 import { IDS } from "src/atlasComponents/sapi"
+import { ToolbarWidgetSvc } from "src/atlasComponents/toolbarWidget/toolbarWidget.service"
+import { UserLayerInfoCmp } from "./userlayerInfo/userlayerInfo.component"
+import { RM_TOOLBAR_WIDGET } from "src/atlasComponents/toolbarWidget/consts"
+import { ToolbarWidget } from "src/atlasComponents/toolbarWidget/toolbarWidget.component"
 
 type LayerOption = Omit<atlasAppearance.const.OldNgLayerCustomLayer, "clType" | "id" | "source"> | Omit<atlasAppearance.const.NewNgLayerOption, "id" | "clType">
 
@@ -742,6 +746,40 @@ export class UserLayerService implements OnDestroy {
         })
       )
     }
+
+    const injector = Injector.create({
+      providers: [
+        {
+          provide: MAT_DIALOG_DATA,
+          useValue: {
+            layerName: id,
+            filename: source,
+            actions,
+            warning: [],
+            meta
+          }
+        },
+        {
+          provide: RM_TOOLBAR_WIDGET,
+          useValue: (_this: ToolbarWidget<UserLayerInfoCmp>) => {
+            
+            const _cleanup = this.#idToCleanup.get(id)
+            this.#idToCleanup.delete(id)
+            if (_cleanup) {
+              _cleanup()
+            }
+            this.store$.dispatch(
+              atlasAppearance.actions.removeCustomLayers({
+                customLayers: [ { id } ]
+              })
+            )
+            this.widgtSvc.rmWidget(_this)
+          }
+        }
+      ],
+      parent: this.injector
+    })
+    this.widgtSvc.addNewWidget(UserLayerInfoCmp, injector)
   }
 
   #subscription: Subscription[] = []
@@ -750,6 +788,8 @@ export class UserLayerService implements OnDestroy {
     private worker: AtlasWorkerService,
     private routerSvc: RouterService,
     private snackbar: MatSnackBar,
+    private widgtSvc: ToolbarWidgetSvc,
+    private injector: Injector,
   ) {
     this.#subscription.push(
       this.routerSvc.customRoute$.pipe(

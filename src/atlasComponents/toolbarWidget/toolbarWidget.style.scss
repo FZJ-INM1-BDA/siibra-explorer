@@ -1,0 +1,34 @@
+.my-card
+{
+    margin: 0.5rem 0.25rem;
+    border-radius: 4px;
+    > h5
+    {
+        margin: 0 1rem;
+        display: flex;
+        align-items: center;
+
+        > span
+        {
+            flex: 1 1 auto;
+        }
+        > button
+        {
+            flex: 0 0 auto;
+        }
+    }
+
+    height: 50dvh;
+    display: flex;
+    flex-direction: column;
+
+    > h5,mat-divider
+    {
+        flex: 0 0 auto;
+    }
+
+    > :last-child
+    {
+        flex: 1 1 auto;
+    }
+}
