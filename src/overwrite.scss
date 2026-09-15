@@ -446,3 +446,12 @@ body
     }
   }
 }
+
+.sxplr-flash-element {
+  animation: flash-bg 500ms ease-in-out;
+}
+
+@keyframes flash-bg {
+  0% { background-color: rgba(255, 255, 100, 0.5); }
+  100% { background-color: transparent; }
+}

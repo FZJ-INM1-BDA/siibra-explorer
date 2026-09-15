@@ -107,6 +107,14 @@
                 <mat-divider></mat-divider>
             </ng-template>
 
+            
+            <button mat-icon-button
+                [sxplr-dialog]="regionHierarchyTmpl"
+                [matTooltip]="view.labels.REGION_HIERARCHY"
+                sxplr-dialog-size="xl"
+                #showHierarchyBtn="sxplrDialog">
+                <mat-icon>account_tree</mat-icon>
+            </button>
 
             <!-- hide/unhide parc visibility tmpl -->
             <button mat-icon-button [sxplr-dialog]="DoiTemplate" [sxplr-dialog-size]="null" [sxplr-dialog-data]="{
@@ -149,21 +157,7 @@
     </ng-template>
     
     <ng-template [ngIf]="view.selectedRegions.length == 1">
-        <ng-template sxplrExperimentalFlag [experimental]="true">
-        <ng-template [ngTemplateOutlet]="btnTmpl" [ngTemplateOutletContext]="{
-            name: view.selectedRegions[0].name,
-            icon: 'account_tree',
-            suffixTmpl: singleRegionSuffixTmpl,
-            menuData: {
-                current: null,
-                type: null,
-                options: []
-            }
-        }">
-        </ng-template>
-        </ng-template>
-        
-        <ng-template sxplrExperimentalFlag [experimental]="false">
+
         <ng-template [ngTemplateOutlet]="btnTmpl" [ngTemplateOutletContext]="{
             name: view.selectedRegions[0].name,
             category: 'region',
@@ -176,9 +170,10 @@
             }
         }">
         </ng-template>
-        </ng-template>
+        
 
         <ng-template #singleRegionSuffixTmpl>
+            
             <div sxplr-sapiviews-core-region
                 class="vbc-row-fixed"
                 #regionDirective="sapiViewsCoreRegion"
@@ -231,9 +226,6 @@
     <ng-template [ngIf]="view.selectedRegions.length > 1">
         
         <ng-template #multiRegionSuffixTmpl>
-            <button mat-icon-button [sxplr-dialog]="regionHierarchyTmpl">
-                <mat-icon>account_tree</mat-icon>
-            </button>
 
             <button mat-icon-button
                 [matTooltip]="view.labels.COPY_REGION_NAMES"
@@ -251,22 +243,6 @@
         </ng-template>
 
         
-        <ng-template sxplrExperimentalFlag [experimental]="true">
-        <ng-template  [ngTemplateOutlet]="btnTmpl" [ngTemplateOutletContext]="{
-            name: '(' + view.selectedRegions.length + ' selected regions)',
-            icon: 'account_tree',
-            suffixTmpl: multiRegionSuffixTmpl,
-            menuData: {
-                current: null,
-                type: null,
-                options: []
-            }
-        }">
-        </ng-template>
-
-        </ng-template>
-        
-        <ng-template sxplrExperimentalFlag [experimental]="false">
         <ng-template  [ngTemplateOutlet]="btnTmpl" [ngTemplateOutletContext]="{
             name: '(' + view.selectedRegions.length + ' selected regions)',
             category: 'regions',
@@ -278,7 +254,6 @@
                 options: []
             }
         }">
-        </ng-template>
         </ng-template>
 
     </ng-template>

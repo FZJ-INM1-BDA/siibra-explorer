@@ -4,6 +4,7 @@ import { CommonModule } from "@angular/common";
 import { AngularMaterialModule } from "src/sharedModules";
 import { BehaviorSubject } from "rxjs";
 import { map, throttleTime } from "rxjs/operators";
+import { FlashDirective } from "src/util/directives/flash.directive";
 
 @Component({
   selector: 'tpbr-viewer',
@@ -15,14 +16,19 @@ import { map, throttleTime } from "rxjs/operators";
   imports: [
     CommonModule,
     AngularMaterialModule,
+    FlashDirective,
   ]
 })
 export class TPBRViewCmp {
+
+  @Input('tpbr-newui')
+  newui = false
+
   @Input('tpbr-concept')
   set _tpbr(value: TPRB){
     this.#tpbr.next(value)
   }
-  #tpbr = new BehaviorSubject<TPRB>(null)
+  #tpbr = new BehaviorSubject<TPRB|null>(null)
 
   view$ = this.#tpbr.pipe(
     throttleTime(16),

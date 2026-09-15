@@ -50,7 +50,6 @@ import { StatusbarCmp } from "src/atlasComponents/statusbar/statusbar.component"
 import { AnnotateCmp } from "src/ui/annotate/annotate.component";
 import { ViewerModeDirective } from "src/util/directives/viewmode.directive";
 import { TopMenuModule } from "src/ui/topMenu/module";
-import { FeatureCombinedViewCmp } from "src/features/combinedView/combinedView.component";
 import { ToolbarCmp } from "src/atlasComponents/toolbar/toolbar.component";
 
 @NgModule({
@@ -92,7 +91,6 @@ import { ToolbarCmp } from "src/atlasComponents/toolbar/toolbar.component";
     AnnotateCmp,
     ViewerModeDirective,
     TopMenuModule,
-    FeatureCombinedViewCmp,
     
     ...(environment.ENABLE_LEAP_MOTION ? [LeapModule] : [])
   ],

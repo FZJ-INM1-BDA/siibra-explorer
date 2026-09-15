@@ -1,32 +1,99 @@
 <ng-template [ngIf]="view$ | async" let-tpbr>
-    <div *ngIf="tpbr.template">
-        {{ tpbr.template.name }}
-    </div>
+    <ng-template [ngIf]="newui" [ngIfElse]="defaultUITmpl">
 
-    <div *ngIf="tpbr.pointStr">
-        Located at: {{ tpbr.pointStr }}
-    </div>
-    
-    <ng-template [ngIf]="tpbr.bboxStringAlt" let-alt>
-        <div>
-            Located at: {{ alt.center }} ± {{ alt.halflwh }} (mm)
-        </div>
+        <!-- selected region -->
+        <ng-template [ngIf]="tpbr.region">
+            <div class="title">
+                <mat-icon fontSet="fas" fontIcon="fa-brain"></mat-icon>
+                <span class="text">
+                    selected region
+                </span>
+            </div>
+
+            <div class="content" [sxplr-flash]="tpbr.region.name">
+                {{ tpbr.region.name }}
+            </div>
+
+            <ng-template [ngIf]="tpbr.parcellation">   
+                <div class="content">
+                    {{ tpbr.parcellation.shortName || tpbr.parcellation.name }}
+                </div>
+            </ng-template>
+            
+        </ng-template>
+
+
+        <!-- bbox -->
+        <ng-template [ngIf]="tpbr.bboxString" let-bboxString>
+            <div class="title">
+                <mat-icon>view_in_ar</mat-icon>
+                <span class="text">bounding box</span>
+            </div>
+            <div class="content"
+                [sxplr-flash]="bboxString.from + bboxString.to">
+                {{ bboxString.from }} - {{ bboxString.to }}
+            </div>
+            
+            <ng-template [ngIf]="tpbr.template" let-template>
+                <div class="content">
+                    {{ template.shortName || template.name }}
+                </div>
+            </ng-template>
+        </ng-template>
+
+
+        <!-- selected point -->
+        <ng-template [ngIf]="tpbr.pointStr">
+
+            <div class="title">
+                <mat-icon>location_on</mat-icon>
+                <span class="text">
+                    center of view
+                </span>
+            </div>
+
+            <div class="content" [sxplr-flash]="tpbr.pointStr">
+                {{ tpbr.pointStr }}
+            </div>
+
+            <ng-template [ngIf]="tpbr.template" let-template>
+                <div class="content">
+                    {{ template.shortName || template.name }}
+                </div>
+            </ng-template>
+        </ng-template>
+
     </ng-template>
 
-    <!-- <ng-template [ngIf]="tpbr.bboxString" let-bboxString>
-        <div>
-            from {{ bboxString.from }}
+    <ng-template #defaultUITmpl>
+        <div *ngIf="tpbr.template">
+            {{ tpbr.template.name }}
         </div>
-        <div>
-            to {{ bboxString.to }}
-        </div>
-    </ng-template> -->
 
-    <div *ngIf="tpbr.parcellation">
-        {{ tpbr.parcellation.name }}
-    </div>
-    <div *ngIf="tpbr.region">
-        {{ tpbr.region.name }}
-    </div>
-    
+        <div *ngIf="tpbr.pointStr">
+            Located at: {{ tpbr.pointStr }}
+        </div>
+        
+        <ng-template [ngIf]="tpbr.bboxStringAlt" let-alt>
+            <div>
+                Located at: {{ alt.center }} ± {{ alt.halflwh }} (mm)
+            </div>
+        </ng-template>
+
+        <!-- <ng-template [ngIf]="tpbr.bboxString" let-bboxString>
+            <div>
+                from {{ bboxString.from }}
+            </div>
+            <div>
+                to {{ bboxString.to }}
+            </div>
+        </ng-template> -->
+
+        <div *ngIf="tpbr.parcellation">
+            {{ tpbr.parcellation.name }}
+        </div>
+        <div *ngIf="tpbr.region">
+            {{ tpbr.region.name }}
+        </div>
+    </ng-template>
 </ng-template>

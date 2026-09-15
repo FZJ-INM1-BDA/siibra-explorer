@@ -39,7 +39,7 @@
     > .collapser
     {
         position: absolute;
-        bottom: -6rem;
+        bottom: -3.5rem;
         right: 0;
         z-index: 10;
 
@@ -56,7 +56,7 @@
         {
             mat-icon
             {
-                transform: translateX(-1rem);
+                transform: translateX(-0.5rem);
             }
         }
 
@@ -88,9 +88,63 @@
         {
             flex: 1 1 auto;
         }
-        > button
+    }
+}
+
+.section-find-body
+{
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+
+    tpbr-viewer
+    {
+        margin: 1rem 2rem;
+        opacity: 0.8;
+        display: block;
+    }
+    button.full-width
+    {
+        margin: 0 1rem 0.5rem 2rem;
+        justify-content: flex-start;
+        
+        flex: 0 0 auto;
+        span
         {
-            flex: 0 0 auto;
+            display: block;
+            text-align: left;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-wrap: nowrap;
+
+            &.button-subtitle
+            {
+                opacity: 0.4;
+                font-size: 75%;
+                margin-top: -0.25rem;
+            }
         }
     }
+}
+
+// both to provide margin, as well as to tank the stretch from parent
+.back-btn-container
+{
+    margin: 1rem;
+}
+
+button.close-panel
+{
+    margin-right: 2rem;
+}
+
+span.warning
+{
+    margin: 1rem;
+}
+
+sxplr-features-connectivity-browser
+{
+    overflow-x: hidden;
+    margin: 0.5rem 1rem;
 }

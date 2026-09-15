@@ -11,9 +11,7 @@
     <ng-template #contentTmpl>
         <ng-template [ngIf]="view.useViewer === 'nehuba'">
             <div class="label">
-                <ng-template sxplrExperimentalFlag [experimental]="false">
                 coordinates (mm)
-                </ng-template>
             </div>
             
             <form name="coordinate-form" [formGroup]="navigationCtlForm">
@@ -25,18 +23,13 @@
                         sxplr-on-focus-select>
                 </ng-template>
             </form>
-
-            <ng-template sxplrExperimentalFlag [experimental]="true">
-            <span class="text-muted">
-                mm
-            </span>
-            </ng-template>
         </ng-template>
     </ng-template>
 
     <ng-template #directTmpl>
         <ng-template [ngTemplateOutlet]="contentTmpl"></ng-template>
         <button mat-icon-button
+            *ngIf="view.useViewer === 'nehuba'"
             class="copy-btn"
             [matTooltip]="view.labels.COPY_CURRENT_POSITION"
             [iav-clipboard-copy]="view.positionMm | addUnitAndJoin : 'mm'">
@@ -52,6 +45,7 @@
         <div mat-dialog-actions>
             
             <button mat-button
+                *ngIf="view.useViewer === 'nehuba'"
                 [matTooltip]="view.labels.COPY_CURRENT_POSITION"
                 [iav-clipboard-copy]="view.positionMm | addUnitAndJoin : 'mm'">
                 <mat-icon>content_copy</mat-icon>
