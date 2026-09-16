@@ -31,6 +31,7 @@ import { ExperimentalService } from "src/experimental/experimental.service";
 import { TPBRCategoryDirective } from "./tpbrCategory.directive";
 import { SimpleSingleFeatureCmp } from "./simpleSingle/simpleSingle.component";
 import { NgLayerCtrlCmp } from "src/viewerModule/nehuba/nehubaViewerInterface/ngLayerCtl/ngLayerCtrl.component";
+import { ExtraVoiDirective } from "./xtraVoi.directive";
 
 @NgModule({
   imports: [
@@ -50,6 +51,7 @@ import { NgLayerCtrlCmp } from "src/viewerModule/nehuba/nehubaViewerInterface/ng
      */
     PlotlyComponent,
     FeatureFilterDirective,
+    ExtraVoiDirective,
     // AtlasColorMapIntents,
     TPBRViewCmp,
     CodeSnippet,

@@ -20,6 +20,13 @@ spec:
             port: 
               number: 8080
       - pathType: Prefix
+        path: "/viewer-cdn"
+        backend:
+          service:
+            name: prod-cdn-siibra-explorer
+            port: 
+              number: 8080
+      - pathType: Prefix
         path: "/viewer-staging"
         backend:
           service:
@@ -48,6 +55,13 @@ spec:
         backend:
           service:
             name: prod-siibra-explorer
+            port: 
+              number: 8080
+      - pathType: Prefix
+        path: "/viewer-cdn"
+        backend:
+          service:
+            name: prod-cdn-siibra-explorer
             port: 
               number: 8080
       - pathType: Prefix

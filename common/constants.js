@@ -110,8 +110,6 @@ These outlines are based on the authoritative Terms and Conditions are found <ht
 If you do not accept the Terms & Conditions you are not permitted to access or use the KG to search for, to submit, to post, or to download any materials found there-in.
 `,
 
-    NEHUBA_DRAG_DROP_TEXT: `Drag and drop any .nii.gz, .nii, .json or .swc files.`,
-
     LOADING_TXT: `Loading ...`,
 
     CANNOT_DECIPHER_HEMISPHERE: 'Cannot decipher region hemisphere.',
@@ -150,12 +148,15 @@ If you do not accept the Terms & Conditions you are not permitted to access or u
     CONFIGURE_LAYER: 'Configure layer',
 
     REMOVE_FRONTAL_OCTANT_HELPER_TEXT: `Hide the octant facing the user, and overlaying the slice views.`,
-    GLASS_BRAIN_ENABLE: `Toggle frontal octant to enable glass brain.`,
+    GLASS_BRAIN_ENABLE: `Disable "Remove frontal octant" to enable glass brain.`,
 
     AUXMESH_DESC: `Some templates contain auxiliary meshes, which compliment the appearance of the template in the perspective view.`,
 
+    SHOW_ALL_MESH_WARN: `Showing all meshes is resource intensive - it can cause the browser to slow down, and even crashes`,
+
     OVERWRITE_SAPI_ENDPOINT_ATTR: `x-sapi-base-url`,
     OVERWRITE_SPATIAL_BACKEND_ATTR: `x-spatial-backend-url`,
+    HIDE_POPUP_ATTR: `x-hide-popup`,
     DATA_ERROR_ATTR: `data-error`,
 
     FREE_MODE: `x-sxplr-free-mode`,

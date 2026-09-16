@@ -3,6 +3,9 @@ export function arrayEqual<T>(compareFn: (o1: T, o2: T) => boolean = null, order
   compareFn = compareFn || defaultCmFn
   return function(array1: T[], array2: T[]){
     if (ordered) {
+      if (array1.length !== array2.length) {
+        return false
+      }
       for (const idx in array1) {
         if (!compareFn(array1[idx], array2[idx])) return false
       }

@@ -11,6 +11,7 @@ import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.di
 import { DialogModule } from "src/ui/dialogInfo";
 import { FileInputModule } from "src/getFileInput/module";
 import { MarkdownModule } from "src/components/markdown";
+import { PluginDisabledReasons } from "./pluginEnabled.pipe";
 
 
 @NgModule({
@@ -23,11 +24,13 @@ import { MarkdownModule } from "src/components/markdown";
     DialogModule,
     FileInputModule,
     MarkdownModule,
+    ExperimentalFlagDirective,
   ],
   declarations: [
     PluginBannerUI,
     PluginPortal,
     IFrameSrcPipe,
+    PluginDisabledReasons,
   ],
   exports: [
     PluginBannerUI,

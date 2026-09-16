@@ -1,3 +1,4 @@
+<ng-template [ngIf]="!data.meta!.fiber">
 <ng-template [ngIf]="view$ | async" [ngIfElse]="spinnerTmpl" let-view>
 
   <mat-action-list>
@@ -28,6 +29,7 @@
 
   </ng-template>
 </ng-template>
+</ng-template>
 
 <ng-template #spinnerTmpl>
   <div>
@@ -35,6 +37,20 @@
   </div>
 </ng-template>
 
+<ng-template [ngIf]="data.meta?.ptcld" let-ptcld>
+  <ptcld-ui
+    [bucketname]="ptcld.bucketname"
+    [fname]="ptcld.fname">
+  </ptcld-ui>
+</ng-template>
+
+<ng-template [ngIf]="data.meta?.fiber" let-fiber>
+  <geomsvc-fiber
+    [bucketname]="fiber.bucketname"
+    [fname]="fiber.fname"
+    >
+  </geomsvc-fiber>
+</ng-template>
 
 <ng-template #ngLayerController let-onlyOpacity="onlyOpacity">
   <ng-layer-tune

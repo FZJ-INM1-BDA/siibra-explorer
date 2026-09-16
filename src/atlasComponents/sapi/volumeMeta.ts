@@ -1,6 +1,5 @@
 type X4Affine = number[][]
 
-
 /**
  * Preferred colormap in order of preference
  */

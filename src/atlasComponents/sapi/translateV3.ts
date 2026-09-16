@@ -182,18 +182,6 @@ const TMP_META_REGISTRY: Record<string, MetaV1Schema> = {
       preferredColormap: ["greyscale"],
       transform: [[-0.7522572875022888,0.49253523349761963,0,-23501134],[-0.49253523349761963,-0.7522572875022888,0,73817088],[0,0,0.8991562724113464,-5074088.5],[0,0,0,1]]
   },
-  "https://neuroglancer.humanbrainproject.eu/precomputed/data-repo-ng-bot/siibra-config/wikibrainstem-original/TRONC_001_11.7T_100um_pub_ORIGINAL": {
-      version: 1,
-      data: {
-          type: "image/1d",
-          range: [{
-              "min": 0.0,
-              "max": 0.03
-          }]
-      },
-      preferredColormap: ["greyscale"],
-      transform: [[0.9884678721427917,0.020477699115872383,-0.15004022419452667,-13731683],[0.08980953693389893,0.7184783816337585,0.6897274255752563,-62889108],[0.12192454934120178,-0.6952477097511292,0.7083531022071838,-44303880],[0,0,0,1]]
-  },
   "https://neuroglancer.humanbrainproject.eu/precomputed/data-repo-ng-bot/siibra-config/chenonceau-anatomy-200um/anatomy_200um": {
       version: 1,
       data: {
@@ -235,12 +223,24 @@ class TranslateV3 {
     return this.#atlasMap.get(atlas.id)
   }
   async translateAtlas(atlas:PathReturn<"/atlases/{atlas_id}">): Promise<SxplrAtlas> {
-    this.#atlasMap.set(atlas["@id"], atlas)
+    
+    // temporary fix to map atlas name
+    // can be removed when https://jugit.fz-juelich.de/t.dickscheid/brainscapes-configurations/-/merge_requests/137 is merged and released to siibra-api
+    const nameMappings: Record<string, string> = {
+      "Multilevel Human Atlas": "Human Atlas",
+      "Monkey Atlas": "Macaque Atlas"
+    }
+    const name = nameMappings[atlas.name] || atlas.name
+    const replacedAtlas = {
+      ...atlas,
+      ...{name}
+    }
+    this.#atlasMap.set(atlas["@id"], replacedAtlas)
     return {
-      id: atlas["@id"],
+      id: replacedAtlas["@id"],
       type: "SxplrAtlas",
-      name: atlas.species,
-      species: atlas.species
+      name: replacedAtlas.name,
+      species: replacedAtlas.species
     }
   }
 
@@ -704,7 +704,7 @@ class TranslateV3 {
       const found = /B20_([0-9]{4})/.exec(url)
       if (found) {
         const sectionId = parseInt(found[1])
-        const realYDis = (sectionId * 2e4 - 70010000) / 1e6
+        const realYDis = (sectionId * 2e4 - 70010000 - 10e3) / 1e6
         return {
           version: 1,
           preferredColormap: iscpn ? ["rgba (4 channel)"] : ["greyscale"],

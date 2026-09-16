@@ -14,12 +14,14 @@ type NgLayerBase = {
   id: string
   clType: 'customlayer/nglayer' | 'baselayer/nglayer'
   sxplrAnnotations?: Record<string, string>
+  meta?: Record<string, any>
 } & CustomLayerBase
 
 export type GenericCustomLayer = {
   clType: 'customlayer/generic'
 } & CustomLayerBase
 
+// n.b. custom colormap *only* works if the region has color attribute defined.
 export type ColorMapCustomLayer = {
   clType: 'customlayer/colormap' | 'baselayer/colormap'
   colormap: WeakMap<SxplrRegion, number[]>

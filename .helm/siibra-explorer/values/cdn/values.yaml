@@ -1,0 +1,5 @@
+replicaCount: 1
+envObj:
+  HOST_PATHNAME: /viewer-cdn
+  OVERWRITE_API_ENDPOINT: https://siibra-cdn.examcopedia.club/api/v3_0
+  OVERWRITE_SPATIAL_ENDPOINT: https://siibra-spatial-backend.apps.ebrains.eu

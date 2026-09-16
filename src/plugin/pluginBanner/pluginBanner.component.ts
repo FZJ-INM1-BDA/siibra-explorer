@@ -1,19 +1,20 @@
-import { Component } from "@angular/core";
+import { Component, TemplateRef } from "@angular/core";
 import { PluginService } from "../service";
 import { PluginManifest } from "../types";
-import { combineLatest, Observable, of, Subject } from "rxjs";
-import { map, scan, startWith } from "rxjs/operators";
+import { combineLatest, of, Subject } from "rxjs";
+import { map } from "rxjs/operators";
 import { select, Store } from "@ngrx/store";
 import { userPreference } from "src/state";
 import { UserLayerService } from "src/viewerModule/nehuba/userLayers/service";
 import { enLabels } from "src/uiLabels";
 import { TFileInputEvent } from "src/getFileInput/type";
-import { MatSnackBar } from "src/sharedModules";
+import { MatDialog, MatSnackBar } from "src/sharedModules";
+import { fromRootStore } from "src/state/atlasSelection";
 
 @Component({
-  selector : 'plugin-banner',
-  templateUrl : './pluginBanner.template.html',
-  styleUrls : [
+  selector: 'plugin-banner',
+  templateUrl: './pluginBanner.template.html',
+  styleUrls: [
     `./pluginBanner.style.css`,
   ],
 })
@@ -26,31 +27,12 @@ export class PluginBannerUI {
     select(userPreference.selectors.showExperimental)
   )
 
-  view$ = combineLatest([
-    of(enLabels),
-    combineLatest([
-    this.svc.pluginManifests$,
-      this.#thirdpartyPlugin$.pipe(
-        scan((acc, curr) => acc.concat(curr), []),
-        startWith([])
-      ),
-    ]).pipe(
-      map(([builtIn, thirdParty]) => [...builtIn, ...thirdParty])
-    )
-  ]).pipe(
-    map(([ labels, plugins ]) => {
-      return {
-        labels, plugins
-      }
-    })
-  )
-  
-
   constructor(
     private store: Store,
     private svc: PluginService,
     private userLayerSvc: UserLayerService,
     private snackbar: MatSnackBar,
+    private matDialog: MatDialog,
   ) {
   }
 
@@ -58,17 +40,25 @@ export class PluginBannerUI {
     this.svc.launchPlugin(plugin.iframeUrl)
   }
 
-  availablePlugins$: Observable<{
-    name: string
-    iframeUrl: string
-  }[]> = combineLatest([
-    this.svc.pluginManifests$,
-    this.#thirdpartyPlugin$.pipe(
-      scan((acc, curr) => acc.concat(curr), []),
-      startWith([])
+  public showTmpl(tmpl: TemplateRef<any>) {
+    this.matDialog.open(tmpl, {
+      minWidth: '60vw'
+    })
+  }
+
+
+  view$ = combineLatest([
+    this.store.pipe(
+      fromRootStore.distinctATP()
     ),
+    this.svc.pluginManifests$,
+    of(enLabels),
   ]).pipe(
-    map(([builtIn, thirdParty]) => [...builtIn, ...thirdParty])
+    map(([{ atlas, parcellation, template }, plugins, labels]) => {
+      return {
+        atlas, parcellation, template, plugins, labels
+      }
+    })
   )
 
   public addThirdPartyPlugin(iframeUrl: string) {
@@ -82,7 +72,7 @@ export class PluginBannerUI {
     }
     this.#thirdpartyPlugin$.next({
       name: 'Added Plugin',
-      iframeUrl
+      iframeUrl,
     })
   }
 

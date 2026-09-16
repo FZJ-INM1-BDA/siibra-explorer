@@ -13,6 +13,7 @@ from .config import SXPLR_EBRAINS_IAM_SA_CLIENT_ID, SXPLR_EBRAINS_IAM_SA_CLIENT_
 from .const import EBRAINS_IAM_DISCOVERY_URL, ERROR_KEY
 from ._store import DataproxyStore
 from .user import get_user_from_request
+from .logger import logger
 
 router = APIRouter()
 
@@ -142,6 +143,34 @@ class SaneUrlDPStore(DataproxyStore):
 
 data_proxy_store = SaneUrlDPStore()
 
+
+def _fallback_get(key: str):
+    tmpl_url = "https://rgw.cscs.ch/ebrains:{bucket_name}/{object_name}"
+    url = tmpl_url.format(bucket_name=SXPLR_BUCKET_NAME, object_name=f"saneUrl/{key}.json")
+    try:
+        resp = requests.get(url)
+        resp.raise_for_status()
+        resp_content = resp.json()
+    except requests.HTTPError as e:
+        if e.response.status_code == 404:
+            raise SaneUrlDPStore.NotFound from e
+        raise DataproxyStore.GenericException from e
+    expiry = resp_content.get("expiry")
+    if expiry is not None and SaneUrlDPStore.GetTimeMs() > expiry:
+        raise SaneUrlDPStore.NotFound("expired")
+    return resp_content.get("value")
+
+
+def _chain(value, errors, cb, *args, **kwargs):
+    if value:
+        return value, errors
+    try:
+        resp = cb(*args, **kwargs)
+        return resp, errors
+    except Exception as e:
+        return value, [*errors, e]
+
+
 @router.get("/{short_id:str}")
 async def get_short(short_id:str, request: Request):
     accept = request.headers.get("Accept", "")
@@ -149,12 +178,25 @@ async def get_short(short_id:str, request: Request):
     headers = {
         "Vary": "accept"
     }
-    try:
-        existing_json: Dict[str, Any] = data_proxy_store.get(short_id)
+    _chain_calls = [
+        data_proxy_store.get,
+        _fallback_get,
+    ]
+
+    value = None
+    errors = []
+    for cb in _chain_calls:
+        value, errors = _chain(value, errors, cb, short_id)
+
+    if value:
+        if len(errors) > 0:
+            headers['x-sxplr-saneurl-error'] = str(len(errors))
+            logger.warning(f"Warning, error in retrieving errors")
+
         if is_browser:
-            hashed_path = existing_json.get("hashPath")
+            hashed_path = value.get("hashPath")
             extra_routes = []
-            for key in existing_json:
+            for key in value:
                 if key.startswith("x-"):
                     extra_routes.append(f"{key}:{short_id}")
                     continue
@@ -162,17 +204,20 @@ async def get_short(short_id:str, request: Request):
             extra_routes_str = "" if len(extra_routes) == 0 else ("/" + "/".join(extra_routes))
 
             return RedirectResponse(f"{HOST_PATHNAME}/#{hashed_path}{extra_routes_str}", headers=headers)
-        return JSONResponse(existing_json, headers=headers)
-    except DataproxyStore.NotFound as e:
-        if is_browser:
-            request.session[ERROR_KEY] = f"Short ID {short_id} not found."
-            return RedirectResponse(HOST_PATHNAME or "/", headers=headers)
-        raise HTTPException(404, str(e))
-    except DataproxyStore.GenericException as e:
-        if is_browser:
-            request.session[ERROR_KEY] = f"Error: {str(e)}"
-            return RedirectResponse(HOST_PATHNAME or "/", headers=headers)
-        raise HTTPException(500, str(e))
+        return JSONResponse(value, headers=headers)
+    
+    for error in errors:
+        if isinstance(error, DataproxyStore.NotFound):
+            if is_browser:
+                request.session[ERROR_KEY] = f"Short ID {short_id} not found."
+                return RedirectResponse(HOST_PATHNAME or "/", headers=headers)
+            raise HTTPException(404, str(error))
+    
+    error_msg = ", ".join([str(e) for e in errors])
+    if is_browser:
+        request.session[ERROR_KEY] = f"Error: {error_msg}"
+        return RedirectResponse(HOST_PATHNAME or "/", headers=headers)
+    raise HTTPException(500, error_msg)
 
 
 class SaneUrlModel(BaseModel):

@@ -47,7 +47,7 @@ import { CONST } from "common/constants"
 import { ViewerCommonEffects } from './viewerModule';
 import { environment } from './environments/environment';
 import { SAPI } from './atlasComponents/sapi';
-import { GET_ATTR_TOKEN, GetAttr, LABEL_EVENT_TRIGGER, LblEventSvc } from './util/constants';
+import { GET_ATTR_TOKEN, GetAttr, LABEL_EVENT_TRIGGER, LblEventSvc, SXPLR_CONF_TOKEN, SxplrConf } from './util/constants';
 import { KCodeModule } from "./experimental/experimental.module"
 import { FreeModeModule } from './freeModeModule';
 import { SxplrSnackBarSvc } from './components';
@@ -238,6 +238,18 @@ import { SxplrOverlaySvc } from './components/overlay';
         return (labels: string[]) => svc.labels$.next(labels)
       },
       deps: [ LblEventSvc ]
+    },
+    {
+      provide: SXPLR_CONF_TOKEN,
+      useFactory: (getAttr: GetAttr) => {
+        const hidePopup = getAttr(CONST.HIDE_POPUP_ATTR)
+        return async () => {
+          return {
+            HIDE_POPUP: !!hidePopup
+          } as SxplrConf
+        }
+      },
+      deps: [GET_ATTR_TOKEN]
     },
     LblEventSvc,
     provideHttpClient(withInterceptorsFromDi()),

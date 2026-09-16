@@ -1,0 +1,12 @@
+<span class="sxplr-custom-cmp text">
+    {{ bucketname }} / {{ fname }}
+</span>
+
+<mat-form-field>
+    <mat-label>Select a level</mat-label>
+    <mat-select (selectionChange)="selectLod($event)">
+        <ng-template ngFor [ngForOf]="lods" let-lod>
+            <mat-option [value]="lod">{{ lod }}</mat-option>
+        </ng-template>
+    </mat-select>
+</mat-form-field>

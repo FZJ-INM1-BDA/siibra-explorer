@@ -135,6 +135,11 @@ export class ViewerCtrlCmp implements OnInit{
       atlasAppearance.actions.toggleFreezeMeshRemoval()
     )
   }
+  public clearSubstrate(){
+    this.store$.dispatch(
+      atlasAppearance.actions.clearSubstrate()
+    )
+  }
 
   public trackByAtId(_idx: number, obj: { ['@id']: string }): string {
     return obj['@id']

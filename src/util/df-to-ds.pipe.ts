@@ -4,7 +4,7 @@ import { MatPaginator, MatSort, MatTableDataSource } from 'src/sharedModules/ang
 import { components } from "src/atlasComponents/sapi/schemaV3"
 type DF = components["schemas"]["DataFrameModel"]
 
-function isDf(val: object): val is DF {
+function isDf(val: object|null): val is DF {
   if (!val) return false
   const keys = [
     "columns",
@@ -22,6 +22,9 @@ export class DfToDsPipe implements PipeTransform {
 
   transform(df: object, sort: MatSort, pg?: MatPaginator): CdkTableDataSourceInput<unknown> {
     if (!isDf(df)) {
+      return null
+    }
+    if (!df.data) {
       return null
     }
     const v = df.data.map((arr, idx) => {

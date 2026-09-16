@@ -110,6 +110,17 @@ export class KeyFrameCtrlCmp {
     ]
   }
 
+  rotate7deg(){
+    if (this.currViewerType === "nehuba") {
+      const perspectivePose = (window as any).viewer?.perspectiveNavigationState?.pose
+      if (!perspectivePose) {
+        return
+      }
+      const deg = 7 / 180 * Math.PI
+      perspectivePose.rotateAbsolute([0, 0, 1], deg, [0, 0, 0])
+    }
+  }
+
   #setAutoRotate(play: boolean, speed: number, reverse: boolean) {
     
     this.viewerInternalSvc.applyInternalState<TAutoRotatePayload>({

@@ -9,6 +9,7 @@ import { ToolbarWidgetSvc } from "src/atlasComponents/toolbarWidget/toolbarWidge
 import { ToolbarWidget } from "src/atlasComponents/toolbarWidget/toolbarWidget.component";
 import { SxplrSnackBarSvc } from "src/components";
 import { RM_TOOLBAR_WIDGET, TOOLBAR_PORTAL_TOKEN } from "src/atlasComponents/toolbarWidget/consts";
+import { PluginManifest } from "./types";
 
 @Injectable({
   providedIn: 'root'
@@ -25,11 +26,7 @@ export class PluginService {
     private snackbar: SxplrSnackBarSvc,
   ){}
 
-  pluginManifests$ = this.http.get<{
-    'siibra-explorer': true
-    name: string
-    iframeUrl: string
-  }[]>(`${environment.BACKEND_URL || ''}plugins/manifests`).pipe(
+  pluginManifests$ = this.http.get<PluginManifest[]>(`${environment.BACKEND_URL || ''}plugins/manifests`).pipe(
     startWith([]),
     catchError(() =>  of([]))
   )

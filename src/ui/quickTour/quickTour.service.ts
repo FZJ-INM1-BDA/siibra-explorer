@@ -1,11 +1,11 @@
-import { ComponentRef, Inject, Injectable } from "@angular/core";
+import { ComponentRef, Inject, Injectable, Optional } from "@angular/core";
 import { BehaviorSubject, Subject } from "rxjs";
 import { Overlay, OverlayRef } from "@angular/cdk/overlay";
 import { ComponentPortal } from "@angular/cdk/portal";
 import { QuickTourThis } from "./quickTourThis.directive";
 import { DoublyLinkedList, IDoublyLinkedItem } from 'src/util'
 import { EnumQuickTourSeverity, PERMISSION_DIALOG_ACTIONS, QuickTourSeverity, QUICK_TOUR_CMP_INJTKN } from "./constrants";
-import { LOCAL_STORAGE_CONST } from "src/util/constants";
+import { LOCAL_STORAGE_CONST, SXPLR_CONF_TOKEN, SxplrConf } from "src/util/constants";
 import { MatDialog, MatDialogRef } from 'src/sharedModules/angularMaterial.exports'
 import { StartTourDialogDialog } from "src/ui/quickTour/startTourDialog/startTourDialog.component";
 
@@ -41,7 +41,8 @@ export class QuickTourService {
      * makes sense, since we want to keep the dependency of svc on cmp as loosely (or non existent) as possible
      */
     @Inject(QUICK_TOUR_CMP_INJTKN) private quickTourCmp: any,
-    private matDialog: MatDialog
+    private matDialog: MatDialog,
+    @Optional() @Inject(SXPLR_CONF_TOKEN) private sxplrConf: SxplrConf,
   ){
   }
 
@@ -71,6 +72,9 @@ export class QuickTourService {
 
     // if already viewed quick tour, return
     if (localStorage.getItem(LOCAL_STORAGE_CONST.QUICK_TOUR_VIEWED)){
+      return
+    }
+    if (this.sxplrConf?.HIDE_POPUP) {
       return
     }
     // if auto start already triggered, return

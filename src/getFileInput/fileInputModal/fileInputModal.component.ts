@@ -103,7 +103,10 @@ export class FileInputModal implements IFileInputConfig, OnChanges{
     this.fileInput = target.files[0]
   }
 
-  handleFileDrop(files: File[]){
+  handleFileDrop(files: string|File[]){
+    if (typeof files === "string") {
+      return
+    }
     this.fileInput = files[0]
   }
 

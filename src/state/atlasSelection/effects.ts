@@ -110,6 +110,10 @@ export class Effect {
     )
   }
 
+  /**
+   * @description a list of hooks to be called in list order after parcellation and template selection. 
+   * The hooks are called in parallel and the results are applied - and potentially overwritten - in the order of the list.
+   */
   onTemplateParcSelectionPostHook: ((arg: OnTmplParcHookArg) => Observable<TPSelectPostHook>)[] = [
     /**
      * This hook gets the region associated with the selected parcellation and template,

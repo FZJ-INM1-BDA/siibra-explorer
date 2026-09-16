@@ -2,7 +2,7 @@ import { Injectable, OnDestroy } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { select, Store } from "@ngrx/store";
 import { combineLatest, NEVER, of, Subscription } from "rxjs";
-import { debounce, distinctUntilChanged, filter, map, mapTo, skipWhile, switchMap, tap, withLatestFrom } from "rxjs/operators";
+import { debounce, distinctUntilChanged, filter, map, mapTo, switchMap, tap, withLatestFrom } from "rxjs/operators";
 import { atlasSelection, MainState, userInterface, userPreference } from "src/state"
 import { CYCLE_PANEL_MESSAGE } from "src/util/constants";
 import { timedValues } from "src/util/generator";
@@ -122,7 +122,9 @@ export class NehubaNavigationEffects implements OnDestroy{
         switchMap(nvUnit => nvUnit.viewerPositionChange)
       )
     ),
-    skipWhile(([nav, lock, _nvUnit, viewerNav]) => lock || navObjEqual(nav, viewerNav)),
+    filter(([nav, lock, _nvUnit, viewerNav]) => {
+      return !lock && !navObjEqual(nav, viewerNav)
+    }),
     tap(([nav, _lock, nvUnit, _viewerNav]) => {
       nvUnit.setNavigationState(nav)
     })
@@ -155,7 +157,7 @@ export class NehubaNavigationEffects implements OnDestroy{
           }
           return of(
             atlasSelection.actions.setNavigation({
-              navigation:roundedNav
+              navigation: roundedNav
             })
           )
         })

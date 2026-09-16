@@ -8,8 +8,13 @@ Feature: Exploring the selected region
         When User clicks a parcel
         Then The clicked parcel is selected
     
-    Scenario: User navigates to the selected region
-        Given User selected a region of interest
+    Scenario: Selecting region navigates to ROI
+        Given above scenario
+        Then The viewer navigates to the said centroid of the region
+        
+    Scenario: User return to the selected region
+        Given User selects a region of interest
+        Given User pan to a different location
         When User clicks `Centroid` button
         Then The viewer navigates to the said centroid of the region
 

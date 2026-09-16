@@ -248,6 +248,7 @@ export class ModularUserAnnotationToolService implements OnDestroy{
         })
       )
     }
+    
     return newTool
   }
 
@@ -287,6 +288,19 @@ export class ModularUserAnnotationToolService implements OnDestroy{
     for (const msg of this.#hoverMsgs){
       append(msg)
     }
+  }
+
+  remark(){
+    this.snackbar.open(
+      `Annotation(s) loaded`,
+      `Open`
+    ).afterDismissed().subscribe(v => {
+      if (v.dismissedByAction) {
+        this.store.dispatch(
+          atlasSelection.actions.setViewerMode({ viewerMode: "annotating" })
+        )
+      }
+    })
   }
 
   constructor(
@@ -640,6 +654,10 @@ export class ModularUserAnnotationToolService implements OnDestroy{
         name: this.defaultTool.name || null
       }
     })
+  }
+
+  parseAnnotationString(input: string){
+    return this.parseAnnotationObject(JSON.parse(input))
   }
 
   parseAnnotationObject(json: TSands | TGeometryJson | TTypedAnnMetadata): IAnnotationGeometry | null{

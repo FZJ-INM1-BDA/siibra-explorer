@@ -8,9 +8,9 @@ type TObj = Record<string, any>
 })
 
 export class MergeObjPipe implements PipeTransform{
-  public transform(o1: TObj, o2: TObj){
+  public transform(o1: TObj|null, o2: TObj){
     return {
-      ...o1,
+      ...(o1 || {}),
       ...o2
     }
   }

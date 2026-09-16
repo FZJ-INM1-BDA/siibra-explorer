@@ -1,47 +1,43 @@
 <ng-template [ngIf]="view$ | async" let-view>
 
-    <mat-action-list>
-        <button mat-menu-item
-            *ngFor="let plugin of view.plugins"
-            (click)="launchPlugin(plugin)">
-            <span>
-                {{ plugin.name }}
-            </span>
-        </button>
+  <mat-list>
+    <ng-template ngFor [ngForOf]="view.plugins" let-plugin>
 
-        <ng-template sxplrExperimentalFlag [experimental]="true">
+      <ng-template [ngIf]="plugin | pluginDisabledReasons : view.atlas : view.template : view.parcellation" let-disableReasons>
+        <ng-template [ngIf]="disableReasons.length > 0" [ngIfElse]="enabledTmpl">
 
-        <ng-template #inputUserLayerTmpl>
-            <markdown-dom [markdown]="view.labels.ADD_LAYER_DESC"></markdown-dom>
-        </ng-template>
-        <button mat-menu-item
-            [matTooltip]="view.labels.ADD_LAYER"
-            (file-input-directive)="loadUserLayer($event); fileinput.dismiss()"
-            [file-input-directive-file]="view.labels.ADD_LOCAL_FILE_DESC"
-            file-input-directive-file-ext=".nii,.nii.gz"
-            [file-input-directive-text]="false"
-            [file-input-directive-url]="view.labels.ADD_REMOTE_URL_PLACEHOLDER"
-            [file-input-directive-message]="inputUserLayerTmpl"
-            [file-input-directive-title]="view.labels.ADD_LAYER_TITLE"
-            #fileinput="fileInputDirective">
-            <span>
-                Add a new layer
+          <mat-list-item [matTooltip]="'Plugin disabled: ' + disableReasons.join(', ')">
+            <span class="sxplr-custom-cmp text warn">
+              <i class="fas fa-exclamation-triangle"></i>
             </span>
-        </button>
-        
-        <button mat-menu-item
-            [sxplr-dialog]="thirdPartyPluginTmpl"
-            [sxplr-dialog-config]="{
-                'width': '90vw'
-            }">
-            <span>
-                Add third party plugin
+            
+            <span class="text-muted">
+              {{ plugin.name }}
             </span>
-        </button>
+          </mat-list-item>
+
         </ng-template>
-    </mat-action-list>
+
+        <ng-template #enabledTmpl>
+          <button mat-menu-item (click)="launchPlugin(plugin)">
+            {{ plugin.name }}
+          </button>
+        </ng-template>
+
+      </ng-template>
+
+    </ng-template>
+
+    <ng-template sxplrExperimentalFlag [experimental]="true">
+      <button mat-menu-item (click)="showTmpl(thirdPartyPluginTmpl)">
+        <span>
+          Add third party plugin
+        </span>
+      </button>
+    </ng-template>
+  </mat-list>
+
 </ng-template>
-
 
 <ng-template #thirdPartyPluginTmpl>
     <h2 mat-dialog-title>
@@ -59,14 +55,12 @@
     </form>
     </mat-dialog-content>
 
-    <mat-dialog-actions align="end">
-    <button (click)="addThirdPartyPlugin(urlInput.value)"
-        mat-raised-button
-        color="primary">
-        Load
+  <mat-dialog-actions align="end">
+    <button (click)="addThirdPartyPlugin(urlInput.value)" mat-raised-button color="primary">
+      Load
     </button>
     <button mat-dialog-close mat-button>
-        cancel
+      cancel
     </button>
     </mat-dialog-actions>
 

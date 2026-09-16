@@ -4,12 +4,12 @@ A typical brain atlas consists of
 
 - a reference coordinate space with a brain reference template, typically a structural image of the brain
 - a parcellation map, which labels coordinates in the reference space with an identifier of a brain region,
-- a taxonomy, which defines the names of brain regions used by the parcellation, and links them to the identifiers used in the parcellation map.
+- a terminology, which defines the names of brain regions used by the parcellation, and links them to the identifiers used in the parcellation map.
 
 siibra extends this basic concept by linking multiple spaces and parcellation maps with complementary properties, and combining them with multimodal data features that capture characteristic aspects of brain organisation for locations in the brain.
 
-## Labelled maps vs probability maps
-The above describes what siibra calls a "labelled map", where each location in the brain is uniquely labelled to belong to exactly one brain region. However, siibra also supports "statistical maps", where each location in the brain is mapped to multiple brain regions with different weights (or probabilities). Each coordinate is then not mapped to a single label, but to a vector of weights, one per brain region. The weights for a specific brain region across all coordinates in the brain then form the statistical (or probabilistic) map for this single region, and the statistical maps of multiple regions may overlap.# Datasets linked to locations in the brain
+## Labelled maps vs statistical maps
+The above describes what siibra calls a "labelled map", which provides a discrete annotation where each location in the brain is uniquely labelled to belong to exactly one brain region. However, siibra also supports "statistical maps" (also called probabilistic maps), which provide a continuous annotation where each location in the brain is mapped to multiple brain regions with different weights (or probabilities). Each coordinate is then not mapped to a single label, but to a vector of weights, one per brain region. The weights for a specific brain region across all coordinates in the brain then form the statistical (or probabilistic) map for this single region, and the statistical maps of multiple regions may overlap.
 
 
 ## Multiple reference spaces

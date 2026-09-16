@@ -1,7 +1,6 @@
-import { CommonModule } from "@angular/common";
+import { CommonModule, DOCUMENT } from "@angular/common";
 import { APP_INITIALIZER, NgModule } from "@angular/core";
 import { AngularMaterialModule } from 'src/sharedModules/angularMaterial.module'
-import { APPEND_SCRIPT_TOKEN } from "src/util/constants";
 import { LeapSignal } from "./leapSignal/leapSignal.component";
 import { LeapService } from "./service";
 import { LeapControlViewRef } from "./signal.directive";
@@ -23,11 +22,14 @@ import { LeapControlViewRef } from "./signal.directive";
     LeapService,
     {
       provide: APP_INITIALIZER,
-      useFactory(appendSrc: (src: string, deferFlag?: boolean) => Promise<void>){
-        return () => appendSrc("leap-0.6.4.js", true)
+      useFactory(document: Document){
+        const scel = document.createElement("script")
+        scel.src = "leap-0.6.4.js"
+        document.head.appendChild(scel)
+        return () => Promise.resolve()
       },
       deps: [
-        APPEND_SCRIPT_TOKEN
+        DOCUMENT
       ],
       multi: true
     },

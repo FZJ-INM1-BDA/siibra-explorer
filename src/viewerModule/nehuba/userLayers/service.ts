@@ -35,13 +35,14 @@ type Meta = {
   filename: string
   min?: number
   max?: number
-}
+} & Record<string, any>
 
 const OVERLAY_LAYER_KEY = "x-overlay-layer"
 const OVERLAY_LAYER_SEP = ","
 const OVERLAY_LAYER_PROTOCOL = `${OVERLAY_LAYER_KEY}://`
 const SUPPORTED_PREFIX = ["nifti://", "precomputed://", "zarr://", "n5://", "swc://", "deepzoom://"] as const
-
+const INGSVC_PTCLD = "ingsvc-ptcld://"
+const INGSVC_FIBER = "ingsvc-fiber://"
 type ValidProtocol = typeof SUPPORTED_PREFIX[number]
 type ValidInputTypes = File | string
 
@@ -199,41 +200,140 @@ export class UserLayerService implements OnDestroy {
       cleanup: () => URL.revokeObjectURL(url)
     }]
   }
-
+  
   @RegisterSource(
     async input => input instanceof File && input.name.endsWith(".csv")
   )
-  async processCsv(file: File): Promise<ReturnType<ProcessResource['processor']>> {
-
-    const id = getUuid()
-    const xform = await linearTransform("LENS_ABA", "NEHUBA")
-    const layer = new AnnotationLayer(id, "#ffcccc", xform)
-    const text = await file.text()
-    const lines = text.split("\n")
-    const triplets: number[][] = lines.map(l => {
-      const xyz = l.split(',').map(n => Number(n))
-      if (xyz.some(v => isNaN(v))) {
-        return null
+  async processCsv(file: File) {
+    const THRESHOLD = 100_000 // display 200k point max
+    
+    function parseCsvLine(csvLine: string){
+      const rvals = csvLine.split(",").map(v => Number(v.trim())*1e6)
+      if (rvals.length !== 3) {
+        throw Error(`Expected exactly 3 elements, but got ${rvals.length}: ${rvals}`)
       }
-      return xyz
-    }).filter(v => !!v)
+      if (!rvals.every(v => typeof v === "number" && !isNaN(v))) {
+        throw Error(`Expected every element is a number, and is not NaN, but untrue: ${rvals}`)
+      }
+      return rvals
+    }
+    try {
+      const pointClds: number[][] = []
+      const stream = file.stream()
+      const reader = stream.getReader()
+      const decoder = new TextDecoder("utf-8")
+      let accumulator = ""
+      let counter = 0
+      // eslint-disable-next-line no-constant-condition
+      while (true) {
+        const { done, value } = await reader.read()
+        accumulator += decoder.decode(value, {stream: true})
+        if (done) {
+          break
+        }
+      }
+      const splitAcc = accumulator.split("\n")
 
-    layer.addAnnotation(triplets.map((triplet, idx) => ({
-      id: `${id}-${idx}`,
-      type: 'point',
-      point: triplet.map(v => v) as [number, number, number]
-    })))
+      const useMod = Math.ceil(splitAcc.length / THRESHOLD)
+    
+      for (const line of splitAcc){
+        counter += 1
+        try {
+          if (counter % useMod === 0) {
+            const pt = parseCsvLine(line)
+            pointClds.push(pt)
+          }
+        } catch (e) {
+          console.error(e)
+          continue
+        }
+      }
 
+      const id = "csv-layer-annot"
+    
+      const layer = new AnnotationLayer("csv-layer-annot")
+      layer.addAnnotation(pointClds.map((triplet, idx) => ({
+        id: `${id}-${idx}`,
+        type: 'point',
+        point: triplet.map(v => v) as [number, number, number]
+      })))
+      
+      return {
+        cleanup: () => {
+          layer.dispose()
+        },
+        meta: {
+          filename: file.name,
+        }
+      }
+      
+    } catch (e) {
+      console.log("error", e)
+      throw e
+    }
+  }
+
+  
+  @RegisterSource(
+    async input => typeof input === "string" && input.startsWith(INGSVC_FIBER)
+  )
+  async processIngSvcFiber(input: string){
+    
+    const trimmedInput = input.slice(INGSVC_FIBER.length)
+    
+    const [ bucketname, ...fnames ] = trimmedInput.split("/")
+    const fname = fnames.join("/")
+    
     return [{
-      cleanup: () => {
-        layer.dispose()
-      },
       meta: {
-        filename: file.name
+        filename: `fiber`,
+        fiber: { bucketname, fname }
       },
-
+      cleanup: noop,
     }]
   }
+
+  @RegisterSource(
+    async input => typeof input === "string" && input.startsWith(INGSVC_PTCLD)
+  )
+  async processIngSvcPtCld(input: string){
+
+    const GEOMSVC_HOST = "https://geom-svc.apps.ebrains.eu"
+    const trimmedInput = input.slice(INGSVC_PTCLD.length)
+    
+    const [ bucketname, ...fnames ] = trimmedInput.split("/")
+    const fname = fnames.join("/")
+    
+    const kdeBaseUrl = `${GEOMSVC_HOST}/ptcld/${bucketname}/${fname}/kde`
+
+    const meta = await (await fetch(`${kdeBaseUrl}/meta.json`)).json()
+    
+    return [
+      {
+        meta: {
+          filename: `ebrains object ${bucketname}/${fname}`,
+          ptcld: {
+            bucketname,
+            fname
+          }
+        },
+        cleanup: noop,
+        protocol: 'precomputed://',
+        url: kdeBaseUrl,
+        option: {
+          legacySpecFlag: "old",
+          shader: getShader({ colormap: "magma" }),
+          type: "image",
+          transform: meta.transform
+        }
+      }
+    ]
+  }
+  /**
+   * 
+   * http://localhost:8080/#/a:juelich:iav:atlas:v1.0.0:2/t:minds:core:referencespace:v1.0.0:265d32a0-3d84-40a5-926f-bf89f68212b9/p:minds:core:parcellationatlas:v1.0.0:05655b58-3b6f-49db-b285-64b5a0276f83/@:0.0.0.-W000.._eCwg.2-FUe3._-s_W.2_evlu..kxW..7jaA.6VrJ.4cDd~..5Bj/vs:v2-ff011b0b/x-overlay-layer:ingsvc-ptcld:%2F%2Ftest-sept-22%2F2026-09-02-ptcld-test
+   * ingsvc-ptcld:%2F%2Ftest-sept-22%2F2026-09-02-ptcld-test
+   */
 
   @RegisterSource(
     async input => typeof input === "string" && input.startsWith(OVERLAY_LAYER_PROTOCOL)
@@ -375,7 +475,8 @@ export class UserLayerService implements OnDestroy {
         transform: meta?.transform || transform,
         shader: getShaderFromMeta(meta),
         opacity: getOpacityFromMeta(meta),
-        type: isSeg ? "segmentation" : "image"
+        type: isSeg ? "segmentation" : "image",
+        meta,
       },
       protocol,
       url,
@@ -698,10 +799,6 @@ export class UserLayerService implements OnDestroy {
         return await processor.apply(this, [input])
       }
     }
-    const inputStr = input instanceof File
-      ? input.name
-      : input
-    throw new Error(`Could not find a processor for ${inputStr}`)
   }
 
   async handleUserInput(input: ValidInputTypes) {
@@ -721,6 +818,7 @@ export class UserLayerService implements OnDestroy {
     } catch (e) {
       this.snackbar.open(`Error opening file: ${e.toString()}`, "Dismiss")
     }
+    return
   }
 
   #addLayer(processedOutput: ProcessorOutput) {
