@@ -1,5 +1,18 @@
-<ng-template [ngIf]="ptCount$ | async" let-count>
-    <span class="sxplr-custom-cmp text">
-        {{ count }} points
-    </span>
-</ng-template>
+<form [formGroup]="formCtrl">
+    <div>
+        <mat-slide-toggle formControlName="kde">kde</mat-slide-toggle>
+    </div>
+    <div>
+        <mat-slide-toggle formControlName="rtree">rtree</mat-slide-toggle>
+        
+        <ng-template [ngIf]="ptCount$ | async" let-count>
+            <span class="sxplr-custom-cmp text">
+                {{ count }} points
+            </span>
+        </ng-template>
+    </div>
+    <div>
+        <mat-slide-toggle formControlName="multires">multires</mat-slide-toggle>
+    </div>
+</form>
+

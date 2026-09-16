@@ -1,13 +1,16 @@
 import { CommonModule } from "@angular/common";
-import { Component, inject, Input } from "@angular/core";
+import { Component, inject, Input, OnChanges, SimpleChanges } from "@angular/core";
+import { FormControl, FormGroup, ReactiveFormsModule } from "@angular/forms";
 import { select, Store } from "@ngrx/store";
-import { concat, from, of } from "rxjs";
-import { debounceTime, distinctUntilChanged, map, shareReplay, switchMap, takeUntil } from "rxjs/operators";
+import { concat, EMPTY, from, of } from "rxjs";
+import { debounceTime, distinctUntilChanged, filter, map, shareReplay, switchMap, takeUntil } from "rxjs/operators";
 import { AnnotationLayer, TNgAnnotationPoint } from "src/atlasComponents/annotations";
 import { IDS } from "src/atlasComponents/sapi";
-import { atlasSelection } from "src/state";
+import { AngularMaterialModule } from "src/sharedModules";
+import { atlasAppearance, atlasSelection } from "src/state";
 import { arrayEqual } from "src/util/array";
 import { DestroyDirective } from "src/util/directives/destroy.directive";
+import { getShader, QuickHash } from "src/util/fn";
 
 const GEOMSVC_HOST = "https://geom-svc.apps.ebrains.eu"
 const COUNT_THRESHOLD = 1e6
@@ -28,13 +31,21 @@ const LOADING_STATE = {
   standalone: true,
   imports: [
     CommonModule,
+    ReactiveFormsModule,
+    AngularMaterialModule,
   ],
   hostDirectives: [
     DestroyDirective,
   ]
 })
 
-export class PtcldUI {
+export class PtcldUI implements OnChanges{
+
+  formCtrl = new FormGroup({
+    kde: new FormControl(false),
+    rtree: new FormControl(false),
+    multires: new FormControl(false),
+  })
 
   LOADING_STATE = LOADING_STATE
 
@@ -46,7 +57,10 @@ export class PtcldUI {
   @Input()
   fname: string | undefined
 
-  
+  #basehash: string |undefined
+  ngOnChanges(_changes: SimpleChanges): void {
+    this.#basehash = QuickHash.GetHash(`${this.bucketname}/${this.fname}`)
+  }
   #pointToPoint(point: [number, number, number], useId=null): TNgAnnotationPoint{
     const id = useId || `${PTCLD_CONST}:${JSON.stringify(point)}`
     return {
@@ -103,17 +117,131 @@ export class PtcldUI {
     shareReplay(1),
   )
 
+  #addMultires(){
+    const mrLayername = `ingsvc-ptcld-multires-${this.#basehash}`
+    const url = `https://data-proxy.ebrains.eu/api/v1/buckets/${this.bucketname}/${this.fname}/multires`
+    
+    
+    this.store.dispatch(
+      atlasAppearance.actions.addCustomLayers({
+        customLayers: [
+          {
+            id: mrLayername,
+            clType: "customlayer/nglayer",
+            source: `precomputed://${url}`,
+            legacySpecFlag: 'old',
+            type: 'annotation'
+          }
+        ]
+      })
+    )
+  }
+
+  #rmMultires(){
+    const mrLayername = `ingsvc-ptcld-multires-${this.#basehash}`
+    this.store.dispatch(
+      atlasAppearance.actions.removeCustomLayers({
+        customLayers: [
+          {
+            id: mrLayername
+          }
+        ]
+      })
+    )
+  }
+
+  #meta: Record<string, any>|undefined
+  async #addKde(){
+    const kdeLayername = `ingsvc-ptcld-kde-${this.#basehash}`
+    const kdeBaseUrl = `${GEOMSVC_HOST}/ptcld/${this.bucketname}/${this.fname}/kde`
+    if (!this.#meta) {
+      this.#meta = await (await fetch(`${kdeBaseUrl}/meta.json`)).json()
+    }
+
+    const shader = getShader({
+      colormap: 'magma',
+    })
+    
+    this.store.dispatch(
+      atlasAppearance.actions.addCustomLayers({
+        customLayers: [
+          {
+            id: kdeLayername,
+            clType: "customlayer/nglayer",
+            source: `precomputed://${kdeBaseUrl}`,
+            legacySpecFlag: 'old',
+            transform: this.#meta!.transform,
+            shader: shader,
+            type: 'image'
+          }
+        ]
+      })
+    )
+  }
+  #removeKde(){
+    const kdeLayername = `ingsvc-ptcld-kde-${this.#basehash}`
+    this.store.dispatch(
+      atlasAppearance.actions.removeCustomLayers({
+        customLayers: [
+          {
+            id: kdeLayername
+          }
+        ]
+      })
+    )
+  }
+
   constructor(private store: Store) {
     this.#ondestroy$.subscribe(() => {
       this.#annLayer?.dispose()
+      this.#removeKde()
+      this.#rmMultires()
     })
-    this.#currViewportDebouncedChanged$.pipe(
+
+    this.formCtrl.controls.kde.valueChanges.pipe(
       takeUntil(this.#ondestroy$),
-      switchMap(vp => this.ptCount$.pipe(
-        map(count => {
-          return { vp, count }
-        })
-      ))
+      distinctUntilChanged()
+    ).subscribe(async flag => {
+      if (flag) {
+        this.#addKde()
+      } else {
+        this.#removeKde()
+      }
+    })
+
+    this.formCtrl.controls.multires.valueChanges.pipe(
+      takeUntil(this.#ondestroy$),
+      distinctUntilChanged()
+    ).subscribe(async flag => {
+      if (flag) {
+        this.#addMultires()
+      } else {
+        this.#rmMultires()
+      }
+    })
+
+    this.formCtrl.controls.rtree.valueChanges.pipe(
+      takeUntil(this.#ondestroy$),
+      distinctUntilChanged(),
+      filter(flag => !flag)
+    ).subscribe(() => {
+      this.#annLayer?.dispose()
+    })
+    
+    this.formCtrl.controls.rtree.valueChanges.pipe(
+      takeUntil(this.#ondestroy$),
+      distinctUntilChanged(),
+      switchMap(flag => 
+        flag
+        ? this.#currViewportDebouncedChanged$.pipe(
+            switchMap(vp => this.ptCount$.pipe(
+              map(count => {
+                return { count, vp }
+              })
+            ))
+          )
+        : EMPTY
+      )
     ).subscribe(async ({ vp, count }) => {
       
       if (typeof count !== "number") {

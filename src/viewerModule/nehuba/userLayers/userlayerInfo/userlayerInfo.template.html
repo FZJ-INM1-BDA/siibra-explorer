@@ -23,10 +23,13 @@
 
   </mat-action-list>
 
-  <ng-template [ngTemplateOutlet]="ngLayerController" [ngTemplateOutletContext]="{
-    onlyOpacity: false
-  }">
-
+  <ng-template [ngIf]="data.layerName">
+    <ng-layer-tune
+      advanced-control="true"
+      [ngLayerName]="data.layerName"
+      [thresholdMax]="data.meta.max || 1"
+      [thresholdMin]="data.meta.min || 0">
+    </ng-layer-tune>
   </ng-template>
 </ng-template>
 </ng-template>
@@ -52,12 +55,3 @@
   </geomsvc-fiber>
 </ng-template>
 
-<ng-template #ngLayerController let-onlyOpacity="onlyOpacity">
-  <ng-layer-tune
-    [hideCtrl]="onlyOpacity ? HIDE_NG_TUNE_CTRL.ONLY_SHOW_OPACITY : ''"
-    advanced-control="true"
-    [ngLayerName]="data.layerName"
-    [thresholdMax]="data.meta.max || 1"
-    [thresholdMin]="data.meta.min || 0">
-  </ng-layer-tune>
-</ng-template>

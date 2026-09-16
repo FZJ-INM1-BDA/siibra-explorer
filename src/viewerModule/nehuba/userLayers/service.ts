@@ -74,7 +74,6 @@ function RegisterSource(matcher: ProcessResource['matcher']) {
   providedIn: 'root'
 })
 export class UserLayerService implements OnDestroy {
-  #idToCleanup = new Map<string, () => void>()
 
   static VerifyUrl(source: string) {
     for (const prefix of SUPPORTED_PREFIX) {
@@ -298,15 +297,11 @@ export class UserLayerService implements OnDestroy {
   )
   async processIngSvcPtCld(input: string){
 
-    const GEOMSVC_HOST = "https://geom-svc.apps.ebrains.eu"
-    const trimmedInput = input.slice(INGSVC_PTCLD.length)
-    
+    const trimmedInput = input.slice(INGSVC_PTCLD.length)    
     const [ bucketname, ...fnames ] = trimmedInput.split("/")
     const fname = fnames.join("/")
-    
-    const kdeBaseUrl = `${GEOMSVC_HOST}/ptcld/${bucketname}/${fname}/kde`
 
-    const meta = await (await fetch(`${kdeBaseUrl}/meta.json`)).json()
+    // const meta = await (await fetch(`${kdeBaseUrl}/meta.json`)).json()
     
     return [
       {
@@ -318,14 +313,14 @@ export class UserLayerService implements OnDestroy {
           }
         },
         cleanup: noop,
-        protocol: 'precomputed://',
-        url: kdeBaseUrl,
-        option: {
-          legacySpecFlag: "old",
-          shader: getShader({ colormap: "magma" }),
-          type: "image",
-          transform: meta.transform
-        }
+        // protocol: 'precomputed://',
+        // url: kdeBaseUrl,
+        // option: {
+        //   legacySpecFlag: "old",
+        //   shader: getShader({ colormap: "magma" }),
+        //   type: "image",
+        //   transform: meta.transform
+        // }
       }
     ]
   }
@@ -810,13 +805,6 @@ export class UserLayerService implements OnDestroy {
     try {
       const outputs = await this.#processInput(input)
       for (const output of outputs) {
-
-        const { url, cleanup } = output
-        const id = url
-        if (this.#idToCleanup.has(id)) {
-          continue
-        }
-        this.#idToCleanup.set(id, cleanup)
         this.#addLayer(output)
       }
 
@@ -830,10 +818,10 @@ export class UserLayerService implements OnDestroy {
     const { option, protocol, url, meta, cleanup, actions } = processedOutput
 
     const source = protocol && url && `${protocol}${url}`
-    const id = url ? QuickHash.GetHash(url) : getUuid()
-    this.#idToCleanup.set(id, cleanup)
-
+    
+    let id: string|undefined
     if (source) {
+      id = url ? QuickHash.GetHash(url) : getUuid()
       UserLayerService.VerifyUrl(source)
       const layer = {
         id,
@@ -866,16 +854,14 @@ export class UserLayerService implements OnDestroy {
           provide: RM_TOOLBAR_WIDGET,
           useValue: (_this: ToolbarWidget<UserLayerInfoCmp>) => {
             
-            const _cleanup = this.#idToCleanup.get(id)
-            this.#idToCleanup.delete(id)
-            if (_cleanup) {
-              _cleanup()
+            cleanup()
+            if (id) {
+              this.store$.dispatch(
+                atlasAppearance.actions.removeCustomLayers({
+                  customLayers: [ { id } ]
+                })
+              )
             }
-            this.store$.dispatch(
-              atlasAppearance.actions.removeCustomLayers({
-                customLayers: [ { id } ]
-              })
-            )
             this.widgtSvc.rmWidget(_this)
           }
         }
@@ -915,9 +901,6 @@ export class UserLayerService implements OnDestroy {
         for (const id of prevIds) {
           if (newIds.includes(id)) {
             continue
-          }
-          if (this.#idToCleanup.has(id)) {
-            this.#idToCleanup.get(id)()
           }
         }
       })
