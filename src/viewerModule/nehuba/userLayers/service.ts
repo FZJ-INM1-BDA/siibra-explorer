@@ -438,8 +438,13 @@ export class UserLayerService implements OnDestroy {
           .catch(_e => null as MetaV1Schema)
       )
     }).toPromise()
-
-    const isSeg = info?.type === "segmentation"
+    let type = "image"
+    if (info?.type === "segmentation") {
+      type = "segmentation"
+    }
+    if (info?.['@type'] === "neuroglancer_annotations_v1") {
+      type = "annotation"
+    }
     const actions: Action[] = []
 
     const _xform = meta?.transform || transform || [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]
@@ -475,7 +480,7 @@ export class UserLayerService implements OnDestroy {
         transform: meta?.transform || transform,
         shader: getShaderFromMeta(meta),
         opacity: getOpacityFromMeta(meta),
-        type: isSeg ? "segmentation" : "image",
+        type,
         meta,
       },
       protocol,
