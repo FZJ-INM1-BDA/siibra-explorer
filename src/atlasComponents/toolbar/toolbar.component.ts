@@ -60,6 +60,14 @@ import { BANLIST_CONNECTIVITY, EXPERIMENTAL_CONNECTIVITY, SapiViewsFeatureConnec
 })
 
 export class ToolbarCmp {
+
+  ICON_LABELS = {
+    SEARCH: "explore more",
+    DRAW: "annotate",
+    SHARE: "share",
+    WIDGETS: "widgets"
+  }
+
   @ViewChild('searchSwitch')
   findSwitch: SwitchDirective|undefined
 

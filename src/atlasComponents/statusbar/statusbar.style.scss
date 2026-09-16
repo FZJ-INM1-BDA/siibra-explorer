@@ -75,3 +75,22 @@ sxplr-sapiviews-core-rich-regionlistsearch
     display: inline-block;
     width: 0;
 }
+
+.menu-opt-container
+{
+    display: flex;
+
+    > mat-icon
+    {
+        flex: 0 0 auto;
+    }
+
+    > .menu-opt-text-container
+    {
+        flex: 1 1 auto;
+
+        text-wrap: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}

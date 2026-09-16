@@ -266,7 +266,7 @@
     <!-- common template for parcellation/single region/multi region -->
     <ng-template #parcellationOptTmpl let-parcellation let-hideVersionIcon="hideVersionIcon">
 
-        <span>
+        <span class="menu-opt-text-container">
             <ng-template [ngIf]="parcellation | isVersioned: view.parcellations" [ngIfElse]="nonVerNameTmpl">
                 {{ parcellation.collection || parcellation.shortName || parcellation.name }}
             </ng-template>
@@ -411,39 +411,45 @@
                     options: getSubMenu(opt),
                     optionTemplate: optionTemplate
                 }">
-                <mat-icon fontSet="far"
-                    [fontIcon]="(opt | parcellationGroupSelected : current) ? 'fa-circle' : 'fa-none'"></mat-icon>
+                <div class="menu-opt-container">
 
-                <ng-template [ngIf]="optionTemplate" [ngIfElse]="defaultOptionTemplate">
-                    <ng-template [ngTemplateOutlet]="optionTemplate" [ngTemplateOutletContext]="{
-                            $implicit: opt
-                        }">
+                    <mat-icon fontSet="far"
+                        [fontIcon]="(opt | parcellationGroupSelected : current) ? 'fa-circle' : 'fa-none'"></mat-icon>
+
+                    <ng-template [ngIf]="optionTemplate" [ngIfElse]="defaultOptionTemplate">
+                        <ng-template [ngTemplateOutlet]="optionTemplate" [ngTemplateOutletContext]="{
+                                $implicit: opt
+                            }">
+                        </ng-template>
                     </ng-template>
-                </ng-template>
 
-                <ng-template #defaultOptionTemplate>
-                    <span>
-                        {{ opt.name }}
-                    </span>
-                </ng-template>
+                    <ng-template #defaultOptionTemplate>
+                        <span class="menu-opt-text-container">
+                            {{ opt.name }}
+                        </span>
+                    </ng-template>
+                </div>
             </button>
 
             <button *ngFor="let opt of options" mat-menu-item [matTooltip]="opt.shortName || opt.name"
                 (click)="selectATP(type, opt.id)" class="menu-button">
-                <mat-icon fontSet="fas" [fontIcon]="opt.id === current.id ? 'fa-circle' : 'fa-none'"></mat-icon>
+                <div class="menu-opt-container">
 
-                <ng-template [ngIf]="optionTemplate" [ngIfElse]="defaultOptionTemplate">
-                    <ng-template [ngTemplateOutlet]="optionTemplate" [ngTemplateOutletContext]="{
-                            $implicit: opt
-                        }">
+                    <mat-icon fontSet="fas" [fontIcon]="opt.id === current.id ? 'fa-circle' : 'fa-none'"></mat-icon>
+
+                    <ng-template [ngIf]="optionTemplate" [ngIfElse]="defaultOptionTemplate">
+                        <ng-template [ngTemplateOutlet]="optionTemplate" [ngTemplateOutletContext]="{
+                                $implicit: opt
+                            }">
+                        </ng-template>
                     </ng-template>
-                </ng-template>
 
-                <ng-template #defaultOptionTemplate>
-                    <span>
-                        {{ opt.shortName || opt.name }}
-                    </span>
-                </ng-template>
+                    <ng-template #defaultOptionTemplate>
+                        <span class="menu-opt-text-container">
+                            {{ opt.shortName || opt.name }}
+                        </span>
+                    </ng-template>
+                </div>
             </button>
 
             <ng-template [ngIf]="suffixTmpl">
@@ -462,31 +468,33 @@
             <button *ngFor="let opt of options" mat-menu-item [matTooltip]="opt.shortName || opt.name"
                 (click)="selectATP(type, opt.id)" class="menu-button">
 
-                <ng-template [ngIf]="opt.id === current.id" [ngIfElse]="notSelTmpl">
-                    <mat-icon fontSet="fas" fontIcon="fa-circle"></mat-icon>
-                </ng-template>
-
-                <ng-template #notSelTmpl>
-                    <ng-template [ngIf]="view.allParcVersions | mapToProperty : 'id' | includes : opt.id " [ngIfElse]="blankTmpl">
-                        <mat-icon fontSet="far" fontIcon="fa-circle"></mat-icon>
+                <div class="menu-opt-container">
+                    <ng-template [ngIf]="opt.id === current.id" [ngIfElse]="notSelTmpl">
+                        <mat-icon fontSet="fas" fontIcon="fa-circle"></mat-icon>
                     </ng-template>
-                    <ng-template #blankTmpl>
-                        <mat-icon fontSet="fas" fontIcon="fa-none"></mat-icon>
-                    </ng-template>
-                </ng-template>
 
-                <ng-template [ngIf]="optionTemplate" [ngIfElse]="defaultOptionTemplate">
-                    <ng-template [ngTemplateOutlet]="optionTemplate" [ngTemplateOutletContext]="{
-                            $implicit: opt
-                        }">
+                    <ng-template #notSelTmpl>
+                        <ng-template [ngIf]="view.allParcVersions | mapToProperty : 'id' | includes : opt.id " [ngIfElse]="blankTmpl">
+                            <mat-icon fontSet="far" fontIcon="fa-circle"></mat-icon>
+                        </ng-template>
+                        <ng-template #blankTmpl>
+                            <mat-icon fontSet="fas" fontIcon="fa-none"></mat-icon>
+                        </ng-template>
                     </ng-template>
-                </ng-template>
 
-                <ng-template #defaultOptionTemplate>
-                    <span>
-                        {{ opt.shortName || opt.name }}
-                    </span>
-                </ng-template>
+                    <ng-template [ngIf]="optionTemplate" [ngIfElse]="defaultOptionTemplate">
+                        <ng-template [ngTemplateOutlet]="optionTemplate" [ngTemplateOutletContext]="{
+                                $implicit: opt
+                            }">
+                        </ng-template>
+                    </ng-template>
+
+                    <ng-template #defaultOptionTemplate>
+                        <span class="menu-opt-text-container">
+                            {{ opt.shortName || opt.name }}
+                        </span>
+                    </ng-template>
+                </div>
             </button>
         </ng-template>
     </mat-menu>

@@ -7,6 +7,7 @@
             #searchSwitch="sxplrSwitch"
             [color]="(searchSwitch.switchState$ | async) ? 'primary' : 'default'"
             (click)="searchSwitch.toggle()"
+            [matTooltip]="ICON_LABELS.SEARCH"
             >
             <mat-icon>search</mat-icon>
         </button>
@@ -16,17 +17,20 @@
             #drawSwitch="sxplrSwitch"
             [color]="(drawSwitch.switchState$ | async) ? 'primary' : 'default'"
             (click)="drawSwitch.toggle()"
+            [matTooltip]="ICON_LABELS.DRAW"
             >
             <mat-icon>draw</mat-icon>
         </button>
         <button mat-icon-button
             class="sxplr-pe-all"
-            [matMenuTriggerFor]="shareMenu">
+            [matMenuTriggerFor]="shareMenu"
+            [matTooltip]="ICON_LABELS.SHARE">
             <mat-icon>share</mat-icon>
         </button>
         <button mat-icon-button
             class="sxplr-pe-all"
-            [matMenuTriggerFor]="toolMenu">
+            [matMenuTriggerFor]="toolMenu"
+            [matTooltip]="ICON_LABELS.WIDGETS">
             <mat-icon>widgets</mat-icon>
         </button>
 
@@ -59,7 +63,7 @@
 
                 <!-- header -->
                 <h5>
-                    <span>Explore more</span>
+                    <span>{{ ICON_LABELS.SEARCH }}</span>
 
                     <button mat-icon-button
                         color="warn"
@@ -397,7 +401,7 @@
         <ng-template [ngIf]="drawSwitch.switchState$ | async">
             <section class="sxplr-pe-all mat-elevation-z4 my-card sxplr-custom-cmp bg">
                 <h5>
-                    <span>Annotate</span>
+                    <span>{{ ICON_LABELS.DRAW }}</span>
                     
                     <button mat-icon-button
                         color="warn"
