@@ -69,13 +69,7 @@ export class FiberUI implements OnDestroy, OnChanges{
       "segments":["0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42","43","44","45","46","47","48","49"],
       "source":`precomputed://${GEOMSVC_HOST}/fiber/${this.bucketname}/${this.fname}/ngskeleton/${encodeURIComponent(ev.value)}/${encodeURIComponent(bboxmin)}/${bboxmax}`
     }
-    
-    const l = (window as any).viewer.layerSpecification.getLayer(
-      FIBER_LAYER_ID,
-      opt
-    )
-    this.#layer = (window as any).viewer.layerManager.addManagedLayer(l)
-
+    this.#layer = (window as any).nehubaViewer.addLayer(opt, FIBER_LAYER_ID)
 
     setTimeout(() => {
       (window as any).nehubaViewer.setMeshesToLoad(this.ids, {

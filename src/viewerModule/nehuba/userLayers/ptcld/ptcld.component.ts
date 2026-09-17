@@ -119,8 +119,7 @@ export class PtcldUI implements OnChanges{
 
   #addMultires(){
     const mrLayername = `ingsvc-ptcld-multires-${this.#basehash}`
-    const url = `https://data-proxy.ebrains.eu/api/v1/buckets/${this.bucketname}/${this.fname}/multires`
-    
+    const url = `https://${GEOMSVC_HOST}/ptcld/${this.bucketname}/${this.fname}/multires`
     
     this.store.dispatch(
       atlasAppearance.actions.addCustomLayers({
