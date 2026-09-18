@@ -768,9 +768,13 @@
                         }
                     ]
                 },
-                "RFC_showParcellation": {
-                    "type": "boolean",
-                    "description": "By default, siibra-explorer will hide parcellation layer. Hovering will still show the parcels. Setting this flag to true will hint to siibra-explorer that the parcels should be visible - as if this the layer is not present)."
+                "RFC_parcVisCfg": {
+                    "enum": [
+                        "VISIBLE",
+                        "HIDDEN",
+                        "VISIBLE_ON_HOVER"
+                    ],
+                    "description": "By default, siibra-explorer will hide parcellation segments. Hovering will still show the parcels. (a.k.a VISIBLE_ON_HOVER)"
                 }
             }
         }

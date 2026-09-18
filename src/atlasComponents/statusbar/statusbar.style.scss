@@ -56,13 +56,20 @@ section.versioned-parc-ctl
     text-align: start;
 }
 
-.tmp-icon-button-container
+.region-section
 {
     display: inline-flex;
-    height: 0;
-    overflow: visible;
     align-items: center;
+
+    .tmp-icon-button-container
+    {
+        display: inline-flex;
+        height: 0;
+        overflow: visible;
+        align-items: center;
+    }
 }
+
 
 sxplr-sapiviews-core-rich-regionlistsearch
 {

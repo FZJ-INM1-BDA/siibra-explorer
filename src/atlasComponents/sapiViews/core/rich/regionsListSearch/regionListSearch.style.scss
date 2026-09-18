@@ -13,7 +13,7 @@
 
 .new-ui-container
 {
-    display: inline-grid;
+    display: grid;
     grid-template-rows: 1.25rem 1.75rem;
     grid-template-columns: auto auto auto auto auto;
 

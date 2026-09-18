@@ -135,128 +135,132 @@
 
     <div class="spacer sxplr-ml-2"></div>
     
-    <ng-template [ngIf]="view.selectedRegions.length == 0">
-        <ng-template iav-media-query #media="iavMediaQuery"
-            [ngIf]="(media.mediaBreakPoint$ | async) > 3"
-            [ngIfElse]="regHierTmpl">
-            <button mat-button
-                [sxplr-dialog]="regionHierarchyTmpl"
-                [matTooltip]="view.labels.REGION_HIERARCHY"
-                sxplr-dialog-size="xl"
-                #showHierarchyBtn="sxplrDialog">
-                <mat-icon>account_tree</mat-icon>
-            </button>
-        </ng-template>
-        
-        <ng-template #regHierTmpl>
-            <ng-template [ngTemplateOutlet]="expressRegionSearchTmpl"></ng-template>
-        </ng-template>
-    </ng-template>
+    <section class="region-section"
+        [sxplr-flash]="view.selectedRegions | mapToProperty : 'name' | addUnitAndJoin ">
 
-    <ng-template [sxplr-dialog]="regionHierarchyTmpl" sxplr-dialog-size="xl" #showHierarchyBtn="sxplrDialog">
-    </ng-template>
-    
-    <ng-template [ngIf]="view.selectedRegions.length == 1">
-
-        <ng-template [ngTemplateOutlet]="btnTmpl" [ngTemplateOutletContext]="{
-            name: view.selectedRegions[0].name,
-            category: 'region',
-            icon: 'account_tree',
-            suffixTmpl: singleRegionSuffixTmpl,
-            menuData: {
-                current: null,
-                type: null,
-                options: []
-            }
-        }">
-        </ng-template>
-        
-
-        <ng-template #singleRegionSuffixTmpl>
-            
-            <div sxplr-sapiviews-core-region
-                class="vbc-row-fixed"
-                #regionDirective="sapiViewsCoreRegion"
-                (sxplr-sapiviews-core-region-navigate-to)="navigateTo($event)"
-                [sxplr-sapiviews-core-region-region]="view.selectedRegions[0]"
-                [sxplr-sapiviews-core-region-atlas]="view.selectedATP.atlas"
-                [sxplr-sapiviews-core-region-parcellation]="view.selectedATP.parcellation"
-                [sxplr-sapiviews-core-region-template]="view.selectedATP.template"
-                [sxplr-sapiviews-core-region-detail-flag]="true">
-            </div>
-            
-            <!-- centroid -->
-            <ng-template [ngIf]="regionDirective.regionPosition$ | async" let-position>
-                <button mat-icon-button [matTooltip]="'centroid: ' + (position | numbers | addUnitAndJoin : 'mm')"
-                    class="vbc-row-fixed"
-                    (click)="navigateTo(position)">
-                    <mat-icon>place</mat-icon>
+        <ng-template [ngIf]="view.selectedRegions.length == 0">
+            <ng-template iav-media-query #media="iavMediaQuery"
+                [ngIf]="(media.mediaBreakPoint$ | async) > 3"
+                [ngIfElse]="regHierTmpl">
+                <button mat-button
+                    [sxplr-dialog]="regionHierarchyTmpl"
+                    [matTooltip]="view.labels.REGION_HIERARCHY"
+                    sxplr-dialog-size="xl"
+                    #showHierarchyBtn="sxplrDialog">
+                    <mat-icon>account_tree</mat-icon>
                 </button>
             </ng-template>
             
-            <!-- info -->
-            <ng-template [ngIf]="(regionDirective.desc$ | async) || ((regionDirective.dois$ | async) || []).length > 0">
+            <ng-template #regHierTmpl>
+                <ng-template [ngTemplateOutlet]="expressRegionSearchTmpl"></ng-template>
+            </ng-template>
+        </ng-template>
+
+        <ng-template [sxplr-dialog]="regionHierarchyTmpl" sxplr-dialog-size="xl" #showHierarchyBtn="sxplrDialog">
+        </ng-template>
+        
+        <ng-template [ngIf]="view.selectedRegions.length == 1">
+
+            <ng-template [ngTemplateOutlet]="btnTmpl" [ngTemplateOutletContext]="{
+                name: view.selectedRegions[0].name,
+                category: 'region',
+                icon: 'account_tree',
+                suffixTmpl: singleRegionSuffixTmpl,
+                menuData: {
+                    current: null,
+                    type: null,
+                    options: []
+                }
+            }">
+            </ng-template>
+            
+
+            <ng-template #singleRegionSuffixTmpl>
+                
+                <div sxplr-sapiviews-core-region
+                    class="vbc-row-fixed"
+                    #regionDirective="sapiViewsCoreRegion"
+                    (sxplr-sapiviews-core-region-navigate-to)="navigateTo($event)"
+                    [sxplr-sapiviews-core-region-region]="view.selectedRegions[0]"
+                    [sxplr-sapiviews-core-region-atlas]="view.selectedATP.atlas"
+                    [sxplr-sapiviews-core-region-parcellation]="view.selectedATP.parcellation"
+                    [sxplr-sapiviews-core-region-template]="view.selectedATP.template"
+                    [sxplr-sapiviews-core-region-detail-flag]="true">
+                </div>
+                
+                <!-- centroid -->
+                <ng-template [ngIf]="regionDirective.regionPosition$ | async" let-position>
+                    <button mat-icon-button [matTooltip]="'centroid: ' + (position | numbers | addUnitAndJoin : 'mm')"
+                        class="vbc-row-fixed"
+                        (click)="navigateTo(position)">
+                        <mat-icon>place</mat-icon>
+                    </button>
+                </ng-template>
+                
+                <!-- info -->
+                <ng-template [ngIf]="(regionDirective.desc$ | async) || ((regionDirective.dois$ | async) || []).length > 0">
+                    
+                    <button mat-icon-button
+                        class="vbc-row-fixed"
+                        [matTooltip]="view.labels.DETAILS"
+                        [sxplr-dialog]="DoiTemplate"
+                        [sxplr-dialog-size]="null"
+                        [sxplr-dialog-data]="{
+                            title: view.selectedRegions[0].name,
+                            desc: regionDirective.desc$ | async,
+                            contributors: regionDirective.contributors$ | async | dedup,
+                            actions: regionDirective.dois$ | async
+                        }">
+                        <mat-icon>info</mat-icon>
+                    </button>
+                </ng-template>
+
+                <button mat-icon-button
+                    color="warn"
+                    (click)="clearRoi()"
+                    [matTooltip]="view.labels.CLEAR_SELECTED_REGION">
+                    <mat-icon>clear</mat-icon>
+                </button>
+            </ng-template>
+
+        </ng-template>
+
+
+        <ng-template [ngIf]="view.selectedRegions.length > 1">
+            
+            <ng-template #multiRegionSuffixTmpl>
+
+                <button mat-icon-button
+                    [matTooltip]="view.labels.COPY_REGION_NAMES"
+                    [iav-clipboard-copy]="view.selectedRegions | mapToProperty : 'name' | json"
+                    >
+                    <mat-icon>content_copy</mat-icon>
+                </button>
                 
                 <button mat-icon-button
-                    class="vbc-row-fixed"
-                    [matTooltip]="view.labels.DETAILS"
-                    [sxplr-dialog]="DoiTemplate"
-                    [sxplr-dialog-size]="null"
-                    [sxplr-dialog-data]="{
-                        title: view.selectedRegions[0].name,
-                        desc: regionDirective.desc$ | async,
-                        contributors: regionDirective.contributors$ | async | dedup,
-                        actions: regionDirective.dois$ | async
-                    }">
-                    <mat-icon>info</mat-icon>
+                    color="warn"
+                    (click)="clearRoi()"
+                    [matTooltip]="view.labels.CLEAR_SELECTED_REGION">
+                    <mat-icon>clear</mat-icon>
                 </button>
             </ng-template>
 
-            <button mat-icon-button
-                color="warn"
-                (click)="clearRoi()"
-                [matTooltip]="view.labels.CLEAR_SELECTED_REGION">
-                <mat-icon>clear</mat-icon>
-            </button>
-        </ng-template>
-
-    </ng-template>
-
-
-    <ng-template [ngIf]="view.selectedRegions.length > 1">
-        
-        <ng-template #multiRegionSuffixTmpl>
-
-            <button mat-icon-button
-                [matTooltip]="view.labels.COPY_REGION_NAMES"
-                [iav-clipboard-copy]="view.selectedRegions | mapToProperty : 'name' | json"
-                >
-                <mat-icon>content_copy</mat-icon>
-            </button>
             
-            <button mat-icon-button
-                color="warn"
-                (click)="clearRoi()"
-                [matTooltip]="view.labels.CLEAR_SELECTED_REGION">
-                <mat-icon>clear</mat-icon>
-            </button>
-        </ng-template>
+            <ng-template  [ngTemplateOutlet]="btnTmpl" [ngTemplateOutletContext]="{
+                name: '(' + view.selectedRegions.length + ' selected regions)',
+                category: 'regions',
+                icon: 'account_tree',
+                suffixTmpl: multiRegionSuffixTmpl,
+                menuData: {
+                    current: null,
+                    type: null,
+                    options: []
+                }
+            }">
+            </ng-template>
 
-        
-        <ng-template  [ngTemplateOutlet]="btnTmpl" [ngTemplateOutletContext]="{
-            name: '(' + view.selectedRegions.length + ' selected regions)',
-            category: 'regions',
-            icon: 'account_tree',
-            suffixTmpl: multiRegionSuffixTmpl,
-            menuData: {
-                current: null,
-                type: null,
-                options: []
-            }
-        }">
         </ng-template>
-
-    </ng-template>
+    </section>
 
 
     <mat-divider vertical class="statsbar-vert-divider sxplr-ml-2 sxplr-mr-2"></mat-divider>

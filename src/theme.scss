@@ -102,6 +102,11 @@ $typographic-config: mat.m2-define-typography-config();
 
     &.immersive-input
     {
+
+      &.no-bg
+      {
+        background-color: rgba(0, 0, 0, 0);
+      }
       background-color: mat.m2-get-color-from-palette($background, background);
       color: mat.m2-get-color-from-palette($foreground, secondary-text);
       border: none;

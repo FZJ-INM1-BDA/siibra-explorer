@@ -447,11 +447,37 @@ body
   }
 }
 
-.sxplr-flash-element {
-  animation: flash-bg 500ms ease-in-out;
+:not([darktheme=true]),
+:not(.darktheme)
+{
+  .sxplr-flash-element {
+    
+    &.sxplr-flash-element-active
+    {
+      animation: flash-bg 500ms ease-in-out;
+    }
+  }
 }
 
+[darktheme=true],
+.darktheme.darktheme
+{
+  .sxplr-flash-element {
+    
+    &.sxplr-flash-element-active
+    {
+      animation: flash-bg-dark 500ms ease-in-out;
+    }
+  }
+}
+
+
 @keyframes flash-bg {
+  0% { background-color: rgba(150, 150, 50, 0.5); }
+  100% { background-color: transparent; }
+}
+
+@keyframes flash-bg-dark {
   0% { background-color: rgba(255, 255, 100, 0.5); }
   100% { background-color: transparent; }
 }

@@ -4,6 +4,7 @@ import { DestroyDirective } from "./destroy.directive";
 import { distinctUntilChanged, skip, takeUntil } from "rxjs/operators";
 
 const FLASH_CLASS = "sxplr-flash-element"
+const FLASH_CLASS_ACTIVE = "sxplr-flash-element-active"
 const TIMEOUT = 1000
 
 @Directive({
@@ -27,16 +28,17 @@ export class FlashDirective {
   #timeoutId: ReturnType<typeof setTimeout> | undefined
 
   constructor(el: ElementRef<HTMLElement>, renderer: Renderer2){
+    renderer.addClass(el.nativeElement, FLASH_CLASS)
     this.#value$.pipe(
       takeUntil(this.#destroy$),
       distinctUntilChanged(),
       skip(1),
     ).subscribe(() => {
-      renderer.removeClass(el.nativeElement, FLASH_CLASS)
+      renderer.removeClass(el.nativeElement, FLASH_CLASS_ACTIVE)
       this.#clearTimeout()
-      renderer.addClass(el.nativeElement, FLASH_CLASS)
+      renderer.addClass(el.nativeElement, FLASH_CLASS_ACTIVE)
       this.#timeoutId = setTimeout(() => {
-        renderer.removeClass(el.nativeElement, FLASH_CLASS)
+        renderer.removeClass(el.nativeElement, FLASH_CLASS_ACTIVE)
         this.#clearTimeout()
       }, TIMEOUT)
     })

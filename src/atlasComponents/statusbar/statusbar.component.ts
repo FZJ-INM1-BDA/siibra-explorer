@@ -20,12 +20,12 @@ import { SapiViewsCoreRichModule } from "../sapiViews/core/rich/module";
 import { SapiViewsCoreRegionModule } from "../sapiViews/core/region";
 import { SapiViewsUtilModule } from "../sapiViews";
 import { ShareModule } from "src/share";
-import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.directive";
 import { ScreenshotModule } from "src/screenshot";
 import { AllVersionsParcs } from "../sapiViews/core/parcellation/allVersions.pipe";
 import { DestroyDirective } from "src/util/directives/destroy.directive";
 import { OnlyShowNewestParc } from "../sapiViews/core/parcellation/onlyShowNewest.pipe";
 import { AtlasViewerRouterModule } from "src/routerModule";
+import { FlashDirective } from "src/util/directives/flash.directive";
 
 const allVersionsPipe = new AllVersionsParcs()
 const onlyShowNewestPipe = new OnlyShowNewestParc()
@@ -50,9 +50,9 @@ const onlyShowNewestPipe = new OnlyShowNewestParc()
     SapiViewsCoreRegionModule,
     SapiViewsUtilModule,
     ShareModule,
-    ExperimentalFlagDirective,
     ScreenshotModule,
-    AtlasViewerRouterModule
+    AtlasViewerRouterModule,
+    FlashDirective,
 ],
   hostDirectives: [
     AvailableATPDirective,

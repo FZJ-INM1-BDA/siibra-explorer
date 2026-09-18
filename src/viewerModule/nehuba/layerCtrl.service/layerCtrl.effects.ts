@@ -28,8 +28,10 @@ export class LayerCtrlEffects {
       const rmPmapAction = atlasAppearance.actions.removeCustomLayers({
         customLayers: [{id: PMAP_LAYER_NAME}]
       })
+      const showParcDelin = atlasAppearance.actions.setShowDelineation({ flag: true })
+      const hideParcDelin = atlasAppearance.actions.setShowDelineation({ flag: false })
       if (viewer !== "NEHUBA") {
-        return of(rmPmapAction)
+        return of(rmPmapAction, showParcDelin)
       }
       return this.store.pipe(
         select(atlasSelection.selectors.selectedRegions),
@@ -40,7 +42,7 @@ export class LayerCtrlEffects {
         // since region selection changed, pmap will definitely be removed. revoke the url resource.
         switchMap(([ regions, { parcellation, template } ]) => {
           if (regions.length !== 1) {
-            return of(rmPmapAction)
+            return of(rmPmapAction, showParcDelin)
           }
 
           return from(this.sapi.getStatisticMapUrl(parcellation, template, regions[0])).pipe(
@@ -51,10 +53,14 @@ export class LayerCtrlEffects {
             ),
             switchMap(([url, niiVolRender]) => {
               if (!url) {
-                return of(rmPmapAction)
+                return of(
+                  rmPmapAction, 
+                  showParcDelin,
+                )
               }
               return of(
                 rmPmapAction,
+                hideParcDelin,
                 atlasAppearance.actions.addCustomLayers({
                   customLayers: [{
                     legacySpecFlag: "old",
