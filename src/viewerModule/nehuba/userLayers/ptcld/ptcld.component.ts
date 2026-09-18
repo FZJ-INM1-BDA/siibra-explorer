@@ -117,10 +117,17 @@ export class PtcldUI implements OnChanges{
     shareReplay(1),
   )
 
-  #addMultires(){
+  async #addMultires(){
     const mrLayername = `ingsvc-ptcld-multires-${this.#basehash}`
     const url = `${GEOMSVC_HOST}/ptcld/${this.bucketname}/${this.fname}/multires`
-    
+    const multiresJson = await (await fetch(`${url}/info`)).json()
+    const properties: Record<string, string>[] = multiresJson['properties']
+    let shader = `void main() { setColor(defaultColor()); }`
+    for (const prop of properties){
+      if (prop['id'] === "color" && prop['type'] === "rgb") {
+        shader = `void main() { setColor(prop_color()); }`
+      }
+    }
     this.store.dispatch(
       atlasAppearance.actions.addCustomLayers({
         customLayers: [
@@ -129,7 +136,8 @@ export class PtcldUI implements OnChanges{
             clType: "customlayer/nglayer",
             source: `precomputed://${url}`,
             legacySpecFlag: 'old',
-            type: 'annotation'
+            type: 'annotation',
+            shader,
           }
         ]
       })
