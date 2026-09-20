@@ -5,14 +5,15 @@ import { select, Store } from "@ngrx/store";
 import { concat, EMPTY, from, of } from "rxjs";
 import { debounceTime, distinctUntilChanged, filter, map, shareReplay, switchMap, takeUntil } from "rxjs/operators";
 import { AnnotationLayer, TNgAnnotationPoint } from "src/atlasComponents/annotations";
-import { IDS } from "src/atlasComponents/sapi";
 import { AngularMaterialModule } from "src/sharedModules";
 import { atlasAppearance, atlasSelection } from "src/state";
 import { arrayEqual } from "src/util/array";
 import { DestroyDirective } from "src/util/directives/destroy.directive";
 import { getShader, QuickHash } from "src/util/fn";
 
-const GEOMSVC_HOST = "https://geom-svc.apps.ebrains.eu"
+const PROD_GEOMSVC_HOST = "https://geom-svc.apps.ebrains.eu"
+// const LOCAL_GEOMSVC_HOST = "http://localhost:8000"
+const GEOMSVC_HOST= PROD_GEOMSVC_HOST
 const COUNT_THRESHOLD = 1e6
 const PTCLD_CONST = "ptcldingsvc"
 const tripletEqual = arrayEqual<number>((v0, v1) => v0 === v1, true)
@@ -100,8 +101,7 @@ export class PtcldUI implements OnChanges{
       of(LOADING_STATE.LOADING),
       this.#currViewportDebouncedChanged$.pipe(
         switchMap(vp => {
-
-          if (vp?.spaceId !== IDS.TEMPLATES.AMBA_CCF_V3) {
+          if (!vp) {
             return of(0)
           }
           if (!this.bucketname || !this.fname) {

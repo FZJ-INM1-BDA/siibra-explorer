@@ -3,7 +3,11 @@ import { Component, Input, OnChanges, OnDestroy } from "@angular/core";
 import { MatSelectChange } from "@angular/material/select";
 import { AngularMaterialModule } from "src/sharedModules";
 
-const GEOMSVC_HOST = "https://geom-svc.apps.ebrains.eu"
+
+const PROD_GEOMSVC_HOST = "https://geom-svc.apps.ebrains.eu"
+// const LOCAL_GEOMSVC_HOST = "http://localhost:8000"
+const GEOMSVC_HOST= PROD_GEOMSVC_HOST
+
 const FIBER_LAYER_ID = 'geom-svc-fiber-layer'
 
 @Component({
