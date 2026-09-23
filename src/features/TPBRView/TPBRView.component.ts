@@ -36,6 +36,7 @@ export class TPBRViewCmp {
       if (!v) return null
       return {
         ...v,
+        pointStrNoUnit: v.point && v.point.map(p => `${p.toFixed(2)}`).join(", "),
         pointStr: v.point && v.point.map(p => `${p.toFixed(2)}mm`).join(", "),
         bboxString: v.bbox && {
           from: v.bbox[0].map(v => v.toFixed(2)).join(", "),

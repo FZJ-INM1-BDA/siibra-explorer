@@ -87,7 +87,7 @@
 
                     <div class="back-btn-container">
                         <button mat-stroked-button (click)="clearSelectedFeature()">
-                            <mat-icon>chevron_left</mat-icon>
+                            <mat-icon>arrow_back</mat-icon>
                             <span>back</span>
                         </button>
                     </div>
@@ -182,7 +182,7 @@
                         </ng-template>
 
                         <ng-template [ngIf]="view.selectedRegions.length !== 1 && view.useViewer === 'THREESURFER'">
-                            <span class="warning">
+                            <span class="panel-content">
                                 select one and only one region to get started
                             </span>
                         </ng-template>
@@ -213,33 +213,43 @@
                     <section *ngIf="ptAsgmtSwitch.switchState$ | async" class="section-find-body">
                         <div class="back-btn-container">
                             <button mat-stroked-button (click)="ptAsgmtSwitch.close()">
-                                <mat-icon>chevron_left</mat-icon>
+                                <mat-icon>arrow_back</mat-icon>
                                 <span>back</span>
                             </button>
                         </div>
+                        
+                        <tpbr-viewer
+                            [tpbr-newui]="true"
+                                [tpbr-concept]="{
+                                template: view.selectedTemplate,
+                                parcellation: view.selectedParcellation,
+                                point: view.currentViewport?.center
+                            }">
+                        </tpbr-viewer>
 
-                        <ng-template [ngIf]="
-                            view.currentViewport.center
-                            && view.selectedTemplate
-                            && view.selectedParcellation"
-                            [ngIfElse]="ptAsgmtFallbackTmpl">
-                            
-                            <tpbr-viewer
-                                [tpbr-newui]="true"
-                                    [tpbr-concept]="{
-                                    template: view.selectedTemplate,
-                                    parcellation: view.selectedParcellation,
-                                    point: view.currentViewport.center
-                                }">
-                            </tpbr-viewer>
+                        <mat-divider></mat-divider>
 
-                            <mat-divider></mat-divider>
+                        <section
+                            class="section-content sxplr-custom-cmp darker-bg darker-text">
+                                
+                            <p class="text align-items-center">
+                                <span class="panel-header">
+                                    point assignment
+                                </span>
+                            </p>
                             <sxplr-point-assignment
+                                class="panel-content sxplr-d-block"
+                                [newUI]="true"
+                                *ngIf="
+                                    view.currentViewport.center
+                                    && view.selectedTemplate
+                                    && view.selectedParcellation;
+                                    else ptAsgmtFallbackTmpl"
                                 [point]="view.currentViewport.center | ptToSands : view.selectedTemplate.id"
                                 [template]="view.selectedTemplate"
                                 [parcellation]="view.selectedParcellation">
                             </sxplr-point-assignment>
-                        </ng-template>
+                        </section>
 
                         <ng-template #ptAsgmtFallbackTmpl>
                             Point center, template and parcellation must be defined for point assignemnt to work
@@ -250,14 +260,15 @@
                     <section *ngIf="spatialFeatureSwitch.switchState$ | async" class="section-find-body">
                         
                         <div class="back-btn-container">
-                            <button mat-stroked-button (click)="spatialFeatureSwitch.close()">
-                                <mat-icon>chevron_left</mat-icon>
+                            <button mat-button (click)="spatialFeatureSwitch.close()">
+                                <mat-icon>arrow_back</mat-icon>
                                 <span>back</span>
                             </button>
                         </div>
 
                         <ng-template [ngIf]="view.currentViewport.minpoint && view.currentViewport.maxpoint" [ngIfElse]="spatialFeatFallbackTmpl">
 
+                            <mat-divider></mat-divider>
                             <tpbr-viewer
                                 [tpbr-newui]="true"
                                 [tpbr-concept]="{
@@ -269,24 +280,35 @@
 
                             <mat-divider></mat-divider>
 
-                            <ng-template [ngIf]="!(spatialFeatCmp.busy$ | async) && (spatialFeatCmp.features$ | async).length === 0">
-                                <span class="warning">
-                                    No spatial features found.    
-                                </span>
-                            </ng-template>
-                            
-                            <sxplr-feature-entry
-                                [template]="view.selectedTemplate"
-                                [bbox]="bbox.bbox$ | async | getProperty : 'bbox'"
-                                #voiFeatureEntryCmp="featureEntryCmp"
-                                sxplr-sapiviews-core-space-boundingbox
-                                [sxplr-sapiviews-core-space-boundingbox-space]="view.selectedTemplate"
-                                [sxplr-sapiviews-core-space-boundingbox-spec]="[view.currentViewport.minpoint, view.currentViewport.maxpoint]"
-                                #bbox="sxplrSapiViewsCoreSpaceBoundingBox"
-                                #spatialFeatCmp="featureEntryCmp"
-                                >
-                            </sxplr-feature-entry>
-                            
+                            <section class="section-content sxplr-custom-cmp darker-bg darker-text">
+
+                                <p class="text align-items-center">
+                                    <span class="panel-header">
+                                        spatial features
+                                    </span>
+                                </p>
+
+                                <ng-template [ngIf]="!(spatialFeatCmp.busy$ | async) && (spatialFeatCmp.features$ | async).length === 0">
+                                    <span class="text">
+                                        No spatial features found.    
+                                    </span>
+                                </ng-template>
+                                
+                                <sxplr-feature-entry
+                                    class="panel-content"
+                                    [template]="view.selectedTemplate"
+                                    [bbox]="bbox.bbox$ | async | getProperty : 'bbox'"
+                                    #voiFeatureEntryCmp="featureEntryCmp"
+                                    sxplr-sapiviews-core-space-boundingbox
+                                    [sxplr-sapiviews-core-space-boundingbox-space]="view.selectedTemplate"
+                                    [sxplr-sapiviews-core-space-boundingbox-spec]="[view.currentViewport.minpoint, view.currentViewport.maxpoint]"
+                                    #bbox="sxplrSapiViewsCoreSpaceBoundingBox"
+                                    #spatialFeatCmp="featureEntryCmp"
+                                    >
+                                </sxplr-feature-entry>
+                                
+                            </section>
+
                             <div voiBbox
                                 [geometry]="voiFeatureEntryCmp.geometry$ | async"
                                 [volumes]="voiFeatureEntryCmp.volumes$ | async"
@@ -302,13 +324,13 @@
 
                     <!-- regional feature + connectivities -->
                     <ng-template #regFeatFallbackTmpl>
-                        <span class="warning">Parcellation must be selected. One and only one region must be selected.</span>
+                        <span class="panel-content">Parcellation must be selected. One and only one region must be selected.</span>
                     </ng-template>
 
                     <section *ngIf="regionallFeatureSwitch.switchState$ | async" class="section-find-body">
                         <div class="back-btn-container">
                             <button mat-stroked-button (click)="regionallFeatureSwitch.close()">
-                                <mat-icon>chevron_left</mat-icon>
+                                <mat-icon>arrow_back</mat-icon>
                                 <span>back</span>
                             </button>
                         </div>
@@ -327,46 +349,63 @@
 
                             <mat-divider></mat-divider>
 
-                            <ng-template [ngIf]="!(regFeatCmp.busy$ | async) && (regFeatCmp.features$ | async).length === 0">
-                                <span class="warning">No regional features found.</span>
-                            </ng-template>
+                            <section class="section-content sxplr-custom-cmp darker-bg darker-text">
 
-                            <sxplr-feature-entry
-                                [parcellation]="view.selectedParcellation"
-                                [region]="view.selectedRegions[0]"
-                                [hideConnectivity]="true"
-                                #regFeatCmp="featureEntryCmp"
-                                >
-                            </sxplr-feature-entry>
+                                <p class="text align-items-center">
+                                    <span class="panel-header">
+                                        regional features
+                                    </span>
+                                </p>
+
+                                <ng-template [ngIf]="!(regFeatCmp.busy$ | async) && (regFeatCmp.features$ | async).length === 0">
+                                    <span class="panel-content">No regional features found.</span>
+                                </ng-template>
+
+                                <sxplr-feature-entry
+                                    class="panel-content"
+                                    [parcellation]="view.selectedParcellation"
+                                    [region]="view.selectedRegions[0]"
+                                    [hideConnectivity]="true"
+                                    #regFeatCmp="featureEntryCmp"
+                                    >
+                                </sxplr-feature-entry>
+                            </section>
+
                         </ng-template>
                         
                     </section>
 
+                    <!-- connectivty main body -->
                     <section *ngIf="connFeatureSwitch.switchState$ | async" class="section-find-body">
                         <div class="back-btn-container">
                             <button mat-stroked-button (click)="connFeatureSwitch.close()">
-                                <mat-icon>chevron_left</mat-icon>
+                                <mat-icon>arrow_back</mat-icon>
                                 <span>back</span>
                             </button>
                         </div>
-                        <ng-template
-                            [ngIf]="view.selectedParcellation && view.selectedRegions.length === 1"
-                            [ngIfElse]="regFeatFallbackTmpl">
+                        
+                        <tpbr-viewer
+                            [tpbr-newui]="true"
+                            [tpbr-concept]="{
+                                parcellation: view.selectedParcellation,
+                                region: view.selectedRegions[0]
+                            }"
+                            [parcellation]="view.selectedParcellation"
+                            [region]="view.selectedRegions[0]"
+                            tpbr-category
+                            #tpbrCategory="tpbrCategory">
+                        </tpbr-viewer>
 
-                            <tpbr-viewer
-                                [tpbr-newui]="true"
-                                [tpbr-concept]="{
-                                    parcellation: view.selectedParcellation,
-                                    region: view.selectedRegions[0]
-                                }"
-                                [parcellation]="view.selectedParcellation"
-                                [region]="view.selectedRegions[0]"
-                                tpbr-category
-                                #tpbrCategory="tpbrCategory">
-                            </tpbr-viewer>
+                        <mat-divider></mat-divider>
 
-                            <mat-divider></mat-divider>
-                            
+                        <section class="section-content sxplr-custom-cmp darker-bg darker-text"
+                            *ngIf="view.selectedParcellation && view.selectedRegions.length === 1; else regFeatFallbackTmpl">
+
+                            <p class="text align-items-center">
+                                <span class="panel-header">
+                                    regional connectivities
+                                </span>
+                            </p>
                             <ng-template [ngIf]="view.showConnectivity" [ngIfElse]="noConnTmpl">
 
                                 <ng-template [ngIf]="tpbrCategory.cateogryCollections$ | async | keyvalue | filterCategory : ['connectivity']" let-connectivity>
@@ -374,6 +413,7 @@
                                         <ng-template [ngIf]="conn.value" let-connType>
                                             
                                             <sxplr-features-connectivity-browser
+                                                class="panel-content sxplr-d-block"
                                                 [region]="view.selectedRegions[0]"
                                                 [sxplr-features-connectivity-browser-template]="view.selectedTemplate"
                                                 [sxplr-features-connectivity-browser-parcellation]="view.selectedParcellation"
@@ -384,11 +424,12 @@
                                     </ng-template>
                                 </ng-template>
                             </ng-template>
-                        </ng-template>
                         
+                        </section>
+
 
                         <ng-template #noConnTmpl>
-                            <span class="warning">
+                            <span class="panel-content">
                                 This template/parcellation does not support regional connectivity.
                             </span>
                         </ng-template>

@@ -1,4 +1,4 @@
-import { Component, Inject, Optional, TemplateRef } from '@angular/core';
+import { Component, Inject, Input, Optional, TemplateRef } from '@angular/core';
 import { Clipboard, MatDialog, MatDialogRef, MatSnackBar } from 'src/sharedModules/angularMaterial.exports';
 import { SAPI } from 'src/atlasComponents/sapi/sapi.service';
 import { Store } from '@ngrx/store';
@@ -13,6 +13,9 @@ import { CLICK_INTERCEPTOR_INJECTOR, ClickInterceptor, HOVER_INTERCEPTOR_INJECTO
   styleUrls: ['./point-assignment.component.scss']
 })
 export class PointAssignmentComponent extends PointAssignmentDirective {
+
+  @Input()
+  newUI: boolean = false
 
   constructor(sapi: SAPI, private dialog: MatDialog,
     private store: Store,

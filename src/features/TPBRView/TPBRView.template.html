@@ -10,12 +10,12 @@
                 </span>
             </div>
 
-            <div class="content" [sxplr-flash]="tpbr.region.name">
+            <div class="content lvl1" [sxplr-flash]="tpbr.region.name">
                 {{ tpbr.region.name }}
             </div>
 
             <ng-template [ngIf]="tpbr.parcellation">   
-                <div class="content">
+                <div class="content lvl2">
                     {{ tpbr.parcellation.shortName || tpbr.parcellation.name }}
                 </div>
             </ng-template>
@@ -27,15 +27,32 @@
         <ng-template [ngIf]="tpbr.bboxString" let-bboxString>
             <div class="title">
                 <mat-icon>view_in_ar</mat-icon>
-                <span class="text">bounding box</span>
+                <span class="text">bounding box (mm)</span>
             </div>
-            <div class="content"
-                [sxplr-flash]="bboxString.from + bboxString.to">
-                {{ bboxString.from }} - {{ bboxString.to }}
+            <div class="content bbox-grid" [sxplr-flash]="bboxString.from + bboxString.to">
+                <span class="bbox-grid-cell bbox-grid-leader lvl2">from</span>
+                <ng-template [ngIf]="tpbr.bbox" let-bbox>
+                    <ng-template ngFor [ngForOf]="bbox[0]" let-value let-index>
+                        <span [ngClass]="'bbox-grid-cell bbox-grid-value bbox-grid-value-' + index">
+                            {{ value | number : '1.2-2' }}
+                        </span>
+                    </ng-template>
+                </ng-template>
+
+                <span class="bbox-grid-cell bbox-grid-leader lvl2">to</span>
+
+                <ng-template [ngIf]="tpbr.bbox" let-bbox>
+                    <ng-template ngFor [ngForOf]="bbox[1]" let-value let-index="index">
+                        <span [ngClass]="'bbox-grid-cell bbox-grid-value bbox-grid-value-' + index">
+                            {{ value | number : '1.2-2' }}
+                        </span>
+                    </ng-template>
+                </ng-template>
+
             </div>
             
             <ng-template [ngIf]="tpbr.template" let-template>
-                <div class="content">
+                <div class="content lvl2">
                     {{ template.shortName || template.name }}
                 </div>
             </ng-template>
@@ -48,16 +65,16 @@
             <div class="title">
                 <mat-icon>location_on</mat-icon>
                 <span class="text">
-                    center of view
+                    center of view (mm)
                 </span>
             </div>
 
-            <div class="content" [sxplr-flash]="tpbr.pointStr">
-                {{ tpbr.pointStr }}
+            <div class="content" [sxplr-flash]="tpbr.pointStrNoUnit">
+                <span class="lvl1">{{ tpbr.pointStrNoUnit }}</span>
             </div>
 
             <ng-template [ngIf]="tpbr.template" let-template>
-                <div class="content">
+                <div class="content lvl2">
                     {{ template.shortName || template.name }}
                 </div>
             </ng-template>

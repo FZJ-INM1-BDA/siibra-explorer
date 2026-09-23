@@ -146,6 +146,8 @@ export class PointAssignmentDirective implements OnDestroy, OnInit{
     }),
   )
 
+  docUrl: string = "https://siibra-python.readthedocs.io/en/v0.4eol/examples/05_anatomical_assignment/001_coordinates.html"
+
   infoMsg$: Observable<string> = combineLatest([
     this.coordTxt$,
     this.parcellation$,
@@ -166,7 +168,7 @@ export class PointAssignmentDirective implements OnDestroy, OnInit{
       }
       return `Assignment of \`${coordText}\` to the ${maptype} of \`${parcellation.name}\` in \`${template.name}\`.
 
-For more detail, see [siibra-python documentation](https://siibra-python.readthedocs.io/en/v0.4eol/examples/05_anatomical_assignment/001_coordinates.html).
+For more detail, see [siibra-python documentation](${this.docUrl}).
 
 ${warningMsg}`
     })

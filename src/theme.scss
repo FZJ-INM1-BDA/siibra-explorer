@@ -74,13 +74,19 @@ $typographic-config: mat.m2-define-typography-config();
     &[darker-bg],
     &.darker-bg
     {
-      background-color: mat.m2-get-color-from-palette($background, background);
+      background-color: mat.m2-get-color-from-palette($background, app-bar);
     }
 
     &[text],
     &.text
     {
       color: mat.m2-get-color-from-palette($foreground, text);
+    }
+    
+    &[darker-text],
+    &.darker-text
+    {
+      color: mat.m2-get-color-from-palette($foreground, secondary-text);
     }
     &[primary],
     &.primary

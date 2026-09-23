@@ -28,6 +28,53 @@
     text-wrap: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
-    opacity: 0.8;
     margin-left:0.25rem;
+
+    &.lvl1,
+    & .lvl1
+    {
+        opacity: 0.8;
+    }
+    &.lvl2,
+    & .lvl2
+    {
+        opacity: 0.5;
+    }
+}
+
+.bbox-grid
+{
+    display: inline-grid;
+    column-count: 4;
+    gap: 0 1rem;
+
+    &>.bbox-grid-cell
+    {
+        column-span: 1;
+    }
+    &>.bbox-grid-leader
+    {
+        grid-column-start: 1;
+    }
+    
+    &>.bbox-grid-value
+    {
+        text-align: right;
+    }
+
+    &>.bbox-grid-value-0
+    {
+        grid-column-start: 2;
+    }
+    
+    &>.bbox-grid-value-1
+    {
+        grid-column-start: 3;
+    }
+    
+    &>.bbox-grid-value-2
+    {
+        grid-column-start: 4;
+    }
+    
 }
