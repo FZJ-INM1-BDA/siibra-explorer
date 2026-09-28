@@ -81,6 +81,16 @@ export class EntryComponent extends TPBRCategoryDirective implements AfterViewIn
     shareReplay(1),
   )
 
+  total$ = this.#catAccDirs.pipe(
+    switchMap(dirs => 
+      combineLatest(dirs.map(d => d.total$)).pipe(
+        map(tallies => 
+          tallies.reduce((acc, curr) => acc + curr)
+        )
+      )
+    )
+  )
+
   fibers$: Observable<{source: string, name: string, label: string}[]> = combineLatest([
     this.store.pipe(
       select(userPreference.selectors.showExperimental)

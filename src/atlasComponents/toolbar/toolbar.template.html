@@ -357,7 +357,7 @@
                                     </span>
                                 </p>
 
-                                <ng-template [ngIf]="!(regFeatCmp.busy$ | async) && (regFeatCmp.features$ | async).length === 0">
+                                <ng-template [ngIf]="!(regFeatCmp.busy$ | async) && (regFeatCmp.total$ | async) === 0">
                                     <span class="panel-content">No regional features found.</span>
                                 </ng-template>
 
