@@ -56,7 +56,7 @@
     "@ngrx/operators": "^18.0.0",
     "@ngrx/store": "^18.1.1",
     "acorn": "^8.4.1",
-    "export-nehuba": "^0.2.0-dev15",
+    "export-nehuba": "^0.2.0-dev16",
     "file-loader": "^6.2.0",
     "hbp-connectivity-component": "0.6.8",
     "jszip": "^3.6.0",
