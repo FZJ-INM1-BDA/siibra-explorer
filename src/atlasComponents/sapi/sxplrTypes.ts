@@ -129,6 +129,7 @@ export type VoiFeature = {
     info: Record<string, any>
     meta?: MetaV1Schema
     insertIndex?: number
+    type?: string
   }
 } & Feature
 

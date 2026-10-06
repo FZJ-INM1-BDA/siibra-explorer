@@ -67,6 +67,9 @@ export class NgLayerCtrlCmp implements OnChanges, OnDestroy{
   @Input("ng-layer-ctl-meta")
   meta: MetaV1Schema
 
+  @Input("ng-layer-ctl-type")
+  type: string = "image"
+
   @Input("ng-layer-ctl-insert-index")
   insertIndex = 1
 
@@ -161,6 +164,7 @@ export class NgLayerCtrlCmp implements OnChanges, OnDestroy{
             clType: 'customlayer/nglayer',
             source: `${format}${this.source}`,
             opacity: this.opacity,
+            type: this.type,
             meta: {
               insertIndex: this.insertIndex,
             }

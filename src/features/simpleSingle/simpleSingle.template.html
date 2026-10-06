@@ -30,58 +30,62 @@
                 [ng-layer-ctl-show]="true">
             </ng-layer-ctl>
 
-            <mat-form-field class="flex-grow-3">
-                <mat-label>
-                    Visualize with a model
-                </mat-label>
-                <mat-select #vizSelect="matSelect">
-                    <mat-option disabled selected>Select a model</mat-option>
-                    <mat-option
-                        *ngFor="let aVoi of view.additionalVois"
-                        [value]="aVoi.id">
-                        {{ aVoi.name }}
-                    </mat-option>
-                </mat-select>
-            </mat-form-field>
 
-                  
-            <ng-template ngFor [ngForOf]="view.additionalVois" let-aVoi>
-                <ng-template [ngIf]="aVoi.id === vizSelect.value">
-                    <button mat-icon-button
-                        [matTooltip]="labels.DETAILS"
-                        [sxplr-dialog]="DoiTemplate"
-                        [sxplr-dialog-size]="null"
-                        [sxplr-dialog-data]="{
-                            title: aVoi.name,
-                            desc: aVoi.desc,
-                            contributors: aVoi.contributors | dedup, 
-                            actions: aVoi.link | mapToProperty : 'href' | dedup
-                        }">
-                        <mat-icon>info</mat-icon>
-                    </button>
-                </ng-template>
-            </ng-template>
-            <button mat-icon-button color="warn"
-                (click)="vizSelect.value = null"
-                [disabled]="!vizSelect.value">
-                <mat-icon>clear</mat-icon>
-            </button>
-                  
-            <ng-template ngFor [ngForOf]="view.additionalVois" let-aVoi>
-                <ng-template [ngIf]="aVoi.id === vizSelect.value">
-                    <mat-divider></mat-divider>
-                    <ng-layer-ctl
-                        [ng-layer-ctl-name]="SXPLR_PREFIX + aVoi.ngVolume.url"
-                        [ng-layer-ctl-src]="aVoi.ngVolume.url"
-                        [ng-layer-ctl-transform]="aVoi.ngVolume.transform"
-                        [ng-layer-ctl-meta]="aVoi.ngVolume.meta"
-                        [ng-layer-ctl-insert-index]="aVoi.ngVolume.insertIndex"
-                        [ng-layer-ctl-opacity]="1.0">
-                    </ng-layer-ctl>
-                </ng-template>
-            </ng-template>
         </mat-tab>
     </mat-tab-group>
+
+    <mat-divider></mat-divider>
+
+    
+    <mat-form-field class="flex-grow-3">
+        <mat-label>
+            Visualize with a model
+        </mat-label>
+        <mat-select #vizSelect="matSelect">
+            <mat-option disabled selected>Select a model</mat-option>
+            <mat-option
+                *ngFor="let aVoi of view.additionalVois"
+                [value]="aVoi.id">
+                {{ aVoi.name }}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+    <ng-template ngFor [ngForOf]="view.additionalVois" let-aVoi>
+        <ng-template [ngIf]="aVoi.id === vizSelect.value">
+            <button mat-icon-button
+                [matTooltip]="labels.DETAILS"
+                [sxplr-dialog]="DoiTemplate"
+                [sxplr-dialog-size]="null"
+                [sxplr-dialog-data]="{
+                    title: aVoi.name,
+                    desc: aVoi.desc,
+                    contributors: aVoi.contributors | dedup, 
+                    actions: aVoi.link | mapToProperty : 'href' | dedup
+                }">
+                <mat-icon>info</mat-icon>
+            </button>
+        </ng-template>
+    </ng-template>
+    <button mat-icon-button color="warn"
+        (click)="vizSelect.value = null"
+        [disabled]="!vizSelect.value">
+        <mat-icon>clear</mat-icon>
+    </button>
+            
+    <ng-template ngFor [ngForOf]="view.additionalVois" let-aVoi>
+        <ng-template [ngIf]="aVoi.id === vizSelect.value">
+            <mat-divider></mat-divider>
+            <ng-layer-ctl
+                [ng-layer-ctl-name]="SXPLR_PREFIX + aVoi.ngVolume.url"
+                [ng-layer-ctl-src]="aVoi.ngVolume.url"
+                [ng-layer-ctl-transform]="aVoi.ngVolume.transform"
+                [ng-layer-ctl-meta]="aVoi.ngVolume.meta"
+                [ng-layer-ctl-insert-index]="aVoi.ngVolume.insertIndex"
+                [ng-layer-ctl-opacity]="1.0"
+                [ng-layer-ctl-type]="aVoi.ngVolume.type">
+            </ng-layer-ctl>
+        </ng-template>
+    </ng-template>
 
     <mat-divider></mat-divider>
 

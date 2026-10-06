@@ -21,6 +21,20 @@ export interface paths {
      */
     get: operations["get_single_feature_download_feature__feature_id__download_get"]
   }
+  "/spatial/transform": {
+    /** Transform */
+    get: operations["transform_spatial_transform_get"]
+    /** Transform Multi */
+    post: operations["transform_multi_spatial_transform_post"]
+  }
+  "/spatial/features": {
+    /** Features */
+    get: operations["features_spatial_features_get"]
+  }
+  "/spatial/geometry/{uuid}": {
+    /** Geometries */
+    get: operations["geometries_spatial_geometry__uuid__get"]
+  }
   "/atlases": {
     /**
      * Get All Atlases 
@@ -163,20 +177,6 @@ export interface paths {
      */
     get: operations["get_download_bundle_atlas_download_get"]
   }
-  "/atlas_download/{task_id}": {
-    /**
-     * Get Download Progress 
-     * @description Get download task progress with task_id
-     */
-    get: operations["get_download_progress_atlas_download__task_id__get"]
-  }
-  "/atlas_download/{task_id}/download": {
-    /**
-     * Get Download Result 
-     * @description Download the bundle
-     */
-    get: operations["get_download_result_atlas_download__task_id__download_get"]
-  }
   "/feature/_types": {
     /**
      * Get All Feature Types 
@@ -231,16 +231,15 @@ export interface paths {
   "/feature/Image": {
     /**
      * Get All Voi 
-     * @description Get all Image features
+     * @description Get all Image features n.b. type will no longer be parsed as intended. If unset, will return all spatial features.
+     * If set, only `BlockfaceVolumeOfInterest`, `CellBodyStainedVolumeOfInterest`,` DTIVolumeOfInterest` will return VOI features
+     * of the corresponding category.
      */
     get: operations["get_all_voi_feature_Image_get"]
   }
-  "/feature/Image/{feature_id}": {
-    /**
-     * Get Single Voi 
-     * @description Get a single Image feature
-     */
-    get: operations["get_single_voi_feature_Image__feature_id__get"]
+  "/feature/Geom": {
+    /** All Geom Feature */
+    get: operations["all_geom_feature_feature_Geom_get"]
   }
   "/feature/GeneExpressions": {
     /**
@@ -747,6 +746,27 @@ export interface components {
       category?: string
     }
     /**
+     * FeatureModel 
+     * @description FeatureModel
+     */
+    FeatureModel: {
+      /** @Type */
+      "@type": string
+      /** Id */
+      id: string
+      /** Modality */
+      modality?: string
+      /** Category */
+      category: string
+      /** Description */
+      description: string
+      /** Name */
+      name: string
+      /** Datasets */
+      datasets: (components["schemas"]["EbrainsDatasetModel"])[]
+      anchor?: components["schemas"]["SiibraAnchorModel"]
+    }
+    /**
      * GeneModel 
      * @description ConfigBaseModel
      */
@@ -757,6 +777,29 @@ export interface components {
       symbol: string
       /** Description */
       description: string
+    }
+    /**
+     * GeomSvcArtefactEnum 
+     * @description An enumeration. 
+     * @enum {string}
+     */
+    GeomSvcArtefactEnum: "absent" | "present" | "pending" | "running" | "error"
+    /** GeomSvcArtefactStatus */
+    GeomSvcArtefactStatus: {
+      status: components["schemas"]["GeomSvcArtefactEnum"]
+      /** Uri */
+      uri: {
+        [key: string]: string | undefined
+      }
+    }
+    /** GeomSvcModel */
+    GeomSvcModel: {
+      /** Name */
+      name: string
+      /** Source */
+      source: string
+      /** Label */
+      label: string
     }
     /** HTTPValidationError */
     HTTPValidationError: {
@@ -924,200 +967,311 @@ export interface components {
        */
       contributor: Record<string, never>
     }
-    /** Page[CommonCoordinateSpaceModel] */
+    /**
+     * Page[CommonCoordinateSpaceModel] 
+     * @description Marker class for page classes.
+     * 
+     * Used to mark classes that can be used as pages but don't directly inherit from AbstractPage.
+     */
     Page_CommonCoordinateSpaceModel_: {
       /** Items */
       items: (components["schemas"]["CommonCoordinateSpaceModel"])[]
       /** Total */
-      total?: number
+      total: number
       /** Page */
-      page?: number
+      page: number
       /** Size */
-      size?: number
+      size: number
       /** Pages */
-      pages?: number
+      pages: number
     }
-    /** Page[FeatureMetaModel] */
+    /**
+     * Page[FeatureMetaModel] 
+     * @description Marker class for page classes.
+     * 
+     * Used to mark classes that can be used as pages but don't directly inherit from AbstractPage.
+     */
     Page_FeatureMetaModel_: {
       /** Items */
       items: (components["schemas"]["FeatureMetaModel"])[]
       /** Total */
-      total?: number
+      total: number
       /** Page */
-      page?: number
+      page: number
       /** Size */
-      size?: number
+      size: number
       /** Pages */
-      pages?: number
+      pages: number
     }
-    /** Page[GeneModel] */
+    /**
+     * Page[FeatureModel] 
+     * @description Marker class for page classes.
+     * 
+     * Used to mark classes that can be used as pages but don't directly inherit from AbstractPage.
+     */
+    Page_FeatureModel_: {
+      /** Items */
+      items: (components["schemas"]["FeatureModel"])[]
+      /** Total */
+      total: number
+      /** Page */
+      page: number
+      /** Size */
+      size: number
+      /** Pages */
+      pages: number
+    }
+    /**
+     * Page[GeneModel] 
+     * @description Marker class for page classes.
+     * 
+     * Used to mark classes that can be used as pages but don't directly inherit from AbstractPage.
+     */
     Page_GeneModel_: {
       /** Items */
       items: (components["schemas"]["GeneModel"])[]
       /** Total */
-      total?: number
+      total: number
       /** Page */
-      page?: number
+      page: number
       /** Size */
-      size?: number
+      size: number
       /** Pages */
-      pages?: number
+      pages: number
     }
-    /** Page[MapModel] */
+    /**
+     * Page[GeomSvcModel] 
+     * @description Marker class for page classes.
+     * 
+     * Used to mark classes that can be used as pages but don't directly inherit from AbstractPage.
+     */
+    Page_GeomSvcModel_: {
+      /** Items */
+      items: (components["schemas"]["GeomSvcModel"])[]
+      /** Total */
+      total: number
+      /** Page */
+      page: number
+      /** Size */
+      size: number
+      /** Pages */
+      pages: number
+    }
+    /**
+     * Page[MapModel] 
+     * @description Marker class for page classes.
+     * 
+     * Used to mark classes that can be used as pages but don't directly inherit from AbstractPage.
+     */
     Page_MapModel_: {
       /** Items */
       items: (components["schemas"]["MapModel"])[]
       /** Total */
-      total?: number
+      total: number
       /** Page */
-      page?: number
+      page: number
       /** Size */
-      size?: number
+      size: number
       /** Pages */
-      pages?: number
+      pages: number
     }
-    /** Page[ParcellationEntityVersionModel] */
+    /**
+     * Page[ParcellationEntityVersionModel] 
+     * @description Marker class for page classes.
+     * 
+     * Used to mark classes that can be used as pages but don't directly inherit from AbstractPage.
+     */
     Page_ParcellationEntityVersionModel_: {
       /** Items */
       items: (components["schemas"]["ParcellationEntityVersionModel"])[]
       /** Total */
-      total?: number
+      total: number
       /** Page */
-      page?: number
+      page: number
       /** Size */
-      size?: number
+      size: number
       /** Pages */
-      pages?: number
+      pages: number
     }
-    /** Page[RegionRelationAsmtModel] */
+    /**
+     * Page[RegionRelationAsmtModel] 
+     * @description Marker class for page classes.
+     * 
+     * Used to mark classes that can be used as pages but don't directly inherit from AbstractPage.
+     */
     Page_RegionRelationAsmtModel_: {
       /** Items */
       items: (components["schemas"]["RegionRelationAsmtModel"])[]
       /** Total */
-      total?: number
+      total: number
       /** Page */
-      page?: number
+      page: number
       /** Size */
-      size?: number
+      size: number
       /** Pages */
-      pages?: number
+      pages: number
     }
-    /** Page[SiibraAtlasModel] */
+    /**
+     * Page[SiibraAtlasModel] 
+     * @description Marker class for page classes.
+     * 
+     * Used to mark classes that can be used as pages but don't directly inherit from AbstractPage.
+     */
     Page_SiibraAtlasModel_: {
       /** Items */
       items: (components["schemas"]["SiibraAtlasModel"])[]
       /** Total */
-      total?: number
+      total: number
       /** Page */
-      page?: number
+      page: number
       /** Size */
-      size?: number
+      size: number
       /** Pages */
-      pages?: number
+      pages: number
     }
-    /** Page[SiibraCorticalProfileModel] */
+    /**
+     * Page[SiibraCorticalProfileModel] 
+     * @description Marker class for page classes.
+     * 
+     * Used to mark classes that can be used as pages but don't directly inherit from AbstractPage.
+     */
     Page_SiibraCorticalProfileModel_: {
       /** Items */
       items: (components["schemas"]["SiibraCorticalProfileModel"])[]
       /** Total */
-      total?: number
+      total: number
       /** Page */
-      page?: number
+      page: number
       /** Size */
-      size?: number
+      size: number
       /** Pages */
-      pages?: number
+      pages: number
     }
-    /** Page[SiibraEbrainsDataFeatureModel] */
+    /**
+     * Page[SiibraEbrainsDataFeatureModel] 
+     * @description Marker class for page classes.
+     * 
+     * Used to mark classes that can be used as pages but don't directly inherit from AbstractPage.
+     */
     Page_SiibraEbrainsDataFeatureModel_: {
       /** Items */
       items: (components["schemas"]["SiibraEbrainsDataFeatureModel"])[]
       /** Total */
-      total?: number
+      total: number
       /** Page */
-      page?: number
+      page: number
       /** Size */
-      size?: number
+      size: number
       /** Pages */
-      pages?: number
+      pages: number
     }
-    /** Page[SiibraParcellationModel] */
+    /**
+     * Page[SiibraParcellationModel] 
+     * @description Marker class for page classes.
+     * 
+     * Used to mark classes that can be used as pages but don't directly inherit from AbstractPage.
+     */
     Page_SiibraParcellationModel_: {
       /** Items */
       items: (components["schemas"]["SiibraParcellationModel"])[]
       /** Total */
-      total?: number
+      total: number
       /** Page */
-      page?: number
+      page: number
       /** Size */
-      size?: number
+      size: number
       /** Pages */
-      pages?: number
+      pages: number
     }
-    /** Page[SiibraRegionalConnectivityModel] */
+    /**
+     * Page[SiibraRegionalConnectivityModel] 
+     * @description Marker class for page classes.
+     * 
+     * Used to mark classes that can be used as pages but don't directly inherit from AbstractPage.
+     */
     Page_SiibraRegionalConnectivityModel_: {
       /** Items */
       items: (components["schemas"]["SiibraRegionalConnectivityModel"])[]
       /** Total */
-      total?: number
+      total: number
       /** Page */
-      page?: number
+      page: number
       /** Size */
-      size?: number
+      size: number
       /** Pages */
-      pages?: number
+      pages: number
     }
-    /** Page[SiibraTabularModel] */
+    /**
+     * Page[SiibraTabularModel] 
+     * @description Marker class for page classes.
+     * 
+     * Used to mark classes that can be used as pages but don't directly inherit from AbstractPage.
+     */
     Page_SiibraTabularModel_: {
       /** Items */
       items: (components["schemas"]["SiibraTabularModel"])[]
       /** Total */
-      total?: number
+      total: number
       /** Page */
-      page?: number
+      page: number
       /** Size */
-      size?: number
+      size: number
       /** Pages */
-      pages?: number
+      pages: number
     }
-    /** Page[SiibraVoiModel] */
+    /**
+     * Page[SiibraVoiModel] 
+     * @description Marker class for page classes.
+     * 
+     * Used to mark classes that can be used as pages but don't directly inherit from AbstractPage.
+     */
     Page_SiibraVoiModel_: {
       /** Items */
       items: (components["schemas"]["SiibraVoiModel"])[]
       /** Total */
-      total?: number
+      total: number
       /** Page */
-      page?: number
+      page: number
       /** Size */
-      size?: number
+      size: number
       /** Pages */
-      pages?: number
+      pages: number
     }
-    /** Page[Union[SiibraCorticalProfileModel, SiibraReceptorDensityFp, SiibraTabularModel]] */
+    /**
+     * Page[Union[SiibraCorticalProfileModel, SiibraReceptorDensityFp, SiibraTabularModel]] 
+     * @description Marker class for page classes.
+     * 
+     * Used to mark classes that can be used as pages but don't directly inherit from AbstractPage.
+     */
     Page_Union_SiibraCorticalProfileModel__SiibraReceptorDensityFp__SiibraTabularModel__: {
       /** Items */
       items: (components["schemas"]["SiibraCorticalProfileModel"] | components["schemas"]["SiibraReceptorDensityFp"] | components["schemas"]["SiibraTabularModel"])[]
       /** Total */
-      total?: number
+      total: number
       /** Page */
-      page?: number
+      page: number
       /** Size */
-      size?: number
+      size: number
       /** Pages */
-      pages?: number
+      pages: number
     }
-    /** Page[Union[SiibraVoiModel, SiibraCorticalProfileModel, SiibraRegionalConnectivityModel, SiibraReceptorDensityFp, SiibraTabularModel, SiibraEbrainsDataFeatureModel]] */
+    /**
+     * Page[Union[SiibraVoiModel, SiibraCorticalProfileModel, SiibraRegionalConnectivityModel, SiibraReceptorDensityFp, SiibraTabularModel, SiibraEbrainsDataFeatureModel]] 
+     * @description Marker class for page classes.
+     * 
+     * Used to mark classes that can be used as pages but don't directly inherit from AbstractPage.
+     */
     Page_Union_SiibraVoiModel__SiibraCorticalProfileModel__SiibraRegionalConnectivityModel__SiibraReceptorDensityFp__SiibraTabularModel__SiibraEbrainsDataFeatureModel__: {
       /** Items */
       items: (components["schemas"]["SiibraVoiModel"] | components["schemas"]["SiibraCorticalProfileModel"] | components["schemas"]["SiibraRegionalConnectivityModel"] | components["schemas"]["SiibraReceptorDensityFp"] | components["schemas"]["SiibraTabularModel"] | components["schemas"]["SiibraEbrainsDataFeatureModel"])[]
       /** Total */
-      total?: number
+      total: number
       /** Page */
-      page?: number
+      page: number
       /** Size */
-      size?: number
+      size: number
       /** Pages */
-      pages?: number
+      pages: number
     }
     /**
      * ParcellationEntityVersionModel 
@@ -1565,6 +1719,25 @@ export interface components {
       volume: components["schemas"]["VolumeModel"]
       boundingbox: components["schemas"]["BoundingBoxModel"]
     }
+    /** SpatialBackendMultiRespModel */
+    SpatialBackendMultiRespModel: {
+      /** Target Points */
+      target_points: ((number)[])[]
+    }
+    /** SpatialBackendPostModel */
+    SpatialBackendPostModel: {
+      /** From Space Id */
+      from_space_id: string
+      /** To Space Id */
+      to_space_id: string
+      /** From Points */
+      from_points: ((number)[])[]
+    }
+    /** SpatialBackendRespModel */
+    SpatialBackendRespModel: {
+      /** Target Point */
+      target_point: (number)[]
+    }
     /** StatisticModelInfo */
     StatisticModelInfo: {
       /** Min */
@@ -1734,6 +1907,101 @@ export interface operations {
       200: {
         content: {
           "application/json": Record<string, never>
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"]
+        }
+      }
+    }
+  }
+  transform_spatial_transform_get: {
+    /** Transform */
+    parameters: {
+      query: {
+        from_space_id: string
+        to_space_id: string
+        x: number
+        y: number
+        z: number
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["SpatialBackendRespModel"]
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"]
+        }
+      }
+    }
+  }
+  transform_multi_spatial_transform_post: {
+    /** Transform Multi */
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SpatialBackendPostModel"]
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["SpatialBackendMultiRespModel"]
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"]
+        }
+      }
+    }
+  }
+  features_spatial_features_get: {
+    /** Features */
+    parameters: {
+      query: {
+        space_id: string
+        bbox: string
+        page?: number
+        size?: number
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Page_GeomSvcModel_"]
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"]
+        }
+      }
+    }
+  }
+  geometries_spatial_geometry__uuid__get: {
+    /** Geometries */
+    parameters: {
+      path: {
+        uuid: string
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["GeomSvcArtefactStatus"]
         }
       }
       /** @description Validation Error */
@@ -2261,56 +2529,6 @@ export interface operations {
       }
     }
   }
-  get_download_progress_atlas_download__task_id__get: {
-    /**
-     * Get Download Progress 
-     * @description Get download task progress with task_id
-     */
-    parameters: {
-      path: {
-        task_id: string
-      }
-    }
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": Record<string, never>
-        }
-      }
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"]
-        }
-      }
-    }
-  }
-  get_download_result_atlas_download__task_id__download_get: {
-    /**
-     * Get Download Result 
-     * @description Download the bundle
-     */
-    parameters: {
-      path: {
-        task_id: string
-      }
-    }
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": Record<string, never>
-        }
-      }
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"]
-        }
-      }
-    }
-  }
   get_all_feature_types_feature__types_get: {
     /**
      * Get All Feature Types 
@@ -2518,7 +2736,9 @@ export interface operations {
   get_all_voi_feature_Image_get: {
     /**
      * Get All Voi 
-     * @description Get all Image features
+     * @description Get all Image features n.b. type will no longer be parsed as intended. If unset, will return all spatial features.
+     * If set, only `BlockfaceVolumeOfInterest`, `CellBodyStainedVolumeOfInterest`,` DTIVolumeOfInterest` will return VOI features
+     * of the corresponding category.
      */
     parameters: {
       query: {
@@ -2544,25 +2764,21 @@ export interface operations {
       }
     }
   }
-  get_single_voi_feature_Image__feature_id__get: {
-    /**
-     * Get Single Voi 
-     * @description Get a single Image feature
-     */
+  all_geom_feature_feature_Geom_get: {
+    /** All Geom Feature */
     parameters: {
       query: {
         space_id: string
-        type?: string
-      }
-      path: {
-        feature_id: string
+        bbox?: string
+        page?: number
+        size?: number
       }
     }
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["SiibraVoiModel"]
+          "application/json": components["schemas"]["Page_FeatureModel_"]
         }
       }
       /** @description Validation Error */

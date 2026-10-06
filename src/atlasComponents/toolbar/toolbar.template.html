@@ -296,6 +296,7 @@
                                 
                                 <sxplr-feature-entry
                                     class="panel-content"
+                                    [newSpatialFeature]="true"
                                     [template]="view.selectedTemplate"
                                     [bbox]="bbox.bbox$ | async | getProperty : 'bbox'"
                                     #voiFeatureEntryCmp="featureEntryCmp"

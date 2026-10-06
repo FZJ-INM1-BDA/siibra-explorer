@@ -15,7 +15,7 @@ export type SxplrCoordinatePointExtension = {
   color: string
   '@id': string // should match the id of opendminds specs
 }
-export type SapiSpatialFeatureModel = PathReturn<"/feature/Image/{feature_id}">
+export type SapiSpatialFeatureModel = components["schemas"]["SiibraVoiModel"]
 export type SapiFeatureModel = SapiSpatialFeatureModel | PathReturn<"/feature/Tabular/{feature_id}"> | PathReturn<"/feature/RegionalConnectivity/{feature_id}"> | PathReturn<"/feature/CorticalProfile/{feature_id}">
 
 export type SapiRoute = keyof paths

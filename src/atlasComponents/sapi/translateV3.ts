@@ -1,7 +1,7 @@
 import {
   SxplrAtlas, SxplrParcellation, SxplrTemplate, SxplrRegion, NgLayerSpec, NgPrecompMeshSpec, NgSegLayerSpec, VoiFeature, Point, TThreeMesh, LabelledMap, CorticalFeature, Feature, GenericInfo, BoundingBox, SimpleCompoundFeature
 } from "./sxplrTypes"
-import { PathReturn, MetaV1Schema, /* CompoundFeature */ } from "./typeV3"
+import { SapiSpatialFeatureModel, PathReturn, MetaV1Schema, /* CompoundFeature */ } from "./typeV3"
 import { hexToRgb } from 'common/util'
 import { components } from "./schemaV3"
 import { defaultdict, getFactor, getShaderFromMeta } from "src/util/fn"
@@ -843,7 +843,7 @@ class TranslateV3 {
     }
   }
 
-  #isVoi(feat: unknown): feat is PathReturn<"/feature/Image/{feature_id}"> {
+  #isVoi(feat: unknown): feat is SapiSpatialFeatureModel {
     return feat['@type'].includes("feature/volume_of_interest")
   }
 
@@ -859,7 +859,7 @@ class TranslateV3 {
     
   // }
 
-  async translateVoiFeature(feat: PathReturn<"/feature/Image/{feature_id}">): Promise<VoiFeature> {
+  async translateVoiFeature(feat: SapiSpatialFeatureModel): Promise<VoiFeature> {
     const [superObj, { loc: center }, { loc: maxpoint }, { loc: minpoint }, { "neuroglancer/precomputed": precomputedVol, "zarr2": zarrVol }] = await Promise.all([
       this.translateBaseFeature(feat),
       this.#translatePoint(feat.boundingbox.center),

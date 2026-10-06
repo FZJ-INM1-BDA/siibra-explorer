@@ -8,7 +8,7 @@ import { BehaviorSubject, forkJoin, from, Observable, of, Subject, throwError } 
 import {
   translateV3Entities
 } from "./translateV3"
-import { FeatureType, PathReturn, RouteParam, SapiRoute } from "./typeV3";
+import { PathReturn, RouteParam, SapiRoute } from "./typeV3";
 import { SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate } from "./sxplrTypes";
 import { parcBanList, speciesOrder } from "src/util/constants";
 
@@ -187,10 +187,18 @@ export class SAPI{
     return false
   }
 
-  getV3FeatureDetail<T extends FeatureType>(featureType: T, sapiParam: RouteParam<`/feature/${T}/{feature_id}`>): Observable<PathReturn<`/feature/${T}/{feature_id}`>> {
-    return this.v3Get<`/feature/${T}/{feature_id}`>(`/feature/${featureType}/{feature_id}`, {
-      ...sapiParam
+  getGeomFeatures(space_id: string, bbox?: string){
+    const baseQueryObj = { space_id, bbox, }
+    
+    const getPage = (page: number) => this.v3Get("/feature/Geom", {
+      query: {
+        ...baseQueryObj,
+        page,
+      }
     })
+    return getPage(1).pipe(
+      switchMap(resp => this.iteratePages(resp, getPage))
+    )
   }
 
   getFeaturePlot(id: string, params: RouteParam<"/feature/{feature_id}/plotly">["query"] & Record<string, string> = {}) {

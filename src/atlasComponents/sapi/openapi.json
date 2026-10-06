@@ -106,6 +106,239 @@
         }
       }
     },
+    "/spatial/transform": {
+      "get": {
+        "tags": [
+          "spatial"
+        ],
+        "summary": "Transform",
+        "operationId": "transform_spatial_transform_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "From Space Id"
+            },
+            "name": "from_space_id",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "To Space Id"
+            },
+            "name": "to_space_id",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "type": "number",
+              "title": "X"
+            },
+            "name": "x",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "type": "number",
+              "title": "Y"
+            },
+            "name": "y",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "type": "number",
+              "title": "Z"
+            },
+            "name": "z",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpatialBackendRespModel"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "spatial"
+        ],
+        "summary": "Transform Multi",
+        "operationId": "transform_multi_spatial_transform_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SpatialBackendPostModel"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpatialBackendMultiRespModel"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spatial/features": {
+      "get": {
+        "tags": [
+          "spatial"
+        ],
+        "summary": "Features",
+        "operationId": "features_spatial_features_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Space Id"
+            },
+            "name": "space_id",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Bbox"
+            },
+            "name": "bbox",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1.0,
+              "title": "Page",
+              "default": 1
+            },
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100.0,
+              "minimum": 1.0,
+              "title": "Size",
+              "default": 50
+            },
+            "name": "size",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_GeomSvcModel_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/spatial/geometry/{uuid}": {
+      "get": {
+        "tags": [
+          "spatial"
+        ],
+        "summary": "Geometries",
+        "operationId": "geometries_spatial_geometry__uuid__get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Uuid"
+            },
+            "name": "uuid",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeomSvcArtefactStatus"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/atlases": {
       "get": {
         "tags": [
@@ -119,7 +352,7 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "minimum": 1,
+              "minimum": 1.0,
               "title": "Page",
               "default": 1
             },
@@ -130,8 +363,8 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "maximum": 100,
-              "minimum": 1,
+              "maximum": 100.0,
+              "minimum": 1.0,
               "title": "Size",
               "default": 50
             },
@@ -219,7 +452,7 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "minimum": 1,
+              "minimum": 1.0,
               "title": "Page",
               "default": 1
             },
@@ -230,8 +463,8 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "maximum": 100,
-              "minimum": 1,
+              "maximum": 100.0,
+              "minimum": 1.0,
               "title": "Size",
               "default": 50
             },
@@ -319,7 +552,7 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "minimum": 1,
+              "minimum": 1.0,
               "title": "Page",
               "default": 1
             },
@@ -330,8 +563,8 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "maximum": 100,
-              "minimum": 1,
+              "maximum": 100.0,
+              "minimum": 1.0,
               "title": "Size",
               "default": 50
             },
@@ -437,7 +670,7 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "minimum": 1,
+              "minimum": 1.0,
               "title": "Page",
               "default": 1
             },
@@ -448,8 +681,8 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "maximum": 100,
-              "minimum": 1,
+              "maximum": 100.0,
+              "minimum": 1.0,
               "title": "Size",
               "default": 50
             },
@@ -512,7 +745,7 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "minimum": 1,
+              "minimum": 1.0,
               "title": "Page",
               "default": 1
             },
@@ -523,8 +756,8 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "maximum": 100,
-              "minimum": 1,
+              "maximum": 100.0,
+              "minimum": 1.0,
               "title": "Size",
               "default": 50
             },
@@ -587,7 +820,7 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "minimum": 1,
+              "minimum": 1.0,
               "title": "Page",
               "default": 1
             },
@@ -598,8 +831,8 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "maximum": 100,
-              "minimum": 1,
+              "maximum": 100.0,
+              "minimum": 1.0,
               "title": "Size",
               "default": 50
             },
@@ -785,8 +1018,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "title": "Name",
-              "default": ""
+              "title": "Name"
             },
             "name": "name",
             "in": "query"
@@ -1053,7 +1285,7 @@
             "schema": {
               "type": "number",
               "title": "Sigma Mm",
-              "default": 0
+              "default": 0.0
             },
             "name": "sigma_mm",
             "in": "query"
@@ -1122,7 +1354,7 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "minimum": 1,
+              "minimum": 1.0,
               "title": "Page",
               "default": 1
             },
@@ -1133,8 +1365,8 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "maximum": 100,
-              "minimum": 1,
+              "maximum": 100.0,
+              "minimum": 1.0,
               "title": "Size",
               "default": 50
             },
@@ -1266,94 +1498,11 @@
           {
             "required": false,
             "schema": {
-              "type": "boolean",
-              "title": "Strict Mode",
-              "default": false
+              "type": "string",
+              "title": "Strict Mode"
             },
             "name": "strict_mode",
             "in": "query"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/atlas_download/{task_id}": {
-      "get": {
-        "tags": [
-          "download"
-        ],
-        "summary": "Get Download Progress",
-        "description": "Get download task progress with task_id",
-        "operationId": "get_download_progress_atlas_download__task_id__get",
-        "parameters": [
-          {
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Task Id"
-            },
-            "name": "task_id",
-            "in": "path"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/atlas_download/{task_id}/download": {
-      "get": {
-        "tags": [
-          "download"
-        ],
-        "summary": "Get Download Result",
-        "description": "Download the bundle",
-        "operationId": "get_download_result_atlas_download__task_id__download_get",
-        "parameters": [
-          {
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Task Id"
-            },
-            "name": "task_id",
-            "in": "path"
           }
         ],
         "responses": {
@@ -1391,7 +1540,7 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "minimum": 1,
+              "minimum": 1.0,
               "title": "Page",
               "default": 1
             },
@@ -1402,8 +1551,8 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "maximum": 100,
-              "minimum": 1,
+              "maximum": 100.0,
+              "minimum": 1.0,
               "title": "Size",
               "default": 50
             },
@@ -1466,7 +1615,7 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "minimum": 1,
+              "minimum": 1.0,
               "title": "Page",
               "default": 1
             },
@@ -1477,8 +1626,8 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "maximum": 100,
-              "minimum": 1,
+              "maximum": 100.0,
+              "minimum": 1.0,
               "title": "Size",
               "default": 50
             },
@@ -1620,7 +1769,7 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "minimum": 1,
+              "minimum": 1.0,
               "title": "Page",
               "default": 1
             },
@@ -1631,8 +1780,8 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "maximum": 100,
-              "minimum": 1,
+              "maximum": 100.0,
+              "minimum": 1.0,
               "title": "Size",
               "default": 50
             },
@@ -1774,7 +1923,7 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "minimum": 1,
+              "minimum": 1.0,
               "title": "Page",
               "default": 1
             },
@@ -1785,8 +1934,8 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "maximum": 100,
-              "minimum": 1,
+              "maximum": 100.0,
+              "minimum": 1.0,
               "title": "Size",
               "default": 50
             },
@@ -1905,7 +2054,7 @@
           "feature"
         ],
         "summary": "Get All Voi",
-        "description": "Get all Image features",
+        "description": "Get all Image features n.b. type will no longer be parsed as intended. If unset, will return all spatial features.\nIf set, only `BlockfaceVolumeOfInterest`, `CellBodyStainedVolumeOfInterest`,` DTIVolumeOfInterest` will return VOI features\nof the corresponding category.",
         "operationId": "get_all_voi_feature_Image_get",
         "parameters": [
           {
@@ -1939,7 +2088,7 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "minimum": 1,
+              "minimum": 1.0,
               "title": "Page",
               "default": 1
             },
@@ -1950,8 +2099,8 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "maximum": 100,
-              "minimum": 1,
+              "maximum": 100.0,
+              "minimum": 1.0,
               "title": "Size",
               "default": 50
             },
@@ -1983,24 +2132,14 @@
         }
       }
     },
-    "/feature/Image/{feature_id}": {
+    "/feature/Geom": {
       "get": {
         "tags": [
           "feature"
         ],
-        "summary": "Get Single Voi",
-        "description": "Get a single Image feature",
-        "operationId": "get_single_voi_feature_Image__feature_id__get",
+        "summary": "All Geom Feature",
+        "operationId": "all_geom_feature_feature_Geom_get",
         "parameters": [
-          {
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Feature Id"
-            },
-            "name": "feature_id",
-            "in": "path"
-          },
           {
             "required": true,
             "schema": {
@@ -2014,9 +2153,32 @@
             "required": false,
             "schema": {
               "type": "string",
-              "title": "Type"
+              "title": "Bbox"
             },
-            "name": "type",
+            "name": "bbox",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1.0,
+              "title": "Page",
+              "default": 1
+            },
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100.0,
+              "minimum": 1.0,
+              "title": "Size",
+              "default": 50
+            },
+            "name": "size",
             "in": "query"
           }
         ],
@@ -2026,7 +2188,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SiibraVoiModel"
+                  "$ref": "#/components/schemas/Page_FeatureModel_"
                 }
               }
             }
@@ -2084,7 +2246,7 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "minimum": 1,
+              "minimum": 1.0,
               "title": "Page",
               "default": 1
             },
@@ -2095,8 +2257,8 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "maximum": 100,
-              "minimum": 1,
+              "maximum": 100.0,
+              "minimum": 1.0,
               "title": "Size",
               "default": 50
             },
@@ -2177,7 +2339,7 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "minimum": 1,
+              "minimum": 1.0,
               "title": "Page",
               "default": 1
             },
@@ -2188,8 +2350,8 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "maximum": 100,
-              "minimum": 1,
+              "maximum": 100.0,
+              "minimum": 1.0,
               "title": "Size",
               "default": 50
             },
@@ -2252,7 +2414,7 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "minimum": 1,
+              "minimum": 1.0,
               "title": "Page",
               "default": 1
             },
@@ -2263,8 +2425,8 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "maximum": 100,
-              "minimum": 1,
+              "maximum": 100.0,
+              "minimum": 1.0,
               "title": "Size",
               "default": 50
             },
@@ -2336,7 +2498,7 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "minimum": 1,
+              "minimum": 1.0,
               "title": "Page",
               "default": 1
             },
@@ -2347,8 +2509,8 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "maximum": 100,
-              "minimum": 1,
+              "maximum": 100.0,
+              "minimum": 1.0,
               "title": "Size",
               "default": 50
             },
@@ -2466,7 +2628,7 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "minimum": 1,
+              "minimum": 1.0,
               "title": "Page",
               "default": 1
             },
@@ -2477,8 +2639,8 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "maximum": 100,
-              "minimum": 1,
+              "maximum": 100.0,
+              "minimum": 1.0,
               "title": "Size",
               "default": 50
             },
@@ -3267,6 +3429,55 @@
         "title": "FeatureMetaModel",
         "description": "Meta feature type"
       },
+      "FeatureModel": {
+        "properties": {
+          "@type": {
+            "type": "string",
+            "title": "@Type"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "modality": {
+            "type": "string",
+            "title": "Modality"
+          },
+          "category": {
+            "type": "string",
+            "title": "Category"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "datasets": {
+            "items": {
+              "$ref": "#/components/schemas/EbrainsDatasetModel"
+            },
+            "type": "array",
+            "title": "Datasets"
+          },
+          "anchor": {
+            "$ref": "#/components/schemas/SiibraAnchorModel"
+          }
+        },
+        "type": "object",
+        "required": [
+          "@type",
+          "id",
+          "category",
+          "description",
+          "name",
+          "datasets"
+        ],
+        "title": "FeatureModel",
+        "description": "FeatureModel"
+      },
       "GeneModel": {
         "properties": {
           "@type": {
@@ -3290,6 +3501,61 @@
         ],
         "title": "GeneModel",
         "description": "ConfigBaseModel"
+      },
+      "GeomSvcArtefactEnum": {
+        "type": "string",
+        "enum": [
+          "absent",
+          "present",
+          "pending",
+          "running",
+          "error"
+        ],
+        "title": "GeomSvcArtefactEnum",
+        "description": "An enumeration."
+      },
+      "GeomSvcArtefactStatus": {
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/GeomSvcArtefactEnum"
+          },
+          "uri": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Uri"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "uri"
+        ],
+        "title": "GeomSvcArtefactStatus"
+      },
+      "GeomSvcModel": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "source",
+          "label"
+        ],
+        "title": "GeomSvcModel"
       },
       "HTTPValidationError": {
         "properties": {
@@ -3606,30 +3872,35 @@
           },
           "total": {
             "type": "integer",
-            "minimum": 0,
+            "minimum": 0.0,
             "title": "Total"
           },
           "page": {
             "type": "integer",
-            "minimum": 1,
+            "minimum": 1.0,
             "title": "Page"
           },
           "size": {
             "type": "integer",
-            "minimum": 1,
+            "minimum": 1.0,
             "title": "Size"
           },
           "pages": {
             "type": "integer",
-            "minimum": 0,
+            "minimum": 0.0,
             "title": "Pages"
           }
         },
         "type": "object",
         "required": [
-          "items"
+          "items",
+          "total",
+          "page",
+          "size",
+          "pages"
         ],
-        "title": "Page[CommonCoordinateSpaceModel]"
+        "title": "Page[CommonCoordinateSpaceModel]",
+        "description": "Marker class for page classes.\n\nUsed to mark classes that can be used as pages but don't directly inherit from AbstractPage."
       },
       "Page_FeatureMetaModel_": {
         "properties": {
@@ -3642,30 +3913,76 @@
           },
           "total": {
             "type": "integer",
-            "minimum": 0,
+            "minimum": 0.0,
             "title": "Total"
           },
           "page": {
             "type": "integer",
-            "minimum": 1,
+            "minimum": 1.0,
             "title": "Page"
           },
           "size": {
             "type": "integer",
-            "minimum": 1,
+            "minimum": 1.0,
             "title": "Size"
           },
           "pages": {
             "type": "integer",
-            "minimum": 0,
+            "minimum": 0.0,
             "title": "Pages"
           }
         },
         "type": "object",
         "required": [
-          "items"
+          "items",
+          "total",
+          "page",
+          "size",
+          "pages"
         ],
-        "title": "Page[FeatureMetaModel]"
+        "title": "Page[FeatureMetaModel]",
+        "description": "Marker class for page classes.\n\nUsed to mark classes that can be used as pages but don't directly inherit from AbstractPage."
+      },
+      "Page_FeatureModel_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/FeatureModel"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Page"
+          },
+          "size": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Size"
+          },
+          "pages": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Pages"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "page",
+          "size",
+          "pages"
+        ],
+        "title": "Page[FeatureModel]",
+        "description": "Marker class for page classes.\n\nUsed to mark classes that can be used as pages but don't directly inherit from AbstractPage."
       },
       "Page_GeneModel_": {
         "properties": {
@@ -3678,30 +3995,76 @@
           },
           "total": {
             "type": "integer",
-            "minimum": 0,
+            "minimum": 0.0,
             "title": "Total"
           },
           "page": {
             "type": "integer",
-            "minimum": 1,
+            "minimum": 1.0,
             "title": "Page"
           },
           "size": {
             "type": "integer",
-            "minimum": 1,
+            "minimum": 1.0,
             "title": "Size"
           },
           "pages": {
             "type": "integer",
-            "minimum": 0,
+            "minimum": 0.0,
             "title": "Pages"
           }
         },
         "type": "object",
         "required": [
-          "items"
+          "items",
+          "total",
+          "page",
+          "size",
+          "pages"
         ],
-        "title": "Page[GeneModel]"
+        "title": "Page[GeneModel]",
+        "description": "Marker class for page classes.\n\nUsed to mark classes that can be used as pages but don't directly inherit from AbstractPage."
+      },
+      "Page_GeomSvcModel_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/GeomSvcModel"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Page"
+          },
+          "size": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Size"
+          },
+          "pages": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Pages"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "page",
+          "size",
+          "pages"
+        ],
+        "title": "Page[GeomSvcModel]",
+        "description": "Marker class for page classes.\n\nUsed to mark classes that can be used as pages but don't directly inherit from AbstractPage."
       },
       "Page_MapModel_": {
         "properties": {
@@ -3714,30 +4077,35 @@
           },
           "total": {
             "type": "integer",
-            "minimum": 0,
+            "minimum": 0.0,
             "title": "Total"
           },
           "page": {
             "type": "integer",
-            "minimum": 1,
+            "minimum": 1.0,
             "title": "Page"
           },
           "size": {
             "type": "integer",
-            "minimum": 1,
+            "minimum": 1.0,
             "title": "Size"
           },
           "pages": {
             "type": "integer",
-            "minimum": 0,
+            "minimum": 0.0,
             "title": "Pages"
           }
         },
         "type": "object",
         "required": [
-          "items"
+          "items",
+          "total",
+          "page",
+          "size",
+          "pages"
         ],
-        "title": "Page[MapModel]"
+        "title": "Page[MapModel]",
+        "description": "Marker class for page classes.\n\nUsed to mark classes that can be used as pages but don't directly inherit from AbstractPage."
       },
       "Page_ParcellationEntityVersionModel_": {
         "properties": {
@@ -3750,30 +4118,35 @@
           },
           "total": {
             "type": "integer",
-            "minimum": 0,
+            "minimum": 0.0,
             "title": "Total"
           },
           "page": {
             "type": "integer",
-            "minimum": 1,
+            "minimum": 1.0,
             "title": "Page"
           },
           "size": {
             "type": "integer",
-            "minimum": 1,
+            "minimum": 1.0,
             "title": "Size"
           },
           "pages": {
             "type": "integer",
-            "minimum": 0,
+            "minimum": 0.0,
             "title": "Pages"
           }
         },
         "type": "object",
         "required": [
-          "items"
+          "items",
+          "total",
+          "page",
+          "size",
+          "pages"
         ],
-        "title": "Page[ParcellationEntityVersionModel]"
+        "title": "Page[ParcellationEntityVersionModel]",
+        "description": "Marker class for page classes.\n\nUsed to mark classes that can be used as pages but don't directly inherit from AbstractPage."
       },
       "Page_RegionRelationAsmtModel_": {
         "properties": {
@@ -3786,30 +4159,35 @@
           },
           "total": {
             "type": "integer",
-            "minimum": 0,
+            "minimum": 0.0,
             "title": "Total"
           },
           "page": {
             "type": "integer",
-            "minimum": 1,
+            "minimum": 1.0,
             "title": "Page"
           },
           "size": {
             "type": "integer",
-            "minimum": 1,
+            "minimum": 1.0,
             "title": "Size"
           },
           "pages": {
             "type": "integer",
-            "minimum": 0,
+            "minimum": 0.0,
             "title": "Pages"
           }
         },
         "type": "object",
         "required": [
-          "items"
+          "items",
+          "total",
+          "page",
+          "size",
+          "pages"
         ],
-        "title": "Page[RegionRelationAsmtModel]"
+        "title": "Page[RegionRelationAsmtModel]",
+        "description": "Marker class for page classes.\n\nUsed to mark classes that can be used as pages but don't directly inherit from AbstractPage."
       },
       "Page_SiibraAtlasModel_": {
         "properties": {
@@ -3822,30 +4200,35 @@
           },
           "total": {
             "type": "integer",
-            "minimum": 0,
+            "minimum": 0.0,
             "title": "Total"
           },
           "page": {
             "type": "integer",
-            "minimum": 1,
+            "minimum": 1.0,
             "title": "Page"
           },
           "size": {
             "type": "integer",
-            "minimum": 1,
+            "minimum": 1.0,
             "title": "Size"
           },
           "pages": {
             "type": "integer",
-            "minimum": 0,
+            "minimum": 0.0,
             "title": "Pages"
           }
         },
         "type": "object",
         "required": [
-          "items"
+          "items",
+          "total",
+          "page",
+          "size",
+          "pages"
         ],
-        "title": "Page[SiibraAtlasModel]"
+        "title": "Page[SiibraAtlasModel]",
+        "description": "Marker class for page classes.\n\nUsed to mark classes that can be used as pages but don't directly inherit from AbstractPage."
       },
       "Page_SiibraCorticalProfileModel_": {
         "properties": {
@@ -3858,30 +4241,35 @@
           },
           "total": {
             "type": "integer",
-            "minimum": 0,
+            "minimum": 0.0,
             "title": "Total"
           },
           "page": {
             "type": "integer",
-            "minimum": 1,
+            "minimum": 1.0,
             "title": "Page"
           },
           "size": {
             "type": "integer",
-            "minimum": 1,
+            "minimum": 1.0,
             "title": "Size"
           },
           "pages": {
             "type": "integer",
-            "minimum": 0,
+            "minimum": 0.0,
             "title": "Pages"
           }
         },
         "type": "object",
         "required": [
-          "items"
+          "items",
+          "total",
+          "page",
+          "size",
+          "pages"
         ],
-        "title": "Page[SiibraCorticalProfileModel]"
+        "title": "Page[SiibraCorticalProfileModel]",
+        "description": "Marker class for page classes.\n\nUsed to mark classes that can be used as pages but don't directly inherit from AbstractPage."
       },
       "Page_SiibraEbrainsDataFeatureModel_": {
         "properties": {
@@ -3894,30 +4282,35 @@
           },
           "total": {
             "type": "integer",
-            "minimum": 0,
+            "minimum": 0.0,
             "title": "Total"
           },
           "page": {
             "type": "integer",
-            "minimum": 1,
+            "minimum": 1.0,
             "title": "Page"
           },
           "size": {
             "type": "integer",
-            "minimum": 1,
+            "minimum": 1.0,
             "title": "Size"
           },
           "pages": {
             "type": "integer",
-            "minimum": 0,
+            "minimum": 0.0,
             "title": "Pages"
           }
         },
         "type": "object",
         "required": [
-          "items"
+          "items",
+          "total",
+          "page",
+          "size",
+          "pages"
         ],
-        "title": "Page[SiibraEbrainsDataFeatureModel]"
+        "title": "Page[SiibraEbrainsDataFeatureModel]",
+        "description": "Marker class for page classes.\n\nUsed to mark classes that can be used as pages but don't directly inherit from AbstractPage."
       },
       "Page_SiibraParcellationModel_": {
         "properties": {
@@ -3930,30 +4323,35 @@
           },
           "total": {
             "type": "integer",
-            "minimum": 0,
+            "minimum": 0.0,
             "title": "Total"
           },
           "page": {
             "type": "integer",
-            "minimum": 1,
+            "minimum": 1.0,
             "title": "Page"
           },
           "size": {
             "type": "integer",
-            "minimum": 1,
+            "minimum": 1.0,
             "title": "Size"
           },
           "pages": {
             "type": "integer",
-            "minimum": 0,
+            "minimum": 0.0,
             "title": "Pages"
           }
         },
         "type": "object",
         "required": [
-          "items"
+          "items",
+          "total",
+          "page",
+          "size",
+          "pages"
         ],
-        "title": "Page[SiibraParcellationModel]"
+        "title": "Page[SiibraParcellationModel]",
+        "description": "Marker class for page classes.\n\nUsed to mark classes that can be used as pages but don't directly inherit from AbstractPage."
       },
       "Page_SiibraRegionalConnectivityModel_": {
         "properties": {
@@ -3966,30 +4364,35 @@
           },
           "total": {
             "type": "integer",
-            "minimum": 0,
+            "minimum": 0.0,
             "title": "Total"
           },
           "page": {
             "type": "integer",
-            "minimum": 1,
+            "minimum": 1.0,
             "title": "Page"
           },
           "size": {
             "type": "integer",
-            "minimum": 1,
+            "minimum": 1.0,
             "title": "Size"
           },
           "pages": {
             "type": "integer",
-            "minimum": 0,
+            "minimum": 0.0,
             "title": "Pages"
           }
         },
         "type": "object",
         "required": [
-          "items"
+          "items",
+          "total",
+          "page",
+          "size",
+          "pages"
         ],
-        "title": "Page[SiibraRegionalConnectivityModel]"
+        "title": "Page[SiibraRegionalConnectivityModel]",
+        "description": "Marker class for page classes.\n\nUsed to mark classes that can be used as pages but don't directly inherit from AbstractPage."
       },
       "Page_SiibraTabularModel_": {
         "properties": {
@@ -4002,30 +4405,35 @@
           },
           "total": {
             "type": "integer",
-            "minimum": 0,
+            "minimum": 0.0,
             "title": "Total"
           },
           "page": {
             "type": "integer",
-            "minimum": 1,
+            "minimum": 1.0,
             "title": "Page"
           },
           "size": {
             "type": "integer",
-            "minimum": 1,
+            "minimum": 1.0,
             "title": "Size"
           },
           "pages": {
             "type": "integer",
-            "minimum": 0,
+            "minimum": 0.0,
             "title": "Pages"
           }
         },
         "type": "object",
         "required": [
-          "items"
+          "items",
+          "total",
+          "page",
+          "size",
+          "pages"
         ],
-        "title": "Page[SiibraTabularModel]"
+        "title": "Page[SiibraTabularModel]",
+        "description": "Marker class for page classes.\n\nUsed to mark classes that can be used as pages but don't directly inherit from AbstractPage."
       },
       "Page_SiibraVoiModel_": {
         "properties": {
@@ -4038,30 +4446,35 @@
           },
           "total": {
             "type": "integer",
-            "minimum": 0,
+            "minimum": 0.0,
             "title": "Total"
           },
           "page": {
             "type": "integer",
-            "minimum": 1,
+            "minimum": 1.0,
             "title": "Page"
           },
           "size": {
             "type": "integer",
-            "minimum": 1,
+            "minimum": 1.0,
             "title": "Size"
           },
           "pages": {
             "type": "integer",
-            "minimum": 0,
+            "minimum": 0.0,
             "title": "Pages"
           }
         },
         "type": "object",
         "required": [
-          "items"
+          "items",
+          "total",
+          "page",
+          "size",
+          "pages"
         ],
-        "title": "Page[SiibraVoiModel]"
+        "title": "Page[SiibraVoiModel]",
+        "description": "Marker class for page classes.\n\nUsed to mark classes that can be used as pages but don't directly inherit from AbstractPage."
       },
       "Page_Union_SiibraCorticalProfileModel__SiibraReceptorDensityFp__SiibraTabularModel__": {
         "properties": {
@@ -4084,30 +4497,35 @@
           },
           "total": {
             "type": "integer",
-            "minimum": 0,
+            "minimum": 0.0,
             "title": "Total"
           },
           "page": {
             "type": "integer",
-            "minimum": 1,
+            "minimum": 1.0,
             "title": "Page"
           },
           "size": {
             "type": "integer",
-            "minimum": 1,
+            "minimum": 1.0,
             "title": "Size"
           },
           "pages": {
             "type": "integer",
-            "minimum": 0,
+            "minimum": 0.0,
             "title": "Pages"
           }
         },
         "type": "object",
         "required": [
-          "items"
+          "items",
+          "total",
+          "page",
+          "size",
+          "pages"
         ],
-        "title": "Page[Union[SiibraCorticalProfileModel, SiibraReceptorDensityFp, SiibraTabularModel]]"
+        "title": "Page[Union[SiibraCorticalProfileModel, SiibraReceptorDensityFp, SiibraTabularModel]]",
+        "description": "Marker class for page classes.\n\nUsed to mark classes that can be used as pages but don't directly inherit from AbstractPage."
       },
       "Page_Union_SiibraVoiModel__SiibraCorticalProfileModel__SiibraRegionalConnectivityModel__SiibraReceptorDensityFp__SiibraTabularModel__SiibraEbrainsDataFeatureModel__": {
         "properties": {
@@ -4139,30 +4557,35 @@
           },
           "total": {
             "type": "integer",
-            "minimum": 0,
+            "minimum": 0.0,
             "title": "Total"
           },
           "page": {
             "type": "integer",
-            "minimum": 1,
+            "minimum": 1.0,
             "title": "Page"
           },
           "size": {
             "type": "integer",
-            "minimum": 1,
+            "minimum": 1.0,
             "title": "Size"
           },
           "pages": {
             "type": "integer",
-            "minimum": 0,
+            "minimum": 0.0,
             "title": "Pages"
           }
         },
         "type": "object",
         "required": [
-          "items"
+          "items",
+          "total",
+          "page",
+          "size",
+          "pages"
         ],
-        "title": "Page[Union[SiibraVoiModel, SiibraCorticalProfileModel, SiibraRegionalConnectivityModel, SiibraReceptorDensityFp, SiibraTabularModel, SiibraEbrainsDataFeatureModel]]"
+        "title": "Page[Union[SiibraVoiModel, SiibraCorticalProfileModel, SiibraRegionalConnectivityModel, SiibraReceptorDensityFp, SiibraTabularModel, SiibraEbrainsDataFeatureModel]]",
+        "description": "Marker class for page classes.\n\nUsed to mark classes that can be used as pages but don't directly inherit from AbstractPage."
       },
       "ParcellationEntityVersionModel": {
         "properties": {
@@ -5104,6 +5527,70 @@
         ],
         "title": "SiibraVoiModel",
         "description": "SiibraVoiModel"
+      },
+      "SpatialBackendMultiRespModel": {
+        "properties": {
+          "target_points": {
+            "items": {
+              "items": {
+                "type": "number"
+              },
+              "type": "array"
+            },
+            "type": "array",
+            "title": "Target Points"
+          }
+        },
+        "type": "object",
+        "required": [
+          "target_points"
+        ],
+        "title": "SpatialBackendMultiRespModel"
+      },
+      "SpatialBackendPostModel": {
+        "properties": {
+          "from_space_id": {
+            "type": "string",
+            "title": "From Space Id"
+          },
+          "to_space_id": {
+            "type": "string",
+            "title": "To Space Id"
+          },
+          "from_points": {
+            "items": {
+              "items": {
+                "type": "number"
+              },
+              "type": "array"
+            },
+            "type": "array",
+            "title": "From Points"
+          }
+        },
+        "type": "object",
+        "required": [
+          "from_space_id",
+          "to_space_id",
+          "from_points"
+        ],
+        "title": "SpatialBackendPostModel"
+      },
+      "SpatialBackendRespModel": {
+        "properties": {
+          "target_point": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Target Point"
+          }
+        },
+        "type": "object",
+        "required": [
+          "target_point"
+        ],
+        "title": "SpatialBackendRespModel"
       },
       "StatisticModelInfo": {
         "properties": {

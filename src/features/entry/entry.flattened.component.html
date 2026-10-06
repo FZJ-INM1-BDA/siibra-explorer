@@ -225,3 +225,25 @@
     <spinner-cmp class="sxplr-pl-2 sxplr-d-block"></spinner-cmp>
 </ng-template>
 
+<ng-template [ngIf]="newSpatialFlag$ | async">
+    <ng-template [ngIf]="newSpFeatures$ | async" let-newspfeature>
+        <ng-template [ngIf]="newspfeature.length === 0" [ngIfElse]="newSpFeatTmpl">
+            No spatial features are found.
+        </ng-template>
+        <ng-template #newSpFeatTmpl>
+            <cdk-virtual-scroll-viewport itemSize="36" class="virtual-scroll-viewport">
+                <ng-template cdkVirtualFor
+                    [cdkVirtualForOf]="newspfeature"
+                    let-feature
+                    let-last="last">
+                    <button
+                        mat-button
+                        class="virtual-scroll-item sxplr-w-100"
+                        (click)="onClickFeature(feature)">
+                        <span class="ws-no-wrap"> {{ feature.name }} </span>
+                    </button>
+                </ng-template>
+            </cdk-virtual-scroll-viewport>
+        </ng-template>
+    </ng-template>
+</ng-template>

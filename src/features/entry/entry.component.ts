@@ -29,6 +29,29 @@ const GEOMSVC_HOST = "https://geom-svc.apps.ebrains.eu"
 export class EntryComponent extends TPBRCategoryDirective implements AfterViewInit {
 
   #hideConn$ = new BehaviorSubject(true)
+  newSpatialFlag$ = new BehaviorSubject(false)
+
+  @Input()
+  set newSpatialFeature(flag: boolean){
+    this.newSpatialFlag$.next(flag)
+  }
+
+  newSpFeatures$ = this.newSpatialFlag$.pipe(
+    switchMap(flag => {
+      if (!flag) {
+        return of([])
+      }
+      return this.TPRBbox$.pipe(
+        switchMap(tpbr => {
+          const { bbox, template } = tpbr || {}
+          if (!bbox || !template) {
+            return of([])
+          }
+          return this.sapi.getGeomFeatures(template.id, JSON.stringify(bbox))
+        })
+      )
+    })
+  )
 
   // default is show, so if hideConn is set, revert
   @Input()
