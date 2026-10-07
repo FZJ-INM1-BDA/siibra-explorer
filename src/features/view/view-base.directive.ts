@@ -1,6 +1,6 @@
 import { Directive, Inject, Input } from "@angular/core";
-import { BehaviorSubject, combineLatest, concat, Observable, of } from "rxjs";
-import { catchError, debounceTime, distinctUntilChanged, map, shareReplay, switchMap, take, withLatestFrom } from "rxjs/operators";
+import { BehaviorSubject, combineLatest, concat, forkJoin, from, Observable, of, timer } from "rxjs";
+import { catchError, debounceTime, distinctUntilChanged, map, scan, shareReplay, switchMap, takeWhile, tap, withLatestFrom } from "rxjs/operators";
 import { SAPI } from "src/atlasComponents/sapi";
 import { Feature, SimpleCompoundFeature, SxplrRegion, SxplrTemplate, VoiFeature } from "src/atlasComponents/sapi/sxplrTypes";
 import { MetaV1Schema, PathReturn } from "src/atlasComponents/sapi/typeV3";
@@ -28,7 +28,7 @@ const BIGBRAIN_XZ = [
 ]
 type _Voi = VoiFeature
 
-async function processCPN(voi: Feature): Promise<_Voi[]>{
+async function processCPN(voi: Feature): Promise<_Voi[]> {
   if (!isVoiData(voi)) {
     return []
   }
@@ -43,7 +43,7 @@ async function processCPN(voi: Feature): Promise<_Voi[]>{
     const url = `https://zam12104.jsc.fz-juelich.de/gpuvm-deploy/cuda/bb1micron/B20_${sectionIdStr}.tif::pipelines/cpn.json`
     const resp = await fetch(`${url}/meta.json`)
     const meta: MetaV1Schema = await resp.json()
-    
+
     meta.transform[1][3] -= 40e3
     return [{
       bbox: {
@@ -110,103 +110,154 @@ async function processCPN(voi: Feature): Promise<_Voi[]>{
 })
 export class FeatureViewBase {
 
-  
-  
-  async processGeom(feature: Feature): Promise<_Voi[]> {
-    const returnVal : _Voi[] = []
-    try {
-      const result = await this.sapi.v3Get("/spatial/geometry/{uuid}", {
-        path: {
-          uuid: feature.id
-        }
-      }).toPromise()
+  public BUSY_NS = {
+    ADD_VOI: "ADD_VOI"
+  } as const
 
-      if (result["status"] !== "present") {
-        return returnVal
-      }
-      
-      const baseObj: Omit<_Voi, 'ngVolume'> = {
-        bbox: {
-          center: [0, 0, 0],
-          minpoint: [-100, -100, -100],
-          maxpoint: [100, 100, 100],
-          spaceId: ""
-        },
-        id: 'foo',
-        desc: 'test-desc',
-        contributors: [],
-        link: [],
-        name: 'foo'
-      }
-      
-      const ingsvcPtcld = result?.["uri"]?.["ingsvc-ptcld"]
-      if (ingsvcPtcld) {
-        const base = `https://data-proxy.ebrains.eu/api/v1/buckets/${ingsvcPtcld}`
-        const url = `${base}/geomsvc.meta.json`
-        const resp = await fetch(url)
-        const geomsvcMeta = await resp.json()
+  getGeomObs(feat: Feature) {
+    return combineLatest([
+      this.sapi.sapiEndpoint$,
+      timer(0, 5000)
+    ]).pipe(
+      switchMap(([baseUrl, _idx]) => {
+        const { path, params } = this.sapi.v3GetRoute("/spatial/geometry/{uuid}", {
+          path: {
+            uuid: feat.id
+          }
+        })
         
-        // TODO fix properly
-        for (const datum of geomsvcMeta.data){
-          const { id, label, path, protocol, format } = datum
-          if (protocol !== "neuroglancer-precomputed") {
-            continue
-          }
-          let transform = undefined
-          try {
-            const resp = await fetch(`${base}/${path}/meta.json`)
-            transform = (await resp.json())['transform']
-          } catch (e) {
-            console.warn("meta fetching error", e)
-          }
-
-          let type = 'image'
-          if (format === "multiresAnnot") {
-            type = "annotation"
-          }
-          
-          returnVal.push({
-            ...baseObj,
-            id,
-            name: label,
-            ngVolume: {
-              format: "neuroglancer-precomputed",
-              info: {},
-              transform,
-              url: `${base}/${path}`,
-              type,
-              meta: {
-                preferredColormap: ["magma"],
-                version: 1,
-                "https://schema.brainatlas.eu/github/humanbrainproject/neuroglancer": {
-                  opacity: 0.75
-                }
-              }
-            }
-          })
+        const url = new URL(`${baseUrl}${path}`)
+        for (const [key, value] of Object.entries(params)){
+          url.searchParams.set(key, value.toString())
         }
-      }
-      
-    } catch (e) {
-      console.log("error", e)
-    }
-    
-    return returnVal
+        return from(fetch(url).then(res => res.json()))
+      }),
+      takeWhile(result => result.status !== "present", true),
+      catchError(() => of({ status: 'error' as const }))
+    )
   }
 
-  busy$ = new BehaviorSubject<boolean>(false)
+  #getGeomVoi(feat: Feature) {
+    this.setBusy(this.BUSY_NS.ADD_VOI, true)
+    return this.getGeomObs(feat).pipe(
+      switchMap(result => {
+        if (result.status !== "present") {
+          return of([] as _Voi[])
+        }
 
-  
-  #feature$ = new BehaviorSubject<Feature|SimpleCompoundFeature>(null)
+        const baseObj: Omit<_Voi, 'ngVolume'> = {
+          bbox: {
+            center: [0, 0, 0],
+            minpoint: [-100, -100, -100],
+            maxpoint: [100, 100, 100],
+            spaceId: ""
+          },
+          id: 'foo',
+          desc: 'test-desc',
+          contributors: [],
+          link: [],
+          name: 'foo'
+        }
+
+        const ingsvcPtcld = result?.["uri"]?.["ingsvc-ptcld"]
+        if (!ingsvcPtcld) {
+          return of([] as _Voi[])
+        }
+
+        const base = `https://data-proxy.ebrains.eu/api/v1/buckets/${ingsvcPtcld}`
+        const url = `${base}/geomsvc.meta.json`
+        return from(fetch(url).then(res => res.json())).pipe(
+          switchMap(geomsvcMeta => {
+
+            const xformUrls: { datum: any, url: string }[] = []
+            for (const datum of geomsvcMeta.data) {
+              const { path, protocol } = datum
+              if (protocol !== "neuroglancer-precomputed") {
+                continue
+              }
+              xformUrls.push({ datum, url: `${base}/${path}/meta.json` })
+            }
+
+            if (xformUrls.length === 0) {
+              return of([])
+            }
+            return forkJoin(
+              xformUrls.map(({ datum, url }) => {
+                const { id, label, format, path } = datum
+                
+                let type = 'image'
+                if (format === "multiresAnnot") {
+                  type = "annotation"
+                }
+                return from(
+                  fetch(url)
+                    .then(res => res.json())
+                    .then(meta => {
+                      const transform = meta['transform']
+                      if (!transform) {
+                        throw new Error(`transform not defined in meta`)
+                      }
+                      return transform as number[][]
+                    })
+                ).pipe(
+                  catchError(() => of(undefined)),
+                  map(transform => {
+                    return {
+                      ...baseObj,
+                      id,
+                      name: label,
+                      ngVolume: {
+                        format: "neuroglancer-precomputed",
+                        info: {},
+                        transform,
+                        url: `${base}/${path}`,
+                        type,
+                        meta: {
+                          preferredColormap: ["magma"],
+                          version: 1,
+                          "https://schema.brainatlas.eu/github/humanbrainproject/neuroglancer": {
+                            opacity: 0.75
+                          }
+                        }
+                      }
+                    }
+                  })
+                )
+              })
+            )
+          })
+        )
+      }),
+      tap({
+        complete: () => {
+          this.setBusy(this.BUSY_NS.ADD_VOI, false)
+        }
+      })
+    )
+  }
+
+  nsBusy$ = new BehaviorSubject<Record<string, boolean>>({ [this.BUSY_NS.ADD_VOI]: true })
+  busy$ = this.nsBusy$.pipe(
+    scan((acc, curr) => ({ ...acc, ...curr })),
+    map(record => Object.values(record).some(flag => !!flag))
+  )
+
+  setBusy(namespace: string, flag: boolean) {
+    this.nsBusy$.next({
+      [namespace]: flag
+    })
+  }
+
+  #feature$ = new BehaviorSubject<Feature | SimpleCompoundFeature>(null)
   exportedFeature$ = this.#feature$.asObservable()
   @Input()
-  set feature(val: Feature|SimpleCompoundFeature) {
+  set feature(val: Feature | SimpleCompoundFeature) {
     this.#feature$.next(val)
   }
 
   #extraParams = new BehaviorSubject<ExtraParams>(null)
   @Input()
-  set extraParams(val: ExtraParams){
+  set extraParams(val: ExtraParams) {
     this.#extraParams.next(val)
   }
 
@@ -217,7 +268,7 @@ export class FeatureViewBase {
   #featureDetail$ = this.#featureId.pipe(
     switchMap(fid => this.sapi.getV3FeatureDetailWithId(fid)),
   )
-  
+
   #loadingDetail$ = this.#feature$.pipe(
     switchMap(() => concat(
       of(true),
@@ -249,9 +300,9 @@ export class FeatureViewBase {
         map(params => params?.regions)
       )
     ),
-    map(([ isConnectivity, selectedRegions ]) => isConnectivity
-    ? {"regions": selectedRegions.map(r => r.name).join(" ")}
-    : {} )
+    map(([ isConnectivity, selectedRegions]) => isConnectivity
+      ? { "regions": selectedRegions.map(r => r.name).join(" ") }
+      : {})
   )
 
   #plotlyInput$ = combineLatest([
@@ -260,11 +311,11 @@ export class FeatureViewBase {
     this.#additionalParams$,
   ]).pipe(
     debounceTime(16),
-    map(([ id, darktheme, additionalParams ]) => ({ id, darktheme, additionalParams })),
+    map(([id, darktheme, additionalParams]) => ({ id, darktheme, additionalParams })),
     distinctUntilChanged((o, n) => o.id === n.id && o.darktheme === n.darktheme),
     shareReplay(1),
   )
-  
+
   #plotly$: Observable<PlotlyResponse> = this.#plotlyInput$.pipe(
     switchMap(({ id, darktheme, additionalParams }) => {
       if (!id) {
@@ -285,7 +336,7 @@ export class FeatureViewBase {
     }),
     shareReplay(1),
   )
-    
+
   #loadingPlotly$ = this.#plotlyInput$.pipe(
     switchMap(() => concat(
       of(true),
@@ -294,7 +345,7 @@ export class FeatureViewBase {
       )
     )),
   )
-   
+  
   #detailLinks = this.#feature$.pipe(
     switchMap(() => concat(
       of([] as string[]),
@@ -303,7 +354,7 @@ export class FeatureViewBase {
         map(val => (val?.link || []).map(l => l.href))
       )
     ))
-  ) 
+  )
 
   additionalLinks$ = this.#detailLinks.pipe(
     distinctUntilChanged((o, n) => o.length == n.length),
@@ -333,7 +384,6 @@ export class FeatureViewBase {
           } else {
             errortext += '!'
           }
-          
           return of(errortext)
         }),
       )
@@ -354,7 +404,7 @@ export class FeatureViewBase {
     this.#featureDesc$,
     this.#featureContributors$,
   ]).pipe(
-    map(([ warnings, additionalLinks, downloadLink, desc, contributors ]) => {
+    map(([warnings, additionalLinks, downloadLink, desc, contributors]) => {
       return {
         warnings, additionalLinks, downloadLink, desc, contributors
       }
@@ -373,14 +423,14 @@ export class FeatureViewBase {
     ),
     this.#derivedFeatProps$
   ]).pipe(
-    map(([ feature, busy, { warnings, additionalLinks, downloadLink, desc, contributors } ]) => {
+    map(([feature, busy, { warnings, additionalLinks, downloadLink, desc, contributors }]) => {
       return {
         featureId: feature.id,
         name: feature.name,
         links: feature.link,
         category: feature.category === 'Unknown category'
-        ? `Feature: other`
-        : `Feature: ${feature.category}`,
+          ? `Feature: other`
+          : `Feature: ${feature.category}`,
         busy,
         warnings,
         additionalLinks,
@@ -399,7 +449,7 @@ export class FeatureViewBase {
         }
         return concat(
           of([] as _Voi[]),
-          this.#getAdditionalVois(voi),
+          this.#getAdditionalVoiObs(voi),
         )
       })
     ),
@@ -412,7 +462,7 @@ export class FeatureViewBase {
       map(feat => isVoiData(feat) ? feat : null)
     )
   ]).pipe(
-    map(([ additionalVois, plotly, param, voi ]) => {
+    map(([additionalVois, plotly, param, voi]) => {
       return {
         voi, plotly, cmpFeatElmts: null, selectedTemplate: param?.space, additionalVois
       }
@@ -425,7 +475,6 @@ export class FeatureViewBase {
     this.expmtalSvc.showExperimentalFlag$
   ]).pipe(
     map(([baseview, specialview, showExperimentalFlag]) => {
-      
       return {
         ...baseview,
         ...specialview,
@@ -438,30 +487,23 @@ export class FeatureViewBase {
     protected sapi: SAPI,
     @Inject(DARKTHEME) protected darktheme$: Observable<boolean>,
     private expmtalSvc: ExperimentalService,
-  ){
+  ) {
 
   }
 
-  async #getAdditionalVois(voi: Feature){
-    const exmptFlag = await this.expmtalSvc.showExperimentalFlag$.pipe(
-      take(1)
-    ).toPromise()
-    
-    
-    const additionalVois: _Voi[] = []
-
-    if (!exmptFlag) {
-      return additionalVois
-    }
-
-    const [ cpnVols, geomVols ] = await Promise.all([
-      processCPN(voi),
-      this.processGeom(voi)
-    ])
-
-    additionalVois.push(...cpnVols, ...geomVols)
-
-    
-    return additionalVois
+  #getAdditionalVoiObs(feat: Feature) {
+    return this.expmtalSvc.showExperimentalFlag$.pipe(
+      switchMap(flag => {
+        if (!flag) {
+          return of([])
+        }
+        return combineLatest([
+          processCPN(feat),
+          this.#getGeomVoi(feat)
+        ]).pipe(
+          map(([cpnAddVois, geomAddVois]) => [...cpnAddVois, ...geomAddVois])
+        )
+      })
+    )
   }
 }

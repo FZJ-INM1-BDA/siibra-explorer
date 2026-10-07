@@ -30,13 +30,16 @@
                 [ng-layer-ctl-show]="true">
             </ng-layer-ctl>
 
-
         </mat-tab>
     </mat-tab-group>
 
     <mat-divider></mat-divider>
 
     
+    <ng-template sxplrExperimentalFlag [experimental]="true">
+
+    <mat-progress-bar *ngIf="(nsBusy$ | async)[BUSY_NS.ADD_VOI]" mode="indeterminate"></mat-progress-bar>
+
     <mat-form-field class="flex-grow-3">
         <mat-label>
             Visualize with a model
@@ -88,6 +91,8 @@
     </ng-template>
 
     <mat-divider></mat-divider>
+
+    </ng-template>
 
     <button mat-icon-button
         matTooltip="more info"
