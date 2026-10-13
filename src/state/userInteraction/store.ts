@@ -28,7 +28,7 @@ export const reducer = createReducer(
     }
   ),
   on(
-    actions.showFeature,
+    actions.setHydratedFeature,
     (state, { feature }) => {
       return {
         ...state,

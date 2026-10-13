@@ -86,11 +86,13 @@
                 <ng-template [ngIf]="view.selectedFeature" [ngIfElse]="defaultBodyTmpl">
 
                     <div class="back-btn-container">
-                        <button mat-stroked-button (click)="clearSelectedFeature()">
+                        <button mat-button (click)="clearSelectedFeature()">
                             <mat-icon>arrow_back</mat-icon>
                             <span>back</span>
                         </button>
                     </div>
+
+                    <mat-divider></mat-divider>
 
                     <sxplr-feature-simple-single
                         [feature]="view.selectedFeature">
@@ -212,7 +214,7 @@
                     <!-- ptassignment -->
                     <section *ngIf="ptAsgmtSwitch.switchState$ | async" class="section-find-body">
                         <div class="back-btn-container">
-                            <button mat-stroked-button (click)="ptAsgmtSwitch.close()">
+                            <button mat-button (click)="ptAsgmtSwitch.close()">
                                 <mat-icon>arrow_back</mat-icon>
                                 <span>back</span>
                             </button>
@@ -287,12 +289,6 @@
                                         spatial features
                                     </span>
                                 </p>
-
-                                <ng-template [ngIf]="!(spatialFeatCmp.busy$ | async) && (spatialFeatCmp.features$ | async).length === 0">
-                                    <span class="text">
-                                        No spatial features found.    
-                                    </span>
-                                </ng-template>
                                 
                                 <sxplr-feature-entry
                                     class="panel-content"
@@ -311,7 +307,6 @@
                             </section>
 
                             <div voiBbox
-                                [geometry]="voiFeatureEntryCmp.geometry$ | async"
                                 [volumes]="voiFeatureEntryCmp.volumes$ | async"
                                 [features]="voiFeatureEntryCmp.features$ | async">
                             </div>
@@ -330,7 +325,7 @@
 
                     <section *ngIf="regionallFeatureSwitch.switchState$ | async" class="section-find-body">
                         <div class="back-btn-container">
-                            <button mat-stroked-button (click)="regionallFeatureSwitch.close()">
+                            <button mat-button (click)="regionallFeatureSwitch.close()">
                                 <mat-icon>arrow_back</mat-icon>
                                 <span>back</span>
                             </button>
@@ -379,7 +374,7 @@
                     <!-- connectivty main body -->
                     <section *ngIf="connFeatureSwitch.switchState$ | async" class="section-find-body">
                         <div class="back-btn-container">
-                            <button mat-stroked-button (click)="connFeatureSwitch.close()">
+                            <button mat-button (click)="connFeatureSwitch.close()">
                                 <mat-icon>arrow_back</mat-icon>
                                 <span>back</span>
                             </button>

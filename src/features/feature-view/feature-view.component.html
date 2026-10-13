@@ -100,24 +100,6 @@
       </markdown-dom>
     </mat-tab>
 
-
-    <!-- plotly view -->
-    <ng-template [ngIf]="view.plotly" let-plotly>
-      <mat-tab label="Visualization">
-        <ng-template matTabContent>
-          <sxplr-plotly-component
-            (plotly-label-clicked)="navigateToRegionByName($event)"
-            [plotly-json]="plotly"></sxplr-plotly-component>
-        
-          <!-- Other generic intents -->
-          <!-- For now, only used for colorization of atlas -->
-          <!-- <atlas-colormap-intents [intents]="intents$ | async"
-            (actions)="onAction($event)">
-          </atlas-colormap-intents> -->
-        </ng-template>
-      </mat-tab>
-    </ng-template>
-
   </mat-tab-group>
 
 </ng-template>

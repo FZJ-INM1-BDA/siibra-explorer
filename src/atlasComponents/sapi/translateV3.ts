@@ -844,7 +844,7 @@ class TranslateV3 {
   }
 
   #isVoi(feat: unknown): feat is SapiSpatialFeatureModel {
-    return feat['@type'].includes("feature/volume_of_interest")
+    return feat['@type'].includes("feature/volume_of_interest") && !!(feat as any).boundingbox
   }
 
   // #isCompound(feat: unknown): feat is CompoundFeature {

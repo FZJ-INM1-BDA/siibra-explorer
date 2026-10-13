@@ -1,11 +1,11 @@
 import { AfterViewInit, Component, Inject, Input, QueryList, TemplateRef, ViewChildren, inject } from '@angular/core';
 import { select, Store } from '@ngrx/store';
-import { distinctUntilChanged, map, scan, shareReplay, switchMap, take, takeUntil } from 'rxjs/operators';
+import { distinctUntilChanged, map, scan, shareReplay, switchMap, take, takeUntil, tap } from 'rxjs/operators';
 import { IDS, SAPI } from 'src/atlasComponents/sapi';
 import { Feature } from 'src/atlasComponents/sapi/sxplrTypes';
 import * as userInteraction from "src/state/userInteraction"
 import { CategoryAccDirective } from "../category-acc.directive"
-import { BehaviorSubject, combineLatest, concat, EMPTY, forkJoin, from, merge, Observable, of } from 'rxjs';
+import { BehaviorSubject, combineLatest, concat, EMPTY, forkJoin, merge, Observable, of } from 'rxjs';
 import { TranslatedFeature } from '../list/list.directive';
 import { MatDialog, MatSnackBar } from 'src/sharedModules/angularMaterial.exports';
 import { DestroyDirective } from 'src/util/directives/destroy.directive';
@@ -14,6 +14,7 @@ import { atlasSelection, userPreference } from 'src/state';
 import { ExperimentalService } from 'src/experimental/experimental.service';
 import { BANLIST_CONNECTIVITY, EXPERIMENTAL_CONNECTIVITY, WHITELIST_CONNECTIVITY } from '../connectivity';
 import { TPBRCategoryDirective } from '../tpbrCategory.directive';
+import { translateV3Entities } from 'src/atlasComponents/sapi/translateV3';
 
 const GEOMSVC_HOST = "https://geom-svc.apps.ebrains.eu"
 
@@ -47,7 +48,16 @@ export class EntryComponent extends TPBRCategoryDirective implements AfterViewIn
           if (!bbox || !template) {
             return of([])
           }
-          return this.sapi.getGeomFeatures(template.id, JSON.stringify(bbox))
+          this.newBusyFlag$.next(true)
+          return concat(
+            of([]),
+            this.sapi.getGeomFeatures(template.id, JSON.stringify(bbox)).pipe(
+              switchMap(feats => forkJoin(
+                feats.map(feat => translateV3Entities.translateFeature(feat))
+              )),
+              tap(() => this.newBusyFlag$.next(false))
+            )
+          )
         })
       )
     })
@@ -201,57 +211,7 @@ export class EntryComponent extends TPBRCategoryDirective implements AfterViewIn
     })
   )
 
-  geometry$ = combineLatest([
-    this.store.pipe(
-      select(userPreference.selectors.showExperimental)
-    ),
-    this.TPRBbox$.pipe(
-      shareReplay(1)
-    ),
-  ]).pipe(
-    switchMap(([showExmptFlag, val]) => {
-      if (!showExmptFlag || !val) {
-        return of([])
-      }
-      const { template, bbox } = val
-      if (template.id !== IDS.TEMPLATES.AMBA_CCF_V3) {
-        return of([])
-      }
-      const translateMm = [11400000 - 5737500, 13200000 - 6637500 + 1e6, 8000000 - 4037500].map(v => v/1e6)
-
-      const bboxStr = bbox.map(triplet => 
-        triplet.map((v, idx) => translateMm[idx] - v).join(",")
-      ).reverse().join("/")
-
-      const tmpHost = `${GEOMSVC_HOST}/spaces/allenccf_v3`
-      const filename = `SST42_cloud.csv`
-      return concat(
-        of([]),
-        from(
-          fetch(`${tmpHost}/${filename}/0/${bboxStr}/stat`).then(res => res.json())
-        ).pipe(
-          switchMap(result => {
-            if ((result.count || 1e10) > 1e5) {
-              this.snackbar.open(`Pointclouds: too many points. Zoom in further to visualize.`, null, { duration: 2500 })
-              return EMPTY
-            }
-            return from(
-              fetch(`${tmpHost}/${filename}/0/${bboxStr}/geometry`).then(res => res.json())
-            ).pipe(
-              map(
-                (arr: number[][]) => arr.map(
-                  triplet => triplet.map(
-                    (v, idx) => (translateMm[idx] - v) * 1e6
-                  )
-                )
-              )
-            )
-          })
-        )
-      )
-    }),
-    shareReplay(1),
-  )
+  newBusyFlag$ = new BehaviorSubject(false)
 
   busy$ = this.#catAccDirs.pipe(
     switchMap(dirs => combineLatest(

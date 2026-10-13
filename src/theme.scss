@@ -3,6 +3,11 @@
 
 @include mat.core();
 
+.compact {
+  @include mat.form-field-density(-4);
+  @include mat.select-density(-4);
+}
+
 $themes: "default", "ebrains";
 $themes-map: (
   "default": (

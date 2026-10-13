@@ -1,6 +1,6 @@
 import { Directive, Inject, Input } from "@angular/core";
 import { BehaviorSubject, combineLatest, concat, forkJoin, from, Observable, of, timer } from "rxjs";
-import { catchError, debounceTime, distinctUntilChanged, map, scan, shareReplay, switchMap, takeWhile, tap, withLatestFrom } from "rxjs/operators";
+import { catchError, debounceTime, distinctUntilChanged, map, scan, shareReplay, startWith, switchMap, takeWhile, tap, withLatestFrom } from "rxjs/operators";
 import { SAPI } from "src/atlasComponents/sapi";
 import { Feature, SimpleCompoundFeature, SxplrRegion, SxplrTemplate, VoiFeature } from "src/atlasComponents/sapi/sxplrTypes";
 import { MetaV1Schema, PathReturn } from "src/atlasComponents/sapi/typeV3";
@@ -103,6 +103,27 @@ async function processCPN(voi: Feature): Promise<_Voi[]> {
   }
 }
 
+type ViewAsLabel = {
+  label: string
+}
+
+type PlotlyViewAs = {
+  type: "plotly"
+  data: PlotlyResponse
+} & ViewAsLabel
+
+type VolumesViewAs = {
+  type: "volumes"
+  volumes: VoiFeature['ngVolume'][]
+} & ViewAsLabel
+
+type AnnotViewAs = {
+  type: "annotations"
+  annots: VoiFeature['ngVolume'][]
+} & ViewAsLabel
+
+export type ViewAs = PlotlyViewAs | VolumesViewAs | AnnotViewAs
+
 
 @Directive({
   selector: '[feature-view-base]',
@@ -113,6 +134,15 @@ export class FeatureViewBase {
   public BUSY_NS = {
     ADD_VOI: "ADD_VOI"
   } as const
+
+  /**
+   * Casts an untyped template value (e.g. the `any`-typed value of a
+   * `<mat-select>`) to the {@link ViewAs} union so the template type-checker
+   * can narrow it under `@switch (opt.type)`.
+   */
+  asViewAs(opt: unknown): ViewAs {
+    return opt as ViewAs
+  }
 
   getGeomObs(feat: Feature) {
     return combineLatest([
@@ -132,8 +162,9 @@ export class FeatureViewBase {
         }
         return from(fetch(url).then(res => res.json()))
       }),
-      takeWhile(result => result.status !== "present", true),
-      catchError(() => of({ status: 'error' as const }))
+      takeWhile(result => {
+        return result.status !== "present" && !result.error
+      }, true),
     )
   }
 
@@ -142,26 +173,12 @@ export class FeatureViewBase {
     return this.getGeomObs(feat).pipe(
       switchMap(result => {
         if (result.status !== "present") {
-          return of([] as _Voi[])
-        }
-
-        const baseObj: Omit<_Voi, 'ngVolume'> = {
-          bbox: {
-            center: [0, 0, 0],
-            minpoint: [-100, -100, -100],
-            maxpoint: [100, 100, 100],
-            spaceId: ""
-          },
-          id: 'foo',
-          desc: 'test-desc',
-          contributors: [],
-          link: [],
-          name: 'foo'
+          return of([] as ViewAs[])
         }
 
         const ingsvcPtcld = result?.["uri"]?.["ingsvc-ptcld"]
         if (!ingsvcPtcld) {
-          return of([] as _Voi[])
+          return of([] as ViewAs[])
         }
 
         const base = `https://data-proxy.ebrains.eu/api/v1/buckets/${ingsvcPtcld}`
@@ -183,11 +200,31 @@ export class FeatureViewBase {
             }
             return forkJoin(
               xformUrls.map(({ datum, url }) => {
-                const { id, label, format, path } = datum
+                const { label, format, path } = datum
                 
-                let type = 'image'
+                const baseObj = {
+                  format: "neuroglancer-precomputed",
+                  info: {},
+                  url: `${base}/${path}`,
+                  meta: {
+                    preferredColormap: ["magma"],
+                    version: 1,
+                    "https://schema.brainatlas.eu/github/humanbrainproject/neuroglancer": {
+                      opacity: 0.75
+                    }
+                  }
+                }
                 if (format === "multiresAnnot") {
-                  type = "annotation"
+                  return of({
+                    type: "annotations",
+                    label,
+                    annots: [
+                      {
+                        ...baseObj,
+                        type: "annotation"
+                      }
+                    ]
+                  } as AnnotViewAs)
                 }
                 return from(
                   fetch(url)
@@ -203,24 +240,16 @@ export class FeatureViewBase {
                   catchError(() => of(undefined)),
                   map(transform => {
                     return {
-                      ...baseObj,
-                      id,
-                      name: label,
-                      ngVolume: {
-                        format: "neuroglancer-precomputed",
-                        info: {},
-                        transform,
-                        url: `${base}/${path}`,
-                        type,
-                        meta: {
-                          preferredColormap: ["magma"],
-                          version: 1,
-                          "https://schema.brainatlas.eu/github/humanbrainproject/neuroglancer": {
-                            opacity: 0.75
-                          }
+                      label,
+                      type: 'volumes',
+                      volumes: [
+                        {
+                          ...baseObj,
+                          transform,
+                          type: "image"
                         }
-                      }
-                    }
+                      ]
+                    } as VolumesViewAs
                   })
                 )
               })
@@ -316,7 +345,7 @@ export class FeatureViewBase {
     shareReplay(1),
   )
 
-  #plotly$: Observable<PlotlyResponse> = this.#plotlyInput$.pipe(
+  #plotly$: Observable<PlotlyResponse|null> = this.#plotlyInput$.pipe(
     switchMap(({ id, darktheme, additionalParams }) => {
       if (!id) {
         return of(null)
@@ -344,6 +373,54 @@ export class FeatureViewBase {
         map(() => false)
       )
     )),
+  )
+  
+  #viewAs$ = combineLatest([
+    this.#plotly$.pipe(
+      map(data => {
+        if (data) {
+          return [{ data, type: "plotly", label: "Plot" }] as PlotlyViewAs[]
+        }
+        return []
+      })
+    ),
+    this.#feature$.pipe(
+      map(feat => {
+        if (isVoiData(feat)){
+          return [{
+            label: "Image",
+            type: "volumes",
+            volumes: [feat["ngVolume"]]
+          }] as VolumesViewAs[]
+        }
+        return []
+      })
+    ),
+    this.#feature$.pipe(
+      switchMap(feat => {
+        if (!isVoiData(feat)) {
+          return of([])
+        }
+        return from(processCPN(feat)).pipe(
+          map(cpn => {
+            if (cpn.length === 0) {
+              return []
+            }
+            return [{
+              label: "Contour proposal network",
+              type: "volumes",
+              volumes: [feat['ngVolume'], ...cpn.map(v => v['ngVolume'])]
+            }] as VolumesViewAs[]
+          })
+        )
+      })
+    ),
+    this.#feature$.pipe(
+      switchMap(feat => this.#getGeomVoi(feat)),
+    )
+  ]).pipe(
+    startWith([]),
+    map(opts => opts.flatMap(v => v))
   )
   
   #detailLinks = this.#feature$.pipe(
@@ -441,43 +518,15 @@ export class FeatureViewBase {
     })
   )
 
-  #specialView$ = combineLatest([
-    this.#feature$.pipe(
-      switchMap(voi => {
-        if (!voi) {
-          return of([] as _Voi[])
-        }
-        return concat(
-          of([] as _Voi[]),
-          this.#getAdditionalVoiObs(voi),
-        )
-      })
-    ),
-    concat(
-      of(null as PlotlyResponse),
-      this.#plotly$,
-    ),
-    this.#extraParams,
-    this.#feature$.pipe(
-      map(feat => isVoiData(feat) ? feat : null)
-    )
-  ]).pipe(
-    map(([additionalVois, plotly, param, voi]) => {
-      return {
-        voi, plotly, cmpFeatElmts: null, selectedTemplate: param?.space, additionalVois
-      }
-    })
-  )
-
   view$ = combineLatest([
     this.#baseView$,
-    this.#specialView$,
-    this.expmtalSvc.showExperimentalFlag$
+    this.expmtalSvc.showExperimentalFlag$,
+    this.#viewAs$
   ]).pipe(
-    map(([baseview, specialview, showExperimentalFlag]) => {
+    map(([baseview, showExperimentalFlag, viewAs]) => {
       return {
         ...baseview,
-        ...specialview,
+        viewAs,
         showExperimentalFlag
       }
     })
@@ -491,19 +540,4 @@ export class FeatureViewBase {
 
   }
 
-  #getAdditionalVoiObs(feat: Feature) {
-    return this.expmtalSvc.showExperimentalFlag$.pipe(
-      switchMap(flag => {
-        if (!flag) {
-          return of([])
-        }
-        return combineLatest([
-          processCPN(feat),
-          this.#getGeomVoi(feat)
-        ]).pipe(
-          map(([cpnAddVois, geomAddVois]) => [...cpnAddVois, ...geomAddVois])
-        )
-      })
-    )
-  }
 }

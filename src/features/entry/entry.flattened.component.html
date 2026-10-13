@@ -1,4 +1,4 @@
-<mat-accordion>
+<mat-accordion *ngIf="!(newSpatialFlag$ | async)">
 
     <!-- show everything except for connectivity and dataset -->
     <ng-template ngFor [ngForOf]="cateogryCollections$ | async | keyvalue | filterCategory : ['connectivity', 'dataset', 'other'] : false"  let-keyvalue>
@@ -227,23 +227,29 @@
 
 <ng-template [ngIf]="newSpatialFlag$ | async">
     <ng-template [ngIf]="newSpFeatures$ | async" let-newspfeature>
-        <ng-template [ngIf]="newspfeature.length === 0" [ngIfElse]="newSpFeatTmpl">
-            No spatial features are found.
+        <ng-template [ngIf]="newBusyFlag$ | async" [ngIfElse]="notBusyTmpl">
+            <mat-progress-bar mode="indeterminate"></mat-progress-bar>
         </ng-template>
-        <ng-template #newSpFeatTmpl>
-            <cdk-virtual-scroll-viewport itemSize="36" class="virtual-scroll-viewport">
-                <ng-template cdkVirtualFor
-                    [cdkVirtualForOf]="newspfeature"
-                    let-feature
-                    let-last="last">
-                    <button
-                        mat-button
-                        class="virtual-scroll-item sxplr-w-100"
-                        (click)="onClickFeature(feature)">
-                        <span class="ws-no-wrap"> {{ feature.name }} </span>
-                    </button>
-                </ng-template>
-            </cdk-virtual-scroll-viewport>
+        <ng-template #notBusyTmpl>
+            <ng-template [ngIf]="newspfeature.length === 0" [ngIfElse]="newSpFeatTmpl">
+                No spatial features are found.
+            </ng-template>
+            <ng-template #newSpFeatTmpl>
+                <cdk-virtual-scroll-viewport itemSize="36" class="virtual-scroll-viewport">
+                    <ng-template cdkVirtualFor
+                        [cdkVirtualForOf]="newspfeature"
+                        let-feature
+                        let-last="last">
+                        <button
+                            mat-button
+                            [matTooltip]="feature.name"
+                            class="virtual-scroll-item sxplr-w-100"
+                            (click)="onClickFeature(feature)">
+                            <span class="ws-no-wrap"> {{ feature.name }} </span>
+                        </button>
+                    </ng-template>
+                </cdk-virtual-scroll-viewport>
+            </ng-template>
         </ng-template>
     </ng-template>
 </ng-template>

@@ -243,7 +243,7 @@ export class SapiViewsCoreRegionRegionBase {
             // 2b. we wait until **both** calls return
             // --> user could be waiting for a long time, staring at a spinner
             return maps.map(m => {
-              const indices = m.indices[region.name] || []
+              const indices = m.indices[region?.name] || []
               return indices
                 .map(index => m.volumes[index.volume || 0])
                 .filter(v => !!v)

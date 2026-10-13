@@ -1,7 +1,16 @@
-h6
+.panel-header
 {
     overflow: hidden;
+    font-size: 125%;
+    display: block;
+
+    &.subtitle
+    {
+        opacity: 0.7;
+        font-size: 100%;
+    }
 }
+
 .loading
 {
     margin: 1rem;
@@ -10,10 +19,5 @@ h6
 .content
 {
     padding: 0.25rem 1rem;
-
-}
-
-.feature-body
-{
-    margin: 1rem;
+    display: block;
 }
