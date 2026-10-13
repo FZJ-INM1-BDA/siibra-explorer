@@ -277,11 +277,21 @@ export class FeatureViewBase {
     })
   }
 
-  #feature$ = new BehaviorSubject<Feature | SimpleCompoundFeature>(null)
-  exportedFeature$ = this.#feature$.asObservable()
+  
+  #inputFeature$ = new BehaviorSubject<Feature | SimpleCompoundFeature | null>(null)
+  #feature$ = this.#inputFeature$.pipe(
+    switchMap(feat => {
+      if (!feat) {
+        return of(null)
+      }
+      return this.sapi.getV3FeatureDetailWithId(feat.id)
+    }),
+    shareReplay(1),
+  )
+  exportedFeature$ = this.#feature$
   @Input()
   set feature(val: Feature | SimpleCompoundFeature) {
-    this.#feature$.next(val)
+    this.#inputFeature$.next(val)
   }
 
   #extraParams = new BehaviorSubject<ExtraParams>(null)

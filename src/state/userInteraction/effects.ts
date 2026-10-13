@@ -3,11 +3,9 @@ import { Actions, createEffect, ofType } from "@ngrx/effects";
 import * as userInterface from "../userInterface"
 import * as atlasSelection from "../atlasSelection"
 import * as actions from "./actions"
-import { filter, map, mapTo, pairwise, switchMap } from "rxjs/operators";
+import { filter, map, mapTo, pairwise } from "rxjs/operators";
 import { Store } from "@ngrx/store";
 import { SAPI } from "src/atlasComponents/sapi";
-import { generalActions } from "..";
-import { of } from "rxjs";
 
 @Injectable()
 export class Effect {
@@ -42,18 +40,6 @@ export class Effect {
      */
     filter(([o, n]) => o.atlas.id !== n.atlas.id || o.template.id !== n.template.id),
     map(() => actions.clearShownFeature())
-  ))
-
-  onSelectFeautre = createEffect(() => this.action.pipe(
-    ofType(actions.showFeature),
-    switchMap(({ feature }) => {
-      if (!feature) {
-        return of(generalActions.noop())
-      }
-      return this.sapi.getV3FeatureDetailWithId(feature.id).pipe(
-        map(feature => actions.setHydratedFeature({ feature }))
-      )
-    })
   ))
 
   constructor(private action: Actions, private store: Store, private sapi: SAPI){

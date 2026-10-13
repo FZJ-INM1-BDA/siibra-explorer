@@ -32,14 +32,6 @@ export const showFeature = createAction(
   }>()
 )
 
-
-export const setHydratedFeature = createAction(
-  `${nameSpace} setHydratedFeature`,
-  props<{
-    feature: Feature
-  }>()
-)
-
 export const clearShownFeature = createAction(
   `${nameSpace} clearShownFeature`,
 )
