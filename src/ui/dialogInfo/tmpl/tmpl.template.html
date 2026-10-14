@@ -45,13 +45,25 @@
         </ng-template>
 
         <ng-template #defaultTmpl>
-          
-          <button mat-list-item [mat-dialog-close]="action">
-            
-            <span>
+
+          <ng-template [ngIf]="action.startsWith('http')" [ngIfElse]="actionTmpl">
+            <a [href]="action"
+              mat-list-item
+              target="_blank"
+              >
+              <span>
+                {{ action }}
+              </span>
+              <mat-icon>open_in_new</mat-icon>
+            </a>
+          </ng-template>
+
+          <ng-template #actionTmpl>
+
+            <button mat-list-item [mat-dialog-close]="action">
               {{ action }}
-            </span>
-          </button>
+            </button>
+          </ng-template>
         </ng-template>
 
       </ng-template>

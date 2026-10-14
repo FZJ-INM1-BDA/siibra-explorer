@@ -5,6 +5,47 @@
             {{ view.name }}
         </span>
     </section>
+    
+    <mat-divider></mat-divider>    
+
+    <button mat-icon-button
+        matTooltip="more info"
+        [sxplr-dialog]="fullTmpl">
+        <mat-icon>info</mat-icon>
+    </button>
+    
+    <!-- doi -->
+    <ng-template ngFor [ngForOf]="view.links" let-url>
+        <a [href]="url.href"
+            target="_blank"    
+            class="no-hover"
+            mat-icon-button
+            [matTooltip]="url.text || url.href">
+            <mat-icon fontSet="ai" fontIcon="ai-doi"></mat-icon>
+        </a>
+    </ng-template>
+        
+    <!-- additional links -->
+    <ng-template ngFor [ngForOf]="view.additionalLinks" let-url>
+        <a [href]="url"
+            target="_blank"
+            class="no-hover"
+            mat-icon-button
+            [matTooltip]="url">
+            <mat-icon fontSet="ai" fontIcon="ai-doi"></mat-icon>
+        </a>
+    </ng-template>
+
+    <!-- download -->
+    
+    <a [href]="view.downloadLink"
+        target="_blank"
+        class="no-hover"
+        mat-icon-button
+        matTooltip="download">
+        <mat-icon>download</mat-icon>
+    </a>
+        
 
     <mat-divider></mat-divider>
 
@@ -68,6 +109,23 @@
                         </span>
                     }
                 }
+
+                @if (opt.title || opt.desc || opt.links || opt.contributors){
+                    <mat-divider></mat-divider>
+
+                    @if(opt.title || opt.desc || opt.links || opt.contributors) {
+                        <button mat-icon-button
+                            sxplr-dialog
+                            [sxplr-dialog-data]="{
+                                title: opt.title || 'No title provided.',
+                                desc: opt.desc || 'No description provided.',
+                                actions: (opt.links || []) | mapToProperty : 'href',
+                                actionsAsList: true
+                            }">
+                            <mat-icon>info</mat-icon>
+                        </button>
+                    }
+                }
             </ng-template>
         </ng-template>
 
@@ -77,49 +135,7 @@
             </span>
         </ng-template>
 
-        <mat-divider></mat-divider>    
-
-        <button mat-icon-button
-            matTooltip="more info"
-            [sxplr-dialog]="fullTmpl">
-            <mat-icon>info</mat-icon>
-        </button>
-        
-        <!-- doi -->
-        <ng-template ngFor [ngForOf]="view.links" let-url>
-            <a [href]="url.href"
-                target="_blank"    
-                class="no-hover"
-                mat-icon-button
-                [matTooltip]="url.text || url.href">
-                <mat-icon fontSet="ai" fontIcon="ai-doi"></mat-icon>
-            </a>
-        </ng-template>
-            
-        <!-- additional links -->
-        <ng-template ngFor [ngForOf]="view.additionalLinks" let-url>
-            <a [href]="url"
-                target="_blank"
-                class="no-hover"
-                mat-icon-button
-                [matTooltip]="url">
-                <mat-icon fontSet="ai" fontIcon="ai-doi"></mat-icon>
-            </a>
-        </ng-template>
-
-        <!-- download -->
-        
-        <a [href]="view.downloadLink"
-            target="_blank"
-            class="no-hover"
-            mat-icon-button
-            matTooltip="download">
-            <mat-icon>download</mat-icon>
-        </a>
-        
     </section>
-
-
 
     <ng-template #fullTmpl>
         <mat-dialog-content>

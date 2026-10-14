@@ -28,7 +28,7 @@ const BIGBRAIN_XZ = [
 ]
 type _Voi = VoiFeature
 
-async function processCPN(voi: Feature): Promise<_Voi[]> {
+async function findViewAsCpn(voi: Feature): Promise<VolumesViewAs[]>{
   if (!isVoiData(voi)) {
     return []
   }
@@ -36,49 +36,50 @@ async function processCPN(voi: Feature): Promise<_Voi[]> {
   if (!found) {
     return []
   }
-  try {
-    const sectionId = parseInt(found[1])
-    const sectionIdStr = sectionId.toString().padStart(4, '0')
-    const realYDis = (sectionId * 2e4 - 70010000) / 1e6
-    const url = `https://zam12104.jsc.fz-juelich.de/gpuvm-deploy/cuda/bb1micron/B20_${sectionIdStr}.tif::pipelines/cpn.json`
-    const resp = await fetch(`${url}/meta.json`)
-    const meta: MetaV1Schema = await resp.json()
-
-    meta.transform[1][3] -= 40e3
-    return [{
-      bbox: {
-        center: [0, realYDis, 0],
-        minpoint: [-70.677, realYDis, -58.788],
-        maxpoint: [68.533, realYDis, 62.222],
-        spaceId: "minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588"
-      },
-      ngVolume: {
-        info: null,
-        transform: meta.transform,
-        // replace with /cpn later
-        url: `https://zam12104.jsc.fz-juelich.de/gpuvm-deploy/cuda/bb1micron/B20_${sectionIdStr}.tif::pipelines/cpn.json`,
-        meta: {
-          preferredColormap: ["rgba (4 channel)"],
-          version: 1,
-          bestViewPoints: [{
-            type: "enclosed",
-            points: BIGBRAIN_XZ.map(([x, z]) => ({
-              type: "point",
-              value: [x, realYDis, z]
-            }))
-          }]
-        },
-        format: "neuroglancer-precomputed",
-        insertIndex: 2
-      },
-      id: `${sectionId}-cpn`,
-      name: `Contour Proposal Network`,
+  const baseUrl = "https://gateway.brainatlas.eu"
+  const sectionId = parseInt(found[1])
+  const sectionIdStr = sectionId.toString().padStart(4, '0')
+  const realYDis = (sectionId * 2e4 - 70010000) / 1e6
+  const url = `${baseUrl}/gpuvm-deploy/cuda/bb1micron/B20_${sectionIdStr}.tif::pipelines/cpn.json`
+  const resp = await fetch(`${url}/meta.json`)
+  const meta: MetaV1Schema = await resp.json()
+  if (!meta.transform) {
+    return []
+  }
+  meta.transform[1][3] -= 40e3
+  return [
+    {
+      label: "Contour proposal network",
+      type: "volumes",
+      volumes: [
+        voi.ngVolume,
+        {
+          info: null,
+          transform: meta.transform,
+          // replace with /cpn later
+          url: `${baseUrl}/gpuvm-deploy/cuda/bb1micron/B20_${sectionIdStr}.tif::pipelines/cpn.json`,
+          meta: {
+            preferredColormap: ["rgba (4 channel)"],
+            version: 1,
+            bestViewPoints: [{
+              type: "enclosed",
+              points: BIGBRAIN_XZ.map(([x, z]) => ({
+                type: "point",
+                value: [x, realYDis, z]
+              }))
+            }]
+          },
+          format: "neuroglancer-precomputed",
+          insertIndex: 2
+        }
+      ],
       contributors: [
         `Eric Upschulte`,
         `Alexander Oberstraß`
       ],
-      desc: `Contour Proposal Network`,
-      link: [
+      title: 'Contour proposal network',
+      desc: "This visualization shows the overlay of CPN classification on top of the 1um histological scan.",
+      links: [
         {
           href: `https://huggingface.co/spaces/ericup/celldetection`,
           text: `huggingface.co/spaces/ericup/celldetection`
@@ -96,15 +97,16 @@ async function processCPN(voi: Feature): Promise<_Voi[]> {
           text: `Uncertainty-Aware Contour Proposal Networks for Cell Segmentation in Multi-Modality High-Resolution Microscopy Images`
         },
       ]
-    }]
-  } catch (e) {
-    console.warn("Parse voi error:", e)
-    return []
-  }
+    }
+  ]
 }
 
 type ViewAsLabel = {
   label: string
+  title?: string
+  desc?: string
+  contributors?: string[]
+  links?: { href: string, text: string }[]
 }
 
 type PlotlyViewAs = {
@@ -411,22 +413,16 @@ export class FeatureViewBase {
         if (!isVoiData(feat)) {
           return of([])
         }
-        return from(processCPN(feat)).pipe(
-          map(cpn => {
-            if (cpn.length === 0) {
-              return []
-            }
-            return [{
-              label: "Contour proposal network",
-              type: "volumes",
-              volumes: [feat['ngVolume'], ...cpn.map(v => v['ngVolume'])]
-            }] as VolumesViewAs[]
-          })
-        )
+        return from(findViewAsCpn(feat))
       })
     ),
     this.#feature$.pipe(
-      switchMap(feat => this.#getGeomVoi(feat)),
+      switchMap(feat => {
+        if (!feat) {
+          return of([])
+        }
+        return this.#getGeomVoi(feat)
+      }),
     )
   ]).pipe(
     startWith([]),
