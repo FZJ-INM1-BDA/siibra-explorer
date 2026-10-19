@@ -778,19 +778,12 @@ export interface components {
       /** Description */
       description: string
     }
-    /**
-     * GeomSvcArtefactEnum 
-     * @description An enumeration. 
-     * @enum {string}
-     */
-    GeomSvcArtefactEnum: "absent" | "present" | "pending" | "running" | "error"
-    /** GeomSvcArtefactStatus */
-    GeomSvcArtefactStatus: {
-      status: components["schemas"]["GeomSvcArtefactEnum"]
-      /** Uri */
-      uri: {
-        [key: string]: string | undefined
-      }
+    /** GeomSvcMetaResp */
+    GeomSvcMetaResp: {
+      /** Ingartfactsurls */
+      ingArtfactsUrls: (string)[]
+      /** Ingartfactsurls.Log */
+      "ingArtfactsUrls.log": string
     }
     /** GeomSvcModel */
     GeomSvcModel: {
@@ -947,6 +940,12 @@ export interface components {
      * @enum {string}
      */
     MapType: "LABELLED" | "STATISTICAL"
+    /** MetaResp */
+    MetaResp: {
+      /** Version */
+      version: string
+      "https://schema.brainatlas.eu/apps.ebrains.eu/geom-svc/directory": components["schemas"]["GeomSvcMetaResp"]
+    }
     /** OtherContribution */
     OtherContribution: {
       /**
@@ -2001,7 +2000,7 @@ export interface operations {
       /** @description Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["GeomSvcArtefactStatus"]
+          "application/json": components["schemas"]["MetaResp"]
         }
       }
       /** @description Validation Error */

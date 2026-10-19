@@ -1,6 +1,6 @@
 import { Directive, Inject, Input } from "@angular/core";
-import { BehaviorSubject, combineLatest, concat, forkJoin, from, Observable, of, timer } from "rxjs";
-import { catchError, debounceTime, distinctUntilChanged, map, scan, shareReplay, startWith, switchMap, takeWhile, tap, withLatestFrom } from "rxjs/operators";
+import { BehaviorSubject, combineLatest, concat, from, Observable, of } from "rxjs";
+import { catchError, debounceTime, distinctUntilChanged, map, scan, shareReplay, startWith, switchMap, withLatestFrom } from "rxjs/operators";
 import { SAPI } from "src/atlasComponents/sapi";
 import { Feature, SimpleCompoundFeature, SxplrRegion, SxplrTemplate, VoiFeature } from "src/atlasComponents/sapi/sxplrTypes";
 import { MetaV1Schema, PathReturn } from "src/atlasComponents/sapi/typeV3";
@@ -26,9 +26,8 @@ const BIGBRAIN_XZ = [
   [68.533, -58.788],
   [68.533, 62.222],
 ]
-type _Voi = VoiFeature
 
-async function findViewAsCpn(voi: Feature): Promise<VolumesViewAs[]>{
+async function findViewAsCpn(voi: Feature): Promise<VolumesViewAs[]> {
   if (!isVoiData(voi)) {
     return []
   }
@@ -119,12 +118,12 @@ type VolumesViewAs = {
   volumes: VoiFeature['ngVolume'][]
 } & ViewAsLabel
 
-type AnnotViewAs = {
-  type: "annotations"
-  annots: VoiFeature['ngVolume'][]
+type BaseGeomsvcViewAs = {
+  type: "geomsvc"
+  url: string
 } & ViewAsLabel
 
-export type ViewAs = PlotlyViewAs | VolumesViewAs | AnnotViewAs
+export type ViewAs = VolumesViewAs | PlotlyViewAs | BaseGeomsvcViewAs
 
 
 @Directive({
@@ -146,125 +145,16 @@ export class FeatureViewBase {
     return opt as ViewAs
   }
 
-  getGeomObs(feat: Feature) {
-    return combineLatest([
-      this.sapi.sapiEndpoint$,
-      timer(0, 5000)
-    ]).pipe(
-      switchMap(([baseUrl, _idx]) => {
-        const { path, params } = this.sapi.v3GetRoute("/spatial/geometry/{uuid}", {
-          path: {
-            uuid: feat.id
-          }
-        })
-        
-        const url = new URL(`${baseUrl}${path}`)
-        for (const [key, value] of Object.entries(params)){
-          url.searchParams.set(key, value.toString())
-        }
-        return from(fetch(url).then(res => res.json()))
-      }),
-      takeWhile(result => {
-        return result.status !== "present" && !result.error
-      }, true),
-    )
+  isBaseGeomSvcViewAs(opt: unknown): opt is BaseGeomsvcViewAs {
+    return (opt as any)['type'] === "geomsvc"
   }
 
-  #getGeomVoi(feat: Feature) {
-    this.setBusy(this.BUSY_NS.ADD_VOI, true)
-    return this.getGeomObs(feat).pipe(
-      switchMap(result => {
-        if (result.status !== "present") {
-          return of([] as ViewAs[])
-        }
-
-        const ingsvcPtcld = result?.["uri"]?.["ingsvc-ptcld"]
-        if (!ingsvcPtcld) {
-          return of([] as ViewAs[])
-        }
-
-        const base = `https://data-proxy.ebrains.eu/api/v1/buckets/${ingsvcPtcld}`
-        const url = `${base}/geomsvc.meta.json`
-        return from(fetch(url).then(res => res.json())).pipe(
-          switchMap(geomsvcMeta => {
-
-            const xformUrls: { datum: any, url: string }[] = []
-            for (const datum of geomsvcMeta.data) {
-              const { path, protocol } = datum
-              if (protocol !== "neuroglancer-precomputed") {
-                continue
-              }
-              xformUrls.push({ datum, url: `${base}/${path}/meta.json` })
-            }
-
-            if (xformUrls.length === 0) {
-              return of([])
-            }
-            return forkJoin(
-              xformUrls.map(({ datum, url }) => {
-                const { label, format, path } = datum
-                
-                const baseObj = {
-                  format: "neuroglancer-precomputed",
-                  info: {},
-                  url: `${base}/${path}`,
-                  meta: {
-                    preferredColormap: ["magma"],
-                    version: 1,
-                    "https://schema.brainatlas.eu/github/humanbrainproject/neuroglancer": {
-                      opacity: 0.75
-                    }
-                  }
-                }
-                if (format === "multiresAnnot") {
-                  return of({
-                    type: "annotations",
-                    label,
-                    annots: [
-                      {
-                        ...baseObj,
-                        type: "annotation"
-                      }
-                    ]
-                  } as AnnotViewAs)
-                }
-                return from(
-                  fetch(url)
-                    .then(res => res.json())
-                    .then(meta => {
-                      const transform = meta['transform']
-                      if (!transform) {
-                        throw new Error(`transform not defined in meta`)
-                      }
-                      return transform as number[][]
-                    })
-                ).pipe(
-                  catchError(() => of(undefined)),
-                  map(transform => {
-                    return {
-                      label,
-                      type: 'volumes',
-                      volumes: [
-                        {
-                          ...baseObj,
-                          transform,
-                          type: "image"
-                        }
-                      ]
-                    } as VolumesViewAs
-                  })
-                )
-              })
-            )
-          })
-        )
-      }),
-      tap({
-        complete: () => {
-          this.setBusy(this.BUSY_NS.ADD_VOI, false)
-        }
-      })
-    )
+  getGeomViewAs(feat: Feature) {
+    return this.sapi.v3Get("/spatial/geometry/{uuid}", {
+      path: {
+        uuid: feat.id
+      }
+    })
   }
 
   nsBusy$ = new BehaviorSubject<Record<string, boolean>>({ [this.BUSY_NS.ADD_VOI]: true })
@@ -279,7 +169,6 @@ export class FeatureViewBase {
     })
   }
 
-  
   #inputFeature$ = new BehaviorSubject<Feature | SimpleCompoundFeature | null>(null)
   #feature$ = this.#inputFeature$.pipe(
     switchMap(feat => {
@@ -330,7 +219,7 @@ export class FeatureViewBase {
       )
     ))
   )
-  
+
   #isConnectivity$ = this.#feature$.pipe(
     map(v => v.category === "connectivity")
   )
@@ -341,7 +230,7 @@ export class FeatureViewBase {
         map(params => params?.regions)
       )
     ),
-    map(([ isConnectivity, selectedRegions]) => isConnectivity
+    map(([isConnectivity, selectedRegions]) => isConnectivity
       ? { "regions": selectedRegions.map(r => r.name).join(" ") }
       : {})
   )
@@ -357,7 +246,7 @@ export class FeatureViewBase {
     shareReplay(1),
   )
 
-  #plotly$: Observable<PlotlyResponse|null> = this.#plotlyInput$.pipe(
+  #plotly$: Observable<PlotlyResponse | null> = this.#plotlyInput$.pipe(
     switchMap(({ id, darktheme, additionalParams }) => {
       if (!id) {
         return of(null)
@@ -386,7 +275,7 @@ export class FeatureViewBase {
       )
     )),
   )
-  
+
   #viewAs$ = combineLatest([
     this.#plotly$.pipe(
       map(data => {
@@ -398,7 +287,7 @@ export class FeatureViewBase {
     ),
     this.#feature$.pipe(
       map(feat => {
-        if (isVoiData(feat)){
+        if (isVoiData(feat)) {
           return [{
             label: "Image",
             type: "volumes",
@@ -421,14 +310,33 @@ export class FeatureViewBase {
         if (!feat) {
           return of([])
         }
-        return this.#getGeomVoi(feat)
+        return this.getGeomViewAs(feat).pipe(
+          map(res => {
+            const geomSvcDir = res['https://schema.brainatlas.eu/apps.ebrains.eu/geom-svc/directory']
+            return geomSvcDir['ingArtfactsUrls'].map(url => {
+              return {
+                url,
+                type: "geomsvc",
+                label: `Loading ...`
+              } as BaseGeomsvcViewAs
+            })
+          }),
+          catchError(() => of([]))
+        )
       }),
     )
   ]).pipe(
-    startWith([]),
-    map(opts => opts.flatMap(v => v))
+    startWith([] as ViewAs[][]),
+    map(opts => [
+      ...opts.flatMap(v => v),
+      // {
+      //   label: "debug fiber",
+      //   type: "fiber",
+      //   uuid: "foobar",
+      // } as FiberViewAs
+    ])
   )
-  
+
   #detailLinks = this.#feature$.pipe(
     switchMap(() => concat(
       of([] as string[]),

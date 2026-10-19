@@ -37,7 +37,7 @@ export class SAPI{
 
   static API_VERSION = null
 
-  iteratePages<T>(resp: PaginatedResponse<T>, cb: (page: number) => Observable<PaginatedResponse<T>>) {
+  static IteratePages<T>(resp: PaginatedResponse<T>, cb: (page: number) => Observable<PaginatedResponse<T>>) {
     /**
      * technically, it's easier to use a concat + merge + reduce map rather than forkJoin + flatmap
      * but merge does not guarantee same order, forkjoin does
@@ -60,6 +60,10 @@ export class SAPI{
     ]).pipe(
       map(arrOfArr => arrOfArr.flatMap(v => v))
     )
+  }
+
+  iteratePages<T>(resp: PaginatedResponse<T>, cb: (page: number) => Observable<PaginatedResponse<T>>) {
+    return SAPI.IteratePages(resp, cb)
   }
 
   static async VerifyEndpoint(url: string): Promise<string> {

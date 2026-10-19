@@ -86,7 +86,10 @@ export class NgLayerCtrlCmp implements OnChanges, OnDestroy{
   transform: Mat4 = idMat4
 
   @Input('ng-layer-ctl-transform')
-  set _transform(xform: string | Mat4 | number[][]) {
+  set _transform(xform: undefined | string | Mat4 | number[][]) {
+    if (!xform) {
+      return
+    }
     const parsedResult = typeof xform === "string"
       ? JSON.parse(xform)
       : xform

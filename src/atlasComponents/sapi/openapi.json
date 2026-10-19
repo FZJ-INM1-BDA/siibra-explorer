@@ -321,7 +321,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GeomSvcArtefactStatus"
+                  "$ref": "#/components/schemas/MetaResp"
                 }
               }
             }
@@ -3502,37 +3502,26 @@
         "title": "GeneModel",
         "description": "ConfigBaseModel"
       },
-      "GeomSvcArtefactEnum": {
-        "type": "string",
-        "enum": [
-          "absent",
-          "present",
-          "pending",
-          "running",
-          "error"
-        ],
-        "title": "GeomSvcArtefactEnum",
-        "description": "An enumeration."
-      },
-      "GeomSvcArtefactStatus": {
+      "GeomSvcMetaResp": {
         "properties": {
-          "status": {
-            "$ref": "#/components/schemas/GeomSvcArtefactEnum"
-          },
-          "uri": {
-            "additionalProperties": {
+          "ingArtfactsUrls": {
+            "items": {
               "type": "string"
             },
-            "type": "object",
-            "title": "Uri"
+            "type": "array",
+            "title": "Ingartfactsurls"
+          },
+          "ingArtfactsUrls.log": {
+            "type": "string",
+            "title": "Ingartfactsurls.Log"
           }
         },
         "type": "object",
         "required": [
-          "status",
-          "uri"
+          "ingArtfactsUrls",
+          "ingArtfactsUrls.log"
         ],
-        "title": "GeomSvcArtefactStatus"
+        "title": "GeomSvcMetaResp"
       },
       "GeomSvcModel": {
         "properties": {
@@ -3828,6 +3817,23 @@
         ],
         "title": "MapType",
         "description": "MapType\n\nExact match to MapType in siibra, to avoid dependency on siibra"
+      },
+      "MetaResp": {
+        "properties": {
+          "version": {
+            "type": "string",
+            "title": "Version"
+          },
+          "https://schema.brainatlas.eu/apps.ebrains.eu/geom-svc/directory": {
+            "$ref": "#/components/schemas/GeomSvcMetaResp"
+          }
+        },
+        "type": "object",
+        "required": [
+          "version",
+          "https://schema.brainatlas.eu/apps.ebrains.eu/geom-svc/directory"
+        ],
+        "title": "MetaResp"
       },
       "OtherContribution": {
         "properties": {

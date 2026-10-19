@@ -56,9 +56,21 @@
                 <mat-label>Choose a visualization</mat-label>
                 <mat-select [value]="null" #vizSelect>
                     <mat-option [value]="null" class="muted">(hide)</mat-option>
-                    <ng-template ngFor [ngForOf]="view.viewAs" let-opt>
-                        <mat-option [value]="opt">{{ opt.label }}</mat-option>
-                    </ng-template>
+
+                    @for (opt of view.viewAs; track $index) {
+                        @if (isBaseGeomSvcViewAs(opt)){
+                            <mat-option [value]="opt"
+                                spatial-option
+                                [url]="opt.url"
+                                #spatialOpt="spatialOpt"
+                                [disabled]="spatialOpt.disabled$ | async">
+                                {{ spatialOpt.label$ | async }}
+                            </mat-option>
+                        } @else {
+                            <mat-option [value]="opt">{{ opt.label }}</mat-option>
+                        }
+                    }
+                    
                 </mat-select>
             </mat-form-field>
 
@@ -87,20 +99,8 @@
                         }
                     }
 
-                    @case ('annotations') {
-                        @for (vol of opt.annots; track vol.url) {
-                            <ng-layer-ctl
-                                [ng-layer-ctl-name]="vol.url"
-                                [ng-layer-ctl-insert-index]="$index + 1"
-                                [ng-layer-ctl-format]="vol.format"
-                                [ng-layer-ctl-type]="vol.type"
-                                [ng-layer-ctl-src]="vol.url"
-                                [ng-layer-ctl-transform]="vol.transform"
-                                [ng-layer-ctl-info]="vol.info"
-                                [ng-layer-ctl-opacity]="1.0"
-                                [ng-layer-ctl-meta]="vol.meta">
-                            </ng-layer-ctl>
-                        }
+                    @case ('geomsvc') {
+                        <spatial-feature-cmp [url]="opt.url"></spatial-feature-cmp>
                     }
 
                     @default {
