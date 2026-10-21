@@ -11,6 +11,9 @@ import { IconComponent } from "src/sharedModules/icon";
 import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.directive";
 import { PtcldUI } from "../ptcld/ptcld.component";
 import { FiberUI } from "../fiber/fiber.component";
+import { TRXGroupSelector } from "src/features/trx/trxGrpSel/trxGrpSel.component";
+import { DPTRXToUIPipe } from "src/features/trx/uiUrl.pipe";
+import { ShareModule } from "src/share";
 
 export type UserLayerInfoData = {
   layerName: string
@@ -37,6 +40,9 @@ export type UserLayerInfoData = {
     ExperimentalFlagDirective,
     PtcldUI,
     FiberUI,
+    TRXGroupSelector,
+    DPTRXToUIPipe,
+    ShareModule,
   ],
   schemas: [
     CUSTOM_ELEMENTS_SCHEMA,

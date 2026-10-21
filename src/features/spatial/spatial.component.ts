@@ -30,7 +30,30 @@ type GeomVolume = {
 //   type: "annotation"
 // } & GeomBase
 
-async function getMeta(url: string){
+async function getAnnotMeta(url: string) {
+  const base = {
+    format: "neuroglancer-precomputed",
+    type: "annotation",
+    url,
+    transform: undefined,
+    meta: {
+    } as any
+  }
+  try {
+    const resp = await fetch(`${url}/info`)
+    const respJson = await resp.json()
+    if ((respJson['properties'] || []).some((p: any) => p.id === "color" && p.type === "rgb")) {
+      base['meta']["https://schema.brainatlas.eu/github/humanbrainproject/neuroglancer"] = {
+        shader: `void main() { setColor(prop_color());}`
+      }
+    }
+  } catch {
+    console.debug("info cannot be found")
+  }
+  return base
+}
+
+async function getMeta(url: string) {
   try {
     const resp = await fetch(`${url}/meta.json`)
     const meta: MetaV1Schema = await resp.json()
@@ -115,22 +138,14 @@ export class SpatialFeatureCmp extends SpatialOption {
             ...overlays
               .filter(ol => ol['format'] === "neuroglancer-precomputed")
               .map(ol => getMeta(ol["url"])),
+            getAnnotMeta(url).then(view => ({
+              ...view,
+              label: datum['modality'] || url
+            }))
           ])
         ).pipe(
           map(views => {
-            
-            return {
-              views: [
-                ...views,
-                {
-                  format: "neuroglancer-precomputed",
-                  type: "annotation",
-                  label: datum["modality"] || url,
-                  url,
-                  meta: {} as any
-                }
-              ]
-            }
+            return { views }
           })
         )
         // return of({
@@ -172,7 +187,7 @@ export class SpatialFeatureCmp extends SpatialOption {
           ])
         ).pipe(
           map(views => {
-            
+
             return {
               views
             }

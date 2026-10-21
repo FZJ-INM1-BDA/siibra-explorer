@@ -32,7 +32,7 @@ import { TPBRCategoryDirective } from "./tpbrCategory.directive";
 import { SimpleSingleFeatureCmp } from "./simpleSingle/simpleSingle.component";
 import { NgLayerCtrlCmp } from "src/viewerModule/nehuba/nehubaViewerInterface/ngLayerCtl/ngLayerCtrl.component";
 import { ExtraVoiDirective } from "./xtraVoi.directive";
-import { FiberFeatureCmp } from "./fiberfeature/fiberfeature.component";
+import { FiberFeatureCmp } from "./trx/fiberfeature/fiberfeature.component";
 import { SpatialOption } from "./spatial/spatialOpt.directive";
 import { SpatialFeatureCmp } from "./spatial/spatial.component";
 

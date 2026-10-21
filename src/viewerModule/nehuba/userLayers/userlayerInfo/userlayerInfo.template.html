@@ -55,3 +55,29 @@
   </geomsvc-fiber>
 </ng-template>
 
+@if (data.meta?.dpTrx; as dpTrx) {
+  <div>
+    data-proxy TRX grouped viewer
+  </div>
+  
+  @if(dpTrx.uuid; as uuid) {
+
+
+    <a [href]="uuid | toUiPipe"
+      target="_blank"
+      mat-stroked-button>
+      <span>
+        Open TRX file in data-proxy
+      </span>
+      <mat-icon matSuffix>open_in_new</mat-icon>
+    </a>
+
+    <button mat-button
+    [iav-clipboard-copy]="uuid | toUiPipe"
+      >
+      Copy URL
+    </button>
+    
+    <trx-group-selector [uuid]="uuid"></trx-group-selector>
+  }
+}

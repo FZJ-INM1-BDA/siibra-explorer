@@ -34,9 +34,37 @@
           Add third party plugin
         </span>
       </button>
+      <button mat-menu-item [sxplr-dialog]="userLayerTmpl" [sxplr-dialog-size]="null">
+        <span>add layer</span>
+      </button>
     </ng-template>
   </mat-list>
 
+</ng-template>
+
+<ng-template #userLayerTmpl>
+  <h2 mat-dialog-title>
+    Add user layer
+  </h2>
+
+  <mat-dialog-content>
+    <mat-form-field class="d-block">
+      
+      <input type="text" matInput #userLayerInput="matInput"
+        placeholder="e.g. dp-trx://..., precomputed://...">
+    </mat-form-field>
+  </mat-dialog-content>
+  
+  <mat-dialog-actions align="end">
+    <button (click)="loadUserLayer({ type: 'url', payload: {url: userLayerInput.value}})"
+      mat-raised-button
+      color="primary">
+      Load
+    </button>
+    <button mat-dialog-close mat-button>
+      cancel
+    </button>
+  </mat-dialog-actions>
 </ng-template>
 
 <ng-template #thirdPartyPluginTmpl>

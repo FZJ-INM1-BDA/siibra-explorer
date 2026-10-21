@@ -1,12 +1,10 @@
-<div>fiber visualization</div>
-
-@if (view$ | async; as view) {
-    @if (view.bundlenames.length > 0) {
+@if(view$ | async; as view) {
+    @if(view.groupNames.length > 0){
         <mat-form-field class="compact" appearance="outline">
             <mat-label>select a fiber</mat-label>
-            <mat-select [formControl]="selectedFiber">
+            <mat-select [formControl]="selectedGroup">
                 <mat-option [value]="null" class="muted">(hide)</mat-option>
-                @for (bundle of view.bundlenames; track bundle.fibername) {
+                @for (bundle of view.groupNames; track bundle.fibername) {
                     <mat-option [value]="bundle.fibername">
                         {{ bundle.fibername }}
                     </mat-option>
@@ -14,4 +12,6 @@
             </mat-select>
         </mat-form-field>
     }
+} @else {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
 }

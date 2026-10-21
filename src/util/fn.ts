@@ -495,6 +495,10 @@ export function getOpacityFromMeta(meta: MetaV1Schema) {
 }
 
 export function getShaderFromMeta(meta: MetaV1Schema){
+  const shader = meta?.['https://schema.brainatlas.eu/github/humanbrainproject/neuroglancer']?.['shader']
+  if (!!shader) {
+    return shader
+  }
   const { parseColorMapFromStr } = globalThis['ngLayerTune'] || {}
   let colormap = "greyscale"
 

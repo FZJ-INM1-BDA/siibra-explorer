@@ -103,6 +103,10 @@
                         <spatial-feature-cmp [url]="opt.url"></spatial-feature-cmp>
                     }
 
+                    @case ('fiber') {
+                        <fiber-feature class="content" [uuid]="opt.url"></fiber-feature>
+                    }
+
                     @default {
                         <span class="content muted">
                             Cannot render visualization of type: {{ $any(opt).type }}

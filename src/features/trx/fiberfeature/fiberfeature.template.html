@@ -1,0 +1,10 @@
+<div>fiber visualization</div>
+
+
+@if (view$ | async; as view) {
+    <trx-group-selector
+        [uuid]="view.uuid"
+        [selectGroup]="view.selectedGroup"
+        (groupSelected)="handleGroupSelected($event)">
+    </trx-group-selector>
+}

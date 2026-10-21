@@ -43,6 +43,7 @@ const OVERLAY_LAYER_PROTOCOL = `${OVERLAY_LAYER_KEY}://`
 const SUPPORTED_PREFIX = ["nifti://", "precomputed://", "zarr://", "n5://", "swc://", "deepzoom://"] as const
 const INGSVC_PTCLD = "ingsvc-ptcld://"
 const INGSVC_FIBER = "ingsvc-fiber://"
+const DP_TRX = "dp-trx://"
 type ValidProtocol = typeof SUPPORTED_PREFIX[number]
 type ValidInputTypes = File | string
 
@@ -274,6 +275,27 @@ export class UserLayerService implements OnDestroy {
 
   
   @RegisterSource(
+    async input => typeof input === "string" && input.startsWith(DP_TRX)
+  )
+  async processDPTrx(input: string){
+    const trimmedInput = input.slice(DP_TRX.length)
+    
+    const [ bucketname, ...fnames ] = trimmedInput.split("/")
+    const fname = fnames.join("/")
+    
+    return [{
+      meta: {
+        filename: `trx`,
+        dpTrx: {
+          uuid: `dp-${bucketname}/${fname}`
+        },
+        id: 'dp-trx'
+      },
+      cleanup: noop,
+    }]
+  }
+  
+  @RegisterSource(
     async input => typeof input === "string" && input.startsWith(INGSVC_FIBER)
   )
   async processIngSvcFiber(input: string){
@@ -358,7 +380,7 @@ export class UserLayerService implements OnDestroy {
             cleanup()
             const trimmedSrc = trimSrc(src)
             const newKey = trimmedSrc.length === 0 ? null : trimmedSrc.join(OVERLAY_LAYER_SEP)
-            this.routerSvc.setCustomRoute(OVERLAY_LAYER_KEY, newKey)
+            this.routerSvc.setCustomRoute(OVERLAY_LAYER_KEY, newKey || '')
           }
         }
       })
@@ -814,12 +836,15 @@ export class UserLayerService implements OnDestroy {
     return
   }
 
+  #addedLayer = new Set<string>()
   #addLayer(processedOutput: ProcessorOutput) {
     const { option, protocol, url, meta, cleanup, actions } = processedOutput
 
     const source = protocol && url && `${protocol}${url}`
     
+    const metaId = meta?.id
     let id: string|undefined
+
     if (source) {
       id = url ? QuickHash.GetHash(url) : getUuid()
       UserLayerService.VerifyUrl(source)
@@ -836,6 +861,16 @@ export class UserLayerService implements OnDestroy {
           customLayers: [layer],
         })
       )
+    }
+    
+    if (!id && !metaId) {
+      return
+    }
+    if (id && this.#addedLayer.has(id)) {
+      return
+    }
+    if (metaId && this.#addedLayer.has(metaId)) {
+      return
     }
 
     const injector = Injector.create({
@@ -855,7 +890,11 @@ export class UserLayerService implements OnDestroy {
           useValue: (_this: ToolbarWidget<UserLayerInfoCmp>) => {
             
             cleanup()
-            if (id) {
+            if (!!metaId) {
+              this.#addedLayer.delete(metaId)
+            }
+            if (!!id) {
+              this.#addedLayer.delete(id)
               this.store$.dispatch(
                 atlasAppearance.actions.removeCustomLayers({
                   customLayers: [ { id } ]
@@ -868,6 +907,13 @@ export class UserLayerService implements OnDestroy {
       ],
       parent: this.injector
     })
+    if (!!id) {
+      this.#addedLayer.add(id)
+    }
+    if (!!metaId) {
+      this.#addedLayer.add(metaId)
+    }
+    
     this.widgtSvc.addNewWidget(UserLayerInfoCmp, injector)
   }
 
@@ -888,7 +934,7 @@ export class UserLayerService implements OnDestroy {
         filter(url => !!url)
       ).subscribe(url => {
         const escaped = url.replace(/__dblcol__/g, "::")
-        this.handleUserInput(escaped)
+        this.handleUserInput(`${OVERLAY_LAYER_PROTOCOL}${escaped}`)
       }),
       this.store$.pipe(
         select(atlasAppearance.selectors.customLayers),

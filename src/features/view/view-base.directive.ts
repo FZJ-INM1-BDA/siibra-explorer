@@ -123,7 +123,12 @@ type BaseGeomsvcViewAs = {
   url: string
 } & ViewAsLabel
 
-export type ViewAs = VolumesViewAs | PlotlyViewAs | BaseGeomsvcViewAs
+type TmpGeomSvcFiber = {
+  type: "fiber"
+  url: string
+} & ViewAsLabel
+
+export type ViewAs = VolumesViewAs | PlotlyViewAs | BaseGeomsvcViewAs | TmpGeomSvcFiber
 
 
 @Directive({
@@ -309,6 +314,15 @@ export class FeatureViewBase {
       switchMap(feat => {
         if (!feat) {
           return of([])
+        }
+        if (feat.id === "494818fa-9126-4432-a167-52ff02534a8b--icbm152") {
+          return of([
+            {
+              type: "fiber",
+              label: "test fiber",
+              url: "dp-d-494818fa-9126-4432-a167-52ff02534a8b/sub-chenonceau/derivatives/sub-chenonceau_space-MNI152NLin2009cAsym_model-global-tractography_desc-deep-white-matter-atlas.trx"
+            } as TmpGeomSvcFiber
+          ])
         }
         return this.getGeomViewAs(feat).pipe(
           map(res => {
