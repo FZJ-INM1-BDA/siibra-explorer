@@ -126,6 +126,8 @@ type BaseGeomsvcViewAs = {
 type TmpGeomSvcFiber = {
   type: "fiber"
   url: string
+  overview: string
+  detail: string
 } & ViewAsLabel
 
 export type ViewAs = VolumesViewAs | PlotlyViewAs | BaseGeomsvcViewAs | TmpGeomSvcFiber
@@ -316,11 +318,14 @@ export class FeatureViewBase {
           return of([])
         }
         if (feat.id === "494818fa-9126-4432-a167-52ff02534a8b--icbm152") {
+          
           return of([
             {
               type: "fiber",
-              label: "test fiber",
-              url: "dp-d-494818fa-9126-4432-a167-52ff02534a8b/sub-chenonceau/derivatives/sub-chenonceau_space-MNI152NLin2009cAsym_model-global-tractography_desc-deep-white-matter-atlas.trx"
+              label: "sample fiber visualization",
+              url: "dp-reference-atlas-data/temp/geomsvc-data/20261023-fiber-showcase/sub-Chenonceau_space-MNI152NLin2009cAsym_model-global-tractography_desc-deep-white-matter-atlas.rasmm.trx",
+              overview: 'dp-reference-atlas-data/temp/geomsvc-data/20261023-fiber-showcase/gkg-downsample.zip',
+              detail: 'dp-reference-atlas-data/temp/geomsvc-data/20261023-fiber-showcase/sub-Chenonceau_space-MNI152NLin2009cAsym_model-global-tractography_desc-deep-white-matter-atlas.rasmm.trx',
             } as TmpGeomSvcFiber
           ])
         }

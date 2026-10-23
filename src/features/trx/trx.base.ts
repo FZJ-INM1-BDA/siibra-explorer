@@ -2,21 +2,9 @@ import { Directive, Input } from "@angular/core"
 import { BehaviorSubject, from, of } from "rxjs"
 import { switchMap, take } from "rxjs/operators"
 import { SAPI } from "src/atlasComponents/sapi"
-
-const PROD_GEOMSVC_HOST = "https://geom-svc.apps.ebrains.eu"
-const LOCAL_GEOMSVC_HOST = "http://localhost:5000"
-const GEOMSVC_HOST = PROD_GEOMSVC_HOST || LOCAL_GEOMSVC_HOST
+import { GEOMSVC_HOST, PaginatedResponse } from "./const"
 
 const FIBER_DETAIL_LAYER_ID = 'geomsvc-fiber-detail'
-
-type PaginatedResponse<T> = {
-  items: T[]
-  total?: number
-  page?: number
-  size?: number
-  pages?: number
-}
-
 
 @Directive({
   selector: '[geomsvc-trx]',

@@ -1,18 +1,16 @@
 import { CommonModule } from "@angular/common";
-import { Component, inject } from "@angular/core";
-import { ReactiveFormsModule } from "@angular/forms";
-import { BehaviorSubject, combineLatest, Subject } from "rxjs";
-import { debounceTime, distinctUntilChanged, map, shareReplay, take, takeUntil, withLatestFrom } from "rxjs/operators";
+import { Component, inject, Input, viewChild } from "@angular/core";
+import { FormControl, ReactiveFormsModule } from "@angular/forms";
+import { BehaviorSubject, combineLatest, EMPTY, from, Subject } from "rxjs";
+import { debounceTime, distinctUntilChanged, filter, map, shareReplay, switchMap, takeUntil, withLatestFrom } from "rxjs/operators";
 import { AngularMaterialModule } from "src/sharedModules";
 import { DestroyDirective } from "src/util/directives/destroy.directive";
 import { CLICK_INTERCEPTOR_INJECTOR, ClickInterceptor, HOVER_INTERCEPTOR_INJECTOR, HoverInterceptor } from "src/util/injectionTokens";
 import { TRXBase } from "../trx.base";
 import { TRXGroupSelector } from "../trxGrpSel/trxGrpSel.component";
+import { GEOMSVC_HOST, PaginatedResponse } from "../const"
+import { SAPI } from "src/atlasComponents/sapi";
 import { arrayEqual } from "src/util/array";
-
-const PROD_GEOMSVC_HOST = "https://geom-svc.apps.ebrains.eu"
-const LOCAL_GEOMSVC_HOST = "http://localhost:5000"
-const GEOMSVC_HOST = PROD_GEOMSVC_HOST || LOCAL_GEOMSVC_HOST
 
 const FIBER_OVERVIEW_LAYER_ID = 'geomsvc-fiber-overview'
 
@@ -34,25 +32,54 @@ const FIBER_OVERVIEW_LAYER_ID = 'geomsvc-fiber-overview'
   ]
 })
 
-export class FiberFeatureCmp extends TRXBase {
+export class FiberFeatureCmp extends TRXBase{
+
+  trxGrpSel = viewChild(TRXGroupSelector)
+
+  #overviewUUID$ = new BehaviorSubject<string|null>(null)
+  @Input()
+  set overviewUUID(val: string){
+    this.#overviewUUID$.next(val)
+  }
+
+  overviewSelection = new FormControl<string|null>(null)
+  #masterFlagShow$ = new BehaviorSubject(true)
+
+  overviewLevels$ = this.#overviewUUID$.pipe(
+    switchMap(overviewUUID => {
+      if (!overviewUUID) {
+        return EMPTY
+      }
+
+      const url = `${GEOMSVC_HOST}/fiber_n/${overviewUUID}/overview`
+
+      const getpage = (page: number) => from(
+        fetch(`${url}?page=${page}`)
+          .then(res => res.json() as Promise<PaginatedResponse<{name: string, path: string}>>)
+      )
+
+      return from(getpage(1)).pipe(
+        switchMap(resp => SAPI.IteratePages(resp, getpage))
+      )
+    })
+  )
 
   #destroy$ = inject(DestroyDirective).destroyed$
-  
-  #selectedGroup$ = new BehaviorSubject<string|null>(null)
 
   #hoverInterceptor = inject(HOVER_INTERCEPTOR_INJECTOR, { optional: true }) as HoverInterceptor
   #clickInterceptor = inject(CLICK_INTERCEPTOR_INJECTOR, { optional: true }) as ClickInterceptor
 
   view$ = combineLatest([
+    this.#overviewUUID$,
     this.uuid$,
     this.groupNames$,
-    this.#selectedGroup$,
+    this.overviewLevels$,
   ]).pipe(
-    map(([uuid, bundlenames, selectedGroup]) => {
+    map(([overviewUUID, uuid, bundlenames, overviewLevels]) => {
       return {
-        uuid,
+        overviewUUID, uuid,
         bundlenames,
-        selectedGroup,
+        overviewLevels,
       }
     }),
     shareReplay(1)
@@ -122,10 +149,13 @@ export class FiberFeatureCmp extends TRXBase {
 
       const clickInt = () => {
         if (!hovered) {
-          return false
+          return true
         }
-        this.#selectedGroup$.next(hovered.fibername)
-        return true
+        const grpSel = this.trxGrpSel()
+        if (grpSel) {
+          grpSel.selectGroup(hovered.fibername)
+        }
+        return false
       }
       this.#destroycbs.push(() => deregister(clickInt))
       register(clickInt)
@@ -138,16 +168,59 @@ export class FiberFeatureCmp extends TRXBase {
 
     this.view$.pipe(
       takeUntil(this.#destroy$),
+      filter(v =>
+        (v.overviewLevels || []).length > 0
+        && (v.bundlenames || []).length > 0
+      ),
       distinctUntilChanged(
         (o, n) => (
-          o.uuid === n.uuid
-          && arrayEqual()(o.bundlenames || [], n.bundlenames || [])
+          o.overviewUUID === n.overviewUUID
+          && o.bundlenames.length === n.bundlenames.length
         )
       ),
       debounceTime(160),
-    ).subscribe(({ uuid, bundlenames }) => {
-      if (uuid && bundlenames.length > 0) {
-        this.#loadOverview()
+    ).subscribe(({ overviewLevels }) => {
+      if (overviewLevels.length > 0) {
+        this.overviewSelection.setValue(overviewLevels[0].path)
+      }
+    })
+
+    combineLatest([
+      this.#masterFlagShow$,
+      this.view$,
+      this.overviewSelection.valueChanges
+    ]).pipe(
+      takeUntil(this.#destroy$),
+      filter(([ _showFlag, view, _sel ]) => {
+        if (view.bundlenames.length <= 0) {
+          return false
+        }
+        if (!view.overviewUUID) {
+          return false
+        }
+        return true
+      }),
+      map(([ showFlag, view, sel ]) => {
+        const { bundlenames, overviewUUID } = view
+        const segments = bundlenames.map(v => v.index)
+        return {
+          segments,
+          overviewUUID,
+          sel,
+          showFlag,
+        }
+      }),
+      distinctUntilChanged((o, n) =>
+        o.sel === n.sel
+        && arrayEqual()(o.segments, n.segments)
+        && o.overviewUUID === n.overviewUUID
+        && o.showFlag === n.showFlag
+      )
+    ).subscribe(val => {
+      this.#unloadOverview()
+      const { overviewUUID, segments, sel, showFlag } = val
+      if (sel && overviewUUID && showFlag) {
+        this.#syncLoadOverview(overviewUUID, sel, segments)
       }
     })
 
@@ -161,26 +234,17 @@ export class FiberFeatureCmp extends TRXBase {
   }
 
   handleGroupSelected(groupname: string|null){
-    if (!!groupname) {
-      this.#unloadOverview()
-    } else {
-      this.#loadOverview()
-    }
+    this.#masterFlagShow$.next(!groupname)
   }
-
-  async #loadOverview() {
-    this.#unloadOverview()
-    const { bundlenames, uuid } = await this.view$.pipe(
-      take(1)
-    ).toPromise()
-
-    const segments = bundlenames.map(v => v.index)
+  
+  #syncLoadOverview(overviewUUID: string, currOvSel: string, segments: number[]){
+    
     const opt = {
       "type": "segmentation",
       "opacity": 1,
       "clType": "customlayer/nglayer",
       "segments": segments,
-      "source": `precomputed://${GEOMSVC_HOST}/fiber_n/${uuid}/overview/ngskeleton`
+      "source": `precomputed://${GEOMSVC_HOST}/fiber_n/${overviewUUID}/overview/${currOvSel}`
     }
 
     this.#overviewLayer = (window as any).nehubaViewer.addLayer(opt, FIBER_OVERVIEW_LAYER_ID)
@@ -191,6 +255,7 @@ export class FiberFeatureCmp extends TRXBase {
       })
     }, 1000)
   }
+
 
   #unloadOverview() {
     if (this.#overviewLayer) {

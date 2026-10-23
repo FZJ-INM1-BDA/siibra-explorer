@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { Component, EventEmitter, Input, Output } from "@angular/core";
+import { Component, EventEmitter, Output } from "@angular/core";
 import { TRXBase } from "../trx.base";
 import { AngularMaterialModule } from "src/sharedModules";
 import { combineLatest } from "rxjs";
@@ -34,8 +34,7 @@ export class TRXGroupSelector extends TRXBase {
     })
   )
 
-  @Input()
-  set selectGroup(val: string | null) {
+  selectGroup(val: string){
     this.selectedGroup.setValue(val)
   }
 
