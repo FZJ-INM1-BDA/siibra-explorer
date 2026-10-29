@@ -52,9 +52,14 @@ export class EntryComponent extends TPBRCategoryDirective implements AfterViewIn
           return concat(
             of([]),
             this.sapi.getGeomFeatures(template.id, JSON.stringify(bbox)).pipe(
-              switchMap(feats => forkJoin(
-                feats.map(feat => translateV3Entities.translateFeature(feat))
-              )),
+              switchMap(feats => {
+                if (feats.length === 0) {
+                  return of([])
+                }
+                return forkJoin(
+                  feats.map(feat => translateV3Entities.translateFeature(feat))
+                )
+              }),
               tap(() => this.newBusyFlag$.next(false))
             )
           )

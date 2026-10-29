@@ -27,7 +27,7 @@
         <ng-template [ngIf]="tpbr.bboxString" let-bboxString>
             <div class="title">
                 <mat-icon>view_in_ar</mat-icon>
-                <span class="text">bounding box (mm)</span>
+                <span class="text">current viewport (mm)</span>
             </div>
             <div class="content bbox-grid" [sxplr-flash]="bboxString.from + bboxString.to">
                 <span class="bbox-grid-cell bbox-grid-leader lvl2">from</span>

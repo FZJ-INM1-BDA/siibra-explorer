@@ -1,14 +1,35 @@
 @if (view$ | async; as view) {
     @for (item of view.views; track item.url) {
-        <ng-layer-ctl
-            [ng-layer-ctl-name]="item.label"
-            [ng-layer-ctl-insert-index]="$index + 1"
-            [ng-layer-ctl-format]="item.format"
-            [ng-layer-ctl-type]="item.type"
-            [ng-layer-ctl-transform]="isVolume(item) ? item.transform : undefined"
-            [ng-layer-ctl-src]="item.url"
-            [ng-layer-ctl-opacity]="1.0"
-            [ng-layer-ctl-meta]="item.meta">
-        </ng-layer-ctl>
+        @switch (item.format) {
+            @case ('neuroglancer-precomputed') {
+                <ng-layer-ctl
+                    [ng-layer-ctl-name]="item.label"
+                    [ng-layer-ctl-insert-index]="$index + 1"
+                    [ng-layer-ctl-format]="item.format"
+                    [ng-layer-ctl-type]="item.type"
+                    [ng-layer-ctl-transform]="isVolume(item) ? item.transform : undefined"
+                    [ng-layer-ctl-src]="item.url"
+                    [ng-layer-ctl-opacity]="1.0"
+                    [ng-layer-ctl-meta]="item.meta">
+                </ng-layer-ctl>
+            }
+            @case('rtree') {
+                <ptcld-ui
+                    class="content"
+                    [bucketname]="item.url.bucketname"
+                    [fname]="item.url.fname"
+                    mode="rtree-only"
+                    >
+                </ptcld-ui>
+            }
+            @default {
+                <p class="content text-muted">
+                    Unhandled format: {{ item.format }}
+                </p>
+            }
+        }
+    }
+    @if (view.views.length === 0) {
+        <p class="content text-muted">This visualization is still being implemented.</p>
     }
 }

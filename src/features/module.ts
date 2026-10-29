@@ -35,6 +35,7 @@ import { ExtraVoiDirective } from "./xtraVoi.directive";
 import { FiberFeatureCmp } from "./trx/fiberfeature/fiberfeature.component";
 import { SpatialOption } from "./spatial/spatialOpt.directive";
 import { SpatialFeatureCmp } from "./spatial/spatial.component";
+import { ValueStoreDirective } from "src/util/directives/value.directive";
 
 @NgModule({
   imports: [
@@ -63,6 +64,7 @@ import { SpatialFeatureCmp } from "./spatial/spatial.component";
     FiberFeatureCmp,
     SpatialOption,
     SpatialFeatureCmp,
+    ValueStoreDirective,
   ],
   declarations: [
     EntryComponent,

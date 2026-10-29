@@ -2,7 +2,7 @@
     @if(view.groupNames.length > 0){
         <mat-form-field class="compact" appearance="outline">
             <mat-label>select a fiber</mat-label>
-            <mat-select [formControl]="selectedGroup">
+            <mat-select [formControl]="selectedGroup" #sel="matSelect">
                 <mat-option [value]="null" class="muted">(hide)</mat-option>
                 @for (bundle of view.groupNames; track bundle.fibername) {
                     <mat-option [value]="bundle.fibername">
@@ -10,7 +10,14 @@
                     </mat-option>
                 }
             </mat-select>
+            
         </mat-form-field>
+        
+        @if(sel.value) {
+            <button (click)="selectedGroup.setValue(null)" mat-button>
+                clear
+            </button>
+        }
     }
 } @else {
     <mat-progress-bar mode="indeterminate"></mat-progress-bar>

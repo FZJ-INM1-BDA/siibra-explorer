@@ -324,7 +324,8 @@ export class FeatureViewBase {
               type: "fiber",
               label: "sample fiber visualization",
               url: "dp-reference-atlas-data/temp/geomsvc-data/20261023-fiber-showcase/sub-Chenonceau_space-MNI152NLin2009cAsym_model-global-tractography_desc-deep-white-matter-atlas.rasmm.trx",
-              overview: 'dp-reference-atlas-data/temp/geomsvc-data/20261023-fiber-showcase/gkg-downsample.zip',
+              // https://data-proxy.ebrains.eu/api/v1/buckets/2025-05-15-test-bucket/20261029-gkg-ds-test/sub-Chenonceau_space-MNI152NLin2009cAsym_model-global-tractography_desc-deep-white-matter-atlas.rasmm.trx.gkgds.zip
+              overview: 'dp-2025-05-15-test-bucket/20261029-gkgds-test2/gkg-downsample.zip',
               detail: 'dp-reference-atlas-data/temp/geomsvc-data/20261023-fiber-showcase/sub-Chenonceau_space-MNI152NLin2009cAsym_model-global-tractography_desc-deep-white-matter-atlas.rasmm.trx',
             } as TmpGeomSvcFiber
           ])

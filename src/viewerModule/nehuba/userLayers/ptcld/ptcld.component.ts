@@ -2,7 +2,7 @@ import { CommonModule } from "@angular/common";
 import { Component, inject, Input, OnChanges, SimpleChanges } from "@angular/core";
 import { FormControl, FormGroup, ReactiveFormsModule } from "@angular/forms";
 import { select, Store } from "@ngrx/store";
-import { concat, EMPTY, from, of } from "rxjs";
+import { BehaviorSubject, combineLatest, concat, EMPTY, from, of } from "rxjs";
 import { debounceTime, distinctUntilChanged, filter, map, shareReplay, switchMap, takeUntil } from "rxjs/operators";
 import { AnnotationLayer, TNgAnnotationPoint } from "src/atlasComponents/annotations";
 import { AngularMaterialModule } from "src/sharedModules";
@@ -14,9 +14,11 @@ import { getShader, QuickHash } from "src/util/fn";
 const PROD_GEOMSVC_HOST = "https://geom-svc.apps.ebrains.eu"
 // const LOCAL_GEOMSVC_HOST = "http://localhost:8000"
 const GEOMSVC_HOST= PROD_GEOMSVC_HOST
-const COUNT_THRESHOLD = 1e6
+const COUNT_THRESHOLD = 1e5
 const PTCLD_CONST = "ptcldingsvc"
 const tripletEqual = arrayEqual<number>((v0, v1) => v0 === v1, true)
+
+type TMODE = "rtree-only" | undefined
 
 const LOADING_STATE = {
   LOADING: "LOADING",
@@ -58,6 +60,13 @@ export class PtcldUI implements OnChanges{
   @Input()
   fname: string | undefined
 
+  #mode$ = new BehaviorSubject<TMODE>(undefined)
+  @Input()
+  set mode(val: TMODE){
+    this.#mode$.next(val)
+  }
+
+
   #basehash: string |undefined
   ngOnChanges(_changes: SimpleChanges): void {
     this.#basehash = QuickHash.GetHash(`${this.bucketname}/${this.fname}`)
@@ -96,7 +105,7 @@ export class PtcldUI implements OnChanges{
     debounceTime(160)
   )
 
-  ptCount$ = this.#currViewportChanged$.pipe(
+  #ptCount$ = this.#currViewportChanged$.pipe(
     switchMap(() => concat(
       of(LOADING_STATE.LOADING),
       this.#currViewportDebouncedChanged$.pipe(
@@ -115,6 +124,18 @@ export class PtcldUI implements OnChanges{
       )
     )),
     shareReplay(1),
+  )
+
+  view$ = combineLatest([
+    this.#ptCount$,
+    this.#mode$
+  ]).pipe(
+    map(([ ptCount, mode ]) => {
+      return {
+        ptCount,
+        mode,
+      }
+    })
   )
 
   async #addMultires(){
@@ -227,6 +248,27 @@ export class PtcldUI implements OnChanges{
       }
     })
 
+    const showRtree$ = combineLatest([
+      this.view$.pipe(
+        map(v => v.mode === "rtree-only")
+      ),
+      concat(
+        of(false),
+        this.formCtrl.controls.rtree.valueChanges
+      )
+    ]).pipe(
+      takeUntil(this.#ondestroy$),
+      map((flags => flags.some(f => f))),
+      distinctUntilChanged(),
+    )
+
+    showRtree$.pipe(
+      filter(f => !f)
+    ).subscribe(() => {
+      this.#annLayer?.dispose()
+    })
+
+
     this.formCtrl.controls.rtree.valueChanges.pipe(
       takeUntil(this.#ondestroy$),
       distinctUntilChanged(),
@@ -235,13 +277,11 @@ export class PtcldUI implements OnChanges{
       this.#annLayer?.dispose()
     })
     
-    this.formCtrl.controls.rtree.valueChanges.pipe(
-      takeUntil(this.#ondestroy$),
-      distinctUntilChanged(),
+    showRtree$.pipe(
       switchMap(flag => 
         flag
         ? this.#currViewportDebouncedChanged$.pipe(
-            switchMap(vp => this.ptCount$.pipe(
+            switchMap(vp => this.#ptCount$.pipe(
               map(count => {
                 return { count, vp }
               })

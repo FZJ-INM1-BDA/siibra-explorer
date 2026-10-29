@@ -1,5 +1,14 @@
-trx-group-selector,
-mat-form-field
+.form-container
 {
-    display: block;
+    display: flex;
+    
+    mat-form-field
+    {
+        display: block;
+        flex: 1 1 auto;
+    }
+    button
+    {
+        flex: 0 0 auto;
+    }
 }

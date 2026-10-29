@@ -62,7 +62,7 @@ export const reducer = createReducer(
     state => {
       return {
         ...state,
-        meshTransparency: state.meshTransparency < 1.0 ? 1.0 : 0.2
+        meshTransparency: state.meshTransparency < 1.0 ? 1.0 : 0.05
       }
     }
   ),

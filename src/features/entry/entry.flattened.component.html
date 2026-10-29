@@ -242,6 +242,7 @@
                         let-last="last">
                         <button
                             mat-button
+                            [matTooltipShowDelay]="160"
                             [matTooltip]="feature.name"
                             class="virtual-scroll-item sxplr-w-100"
                             (click)="onClickFeature(feature)">

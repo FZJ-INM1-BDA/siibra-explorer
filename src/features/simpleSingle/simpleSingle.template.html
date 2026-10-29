@@ -1,144 +1,210 @@
 <ng-template [ngIf]="view$ | async" let-view [ngIfElse]="loadingTmpl">
-    <section class="content">
-        <span class="panel-header subtitle">Feature</span>
-        <span class="panel-header">
-            {{ view.name }}
-        </span>
-    </section>
-    
-    <mat-divider></mat-divider>    
-
-    <button mat-icon-button
-        matTooltip="more info"
-        [sxplr-dialog]="fullTmpl">
-        <mat-icon>info</mat-icon>
-    </button>
-    
-    <!-- doi -->
-    <ng-template ngFor [ngForOf]="view.links" let-url>
-        <a [href]="url.href"
-            target="_blank"    
-            class="no-hover"
-            mat-icon-button
-            [matTooltip]="url.text || url.href">
-            <mat-icon fontSet="ai" fontIcon="ai-doi"></mat-icon>
-        </a>
-    </ng-template>
-        
-    <!-- additional links -->
-    <ng-template ngFor [ngForOf]="view.additionalLinks" let-url>
-        <a [href]="url"
-            target="_blank"
-            class="no-hover"
-            mat-icon-button
-            [matTooltip]="url">
-            <mat-icon fontSet="ai" fontIcon="ai-doi"></mat-icon>
-        </a>
-    </ng-template>
-
-    <!-- download -->
-    
-    <a [href]="view.downloadLink"
-        target="_blank"
-        class="no-hover"
-        mat-icon-button
-        matTooltip="download">
-        <mat-icon>download</mat-icon>
-    </a>
-        
-
-    <mat-divider></mat-divider>
-
-    <section class="sxplr-custom-cmp darker-bg">
-
-        <ng-template [ngIf]="view.viewAs.length > 0" [ngIfElse]="fallbackTmpl">
-            <mat-form-field class="compact content" appearance="outline">
-                <mat-label>Choose a visualization</mat-label>
-                <mat-select [value]="null" #vizSelect>
-                    <mat-option [value]="null" class="muted">(hide)</mat-option>
-
-                    @for (opt of view.viewAs; track $index) {
-                        @if (isBaseGeomSvcViewAs(opt)){
-                            <mat-option [value]="opt"
-                                spatial-option
-                                [url]="opt.url"
-                                #spatialOpt="spatialOpt"
-                                [disabled]="spatialOpt.disabled$ | async">
-                                {{ spatialOpt.label$ | async }}
-                            </mat-option>
-                        } @else {
-                            <mat-option [value]="opt">{{ opt.label }}</mat-option>
-                        }
-                    }
-                    
-                </mat-select>
-            </mat-form-field>
-
-            <ng-template [ngIf]="asViewAs(vizSelect.value)" let-opt>
-                @switch (opt.type) {
-                    @case ('plotly') {
-                        <sxplr-plotly-component
-                            class="content"
-                            (plotly-label-clicked)="navigateToRegionByName($event)"
-                            [plotly-json]="opt.data">
-                        </sxplr-plotly-component>
-                    }
-
-                    @case ('volumes') {
-                        @for (vol of opt.volumes; track vol.url) {
-                            <ng-layer-ctl
-                                [ng-layer-ctl-name]="vol.url"
-                                [ng-layer-ctl-insert-index]="$index + 1"
-                                [ng-layer-ctl-format]="vol.format"
-                                [ng-layer-ctl-src]="vol.url"
-                                [ng-layer-ctl-transform]="vol.transform"
-                                [ng-layer-ctl-info]="vol.info"
-                                [ng-layer-ctl-opacity]="1.0"
-                                [ng-layer-ctl-meta]="vol.meta">
-                            </ng-layer-ctl>
-                        }
-                    }
-
-                    @case ('geomsvc') {
-                        <spatial-feature-cmp [url]="opt.url"></spatial-feature-cmp>
-                    }
-
-                    @case ('fiber') {
-                        <fiber-feature class="content" [uuid]="opt.url" [overviewUUID]="opt.overview"></fiber-feature>
-                    }
-
-                    @default {
-                        <span class="content muted">
-                            Cannot render visualization of type: {{ $any(opt).type }}
-                        </span>
-                    }
-                }
-
-                @if (opt.title || opt.desc || opt.links || opt.contributors){
-                    <mat-divider></mat-divider>
-
-                    @if(opt.title || opt.desc || opt.links || opt.contributors) {
-                        <button mat-icon-button
-                            sxplr-dialog
-                            [sxplr-dialog-data]="{
-                                title: opt.title || 'No title provided.',
-                                desc: opt.desc || 'No description provided.',
-                                actions: (opt.links || []) | mapToProperty : 'href',
-                                actionsAsList: true
-                            }">
-                            <mat-icon>info</mat-icon>
-                        </button>
-                    }
-                }
-            </ng-template>
-        </ng-template>
-
-        <ng-template #fallbackTmpl>
-            <span class="content muted">
-                No available visualizations
+    <section class="section-find-body">
+        <section class="section-header">
+            <span class="panel-header subtitle">Feature</span>
+            <span class="panel-header">
+                {{ view.name }}
             </span>
-        </ng-template>
+        </section>
 
+        <mat-divider></mat-divider>
+
+        <section class="section-icons">
+            <button mat-icon-button
+                matTooltip="more info"
+                [sxplr-dialog]="fullTmpl">
+                <mat-icon>info</mat-icon>
+            </button>
+            
+            <!-- doi -->
+            <ng-template ngFor [ngForOf]="view.links" let-url>
+                <a [href]="url.href"
+                    target="_blank"    
+                    class="no-hover"
+                    mat-icon-button
+                    [matTooltip]="url.text || url.href">
+                    <mat-icon fontSet="ai" fontIcon="ai-doi"></mat-icon>
+                </a>
+            </ng-template>
+                
+            <!-- additional links -->
+            <ng-template ngFor [ngForOf]="view.additionalLinks" let-url>
+                <a [href]="url"
+                    target="_blank"
+                    class="no-hover"
+                    mat-icon-button
+                    [matTooltip]="url">
+                    <mat-icon fontSet="ai" fontIcon="ai-doi"></mat-icon>
+                </a>
+            </ng-template>
+
+            <!-- download -->
+            
+            <a [href]="view.downloadLink"
+                target="_blank"
+                class="no-hover"
+                mat-icon-button
+                matTooltip="download">
+                <mat-icon>download</mat-icon>
+            </a>
+                
+        </section>
+        
+        <mat-divider></mat-divider>
+
+        <section class="section-visualization sxplr-custom-cmp darker-bg">
+
+            <ng-template [ngIf]="view.viewAs.length > 0" [ngIfElse]="fallbackTmpl">
+                @if(view.showExperimentalFlag) {
+                    <mat-form-field class="compact content" appearance="outline">
+                        <mat-label>Choose a visualization</mat-label>
+                        
+                            <mat-select [value]="null" #vizSelect>
+                                <mat-option [value]="null" class="muted">(hide)</mat-option>
+
+                                @for (opt of view.viewAs; track $index) {
+                                    @if (isBaseGeomSvcViewAs(opt)){
+                                        <mat-option [value]="opt"
+                                            spatial-option
+                                            [url]="opt.url"
+                                            #spatialOpt="spatialOpt"
+                                            [disabled]="spatialOpt.disabled$ | async">
+                                            {{ spatialOpt.label$ | async }}
+                                        </mat-option>
+                                    } @else {
+                                        <mat-option [value]="opt">{{ opt.label }}</mat-option>
+                                    }
+                                }
+                                
+                            </mat-select>
+
+                    </mat-form-field>
+                    
+                    @if(vizSelect.value; as selected) {
+                        <ng-template
+                            [ngTemplateOutlet]="vizTmpl"
+                            [ngTemplateOutletContext]="{
+                                $implicit: selected
+                            }">
+                        </ng-template>
+                    }
+                
+                } @else {
+                    <p class="visualization-header">Choose a visualization</p>
+                    <mat-action-list sxplr-value-store #vs="sxplrValueStore">
+                        <button mat-list-item (click)="vs.setValue(null)">
+                            <mat-icon matListItemIcon></mat-icon>
+                            <span matListItemTitle class="text-muted">(hide)</span>
+                        </button>
+                        @for(opt of view.viewAs; track opt.url){
+                            
+                            @if (isBaseGeomSvcViewAs(opt)){
+                                
+                                <button mat-list-item
+                                    spatial-option
+                                    [url]="opt.url"
+                                    #spatialOpt="spatialOpt"
+                                    [activated]="(vs.value$ | async) === opt"
+                                    (click)="vs.setValue(opt)"
+                                    [disabled]="spatialOpt.disabled$ | async">
+                                    
+                                    <mat-icon matListItemIcon>bar_chart</mat-icon>
+                                    <span matListItemTitle>{{ spatialOpt.label$ | async }}</span>
+                                </button>
+                            } @else {
+                                <button mat-list-item
+                                    [activated]="(vs.value$ | async) === opt"
+                                    (click)="vs.setValue(opt)">
+                                    <mat-icon matListItemIcon>bar_chart</mat-icon>
+                                    <span matListItemTitle>{{ opt.label }}</span>
+                                </button>
+                            }
+                        }
+                    </mat-action-list>
+                    @if(vs.value$ | async; as selected){
+                        <mat-divider></mat-divider>
+
+                        <ng-template
+                            [ngTemplateOutlet]="vizTmpl"
+                            [ngTemplateOutletContext]="{
+                                $implicit: selected
+                            }">
+                        </ng-template>
+                    }
+                }
+
+                <ng-template #vizTmpl let-opt>
+                    @if(asViewAs(opt)) {
+                        @switch (opt.type) {
+                            @case ('plotly') {
+                                <sxplr-plotly-component
+                                    class="content"
+                                    (plotly-label-clicked)="navigateToRegionByName($event)"
+                                    [plotly-json]="opt.data">
+                                </sxplr-plotly-component>
+                            }
+
+                            @case ('volumes') {
+                                @for (vol of opt.volumes; track vol.url) {
+                                    <ng-layer-ctl
+                                        [ng-layer-ctl-name]="vol.url"
+                                        [ng-layer-ctl-insert-index]="$index + 1"
+                                        [ng-layer-ctl-format]="vol.format"
+                                        [ng-layer-ctl-src]="vol.url"
+                                        [ng-layer-ctl-transform]="vol.transform"
+                                        [ng-layer-ctl-info]="vol.info"
+                                        [ng-layer-ctl-opacity]="1.0"
+                                        [ng-layer-ctl-meta]="vol.meta">
+                                    </ng-layer-ctl>
+                                }
+                            }
+
+                            @case ('geomsvc') {
+                                @if(opt.url) {
+                                    <spatial-feature-cmp [url]="opt.url"></spatial-feature-cmp>
+                                }
+                            }
+
+                            @case ('fiber') {
+                                <fiber-feature class="content" [uuid]="opt.url" [overviewUUID]="opt.overview"></fiber-feature>
+                            }
+
+                            @default {
+                                <span class="content muted">
+                                    Cannot render visualization of type: {{ $any(opt).type }}
+                                </span>
+                            }
+                        }
+
+                        @if (opt.title || opt.desc || opt.links || opt.contributors){
+                            <mat-divider></mat-divider>
+
+                            @if(opt.title || opt.desc || opt.links || opt.contributors) {
+                                <button mat-icon-button
+                                    sxplr-dialog
+                                    [sxplr-dialog-data]="{
+                                        title: opt.title || 'No title provided.',
+                                        desc: opt.desc || 'No description provided.',
+                                        actions: (opt.links || []) | mapToProperty : 'href',
+                                        actionsAsList: true
+                                    }">
+                                    <mat-icon>info</mat-icon>
+                                </button>
+                            }
+                        }
+                    } @else {
+                        <span>Unable to process visualization</span>
+                    }
+                </ng-template>
+            </ng-template>
+
+            <ng-template #fallbackTmpl>
+                <span class="content muted">
+                    No available visualizations
+                </span>
+            </ng-template>
+
+        </section>
     </section>
 
     <ng-template #fullTmpl>

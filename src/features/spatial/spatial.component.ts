@@ -1,10 +1,13 @@
 import { CommonModule } from "@angular/common";
 import { Component } from "@angular/core";
-import { combineLatest, EMPTY, from, timer } from "rxjs";
+import { combineLatest, EMPTY, from, of, timer } from "rxjs";
 import { MetaError, SpatialOption } from "./spatialOpt.directive";
 import { NgLayerCtrlCmp } from "src/viewerModule/nehuba/nehubaViewerInterface/ngLayerCtl/ngLayerCtrl.component";
 import { catchError, map, switchMap, take } from "rxjs/operators";
 import { MetaV1Schema } from "src/atlasComponents/sapi/volumeMeta";
+import { PtcldUI } from "src/viewerModule/nehuba/userLayers/ptcld/ptcld.component";
+
+const EB_DB_PREFIX = "https://data-proxy.ebrains.eu/api/v1/buckets/"
 
 type Meta = {
   version: 1
@@ -98,6 +101,7 @@ async function getMeta(url: string) {
   imports: [
     CommonModule,
     NgLayerCtrlCmp,
+    PtcldUI,
   ]
 })
 
@@ -137,7 +141,12 @@ export class SpatialFeatureCmp extends SpatialOption {
           Promise.all([
             ...overlays
               .filter(ol => ol['format'] === "neuroglancer-precomputed")
-              .map(ol => getMeta(ol["url"])),
+              .map(ol =>
+                getMeta(ol["url"]).catch(e => {
+                  console.error(`fetching ${ol["url"]} error`, e)
+                  return null
+                })
+              ),
             getAnnotMeta(url).then(view => ({
               ...view,
               label: datum['modality'] || url
@@ -145,7 +154,7 @@ export class SpatialFeatureCmp extends SpatialOption {
           ])
         ).pipe(
           map(views => {
-            return { views }
+            return { views: views.filter(v => !!v) }
           })
         )
         // return of({
@@ -158,6 +167,22 @@ export class SpatialFeatureCmp extends SpatialOption {
         //     } as GeomAnnotation
         //   ]
         // })
+      }
+      if (datum["format"] === "rtree"){
+        const [bucketname, ...rest] = url.replace(EB_DB_PREFIX, '').split("/")
+        const fname = rest.join("/").replace(/\/?rtree\/?/, '')
+        return of({
+          views: [
+            {
+              format: "rtree",
+              url: {
+                bucketname,
+                fname,
+              }
+            }
+          ]
+        })
+        
       }
       if (datum["protocol"] === "neuroglancer-precomputed") {
         const overlays = (datum["overlays"] || []) as any[]
@@ -218,7 +243,10 @@ export class SpatialFeatureCmp extends SpatialOption {
         //   })
         // )
       }
-      return EMPTY
+
+      return of({
+        views: []
+      })
     })
   )
 }
