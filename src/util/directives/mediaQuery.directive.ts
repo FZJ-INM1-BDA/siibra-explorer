@@ -14,12 +14,12 @@ const mediaBreakPoints = [
 ]
 
 enum EnumMediaBreakPoints{
-  xxxl,
-  xxl,
-  xl,
-  l,
-  m,
   s,
+  m,
+  l,
+  xl,
+  xxl,
+  xxxl,
 }
 
 @Directive({

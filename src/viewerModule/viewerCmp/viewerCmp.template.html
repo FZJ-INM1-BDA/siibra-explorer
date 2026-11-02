@@ -4,13 +4,13 @@
 
   <div class="floating-ui">
 
-    <ng-template [ngIf]="(media.mediaBreakPoint$ | async) > 4">
+    <ng-template [ngIf]="(media.mediaBreakPoint$ | async) > 2">
       <div class="logo-container">
         <logo-container></logo-container>
       </div>
     </ng-template>
     
-    <ng-template [ngIf]="(media.mediaBreakPoint$ | async) > 4">
+    <ng-template [ngIf]="(media.mediaBreakPoint$ | async) > 2">
       <div floatingMouseContextualContainerDirective>
         <mouseover-info
           class="contextual-block">
@@ -158,7 +158,7 @@
 <!-- top right -->
 <!-- default top right -->
 <ng-template #minDefaultMainContentTopRight>
-  <top-menu-cmp *ngIf="viewerLoaded" [ismobile]="(media.mediaBreakPoint$ | async) > 3"></top-menu-cmp>
+  <top-menu-cmp *ngIf="viewerLoaded" [ismobile]="(media.mediaBreakPoint$ | async) < 2"></top-menu-cmp>
 </ng-template>
 
 <!-- viewer tmpl -->
