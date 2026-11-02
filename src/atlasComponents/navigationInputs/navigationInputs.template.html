@@ -1,7 +1,7 @@
 <ng-template [ngIf]="view$ | async" let-view>
     <ng-template iav-media-query
         #media="iavMediaQuery"
-        [ngIf]="(media.mediaBreakPoint$ | async) > 3"
+        [ngIf]="(media.mediaBreakPoint$ | async) < 3"
         [ngIfElse]="directTmpl">
         <button mat-button [sxplr-dialog]="dialogTmpl">
             <mat-icon>location_on</mat-icon>

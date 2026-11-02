@@ -42,7 +42,10 @@
 </ng-template>
 
 <mat-autocomplete
+  iav-media-query
+  #media="iavMediaQuery"
   (optionSelected)="optionSelected($event)"
+  [panelWidth]="media.cssWidth$ | async"
   [hideSingleSelectionIndicator]="true"
   autoActiveFirstOption
   #auto="matAutocomplete"

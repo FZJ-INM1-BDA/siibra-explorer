@@ -4,13 +4,13 @@
 
   <div class="floating-ui">
 
-    <ng-template [ngIf]="(media.mediaBreakPoint$ | async) < 2">
+    <ng-template [ngIf]="(media.mediaBreakPoint$ | async) > 4">
       <div class="logo-container">
         <logo-container></logo-container>
       </div>
     </ng-template>
     
-    <ng-template [ngIf]="(media.mediaBreakPoint$ | async) < 2">
+    <ng-template [ngIf]="(media.mediaBreakPoint$ | async) > 4">
       <div floatingMouseContextualContainerDirective>
         <mouseover-info
           class="contextual-block">

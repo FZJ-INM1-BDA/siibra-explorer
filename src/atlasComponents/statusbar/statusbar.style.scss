@@ -23,6 +23,13 @@ button
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+
+    .region-list-search-row-icon
+    {
+        display: inline-flex;
+        width: 2rem;
+        justify-content: center;
+    }
 }
 
 sxplr-sapiviews-core-rich-regionshierarchy

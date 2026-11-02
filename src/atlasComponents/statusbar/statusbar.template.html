@@ -140,7 +140,7 @@
 
         <ng-template [ngIf]="view.selectedRegions.length == 0">
             <ng-template iav-media-query #media="iavMediaQuery"
-                [ngIf]="(media.mediaBreakPoint$ | async) > 3"
+                [ngIf]="(media.mediaBreakPoint$ | async) < 3"
                 [ngIfElse]="regHierTmpl">
                 <button mat-button
                     [sxplr-dialog]="regionHierarchyTmpl"
@@ -308,7 +308,7 @@
                         'text accent': view.selectedRegions | mapToProperty : 'name' | includes : region.name
                     }">
 
-                    <span class="sxplr-m-2">
+                    <span class="region-list-search-row-icon">
                         <i *ngIf="view.leafRegions.includes(region)" class="fas fa-brain"></i>
                         <i *ngIf="view.branchRegions.includes(region)" class="fas fa-code-branch"></i>
                     </span>
@@ -351,7 +351,7 @@
 
     <!-- button tmpl  -->
     <ng-template #btnTmpl let-category="category" let-name="name" let-icon="icon" let-color="color" let-suffixTmpl="suffixTmpl" let-menuData="menuData">
-        <ng-template iav-media-query #media="iavMediaQuery" [ngIf]="(media.mediaBreakPoint$ | async) > 3"
+        <ng-template iav-media-query #media="iavMediaQuery" [ngIf]="(media.mediaBreakPoint$ | async) < 3"
             [ngIfElse]="nameBtnTmpl">
             <button mat-button
                 [color]="color || 'default'"
@@ -379,7 +379,7 @@
 
     <!-- raw button tmpl -->
     <ng-template #rawBtn let-category="category" let-name="name" let-icon="icon" let-onclick="onclick" let-color="color">
-        <ng-template iav-media-query #media="iavMediaQuery" [ngIf]="(media.mediaBreakPoint$ | async) > 3"
+        <ng-template iav-media-query #media="iavMediaQuery" [ngIf]="(media.mediaBreakPoint$ | async) < 3"
             [ngIfElse]="nameBtnTmpl">
             <button mat-button [color]="color || 'default'" (click)="onclick && onclick()">
                 <mat-icon>{{ icon }}</mat-icon>
