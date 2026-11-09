@@ -26,7 +26,13 @@ export class TRXBase {
     this.uuid$.next(val)
   }
 
-  constructor(){
+  protected renderOpts$ = new BehaviorSubject<Record<string, unknown>>({})
+  @Input()
+  set renderOpts(val: Record<string, unknown> | undefined | null) {
+    this.renderOpts$.next(val || {})
+  }
+
+  constructor() {
     NehubaLayerControlService.RegisterLayerName(FIBER_DETAIL_LAYER_ID)
     this.destroy$.subscribe(() => {
       NehubaLayerControlService.DeregisterLayerName(FIBER_DETAIL_LAYER_ID)
@@ -55,33 +61,38 @@ export class TRXBase {
 
   #detailLayer: any
 
-  protected unloadGroup(){
+  protected unloadGroup() {
     if (this.#detailLayer) {
       (window as any).viewer.layerManager.removeManagedLayer(this.#detailLayer)
       this.#detailLayer = null
     }
   }
 
-  protected async loadGroup(fibername: string){
+  protected async loadGroup(fibername: string) {
     this.unloadGroup()
+
+    const renderOpt = await this.renderOpts$.pipe(
+      take(1)
+    ).toPromise()
 
     const rgb = strToRgb(fibername)
 
     const uuid = await this.uuid$.pipe(
       take(1)
     ).toPromise()
-    
+
     const opt = {
       "type": "segmentation",
       "opacity": 1,
       "clType": "customlayer/nglayer",
       "segments": [0],
-      "source": `precomputed://${GEOMSVC_HOST}/fiber_n/${uuid}/detail/${fibername}/ngskeleton`
+      "source": `precomputed://${GEOMSVC_HOST}/fiber_n/${uuid}/detail/${fibername}/ngskeleton`,
+      ...renderOpt
     }
     this.#detailLayer = (window as any).nehubaViewer.addLayer(opt, FIBER_DETAIL_LAYER_ID);
-    
+
     (window as any).nehubaViewer.setSegmentsColors({
-        0: rgb.map(v => v/255)
+      0: rgb.map(v => v / 255)
     }, FIBER_DETAIL_LAYER_ID);
 
     setTimeout(() => {

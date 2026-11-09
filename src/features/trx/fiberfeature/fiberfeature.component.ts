@@ -1,7 +1,7 @@
 import { CommonModule } from "@angular/common";
 import { Component, inject, Input, viewChild } from "@angular/core";
 import { FormControl, ReactiveFormsModule } from "@angular/forms";
-import { BehaviorSubject, combineLatest, EMPTY, from, Subject } from "rxjs";
+import { BehaviorSubject, combineLatest, concat, EMPTY, from, merge, of, Subject } from "rxjs";
 import { debounceTime, distinctUntilChanged, filter, map, shareReplay, switchMap, takeUntil, withLatestFrom } from "rxjs/operators";
 import { AngularMaterialModule } from "src/sharedModules";
 import { CLICK_INTERCEPTOR_INJECTOR, ClickInterceptor, HOVER_INTERCEPTOR_INJECTOR, HoverInterceptor } from "src/util/injectionTokens";
@@ -14,6 +14,12 @@ import { NehubaLayerControlService } from "src/viewerModule/nehuba/layerCtrl.ser
 import { strToRgb } from "common/util"
 
 const FIBER_OVERVIEW_LAYER_ID = 'geomsvc-fiber-overview'
+
+const OVERVIEW_LVL = {
+  LOW: "LOW",
+  MEDIUM: "MEDIUM",
+  HIGH: "HIGH",
+} as const
 
 @Component({
   selector: 'fiber-feature',
@@ -41,6 +47,7 @@ export class FiberFeatureCmp extends TRXBase {
   }
 
   overviewSelection = new FormControl<string | null>(null)
+  overviewLvlSelection = new FormControl<keyof typeof OVERVIEW_LVL | null>(null)
   #masterFlagShow$ = new BehaviorSubject(true)
 
   overviewLevels$ = this.#overviewUUID$.pipe(
@@ -70,12 +77,32 @@ export class FiberFeatureCmp extends TRXBase {
     this.uuid$,
     this.groupNames$,
     this.overviewLevels$,
+    concat(
+      of("LOW" as const),
+      this.overviewLvlSelection.valueChanges,
+    )
   ]).pipe(
-    map(([overviewUUID, uuid, bundlenames, overviewLevels]) => {
+    map(([overviewUUID, uuid, bundlenames, overviewLevels, renderLvl]) => {
+
+      const renderOpts = {
+        skeletonRendering: {
+          mode2d: "lines"
+        },
+        objectAlpha: 1.0
+      }
+      switch (renderLvl) {
+        case "MEDIUM":
+        case "HIGH": {
+          renderOpts['objectAlpha'] = 0.05
+          break
+        }
+      }
       return {
         overviewUUID, uuid,
         bundlenames,
         overviewLevels,
+        overviewLvl: Object.keys(OVERVIEW_LVL) as (keyof typeof OVERVIEW_LVL)[],
+        renderOpts
       }
     }),
     shareReplay(1)
@@ -178,8 +205,10 @@ export class FiberFeatureCmp extends TRXBase {
         )
       ),
       debounceTime(160),
-    ).subscribe(({ overviewLevels }) => {
-      if (overviewLevels.length > 0) {
+    ).subscribe(({ overviewLvl, overviewLevels }) => {
+      if (overviewLvl.length > 0) {
+        this.overviewLvlSelection.setValue(overviewLvl[0])
+      } else if (overviewLevels.length > 0) {
         this.overviewSelection.setValue(overviewLevels[0].path)
       }
     })
@@ -187,7 +216,18 @@ export class FiberFeatureCmp extends TRXBase {
     combineLatest([
       this.#masterFlagShow$,
       this.view$,
-      this.overviewSelection.valueChanges
+      merge(
+        this.overviewSelection.valueChanges.pipe(
+          map(value => {
+            return { value, lvl: null }
+          })
+        ),
+        this.overviewLvlSelection.valueChanges.pipe(
+          map(lvl => {
+            return { value: null, lvl }
+          })
+        ),
+      )
     ]).pipe(
       takeUntil(this.destroy$),
       filter(([_showFlag, view, _sel]) => {
@@ -213,19 +253,49 @@ export class FiberFeatureCmp extends TRXBase {
           sel,
           showFlag,
           cm,
+          view,
         }
       }),
       distinctUntilChanged((o, n) =>
-        o.sel === n.sel
+        o.sel.lvl === n.sel.lvl
+        && o.sel.value === n.sel.value
         && arrayEqual()(o.segments, n.segments)
         && o.overviewUUID === n.overviewUUID
         && o.showFlag === n.showFlag
       )
     ).subscribe(val => {
       this.#unloadOverview()
-      const { overviewUUID, segments, sel, showFlag, cm } = val
-      if (sel && overviewUUID && showFlag) {
-        this.#syncLoadOverview(overviewUUID, sel, segments, cm)
+      const { overviewUUID, segments, sel, showFlag, cm, view } = val
+      if (!sel || !overviewUUID || !showFlag) {
+        return
+      }
+      
+      if (sel.value) {
+        this.#syncLoadOverview(overviewUUID, sel.value, segments, cm)
+      }
+      if (sel.lvl) {
+        if (view.overviewLevels.length <= 0) {
+          return
+        }
+        switch (sel.lvl) {
+          case "LOW": {
+            const lowest = view.overviewLevels[0]
+            this.#syncLoadOverview(overviewUUID, lowest.path, segments, cm)
+            break
+          }
+          case "MEDIUM": {
+            const mediumIdx = Math.floor(view.overviewLevels.length / 2)
+            const medium = view.overviewLevels[mediumIdx]
+            this.#syncLoadOverview(overviewUUID, medium.path, segments, cm, 0.05)
+            break
+          }
+          case "HIGH": {
+            const highIdx = view.overviewLevels.length - 1
+            const high = view.overviewLevels[highIdx]
+            this.#syncLoadOverview(overviewUUID, high.path, segments, cm, 0.05)
+            break
+          }
+        }
       }
     })
 
@@ -242,8 +312,7 @@ export class FiberFeatureCmp extends TRXBase {
     this.#masterFlagShow$.next(!groupname)
   }
 
-  #syncLoadOverview(overviewUUID: string, currOvSel: string, segments: number[], cm: Record<number, number[]>) {
-
+  #syncLoadOverview(overviewUUID: string, currOvSel: string, segments: number[], cm: Record<number, number[]>, objectAlpha=1.0) {
     // TODO discuss if it is possible to not have this matrix
     const matrix = [
       [1, 0, 0, -96500000],
@@ -252,9 +321,12 @@ export class FiberFeatureCmp extends TRXBase {
     ]
     const opt = {
       "type": "segmentation",
-      "opacity": 1,
       "clType": "customlayer/nglayer",
       "segments": segments,
+      "objectAlpha": objectAlpha,
+      "skeletonRendering": {
+        "mode2d": "lines"
+      },
       "source": {
         url: `precomputed://${GEOMSVC_HOST}/fiber_n/${overviewUUID}/overview/${currOvSel}`,
         transform: {
