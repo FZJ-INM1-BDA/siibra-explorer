@@ -156,37 +156,43 @@ const BACKCOMAP_KEY_DICT = {
   }
 }
 
-const parcIdIgnoreLateral = [
-  IDS.PARCELLATION.MEBRAINS
-]
+// const parcIdIgnoreLateral = [
+//   IDS.PARCELLATION.MEBRAINS
+// ]
 
 export function getParcNgId(atlas: SxplrAtlas, tmpl: SxplrTemplate, parc: SxplrParcellation, region: SxplrRegion): string {
   if (!region) {
     return null
   }
 
-  if (parcIdIgnoreLateral.includes(parc.id)) {
-    return `_${MultiDimMap.GetKey(atlas.id, tmpl.id, parc.id, "whole brain")}`
+  // if (parcIdIgnoreLateral.includes(parc.id)) {
+  //   return `_${MultiDimMap.GetKey(atlas.id, tmpl.id, parc.id, "whole brain")}`
+  // }
+  
+  /**
+   * for JBA29 in big brain, there exist several volumes. (e.g. v1, v2, v5, interpolated, etc)
+   */
+  if (
+    (
+      tmpl.id === IDS.TEMPLATES.BIG_BRAIN
+      && (parc.id === IDS.PARCELLATION.JBA29 || parc.id === IDS.PARCELLATION.JBABB)
+    ) || (
+      parc.id === IDS.PARCELLATION.MEBRAINS
+    )
+  ) {
+    const frag = translateV3Entities.mapTPRToFrag[tmpl.id][parc.id][region.name]
+    if (!frag) {
+      throw new Error(`${tmpl.id} ${parc.id} ${region.name} map to frag not defined`)
+    }
+    return `_${MultiDimMap.GetKey(frag)}`
   }
+
 
   let laterality: string = "whole brain"
   if (region.name.indexOf("left") >= 0) laterality = "left hemisphere"
   if (region.name.indexOf("right") >= 0) laterality = "right hemisphere"
   if (parc.id === IDS.PARCELLATION.SULCI) laterality = "whole brain"
   if (parc.id === IDS.PARCELLATION.VON_ECONOMO) laterality = "whole brain"
-
-  /**
-   * for JBA29 in big brain, there exist several volumes. (e.g. v1, v2, v5, interpolated, etc)
-   */
-  if (
-    tmpl.id === IDS.TEMPLATES.BIG_BRAIN
-    && (parc.id === IDS.PARCELLATION.JBA29 || parc.id === IDS.PARCELLATION.JBABB)
-  ) {
-    const frag = translateV3Entities.mapTPRToFrag[tmpl.id][parc.id][region.name]
-    return frag
-      ? `_${MultiDimMap.GetKey(frag)}`
-      : null
-  }
 
   if (parc.id === IDS.PARCELLATION.JBA30 && tmpl.id !== IDS.TEMPLATES.FSAVERAGE) {
     return `_${MultiDimMap.GetKey(atlas.id, tmpl.id, parc.id, "whole brain")}`
