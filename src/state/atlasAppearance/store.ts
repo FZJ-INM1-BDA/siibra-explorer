@@ -3,12 +3,14 @@ import * as actions from "./action"
 import { UseViewer, CustomLayer } from "./const"
 
 export type AtlasAppearanceStore = {
-  useViewer: UseViewer
+  useViewer: UseViewer|null
   octantRemoval: boolean
   meshTransparency: number
   meshRemovalFrozen: boolean
   niftiVolRenderFlag: boolean
   showDelineation: boolean
+  muteDelineation: boolean
+  meshSilhouette: number // 0 - 10
   customLayers: CustomLayer[]
   showAllSegMeshes: boolean
 }
@@ -23,6 +25,8 @@ export const defaultState: AtlasAppearanceStore = {
   // not yet encoded in URL
   niftiVolRenderFlag: false,
   showDelineation: true,
+  muteDelineation: false,
+  meshSilhouette: 0,
   customLayers: [],
   meshTransparency: 1.0,
   showAllSegMeshes: false,
@@ -81,6 +85,25 @@ export const reducer = createReducer(
       return {
         ...state,
         showDelineation: !state.showDelineation
+      }
+    }
+  ),
+  on(
+    actions.setMuteDelineation,
+    (state, { flag }) => {
+      console.log("set mute delin", flag)
+      return {
+        ...state,
+        muteDelineation: flag
+      }
+    }
+  ),
+  on(
+    actions.toggleMeshSilhouette,
+    state => {
+      return {
+        ...state,
+        meshSilhouette: state.meshSilhouette === 1 ? 5 : 1
       }
     }
   ),

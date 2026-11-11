@@ -35,14 +35,19 @@ export class ViewerCtrlCmp implements OnInit{
     ),
     this.store$.pipe(
       select(atlasAppearance.selectors.meshRemovalIsFrozen),
-    )
+    ),
+    this.store$.pipe(
+      select(atlasAppearance.selectors.meshSilhouette),
+      map(value => value > 1)
+    ),
   ]).pipe(
-    map(([ auxTransparent, octantRemoved, showAllMeshes, meshRemovalIsFrozen ]) => {
+    map(([ auxTransparent, octantRemoved, showAllMeshes, meshRemovalIsFrozen, auxSilhouette ]) => {
       return {
         auxTransparent,
         octantRemoved,
         showAllMeshes,
         meshRemovalIsFrozen,
+        auxSilhouette,
         CONST,
       }
     })
@@ -51,6 +56,12 @@ export class ViewerCtrlCmp implements OnInit{
   toggleAux(){
     this.store$.dispatch(
       atlasAppearance.actions.toggleMeshTransparency()
+    )
+  }
+  
+  toggleAuxSilhouette(){
+    this.store$.dispatch(
+      atlasAppearance.actions.toggleMeshSilhouette()
     )
   }
 

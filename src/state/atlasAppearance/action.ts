@@ -19,6 +19,11 @@ export const toggleMeshTransparency = createAction(
   `${nameSpace} toggleMeshTransparency`
 )
 
+
+export const toggleMeshSilhouette = createAction(
+  `${nameSpace} toggleMeshSilhouette`
+)
+
 export const toggleOctantRemoval = createAction(
   `${nameSpace} toggleOctantRemoval`
 )
@@ -33,6 +38,13 @@ export const toggleNiiVolRender = createAction(
 
 export const setShowDelineation = createAction(
   `${nameSpace} setShowDelineation`,
+  props<{
+    flag: boolean
+  }>()
+)
+
+export const setMuteDelineation = createAction(
+  `${nameSpace} setMuteDelineation`,
   props<{
     flag: boolean
   }>()

@@ -412,6 +412,14 @@ export class NehubaViewerUnit {
               this.setLayerTransparency(key, p.payload[key])
             }
           }
+          
+          if (message.type === "setLayerMeshSilhouette") {
+            const p = message as TNgLayerCtrl<'setLayerMeshSilhouette'>
+            for (const key in p.payload) {
+              this.setLayerMeshSilhouette(key, p.payload[key])
+            }
+          }
+
           if (message.type === "updateShader") {
             const p = message as TNgLayerCtrl<'updateShader'>
             for (const key in p.payload) {
@@ -447,12 +455,13 @@ export class NehubaViewerUnit {
         for (const layerLayerIndex of layersLabelIndex) {
           const { layer, labelIndicies } = layerLayerIndex
           totalMeshes += labelIndicies.length
-          
-          this.nehubaViewer.setMeshesToLoad(
-            labelIndicies.length === 0
-            ? [0]
-            : labelIndicies,
-            layer.name)
+
+          if (labelIndicies.length > 0) {
+            this.nehubaViewer.setMeshesToLoad(
+              labelIndicies,
+              layer.name
+            )
+          }
         }
         this.totalMeshesToLoad.emit(totalMeshes)
       })
@@ -811,6 +820,32 @@ export class NehubaViewerUnit {
       }
       return false
     })
+  }
+  
+  private async setLayerMeshSilhouette(_layerName: string, _svalue: number) {
+    // TODO IMPLEMENT
+
+    throw Error("implement me")
+    // await waitFor(() => {
+    //   const layer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(layerName)
+      
+    //   /**
+    //    * for segmentation layer
+    //    */
+    //   if (layer?.layer?.displayState) {
+    //     layer.layer.displayState.objectAlpha.restoreState(alpha)
+    //     return true
+    //   }
+      
+    //   /**
+    //    * for image layer
+    //    */
+    //   if (layer?.layer?.opacity) {
+    //     layer.layer.opacity.restoreState(alpha)
+    //     return true
+    //   }
+    //   return false
+    // })
   }
 
   private setLayerShader(layerName: string, shader: string) {

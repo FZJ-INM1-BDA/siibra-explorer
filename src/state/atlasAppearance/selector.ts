@@ -24,9 +24,19 @@ export const showDelineation = createSelector(
   state => state.showDelineation
 )
 
+export const muteDelineation = createSelector(
+  selectStore,
+  state => state.muteDelineation
+)
+
 export const meshTransparency = createSelector(
   selectStore,
   state => state.meshTransparency
+)
+
+export const meshSilhouette = createSelector(
+  selectStore,
+  state => state.meshSilhouette
 )
 
 export const customLayers = createSelector(

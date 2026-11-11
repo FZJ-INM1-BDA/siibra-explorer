@@ -4,7 +4,7 @@ import { combineLatest, merge, Observable, Subject, Subscription } from "rxjs";
 import { debounceTime, distinctUntilChanged, filter, map, pairwise, shareReplay, startWith, switchMap, withLatestFrom } from "rxjs/operators";
 import { IColorMap, INgLayerCtrl, TNgLayerCtrl } from "./layerCtrl.util";
 import { atlasAppearance, atlasSelection } from "src/state";
-import { serializeSegment } from "../util";
+import { meshedParcellation, serializeSegment } from "../util";
 import { LayerCtrlEffects } from "./layerCtrl.effects";
 import { arrayEqual } from "src/util/array";
 import { SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes";
@@ -198,8 +198,30 @@ export class NehubaLayerControlService implements OnDestroy{
           type: 'setLayerTransparency',
           payload
         })
+      }),
+      
+      combineLatest([
+        this.store$.pipe(
+          select(atlasAppearance.selectors.meshSilhouette),
+          
+        ),
+        this.defaultNgLayers$
+      ]).subscribe(([ svalue, { tmplAuxNgLayers } ]) => {
+        const payload: {
+          [key: string]: number
+        } = {}
+        
+        for (const ngId in tmplAuxNgLayers) {
+          payload[ngId] = svalue
+        }
+        
+        this.manualNgLayersControl$.next({
+          type: 'setLayerMeshSilhouette',
+          payload
+        })
       })
     )
+
   }
 
   public setColorMap$: Observable<IColorMap> = this.activeColorMap$.pipe(
@@ -252,8 +274,9 @@ export class NehubaLayerControlService implements OnDestroy{
         return nonMixableLayers.length > 0
       }),
     ),
+    this.selectedATPR$,
   ]).pipe(
-    switchMap(( [ selectedRegions, customMapExists, nonmixableLayerExists ] ) => this.completeNgIdLabelRegionMap$.pipe(
+    switchMap(( [ selectedRegions, customMapExists, _nonmixableLayerExists, atp ] ) => this.completeNgIdLabelRegionMap$.pipe(
       map(completeNgIdLabelRegion => {
 
         /**
@@ -262,13 +285,14 @@ export class NehubaLayerControlService implements OnDestroy{
          */
         const selectedRegionNameSet = new Set(selectedRegions.map(r => r.name))
         const roiIndexSet = new Set<string>()
+        const atlasIsMeshed = meshedParcellation({ ...atp, regions: selectedRegions })
         for (const ngId in completeNgIdLabelRegion) {
           for (const label in completeNgIdLabelRegion[ngId]) {
             const val = completeNgIdLabelRegion[ngId][label]
-            if (!customMapExists && !selectedRegionNameSet.has(val.name)) {
+            if (atlasIsMeshed || customMapExists || selectedRegionNameSet.has(val.name)) {
+              roiIndexSet.add(serializeSegment(ngId, label))
               continue
             }
-            roiIndexSet.add(serializeSegment(ngId, label))
           } 
         }
         return [...roiIndexSet]

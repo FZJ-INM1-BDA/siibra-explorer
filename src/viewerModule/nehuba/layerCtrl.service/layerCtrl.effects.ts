@@ -12,6 +12,7 @@ import { PMAP_LAYER_NAME } from "../constants";
 import { QuickHash } from "src/util/fn";
 import { getParcNgId } from "../config.service";
 import { SXPLR_ANNOTATIONS_KEY } from "src/util/constants";
+import { meshedParcellation } from "../util";
 
 const SELECTED_SEG_CUSTOM_CM_KEY = "SELECTED_SEG_CUSTOM_CM_KEY"
 
@@ -26,12 +27,16 @@ export class LayerCtrlEffects {
     select(atlasAppearance.selectors.useViewer),
     switchMap(viewer => {
       const rmPmapAction = atlasAppearance.actions.removeCustomLayers({
-        customLayers: [{id: PMAP_LAYER_NAME}]
+        customLayers: [{ id: PMAP_LAYER_NAME }]
       })
       const showParcDelin = atlasAppearance.actions.setShowDelineation({ flag: true })
       const hideParcDelin = atlasAppearance.actions.setShowDelineation({ flag: false })
+      const muteParcDelin = atlasAppearance.actions.setMuteDelineation({ flag: true })
+      const unmuteParcDelin = atlasAppearance.actions.setMuteDelineation({ flag: false })
+
+      const resetActions = [rmPmapAction, showParcDelin, unmuteParcDelin]
       if (viewer !== "NEHUBA") {
-        return of(rmPmapAction, showParcDelin)
+        return of(...resetActions)
       }
       return this.store.pipe(
         select(atlasSelection.selectors.selectedRegions),
@@ -40,9 +45,9 @@ export class LayerCtrlEffects {
         ),
         withLatestFrom(this.#onATP$),
         // since region selection changed, pmap will definitely be removed. revoke the url resource.
-        switchMap(([regions, { parcellation, template }]) => {
+        switchMap(([regions, { parcellation, template, atlas }]) => {
           if (regions.length !== 1) {
-            return of(rmPmapAction, showParcDelin)
+            return of(...resetActions)
           }
 
           return from(this.sapi.getStatisticMapUrl(parcellation, template, regions[0])).pipe(
@@ -53,14 +58,21 @@ export class LayerCtrlEffects {
             ),
             switchMap(([url, niiVolRender]) => {
               if (!url) {
-                return of(
-                  rmPmapAction, 
-                  showParcDelin,
-                )
+                return of(...resetActions)
               }
-              return of(
-                rmPmapAction,
-                hideParcDelin,
+              const actions = []
+
+              actions.push(rmPmapAction)
+
+              const parcIsMeshed = meshedParcellation({ parcellation, template, regions, atlas })
+
+              if (parcIsMeshed) {
+                actions.push(muteParcDelin)
+              } else {
+                actions.push(hideParcDelin)
+                // need to also set selectedAlpha to ... like 0.1 
+              }
+              actions.push(
                 atlasAppearance.actions.addCustomLayers({
                   customLayers: [{
                     legacySpecFlag: "old",
@@ -73,16 +85,14 @@ export class LayerCtrlEffects {
                     }),
                     type: 'image',
                     opacity: 0.5,
-                    ...(niiVolRender? {volumeRendering: "on"} : {})
+                    ...(niiVolRender ? { volumeRendering: "on" } : {})
                   }]
                 })
               )
+              return of(...actions)
             }),
-            catchError((err, obs) => {
-              return of(
-                rmPmapAction,
-                showParcDelin,
-              )
+            catchError((_err, _obs) => {
+              return of(...resetActions)
             })
           )
         })
@@ -93,15 +103,15 @@ export class LayerCtrlEffects {
 
   onATPDebounceNgLayers$ = this.#onATP$.pipe(
     debounceTime(16),
-    switchMap(({ atlas, template, parcellation }) => 
+    switchMap(({ atlas, template, parcellation }) =>
       forkJoin({
         tmplNgLayers: this.sapi.getVoxelTemplateImage(template).pipe(
           map(templateImages => {
             const returnObj: Record<string, NgLayerSpec> = {}
             for (const img of templateImages) {
               const url = typeof img.source === "string"
-              ? img.source
-              : img.source.url
+                ? img.source
+                : img.source.url
               returnObj[QuickHash.GetHash(url)] = img
             }
             return returnObj
@@ -119,7 +129,7 @@ export class LayerCtrlEffects {
         parcNgLayers: from(this.sapi.getTranslatedLabelledNgMap(parcellation, template)).pipe(
           map(val => {
             const returnVal: Record<string, NgSegLayerSpec> = {}
-            for (const [ /** url */, { layer, region } ] of Object.entries(val)) {
+            for (const [ /** url */, { layer, region }] of Object.entries(val)) {
               const { name } = region[0]
               const ngId = getParcNgId(atlas, template, parcellation, {
                 id: '',
@@ -230,7 +240,7 @@ export class LayerCtrlEffects {
         select(atlasSelection.selectors.selectedParcAllRegions)
       )
     ),
-    switchMap(([ [selectedRegions, showAllMeshes], allRegions ]) => {
+    switchMap(([[selectedRegions, showAllMeshes], allRegions]) => {
       const rmAction = atlasAppearance.actions.removeCustomLayers({
         customLayers: [
           {
@@ -249,7 +259,7 @@ export class LayerCtrlEffects {
       const selectedRegionNames = new Set(selectedRegions.map(r => r.name))
       const colormap = new Map<SxplrRegion, number[]>()
 
-      for (const r of allRegions){
+      for (const r of allRegions) {
         if (selectedRegionNames.has(r.name)) {
           colormap.set(r, r.color)
         } else {
@@ -281,5 +291,5 @@ export class LayerCtrlEffects {
     private store: Store<any>,
     private sapi: SAPI,
     private action: Actions,
-  ){}
+  ) { }
 }

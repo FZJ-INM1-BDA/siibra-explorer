@@ -311,6 +311,27 @@ export class NehubaViewerContainerDirective {
         this.nehubaViewerInstance.applyGpuLimit(limit)
       }
     })
+    this.store$.pipe(
+      takeUntil(this.#ondestroy$),
+      select(atlasAppearance.selectors.muteDelineation),
+      withLatestFrom(
+        this.effect.onATPDebounceNgLayers$
+      ),
+      switchMap(
+        switchMapWaitFor({
+          condition: () => !!this.nehubaViewerInstance?.nehubaLoaded,
+          leading: true,
+          interval: 160
+        })
+      ),
+    ).subscribe(([flag, layers]) => {
+      for (const layername of Object.keys(layers.parcNgLayers)){
+        const l = this.nehubaViewerInstance.nehubaViewer.ngviewer.layerManager.getLayerByName(layername)
+        l.layer.displayState.selectedAlpha.restoreState(
+          flag ? 0 : 0.5
+        )
+      }
+    })
 
   }
 

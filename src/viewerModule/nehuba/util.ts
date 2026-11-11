@@ -3,6 +3,8 @@ import { Observable, of, pipe } from 'rxjs'
 import { filter, scan, shareReplay, take } from 'rxjs/operators'
 import { NehubaViewerUnit } from './nehubaViewer/nehubaViewer.component'
 import { userInterface } from 'src/state'
+import { SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate } from 'src/atlasComponents/sapi/sxplrTypes'
+import { IDS } from 'src/atlasComponents/sapi'
 
 const flexContCmnCls = ['w-100', 'h-100', 'd-flex', 'justify-content-center', 'align-items-stretch']
 
@@ -293,3 +295,11 @@ export const SXPLR_STATE_TOKEN = new InjectionToken<
 })
 
 export const NEHUBA_CONFIG = new InjectionToken("NEHUBA_CONFIG")
+
+export function meshedParcellation(atp: Partial<{ atlas: SxplrAtlas, template: SxplrTemplate, parcellation: SxplrParcellation, regions: SxplrRegion[] }>){
+  const { template, parcellation } = atp
+  return (
+    [IDS.PARCELLATION.JBA29, IDS.PARCELLATION.JBA30].includes(parcellation?.id || '')
+    && template?.id === IDS.TEMPLATES.COLIN27
+  )
+}

@@ -7,7 +7,7 @@ import { selectorAuxMeshes } from "../store";
 import { LayerCtrlEffects } from "../layerCtrl.service/layerCtrl.effects";
 import { atlasAppearance, atlasSelection, userInterface } from "src/state";
 import { BaseService } from "../base.service/base.service";
-import { IDS } from "src/atlasComponents/sapi"
+import { meshedParcellation } from "../util";
 
 /**
  * control mesh loading etc
@@ -138,13 +138,12 @@ export class NehubaMeshService implements OnDestroy {
     )
   ]).pipe(
     switchMap(([ allSegMesh, selectedSegMesh, auxmesh, selectedTemplate, selectedParcellation, showAllMeshes ]) => {
-      /**
-       * TODO monkey patching jba29 in colin to show all meshes
-       * 
-       */
-      if ((selectedParcellation.id === IDS.PARCELLATION.JBA29 || IDS.PARCELLATION.JBA30 === selectedParcellation.id) && selectedTemplate.id === IDS.TEMPLATES.COLIN27) {
+
+      const atlasIsMeshed = meshedParcellation({ template: selectedTemplate || undefined, parcellation: selectedParcellation || undefined, })
+      if (atlasIsMeshed) {
         return of(...allSegMesh)
       }
+      
       if (showAllMeshes) {
         return of(...auxmesh, ...allSegMesh)
       }
