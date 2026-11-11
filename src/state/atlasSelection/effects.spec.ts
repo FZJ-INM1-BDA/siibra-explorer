@@ -453,7 +453,8 @@ describe("> effects.ts", () => {
                 navigation: {
                   position: [1e6, 2e6, 3e6]
                 },
-                animation: true
+                animation: true,
+                physical: true
               })
             })
           )

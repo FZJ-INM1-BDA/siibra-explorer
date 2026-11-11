@@ -87,6 +87,7 @@ describe('> viewerCtrlCmp.component.ts', () => {
       mockStore.overrideSelector(userPreference.selectors.showExperimental, true)
       
       mockStore.overrideSelector(atlasAppearance.selectors.showAllSegMeshes, false)
+      mockStore.overrideSelector(atlasAppearance.selectors.meshSilhouette, 0)
       mockStore.overrideSelector(selectorAuxMeshes, [])
     })
 
