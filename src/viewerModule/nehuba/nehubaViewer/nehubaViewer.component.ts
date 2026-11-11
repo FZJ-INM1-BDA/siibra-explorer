@@ -1,6 +1,6 @@
 import { Component, ElementRef, EventEmitter, Output, Inject, Optional, inject } from "@angular/core";
-import { BehaviorSubject, Observable, of, interval, combineLatest } from 'rxjs'
-import { debounceTime, filter, scan, switchMap, take, distinctUntilChanged, debounce, map, takeUntil } from "rxjs/operators";
+import { BehaviorSubject, Observable, of, interval, combineLatest, from, merge } from 'rxjs'
+import { debounceTime, filter, scan, switchMap, take, distinctUntilChanged, debounce, map, takeUntil, buffer, mergeMap, share, skipUntil } from "rxjs/operators";
 import { LoggingService } from "src/logging";
 import { getExportNehuba, getUuid, switchMapWaitFor, waitFor } from "src/util/fn";
 import { arrayOrderedEql } from 'common/util'
@@ -122,7 +122,7 @@ export class NehubaViewerUnit {
     @Optional() @Inject(NEHUBA_HIDE_SLICES) private hideSlices$: Observable<string[]>,
     @Optional() @Inject(SET_COLORMAP_OBS) private setColormap$: Observable<IColorMap>,
     @Optional() @Inject(SET_LAYER_VISIBILITY) private layerVis$: Observable<string[]>,
-    @Optional() @Inject(SET_SEGMENT_VISIBILITY) private segVis$: Observable<string[]>,
+    @Optional() @Inject(SET_SEGMENT_VISIBILITY) private segVis$: Observable<(string[])|null>,
     @Optional() @Inject(NG_LAYER_CONTROL) layerCtrlCb: (callback: (arg: TNgLayerCtrl<keyof INgLayerCtrl>) => void) => () => void,
     @Optional() @Inject(Z_TRAVERSAL_MULTIPLIER) multiplier$: Observable<number>,
     @Optional() @Inject(EXTERNAL_LAYER_CONTROL) private externalLayerCtrl: IExternalLayerCtl,
@@ -352,15 +352,25 @@ export class NehubaViewerUnit {
     }
 
     if (this.segVis$) {
-      this.segVis$.pipe(
-        takeUntil(this.#ondestroy$),
-        switchMap(
-          switchMapWaitFor({
-            condition: () => this._nehubaReady,
-            leading: true,
-          })
-        )
-      ).subscribe(val => {
+      const readyOnce$ = this.nehubaReady.pipe(
+        filter(v => !!v),
+        take(1)
+      )
+      const sharedSegVis$ = this.segVis$.pipe(
+        share()
+      )
+      const prior$ = sharedSegVis$.pipe(
+        buffer(readyOnce$),
+        take(1),
+        mergeMap(v => from(v))
+      )
+      const since$ = sharedSegVis$.pipe(
+        skipUntil(readyOnce$)
+      )
+      merge(
+        prior$,
+        since$,
+      ).pipe().subscribe(val => {
         // null === hide all seg
         if (val === null) {
           this.hideAllSeg()
@@ -437,7 +447,12 @@ export class NehubaViewerUnit {
         for (const layerLayerIndex of layersLabelIndex) {
           const { layer, labelIndicies } = layerLayerIndex
           totalMeshes += labelIndicies.length
-          this.nehubaViewer.setMeshesToLoad(labelIndicies, layer.name)
+          
+          this.nehubaViewer.setMeshesToLoad(
+            labelIndicies.length === 0
+            ? [0]
+            : labelIndicies,
+            layer.name)
         }
         this.totalMeshesToLoad.emit(totalMeshes)
       })
@@ -484,7 +499,6 @@ export class NehubaViewerUnit {
     : null
 
   public loadNehuba() {
-    
     const { createNehubaViewer } = this.exportNehuba
 
     this.nehubaViewer = (window as any)['nehubaViewer'] = createNehubaViewer(this.config, (err: string) => {
@@ -701,7 +715,6 @@ export class NehubaViewerUnit {
   }
 
   public showSegs(array: (number|string)[]) {
-
     if (!this.nehubaViewer) { return }
 
     this.hideAllSeg()
@@ -733,6 +746,9 @@ export class NehubaViewerUnit {
     const newMap: Map<string, number[]> = array.reduce(reduceFn, new Map())
 
     newMap.forEach((segs, ngId) => {
+      if (segs.length === 0) {
+        return
+      }
       this.nehubaViewer.showSegments(segs, ngId)
     })
   }

@@ -396,6 +396,19 @@ export class SAPI{
       space_id: template.id
     }
     
+    // use statistical info endpoint as a proxy to if the statistical map exists
+    const _infoUrl = this.v3GetRoute("/map/statistical_map.info.json", {
+      query
+    })
+    const infoUrl = new URL(`${endpoint}${_infoUrl.path}`)
+    for (const key in _infoUrl.params) {
+      infoUrl.searchParams.set(key, _infoUrl.params[key].toString())
+    }
+    const resp = await fetch(infoUrl)
+    if (!resp.ok) {
+      throw new Error(`Not OK`)
+    }
+
     const _url = this.v3GetRoute("/map/statistical_map.nii.gz", {
       query
     })

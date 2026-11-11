@@ -129,6 +129,25 @@
                             <mat-divider></mat-divider>
                         </ng-template>
 
+                        <!-- bbox block -->
+                        <ng-template [ngIf]="view.useViewer === 'NEHUBA' && view.currentViewport.minpoint && view.currentViewport.maxpoint">
+
+                            <tpbr-viewer
+                                [tpbr-newui]="true"
+                                [tpbr-concept]="{
+                                    template: view.selectedTemplate,
+                                    bbox: [view.currentViewport.minpoint, view.currentViewport.maxpoint],
+                                }">
+
+                            </tpbr-viewer>
+                            
+                            <button mat-stroked-button
+                                class="full-width"
+                                (click)="spatialFeatureSwitch.open()">
+                                <ng-template sxplrExperimentalFlag [experimental]="false">explore</ng-template>
+                                spatial features
+                            </button>
+                        </ng-template>
 
                         <!-- region block -->
                         <ng-template [ngIf]="view.selectedRegions.length === 1">
@@ -187,26 +206,6 @@
                             <span class="panel-content">
                                 select one and only one region to get started
                             </span>
-                        </ng-template>
-
-                        <!-- bbox block -->
-                        <ng-template [ngIf]="view.useViewer === 'NEHUBA' && view.currentViewport.minpoint && view.currentViewport.maxpoint">
-
-                            <tpbr-viewer
-                                [tpbr-newui]="true"
-                                [tpbr-concept]="{
-                                    template: view.selectedTemplate,
-                                    bbox: [view.currentViewport.minpoint, view.currentViewport.maxpoint],
-                                }">
-
-                            </tpbr-viewer>
-                            
-                            <button mat-stroked-button
-                                class="full-width"
-                                (click)="spatialFeatureSwitch.open()">
-                                <ng-template sxplrExperimentalFlag [experimental]="false">explore</ng-template>
-                                spatial features
-                            </button>
                         </ng-template>
 
                     </section>

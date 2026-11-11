@@ -340,8 +340,6 @@ export class NehubaViewerContainerDirective {
     this.clear()
 
     await new Promise(rs => setTimeout(rs, 0))
-
-
     if (this.gpuLimit) {
       const initialNgState = nehubaConfig?.dataset?.initialNgState
       // the correct key is gpuMemoryLimit

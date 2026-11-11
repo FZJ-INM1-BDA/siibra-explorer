@@ -495,8 +495,9 @@ export class Effect {
         map(reg => actions.navigateTo({
           animation: true,
           navigation: {
-            position: reg.hasAnnotation.bestViewPoint.coordinates.map(v => v.value * 1e6)
-          }
+            position: reg.hasAnnotation.bestViewPoint.coordinates.map(v => v.value * 1e6),
+          },
+          physical: true
         })),
         timeout(!!_timeout ?  _timeout : Number.MAX_SAFE_INTEGER),
         catchError(err => {

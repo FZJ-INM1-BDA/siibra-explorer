@@ -230,7 +230,7 @@ export class NehubaLayerControlService implements OnDestroy{
   /**
    * define when shown segments should be updated
    */
-  public segmentVis$: Observable<string[]> = combineLatest([
+  public segmentVis$: Observable<(string[])|null> = combineLatest([
     /**
      * selectedRegions
      */
@@ -255,35 +255,23 @@ export class NehubaLayerControlService implements OnDestroy{
   ]).pipe(
     switchMap(( [ selectedRegions, customMapExists, nonmixableLayerExists ] ) => this.completeNgIdLabelRegionMap$.pipe(
       map(completeNgIdLabelRegion => {
+
         /**
-       * if non mixable layer exist (e.g. pmap)
-       * and no custom color map exist
-       * hide all segmentations
-       */
-      if (!customMapExists && nonmixableLayerExists) {
-        return null
-      }
-  
-      /**
-       * if custom map exists, roi is all regions
-       * otherwise, roi is only selectedRegions
-       */
-      const selectedRegionNameSet = new Set(selectedRegions.map(r => r.name))
-      const roiIndexSet = new Set<string>()
-      for (const ngId in completeNgIdLabelRegion) {
-        for (const label in completeNgIdLabelRegion[ngId]) {
-          const val = completeNgIdLabelRegion[ngId][label]
-          if (!customMapExists && !selectedRegionNameSet.has(val.name)) {
-            continue
-          }
-          roiIndexSet.add(serializeSegment(ngId, label))
-        } 
-      }
-      if (roiIndexSet.size > 0) {
+         * if custom map exists, roi is all regions
+         * otherwise, roi is only selectedRegions
+         */
+        const selectedRegionNameSet = new Set(selectedRegions.map(r => r.name))
+        const roiIndexSet = new Set<string>()
+        for (const ngId in completeNgIdLabelRegion) {
+          for (const label in completeNgIdLabelRegion[ngId]) {
+            const val = completeNgIdLabelRegion[ngId][label]
+            if (!customMapExists && !selectedRegionNameSet.has(val.name)) {
+              continue
+            }
+            roiIndexSet.add(serializeSegment(ngId, label))
+          } 
+        }
         return [...roiIndexSet]
-      } else {
-        return []
-      }
       }),
     )),
   )

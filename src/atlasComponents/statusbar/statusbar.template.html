@@ -3,16 +3,23 @@
     <!-- species -->
     <ng-template [ngIf]="view.selectedATP.atlas" let-selectedAtlas>
         <ng-template [ngTemplateOutlet]="btnTmpl" [ngTemplateOutletContext]="{
-                name: selectedAtlas.name,
+                name: selectedAtlas.species,
                 icon: 'face',
                 category: 'species',
                 menuData: {
                     current: selectedAtlas,
                     type: 'atlasId',
-                    options: view.atlases
+                    options: view.atlases,
+                    optionTemplate: atlasOptTmpl
                 }
             }">
         </ng-template>
+        
+        <!-- this is so that, instead of displaying atlas name, we display species -->
+        <ng-template #atlasOptTmpl let-opt>
+            {{ opt.species || opt.name }}
+        </ng-template>
+        
     </ng-template>
 
     <mat-divider vertical class="statsbar-vert-divider"></mat-divider>
@@ -435,7 +442,7 @@
                 </div>
             </button>
 
-            <button *ngFor="let opt of options" mat-menu-item [matTooltip]="opt.shortName || opt.name"
+            <button *ngFor="let opt of options" mat-menu-item
                 (click)="selectATP(type, opt.id)" class="menu-button">
                 <div class="menu-opt-container">
 

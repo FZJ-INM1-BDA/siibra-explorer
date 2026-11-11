@@ -1,8 +1,8 @@
 import { Injectable } from "@angular/core";
-import { createEffect } from "@ngrx/effects";
+import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { select, Store } from "@ngrx/store";
 import { combineLatest, concat, forkJoin, from, merge, of } from "rxjs";
-import { switchMap, withLatestFrom, map, debounceTime, shareReplay, distinctUntilChanged, pairwise, filter } from "rxjs/operators";
+import { switchMap, withLatestFrom, map, debounceTime, shareReplay, distinctUntilChanged, pairwise, filter, catchError } from "rxjs/operators";
 import { NgLayerSpec, NgPrecompMeshSpec, NgSegLayerSpec, SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
 import { SAPI } from "src/atlasComponents/sapi"
 import { atlasAppearance, atlasSelection, annotation, generalActions } from "src/state";
@@ -40,7 +40,7 @@ export class LayerCtrlEffects {
         ),
         withLatestFrom(this.#onATP$),
         // since region selection changed, pmap will definitely be removed. revoke the url resource.
-        switchMap(([ regions, { parcellation, template } ]) => {
+        switchMap(([regions, { parcellation, template }]) => {
           if (regions.length !== 1) {
             return of(rmPmapAction, showParcDelin)
           }
@@ -77,9 +77,14 @@ export class LayerCtrlEffects {
                   }]
                 })
               )
+            }),
+            catchError((err, obs) => {
+              return of(
+                rmPmapAction,
+                showParcDelin,
+              )
             })
           )
-          
         })
       )
     })
@@ -142,7 +147,6 @@ export class LayerCtrlEffects {
     this.onATPDebounceNgLayers$.pipe(
       switchMap(ngLayers => {
         const { parcNgLayers, tmplAuxNgLayers, tmplNgLayers, sxplrAnnotations } = ngLayers
-        
         const customBaseLayers: atlasAppearance.const.NgLayerCustomLayer[] = []
 
         // order matters. first append tmplNgLayers, then tmpl auxnglayers, then parc layers
@@ -252,7 +256,6 @@ export class LayerCtrlEffects {
           colormap.set(r, [255, 255, 255])
         }
       }
-      
       const addAction = atlasAppearance.actions.addCustomLayers({
         customLayers: [
           {
@@ -266,8 +269,17 @@ export class LayerCtrlEffects {
     })
   ))
 
+  onAddingCustomCM = createEffect(() => this.action.pipe(
+    ofType(atlasAppearance.actions.addCustomLayers),
+    filter(action => action.customLayers.some(l => l.clType === "customlayer/colormap")),
+    map(() => atlasAppearance.actions.setShowDelineation({
+      flag: true
+    }))
+  ))
+
   constructor(
     private store: Store<any>,
     private sapi: SAPI,
+    private action: Actions,
   ){}
 }

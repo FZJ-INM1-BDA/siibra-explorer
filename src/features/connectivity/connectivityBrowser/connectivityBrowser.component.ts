@@ -527,7 +527,8 @@ export class ConnectivityBrowserComponent implements OnChanges {
             navigation: {
               position: centroid.map(v => v*1e6),
             },
-            animation: true
+            animation: true,
+            physical: true,
           })
         )
       }
