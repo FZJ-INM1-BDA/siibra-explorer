@@ -91,7 +91,6 @@ export const reducer = createReducer(
   on(
     actions.setMuteDelineation,
     (state, { flag }) => {
-      console.log("set mute delin", flag)
       return {
         ...state,
         muteDelineation: flag
@@ -103,7 +102,7 @@ export const reducer = createReducer(
     state => {
       return {
         ...state,
-        meshSilhouette: state.meshSilhouette === 1 ? 5 : 1
+        meshSilhouette: state.meshSilhouette === 0 ? 7 : 0
       }
     }
   ),

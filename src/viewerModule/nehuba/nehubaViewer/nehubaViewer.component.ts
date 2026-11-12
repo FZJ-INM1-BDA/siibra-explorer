@@ -822,30 +822,20 @@ export class NehubaViewerUnit {
     })
   }
   
-  private async setLayerMeshSilhouette(_layerName: string, _svalue: number) {
-    // TODO IMPLEMENT
-
-    throw Error("implement me")
-    // await waitFor(() => {
-    //   const layer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(layerName)
+  private async setLayerMeshSilhouette(layerName: string, svalue: number) {
+    await waitFor(() => {
+      const layer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(layerName)
       
-    //   /**
-    //    * for segmentation layer
-    //    */
-    //   if (layer?.layer?.displayState) {
-    //     layer.layer.displayState.objectAlpha.restoreState(alpha)
-    //     return true
-    //   }
+      /**
+       * for segmentation layer
+       */
+      if (layer?.layer?.displayState) {
+        layer.layer.displayState.silhouetteRendering.restoreState(svalue)
+        return true
+      }
       
-    //   /**
-    //    * for image layer
-    //    */
-    //   if (layer?.layer?.opacity) {
-    //     layer.layer.opacity.restoreState(alpha)
-    //     return true
-    //   }
-    //   return false
-    // })
+      return false
+    })
   }
 
   private setLayerShader(layerName: string, shader: string) {
