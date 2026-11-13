@@ -72,10 +72,29 @@ export class FiberFeatureCmp extends TRXBase {
   #hoverInterceptor = inject(HOVER_INTERCEPTOR_INJECTOR, { optional: true }) as HoverInterceptor
   #clickInterceptor = inject(CLICK_INTERCEPTOR_INJECTOR, { optional: true }) as ClickInterceptor
 
+  #overviewGroupNames$ = this.#overviewUUID$.pipe(
+    switchMap(overviewUUID => {
+      if (!overviewUUID) {
+        return EMPTY
+      }
+
+      const url = `${GEOMSVC_HOST}/fiber_n/${overviewUUID}/detail`
+
+      const getpage = (page: number) => from(
+        fetch(`${url}?page=${page}`)
+          .then(res => res.json() as Promise<PaginatedResponse<{ fibername: string, index: number }>>)
+      )
+
+      return from(getpage(1)).pipe(
+        switchMap(resp => SAPI.IteratePages(resp, getpage))
+      )
+    })
+  )
+
   view$ = combineLatest([
     this.#overviewUUID$,
     this.uuid$,
-    this.groupNames$,
+    this.#overviewGroupNames$,
     this.overviewLevels$,
     concat(
       of("LOW" as const),
@@ -98,7 +117,8 @@ export class FiberFeatureCmp extends TRXBase {
         }
       }
       return {
-        overviewUUID, uuid,
+        overviewUUID,
+        uuid,
         bundlenames,
         overviewLevels,
         overviewLvl: Object.keys(OVERVIEW_LVL) as (keyof typeof OVERVIEW_LVL)[],
