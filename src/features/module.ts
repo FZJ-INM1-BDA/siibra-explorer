@@ -36,6 +36,7 @@ import { FiberFeatureCmp } from "./trx/fiberfeature/fiberfeature.component";
 import { SpatialOption } from "./spatial/spatialOpt.directive";
 import { SpatialFeatureCmp } from "./spatial/spatial.component";
 import { ValueStoreDirective } from "src/util/directives/value.directive";
+import { FilterDeprecatedPipe } from "src/util/pipes/filterDep.pipe";
 
 @NgModule({
   imports: [
@@ -65,6 +66,7 @@ import { ValueStoreDirective } from "src/util/directives/value.directive";
     SpatialOption,
     SpatialFeatureCmp,
     ValueStoreDirective,
+    FilterDeprecatedPipe,
   ],
   declarations: [
     EntryComponent,

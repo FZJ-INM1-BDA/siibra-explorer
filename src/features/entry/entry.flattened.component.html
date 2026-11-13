@@ -237,7 +237,7 @@
             <ng-template #newSpFeatTmpl>
                 <cdk-virtual-scroll-viewport itemSize="36" class="virtual-scroll-viewport">
                     <ng-template cdkVirtualFor
-                        [cdkVirtualForOf]="newspfeature"
+                        [cdkVirtualForOf]="newspfeature | filterDeprecated"
                         let-feature
                         let-last="last">
                         <button
