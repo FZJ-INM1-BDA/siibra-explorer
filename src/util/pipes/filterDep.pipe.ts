@@ -1,8 +1,5 @@
 import { Pipe, PipeTransform } from "@angular/core";
 
-interface HasName {
-  name: string
-}
 
 @Pipe({
   standalone: true,

@@ -1,4 +1,4 @@
-<ng-template [ngIf]="view$ | async" let-view>
+<ng-template [ngIf]="view$ | async" let-view iav-media-query #media="iavMediaQuery">
 
     <!-- species -->
     <ng-template [ngIf]="view.selectedATP.atlas" let-selectedAtlas>
@@ -114,14 +114,15 @@
                 <mat-divider></mat-divider>
             </ng-template>
 
-            
-            <button mat-icon-button
-                [sxplr-dialog]="regionHierarchyTmpl"
-                [matTooltip]="view.labels.REGION_HIERARCHY"
-                sxplr-dialog-size="xl"
-                #showHierarchyBtn="sxplrDialog">
-                <mat-icon>account_tree</mat-icon>
-            </button>
+            @if((media.mediaBreakPoint$ | async) < 3){
+                <button mat-icon-button
+                    [sxplr-dialog]="regionHierarchyTmpl"
+                    [matTooltip]="view.labels.REGION_HIERARCHY"
+                    sxplr-dialog-size="xl"
+                    #showHierarchyBtn="sxplrDialog">
+                    <mat-icon>account_tree</mat-icon>
+                </button>
+            }
 
             <!-- hide/unhide parc visibility tmpl -->
             <button mat-icon-button [sxplr-dialog]="DoiTemplate" [sxplr-dialog-size]="null" [sxplr-dialog-data]="{
@@ -136,6 +137,17 @@
                 <mat-icon>{{ view.parcellationVisible ? 'visibility' : 'visibility_off' }}</mat-icon>
             </button>
         </ng-template>
+        
+        @if((media.mediaBreakPoint$ | async) > 2){
+
+            <button mat-icon-button
+                [sxplr-dialog]="regionHierarchyTmpl"
+                [matTooltip]="view.labels.REGION_HIERARCHY"
+                sxplr-dialog-size="xl"
+                #showHierarchyBtn="sxplrDialog">
+                <mat-icon>account_tree</mat-icon>
+            </button>
+        }
     </ng-template>
 
     <!-- region(s) -->
@@ -146,7 +158,7 @@
         [sxplr-flash]="view.selectedRegions | mapToProperty : 'name' | addUnitAndJoin ">
 
         <ng-template [ngIf]="view.selectedRegions.length == 0">
-            <ng-template iav-media-query #media="iavMediaQuery"
+            <ng-template
                 [ngIf]="(media.mediaBreakPoint$ | async) < 3"
                 [ngIfElse]="regHierTmpl">
                 <button mat-button
@@ -328,16 +340,6 @@
             </ng-template>
         </sxplr-sapiviews-core-rich-regionlistsearch>
         
-        <div class="tmp-icon-button-container">
-
-            <button mat-icon-button
-                [sxplr-dialog]="regionHierarchyTmpl"
-                [matTooltip]="view.labels.REGION_HIERARCHY"
-                sxplr-dialog-size="xl"
-                #showHierarchyBtn="sxplrDialog">
-                <mat-icon>account_tree</mat-icon>
-            </button>
-        </div>
     </ng-template>
 
     <!-- region hierarchy tmpl -->
