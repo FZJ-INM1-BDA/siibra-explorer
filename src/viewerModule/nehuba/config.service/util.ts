@@ -176,8 +176,6 @@ export function getParcNgId(atlas: SxplrAtlas, tmpl: SxplrTemplate, parc: SxplrP
     (
       tmpl.id === IDS.TEMPLATES.BIG_BRAIN
       && (parc.id === IDS.PARCELLATION.JBA29 || parc.id === IDS.PARCELLATION.JBABB)
-    ) || (
-      parc.id === IDS.PARCELLATION.MEBRAINS
     )
   ) {
     const frag = translateV3Entities.mapTPRToFrag[tmpl.id][parc.id][region.name]
@@ -193,6 +191,7 @@ export function getParcNgId(atlas: SxplrAtlas, tmpl: SxplrTemplate, parc: SxplrP
   if (region.name.indexOf("right") >= 0) laterality = "right hemisphere"
   if (parc.id === IDS.PARCELLATION.SULCI) laterality = "whole brain"
   if (parc.id === IDS.PARCELLATION.VON_ECONOMO) laterality = "whole brain"
+  if (parc.id === IDS.PARCELLATION.MEBRAINS) laterality = "whole brain"
 
   if (parc.id === IDS.PARCELLATION.JBA30 && tmpl.id !== IDS.TEMPLATES.FSAVERAGE) {
     return `_${MultiDimMap.GetKey(atlas.id, tmpl.id, parc.id, "whole brain")}`

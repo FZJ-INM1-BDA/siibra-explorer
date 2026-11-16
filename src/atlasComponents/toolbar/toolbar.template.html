@@ -151,7 +151,8 @@
 
                         <!-- region block -->
                         <ng-template [ngIf]="view.selectedRegions.length === 1">
-                            
+                            <mat-divider></mat-divider>
+
                             <tpbr-viewer
                                 [tpbr-newui]="true"
                                 [tpbr-concept]="{
@@ -198,8 +199,6 @@
                                 
                                 
                             </button>
-                            
-                            <mat-divider></mat-divider>
                         </ng-template>
 
                         <ng-template [ngIf]="view.selectedRegions.length !== 1 && view.useViewer === 'THREESURFER'">
