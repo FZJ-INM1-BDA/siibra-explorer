@@ -2,13 +2,13 @@ import { CommonModule } from "@angular/common";
 import { Component, inject } from "@angular/core";
 import { SAPI } from "../sapi";
 import { select, Store } from "@ngrx/store";
-import { atlasAppearance, atlasSelection } from "src/state";
+import { atlasAppearance, atlasSelection, userInteraction } from "src/state";
 import { combineLatest, of } from "rxjs";
-import { map, switchMap, takeUntil } from "rxjs/operators";
+import { map, switchMap, take, takeUntil } from "rxjs/operators";
 import { AngularMaterialModule } from "src/sharedModules";
 import { AvailableATPDirective } from "../sapi/core/availableATP.directive";
 import { GroupedParcellation, SapiViewsCoreParcellationModule } from "../sapiViews/core/parcellation";
-import { SxplrParcellation, SxplrRegion } from "../sapi/sxplrTypes";
+import { Feature, SxplrMap, SxplrParcellation, SxplrRegion } from "../sapi/sxplrTypes";
 import { DoiTemplate } from "src/ui/doi/doi.component";
 import { DialogModule } from "src/ui/dialogInfo";
 import { UtilModule } from "src/util";
@@ -26,6 +26,11 @@ import { DestroyDirective } from "src/util/directives/destroy.directive";
 import { OnlyShowNewestParc } from "../sapiViews/core/parcellation/onlyShowNewest.pipe";
 import { AtlasViewerRouterModule } from "src/routerModule";
 import { FlashDirective } from "src/util/directives/flash.directive";
+import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.directive";
+import { AtlasMapReducerXform, CurrentAtlasMapReduceXform, FeatureCategoryBanFilePipe, FilterMapGrpPipe, GatherMapGrpClassifersPipe, MapGridReducerPipe, MapToSpacesPipe, ReducedMapGroup } from "./mapReducer.pipe";
+import { DatasetAggregator } from "src/features/datasetAggregator.directive";
+import { FeatureModule } from "src/features";
+import { ListDirective } from "src/features/list/list.directive";
 
 const allVersionsPipe = new AllVersionsParcs()
 const onlyShowNewestPipe = new OnlyShowNewestParc()
@@ -53,6 +58,15 @@ const onlyShowNewestPipe = new OnlyShowNewestParc()
     ScreenshotModule,
     AtlasViewerRouterModule,
     FlashDirective,
+    ExperimentalFlagDirective,
+    AtlasMapReducerXform,
+    CurrentAtlasMapReduceXform,
+    GatherMapGrpClassifersPipe,
+    MapGridReducerPipe,
+    MapToSpacesPipe,
+    DatasetAggregator,
+    FeatureModule,
+    FeatureCategoryBanFilePipe,
 ],
   hostDirectives: [
     AvailableATPDirective,
@@ -62,6 +76,26 @@ const onlyShowNewestPipe = new OnlyShowNewestParc()
 
 export class StatusbarCmp {
 
+  asReducedMapGroup(input: unknown): input is ReducedMapGroup{
+    return (input as any)?.['type'] === "reducedMapGrp"
+  }
+
+  asAny(input: unknown): input is any {
+    return true
+  }
+
+  datasetDialogExtract(input: any): ListDirective | undefined | null{
+    const {listDir} = input
+    if (listDir instanceof ListDirective) {
+      listDir.datasource$.subscribe()
+      return listDir
+    }
+    return null
+  }
+
+  regionsToRegionNames(regions: SxplrRegion[]): string[]{
+    return regions.map(r => r.name)
+  }
 
   #atpDir = inject(AvailableATPDirective)
   #ondestroy$ = inject(DestroyDirective).destroyed$
@@ -141,13 +175,23 @@ export class StatusbarCmp {
   ]).pipe(
     map(([
       labels,
-      {selectedATP, templates, parcellations, atlases, noGroupParcs, groupParcs},
+      {selectedATP, templates, parcellations, atlases, noGroupParcs, groupParcs, maps, mapAggregations},
       { parcellationVisible },
       { position },
       { allAvailableRegions, labelMappedRegionNames, leafRegions, branchRegions },
       selectedRegions,
     ]) => {
       const allParcVersions = allVersionsPipe.transform(selectedATP.parcellation, parcellations)
+      const suitableMaps = maps.filter(m => 
+        m.parcellationId === selectedATP.parcellation.id
+        && m.spaceId === selectedATP.template.id
+      )
+      const statMap = suitableMaps.find(m => m.type === "STATISTICAL")
+      const selectedMap = statMap && selectedRegions.length === 1
+      ? statMap
+      : suitableMaps.find(m => m.type === "LABELLED")
+
+      const availableMaps = maps.filter(m => m.aggregation?.id === selectedMap?.aggregation?.id)
       return {
         labels,
         selectedATP,
@@ -162,6 +206,11 @@ export class StatusbarCmp {
         branchRegions,
         allParcVersions,
         parcIsVersioned: allParcVersions.length > 0,
+        maps,
+        selectedMap,
+        availableMaps,
+        aggregatedMap: mapAggregations,
+        selectedAggregatedMap: selectedMap?.aggregation
       }
     })
   )
@@ -172,8 +221,66 @@ export class StatusbarCmp {
     )
   }
   
-  public async selectATP(type: 'atlasId' | 'parcellationId' | 'templateId', id: string, regionId?: string) {
-    return await this.#atpDir.selectATP(type, id, regionId)
+  public async selectATP(type: 'atlasId' | 'parcellationId' | 'templateId', id: string, regionIds: string[]=[]) {
+    if (!["atlasId", "parcellationId", "templateId"].includes(type)) {
+      this.selectSome(type, id as any, regionIds)
+      return
+    }
+    return await this.#atpDir.selectATP(type, id, regionIds && regionIds[0])
+  }
+
+  public async selectSome(type: string, value: (SxplrMap[] | string | ListDirective), regionIds: string[] = []){
+    switch (type) {
+      case "maps": {
+        const maps = value as SxplrMap[]
+        const parcIdSet = new Set(maps.map(m => m.parcellationId))
+        if (parcIdSet.size === 0) {
+          console.error(`${maps} had no parcId. aborting`)
+          return
+        }
+        if (parcIdSet.size > 1) {
+          console.warn(`${parcIdSet} has more than 1 entry, using first one`)
+        }
+        const parcId = Array.from(parcIdSet)[0]
+        this.store.dispatch(
+          atlasSelection.actions.selectATPById({
+            parcellationId: parcId,
+            regionId: regionIds && regionIds[0],
+            config: {
+              autoSelect: true
+            }
+          })
+        )
+        return
+      }
+      case "newatlas": {
+        const aggreId = value as string
+        const result = await this.view$.pipe(
+          take(1)
+        ).toPromise()
+        const foundMap = result.maps.find(m => m.aggregation?.id === aggreId)
+        if (!foundMap) {
+          console.error(`Cannot find aggregation with id ${aggreId}`)
+          return
+        }
+        this.store.dispatch(
+          atlasSelection.actions.selectATPById({
+            parcellationId: foundMap.parcellationId,
+            config: {
+              autoSelect: true
+            }
+          })
+        )
+        return
+      }
+      case "features": {
+        const listdir = value as ListDirective
+        break
+      }
+      default: {
+        console.error(`type ${type} cannot be processed`)
+      }
+    }
   }
 
   gotoNewestParc(){
@@ -238,6 +345,14 @@ export class StatusbarCmp {
       throw new Error(`${idx} not defined`)
     }
     this.selectATP("parcellationId", p.id)
+  }
+
+  selectFeature(feature: Feature){
+    this.store.dispatch(
+      userInteraction.actions.showFeature({
+        feature
+      })
+    )
   }
   
   #keyListenerConfigBase = {

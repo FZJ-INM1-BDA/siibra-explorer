@@ -292,6 +292,13 @@ export type webhooks = Record<string, never>;
 
 export interface components {
   schemas: {
+    /** Aggregation */
+    Aggregation: {
+      /** Id */
+      id: string
+      /** Name */
+      name: string
+    }
     /** AxesOrigin */
     AxesOrigin: {
       /**
@@ -931,6 +938,7 @@ export interface components {
       space: components["schemas"]["SiibraAtIdModel"]
       /** Maptype */
       maptype: string
+      aggregation?: components["schemas"]["Aggregation"]
     }
     /**
      * MapType 

@@ -481,3 +481,8 @@ body
   0% { background-color: rgba(255, 255, 100, 0.5); }
   100% { background-color: transparent; }
 }
+
+.wide-menu
+{
+  max-width: unset;
+}

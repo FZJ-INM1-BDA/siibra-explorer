@@ -1,16 +1,18 @@
 <ng-template [ngIf]="view$ | async" let-view>
 
     <section class="nav-bar">
+        <ng-template sxplrExperimentalFlag [deprecated]="true"
+            sxplr-switch
+            #searchSwitch="sxplrSwitch">
         <button mat-icon-button
             class="sxplr-pe-all"
-            sxplr-switch
-            #searchSwitch="sxplrSwitch"
             [color]="(searchSwitch.switchState$ | async) ? 'primary' : 'default'"
             (click)="searchSwitch.toggle()"
             [matTooltip]="ICON_LABELS.SEARCH"
             >
             <mat-icon>search</mat-icon>
         </button>
+        </ng-template>
         <button mat-icon-button
             class="sxplr-pe-all"
             sxplr-switch
@@ -63,7 +65,14 @@
 
                 <!-- header -->
                 <h5>
+                    <ng-template sxplrExperimentalFlag [experimental]="true">
+                    <span>Selected feature</span>
+                    </ng-template>
+
+                    <ng-template sxplrExperimentalFlag [deprecated]="true">
                     <span>{{ ICON_LABELS.SEARCH }}</span>
+                    </ng-template>
+                    
 
                     <button mat-icon-button
                         color="warn"
@@ -85,12 +94,14 @@
                 <!-- single feature override -->
                 <ng-template [ngIf]="view.selectedFeature" [ngIfElse]="defaultBodyTmpl">
 
+                    <ng-template sxplrExperimentalFlag [deprecated]="true">
                     <div class="back-btn-container">
                         <button mat-button (click)="clearSelectedFeature()">
                             <mat-icon>arrow_back</mat-icon>
                             <span>back</span>
                         </button>
                     </div>
+                    </ng-template>
 
                     <mat-divider></mat-divider>
 

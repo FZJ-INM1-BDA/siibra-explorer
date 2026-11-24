@@ -8,6 +8,7 @@ import { select, Store } from "@ngrx/store";
 import { selectors, actions, fromRootStore } from '.'
 import { AtlasSelectionState } from "./const"
 import { atlasAppearance, atlasSelection, generalActions } from "..";
+import { strToRgb } from 'common/util'
 
 import { InterSpaceCoordXformSvc } from "src/atlasComponents/sapi/core/space/interSpaceCoordXform.service";
 import { SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate } from "src/atlasComponents/sapi/sxplrTypes";
@@ -226,7 +227,8 @@ export class Effect {
     switchMap(([regions, layers]) => {
       const map = new Map<SxplrRegion, number[]>()
       for (const region of regions) {
-        map.set(region, region.color)
+        const color = region.color || strToRgb(region.name)
+        map.set(region, color)
       }
       const actions = [
         atlasAppearance.actions.removeCustomLayers({

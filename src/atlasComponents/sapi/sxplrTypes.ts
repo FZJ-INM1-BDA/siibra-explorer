@@ -44,6 +44,19 @@ export type SxplrAtlas = {
   species: string
 } & Partial<AdditionalInfo>
 
+export type SxplrMap = {
+  id: string
+  name: string
+  spaceId: string
+  parcellationId: string
+  aggregation?: {
+    id: string
+    name: string
+  }
+  species: string
+  type: "LABELLED" | "STATISTICAL" | "UNKNOWN"
+} & Partial<AdditionalInfo>
+
 export type AdditionalInfo = {
   desc: string
   contributors: string[]

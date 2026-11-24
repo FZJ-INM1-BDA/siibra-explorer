@@ -23,6 +23,12 @@ export const IDS = {
     JBABBV2: "jba-bb-v2",
     SULCI: "atlas-humansulci",
     VON_ECONOMO: "minds/core/parcellationatlas/v1.0.0/f2b1ac621421708c1bef422bb5058456",
+    D64: "minds/core/parcellationatlas/v1.0.0/d80fbab2-ce7f-4901-a3a2-3c8ef8a3b721",
+    D128: "minds/core/parcellationatlas/v1.0.0/73f41e04-b7ee-4301-a828-4b298ad05ab8",
+    D256: "minds/core/parcellationatlas/v1.0.0/141d510f-0342-4f94-ace7-c97d5f160235",
+    D512: "minds/core/parcellationatlas/v1.0.0/63b5794f-79a4-4464-8dc1-b32e170f3d16",
+    D1024: "minds/core/parcellationatlas/v1.0.0/12fca5c5-b02c-46ce-ab9f-f12babf4c7e1",
+
   }
 }
 

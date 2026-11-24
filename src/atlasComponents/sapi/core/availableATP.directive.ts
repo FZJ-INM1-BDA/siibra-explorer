@@ -7,7 +7,7 @@ import { atlasSelection } from "src/state";
 import { FilterGroupedParcellationPipe } from "src/atlasComponents/sapiViews/core/parcellation";
 
 const pipe = new FilterGroupedParcellationPipe()
-
+const CATCHALL_MAP_AGGR_KEY = "catch-all"
 @Directive({
   selector: '[available-atp]',
   standalone: true,
@@ -30,13 +30,31 @@ export class AvailableATPDirective {
       select(atlasSelection.selectors.selectedAtlas),
       switchMap(atlas => this.sapi.getAllSpaces(atlas))
     ),
+    this.store$.pipe(
+      select(atlasSelection.selectors.selectedAtlas),
+      switchMap(atlas => this.sapi.getAllMaps(atlas))
+    )
   ]).pipe(
-    map(([ parcellations, templates ]) => {
+    map(([ parcellations, templates, maps ]) => {
       const noGroupParcs = pipe.transform(parcellations || [], false)
       const groupParcs = pipe.transform(parcellations || [], true)
-      
+
+      const mapAggregations: { id: string, name: string }[] = []
+      const seen = new Set<string|undefined>()
+      for (const map of maps){
+        const { id = CATCHALL_MAP_AGGR_KEY, name="other" } = map.aggregation || {}
+        
+        if (seen.has(id)) {
+          continue
+        }
+        seen.add(id)
+        mapAggregations.push({
+          id,
+          name
+        })
+      }
       return {
-        noGroupParcs, groupParcs, templates, parcellations
+        noGroupParcs, groupParcs, templates, parcellations, maps, mapAggregations
       }
     })
   )
@@ -46,7 +64,7 @@ export class AvailableATPDirective {
     this.#atlasStates$,
     this.#selectedATP$
   ]).pipe(
-    map(([ atlases, { noGroupParcs, groupParcs, templates, parcellations }, selectedATP ]) => ({ atlases, noGroupParcs, groupParcs, templates, parcellations, selectedATP }))
+    map(([ atlases, { noGroupParcs, groupParcs, templates, parcellations, maps, mapAggregations }, selectedATP ]) => ({ atlases, noGroupParcs, groupParcs, templates, parcellations, selectedATP, maps, mapAggregations }))
   )
 
   constructor(

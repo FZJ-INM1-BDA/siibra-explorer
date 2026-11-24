@@ -22,6 +22,261 @@
         
     </ng-template>
 
+    <ng-template sxplrExperimentalFlag [experimental]="true">
+    <mat-divider vertical class="statsbar-vert-divider"></mat-divider>
+    
+    <!-- atlas aggregator -->
+    <ng-template [ngTemplateOutlet]="btnTmpl" [ngTemplateOutletContext]="{
+        name: view.selectedAggregatedMap?.name || 'Nothing selected',
+        icon: 'category',
+        category: 'atlas',
+        menuData: {
+            current: view.selectedAggregatedMap,
+            type: 'newatlas',
+            options: view.aggregatedMap,
+        }
+    }">
+    </ng-template>
+
+    <mat-divider vertical class="statsbar-vert-divider"></mat-divider>
+
+    <ng-template [ngTemplateOutlet]="btnTmpl" [ngTemplateOutletContext]="{
+        name: (view.selectedMap | currAtlasMapRed : view.availableMaps : view.allParcVersions)?.name || 'Nothing selected',
+        icon: 'map',
+        category: 'map',
+        useNewMenu: true,
+        menuData: {
+            current: view.selectedMap | currAtlasMapRed : view.availableMaps : view.allParcVersions,
+            type: null,
+            options: [],
+            optionTemplate: mapOptTmpl,
+            prefixTmpl: mapGridTmpl
+        }
+    }">
+    </ng-template>
+
+    <!-- grid / pivot map selector: rows = parc versions, cols = map type -->
+    <ng-template #mapGridTmpl>
+        @if(view.availableMaps | mapGridReducer : view.allParcVersions : view.selectedMap : view.parcellations; as grid){
+            <section class="map-grid"
+                iav-stop="mousedown click"
+                [style.grid-template-columns]="'auto auto repeat(' + grid.columns.length + ', minmax(3rem, 1fr))'">
+
+                <!-- header row: two empty corners (row label + star gutter) then column headers -->
+                <span class="map-grid-corner"></span>
+                <span class="map-grid-corner"></span>
+                @for(col of grid.columns; track col.type){
+                    <span class="map-grid-colhead">{{ col.label }}</span>
+                }
+
+                <!-- data rows -->
+                @for(row of grid.rows; track $index){
+                    <span class="map-grid-rowhead" [class.current]="row.isCurrent">{{ row.label }}</span>
+                    <span class="map-grid-star">
+                        @if(row.isNewest){
+                            <mat-icon class="small-icon" matTooltip="newest version">star</mat-icon>
+                        }
+                    </span>
+                    @for(cell of row.cells; track $index){
+                        @if(cell.maps.length > 0){
+                            <button mat-icon-button
+                                class="map-grid-cell"
+                                [color]="cell.selected ? 'primary' : null"
+                                (click)="selectSome('maps', cell.maps, regionsToRegionNames(view.selectedRegions))">
+                                <mat-icon>{{ cell.selected ? 'radio_button_checked' : 'radio_button_unchecked' }}</mat-icon>
+                            </button>
+                        } @else {
+                            <span class="map-grid-cell map-grid-empty">&ndash;</span>
+                        }
+                    }
+                }
+            </section>
+        }
+    </ng-template>
+
+    <!-- not used at the moment. if number of classifiers increases to more than 2 (so grid becomes untenable) using filters might be needed again -->
+    <ng-template #mapOptPrefixTmpl>
+        @if(view.availableMaps | atlasMapRed : view.allParcVersions | gatherMapGrpClassifiers; as classifiers){
+            <section class="filterSection" iav-stop="mousedown click">
+                @for(clf of classifiers | keyvalue; track clf.key){
+                    <h3>{{clf.key}}</h3>
+                    <mat-button-toggle-group [name]="clf.key"
+                        multiple
+                        [hideMultipleSelectionIndicator]="true">
+                        @for(opt of clf.value; track $index){
+                            <mat-button-toggle [value]="opt">{{ opt }}</mat-button-toggle>
+                        }
+                    </mat-button-toggle-group>
+                }
+            </section>
+        }
+    </ng-template>
+
+    <ng-template #mapOptTmpl let-opt>
+        <mat-divider></mat-divider>
+        @if(asReducedMapGroup(opt)) {
+            <div>
+                <span>{{ opt.name }}</span>
+                <mat-chip-set>
+                    @for(classifier of (opt.classifiers | keyvalue); track classifier.key){
+                        <mat-chip>
+                            {{ classifier.key }}: {{ classifier.value }}
+                        </mat-chip>
+                    }
+                </mat-chip-set>
+            </div>
+        } @else {
+            Failed to render mapOptTmpl
+        }
+    </ng-template>
+    
+    <div class="spacer sxplr-ml-2"></div>
+    <ng-template [ngTemplateOutlet]="tmpSelectedRegionTmpl"></ng-template>
+
+    <mat-divider vertical class="statsbar-vert-divider"></mat-divider>
+
+    <!-- template -->
+    <ng-template [ngIf]="view.selectedATP.template" let-selectedTemplate>
+        <ng-template [ngTemplateOutlet]="btnTmpl" [ngTemplateOutletContext]="{
+                name: selectedTemplate.shortName || selectedTemplate.name,
+                icon: 'view_in_ar',
+                category: 'space',
+                suffixTmpl: tmplSuffixTmpl,
+                menuData: {
+                    current: selectedTemplate,
+                    type: 'templateId',
+                    selectATPArgs: view.selectedRegions | mapToProperty : 'name',
+                    options: view.selectedMap | mapToSpaces : view.availableMaps : view.templates
+                }
+            }">
+        </ng-template>
+        <ng-template #tmplSuffixTmpl>
+            <button mat-icon-button
+                [sxplr-dialog]="DoiTemplate"
+                [sxplr-dialog-size]="null"
+                [sxplr-dialog-data]="{
+                    title: selectedTemplate.name,
+                    desc: selectedTemplate.desc,
+                    contributors: selectedTemplate.contributors | dedup, 
+                    actions: selectedTemplate | parcTmplDoiPipe
+                }">
+                <mat-icon>info</mat-icon>
+            </button>
+        </ng-template>
+    </ng-template>
+    
+    <sxplr-nav class="sxplr-ml-2"></sxplr-nav>
+
+    <ng-template
+        dataset-aggregator
+        #dsAggr="datasetAggregator"
+        [template]="view.selectedATP.template"
+        [parcellation]="view.selectedATP.parcellation"
+        [selected-regions]="view.selectedRegions"
+        [ngTemplateOutlet]="btnTmpl"
+        [ngTemplateOutletContext]="{
+            name: 'datasets',
+            icon: 'dataset',
+            category: 'dataset',
+            useNewMenu: true,
+            menuData: {
+                current: null,
+                type: 'datasetType',
+                options: [],
+                prefixTmpl: datasetPrefixTmpl
+            }
+        }">
+    </ng-template>
+
+    <ng-template #datasetPrefixTmpl>
+
+        <section sxplrCategoryAcc #acc="categoryAcc">
+            <h5 class="title">datasets</h5>
+            <mat-divider></mat-divider>
+
+            @if(acc.isBusy$ | async){
+                <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+            } @else {
+                @if(acc.total$ | async; as total){
+                    @if(total === 0){
+                        <span class="text-muted">No dataset found</span>
+                    }
+                }
+            }
+
+
+            @if(dsAggr.cateogryCollections$ | async; as catKeyCol){
+                @for(item of catKeyCol | keyvalue; track item.key){
+                    @for(featureType of item.value | featureCategoryBanFilter; track featureType.display_name){
+                        <ng-template
+                            #listDir="featureListDirective"
+                            sxplr-feature-list-directive
+                            [template]="dsAggr.template"
+                            [parcellation]="dsAggr.parcellation"
+                            [region]="dsAggr.region"
+                            [name]="featureType.name"
+                            [displayName]="featureType.display_name"
+                            [featureRoute]="featureType.path"
+                            [queryParams]="{
+                                type: (featureType.name | featureNamePipe)
+                            }"
+                            >
+                        </ng-template>
+
+                        @if(listDir.total$ | async; as total) {
+                            <button mat-button [sxplr-dialog]="datasetDialogTmpl" sxplr-dialog-size="xl">
+                                {{ featureType.display_name }} ({{ total }})
+                            </button>
+                            <ng-template #datasetDialogTmpl>
+                                
+                                <section class="dataset-viewport">
+                                    <h5>{{ featureType.display_name }} ({{ total }})</h5>
+                                    @if(listDir.datasource$ | async; as ds){
+                                        <cdk-virtual-scroll-viewport itemSize="36">
+                                            <ng-template cdkVirtualFor
+                                                [cdkVirtualForOf]="ds"
+                                                let-feature
+                                                let-last="last"
+                                                >
+                                                
+                                                <!-- n.b. do not introduce mattooltip in scrollable container -->
+                                                <!-- it will override scrollability -->
+                                                <ng-template [ngIf]="feature" [ngIfElse]="fallbackTmpl">
+                                                    <button
+                                                        mat-button
+                                                        class="virtual-scroll-item sxplr-w-100"
+                                                        (click)="selectFeature(feature)">
+                                                        <span class="ws-no-wrap"> {{ feature.name }} </span>
+                                                    </button>
+                                                </ng-template>
+                                                <ng-template #fallbackTmpl>
+                                                    <button
+                                                        disabled
+                                                        mat-button
+                                                        class="virtual-scroll-item sxplr-w-100">
+                                                        <mat-spinner class="sxplr-d-inline-block" [diameter]="14"></mat-spinner> 
+                                                        <span class="ws-no-wrap"> Loading ... </span>
+                                                    </button>
+                                                </ng-template>
+                                            </ng-template>
+                                        </cdk-virtual-scroll-viewport>
+                                    }
+                                    
+                                </section>
+                            </ng-template>
+                        }
+                    }
+                }
+            }
+        </section>
+
+    </ng-template>
+
+    </ng-template>
+    
+    
+    <ng-template sxplrExperimentalFlag [deprecated]="true">
+        
     <mat-divider vertical class="statsbar-vert-divider"></mat-divider>
 
     <!-- template -->
@@ -52,7 +307,7 @@
             </button>
         </ng-template>
     </ng-template>
-
+    
     <sxplr-nav class="sxplr-ml-2"></sxplr-nav>
 
     <mat-divider vertical class="statsbar-vert-divider"></mat-divider>
@@ -153,7 +408,11 @@
     <!-- region(s) -->
 
     <div class="spacer sxplr-ml-2"></div>
-    
+    <ng-template [ngTemplateOutlet]="tmpSelectedRegionTmpl"></ng-template>
+    </ng-template>
+
+    <!-- tmp: selected region tmpl once format is decided, move this to the relevant section-->
+    <ng-template #tmpSelectedRegionTmpl>
     <section class="region-section"
         [sxplr-flash]="view.selectedRegions | mapToProperty : 'name' | addUnitAndJoin ">
 
@@ -171,7 +430,9 @@
             </ng-template>
             
             <ng-template #regHierTmpl>
-                <ng-template [ngTemplateOutlet]="expressRegionSearchTmpl"></ng-template>
+                <ng-template [ngTemplateOutlet]="expressRegionSearchTmpl" [ngTemplateOutletContext]="{
+                    selectBranchCb: showHierarchyBtn.onClick
+                }"></ng-template>
             </ng-template>
         </ng-template>
 
@@ -281,6 +542,8 @@
         </ng-template>
     </section>
 
+    </ng-template>
+
 
     <mat-divider vertical class="statsbar-vert-divider sxplr-ml-2 sxplr-mr-2"></mat-divider>
 
@@ -309,7 +572,7 @@
     </ng-template>
 
     <!-- express region search tmpl -->
-    <ng-template #expressRegionSearchTmpl>
+    <ng-template #expressRegionSearchTmpl let-selectBranchCb="selectBranchCb">
         
         <sxplr-sapiviews-core-rich-regionlistsearch
             class="sxplr-ml-2"
@@ -317,7 +580,7 @@
             [sxplr-sapiviews-core-rich-regionlistsearch-regions]="view.allAvailableRegions"
             (sxplr-sapiviews-core-rich-regionlistsearch-region-select)="view.labelMappedRegionNames.includes($event.name)
             ? selectRoi($event)
-            : showHierarchyBtn.onClick({ 'searchTerm': $event.name })"
+            : selectBranchCb({ 'searchTerm': $event.name })"
             (sxplr-sapiviews-core-rich-regionlistsearch-region-toggle)="view.labelMappedRegionNames.includes($event.name) && toggleRoi($event)">
 
             <ng-template region-template let-region>
@@ -359,12 +622,12 @@
     </ng-template>
 
     <!-- button tmpl  -->
-    <ng-template #btnTmpl let-category="category" let-name="name" let-icon="icon" let-color="color" let-suffixTmpl="suffixTmpl" let-menuData="menuData">
-        <ng-template iav-media-query #media="iavMediaQuery" [ngIf]="(media.mediaBreakPoint$ | async) < 3"
+    <ng-template #btnTmpl let-category="category" let-name="name" let-icon="icon" let-color="color" let-suffixTmpl="suffixTmpl" let-menuData="menuData" let-useNewMenu="useNewMenu">
+        <ng-template [ngIf]="(media.mediaBreakPoint$ | async) < 3"
             [ngIfElse]="nameBtnTmpl">
             <button mat-button
                 [color]="color || 'default'"
-                [matMenuTriggerFor]="selectATPMenu"
+                [matMenuTriggerFor]="useNewMenu ? newSelectMenu : selectATPMenu"
                 [matMenuTriggerData]="menuData | mergeObj : {
                     suffixTmpl: suffixTmpl
                 }">
@@ -375,12 +638,12 @@
         <ng-template #nameBtnTmpl>
             <button mat-button
                 [color]="color || 'default'"
-                [matMenuTriggerFor]="selectATPMenu"
+                [matMenuTriggerFor]="useNewMenu ? newSelectMenu : selectATPMenu"
                 [matMenuTriggerData]="menuData | mergeObj : {
                     suffixTmpl: suffixTmpl
                 }">
                 <div class="category-text">{{category || '&nbsp;'}}</div>
-                <div>{{ name }}</div>
+                <div class="btn-text-container">{{ name }}</div>
             </button>
 
         </ng-template>
@@ -407,6 +670,62 @@
 
     
     <!-- menu tmpl to control popout menu -->
+    <mat-menu #newSelectMenu="matMenu" class="wide-menu">
+
+        <ng-template matMenuContent
+            let-current="current"
+            let-options="options"
+            let-groupedOptions="groupedOptions"
+            let-type="type"
+            let-getSubMenu="getSubMenu"
+            let-optionTemplate="optionTemplate"
+            let-suffixTmpl="suffixTmpl"
+            let-prefixTmpl="prefixTmpl">
+
+            @if(prefixTmpl) {
+                <ng-template [ngTemplateOutlet]="prefixTmpl"></ng-template>
+                <mat-divider></mat-divider>
+            }
+
+            @for( opt of options | slice : 5; track $index){
+                @if(asAny(opt)){
+                    <button mat-menu-item (click)="selectSome(type, opt.id)" class="menu-button">
+                        <div class="menu-opt-container">
+                            <mat-icon fontSet="fas" [fontIcon]="opt.id === current?.id ? 'fa-circle' : 'fa-none'"></mat-icon>
+                            
+                            <ng-template [ngIf]="optionTemplate" [ngIfElse]="defaultOptionTemplate">
+                                <ng-template [ngTemplateOutlet]="optionTemplate" [ngTemplateOutletContext]="{
+                                        $implicit: opt
+                                    }">
+                                </ng-template>
+                            </ng-template>
+
+                            <ng-template #defaultOptionTemplate>
+                                <span class="menu-opt-text-container">
+                                    {{ opt.shortName || opt.name }}
+                                </span>
+                            </ng-template>
+                        </div>
+                    </button>
+                } @else {
+                    Render menu item error... 
+                }
+            }
+
+            @if(options.length > 5){
+                <button mat-menu-item="" disabled="disabled">
+                    ... and {{ options.length - 5 }} more
+                </button>
+            }
+
+            @if(suffixTmpl) {
+                <mat-divider></mat-divider>
+                <ng-template [ngTemplateOutlet]="suffixTmpl"></ng-template>
+            }
+            
+        </ng-template>
+    </mat-menu>
+
     <mat-menu #selectATPMenu="matMenu">
         <ng-template matMenuContent
             let-current="current"
@@ -415,7 +734,8 @@
             let-type="type"
             let-getSubMenu="getSubMenu"
             let-optionTemplate="optionTemplate"
-            let-suffixTmpl="suffixTmpl">
+            let-suffixTmpl="suffixTmpl"
+            let-selectATPArgs="selectATPArgs">
 
             <button *ngFor="let opt of (groupedOptions || [])" mat-menu-item class="menu-button"
                 [matMenuTriggerFor]="selectATPSubMenu" [matMenuTriggerData]="{
@@ -444,26 +764,43 @@
                 </div>
             </button>
 
-            <button *ngFor="let opt of options" mat-menu-item
-                (click)="selectATP(type, opt.id)" class="menu-button">
-                <div class="menu-opt-container">
+            @for (opt of options; track $index) {
+                <ng-template #optTmpl>
+                    @if (opt.id === current?.id) {
+                        <mat-icon fontSet="fas" fontIcon="fa-circle"></mat-icon>
+                        
+                    } @else {
+                        <mat-icon fontSet="fas" fontIcon="fa-none"></mat-icon>
+                    }
 
-                    <mat-icon fontSet="fas" [fontIcon]="opt.id === current.id ? 'fa-circle' : 'fa-none'"></mat-icon>
-
-                    <ng-template [ngIf]="optionTemplate" [ngIfElse]="defaultOptionTemplate">
+                    @if(optionTemplate){
                         <ng-template [ngTemplateOutlet]="optionTemplate" [ngTemplateOutletContext]="{
                                 $implicit: opt
                             }">
                         </ng-template>
-                    </ng-template>
-
-                    <ng-template #defaultOptionTemplate>
+                    } @else {
                         <span class="menu-opt-text-container">
                             {{ opt.shortName || opt.name }}
                         </span>
-                    </ng-template>
-                </div>
-            </button>
+                    }
+                </ng-template>
+
+                @if(selectATPArgs){
+                    <button mat-menu-item class="menu-button"
+                        (click)="selectATP(type, opt.id, selectATPArgs)" >
+                        <div class="menu-opt-container">
+                            <ng-template [ngTemplateOutlet]="optTmpl"></ng-template>
+                        </div>
+                    </button>
+                } @else {
+                    <button mat-menu-item class="menu-button"
+                        (click)="selectATP(type, opt.id)" >
+                        <div class="menu-opt-container">
+                            <ng-template [ngTemplateOutlet]="optTmpl"></ng-template>
+                        </div>
+                    </button>
+                }
+            }
 
             <ng-template [ngIf]="suffixTmpl">
 

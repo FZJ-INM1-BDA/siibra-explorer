@@ -9,7 +9,7 @@ import {
   translateV3Entities
 } from "./translateV3"
 import { PathReturn, RouteParam, SapiRoute } from "./typeV3";
-import { SxplrAtlas, SxplrParcellation, SxplrRegion, SxplrTemplate } from "./sxplrTypes";
+import { SxplrAtlas, SxplrMap, SxplrParcellation, SxplrRegion, SxplrTemplate } from "./sxplrTypes";
 import { parcBanList, speciesOrder } from "src/util/constants";
 
 export const useViewer = {
@@ -332,7 +332,7 @@ export class SAPI{
     return this.#reverseMap.get(parcOrSpaceId)
   }
 
-  public getAllSpaces(atlas: SxplrAtlas): Observable<SxplrTemplate[]> {
+  public getAllSpaces(atlas: SxplrAtlas|null): Observable<SxplrTemplate[]> {
     if (!atlas) {
       return of([])
     }
@@ -345,7 +345,7 @@ export class SAPI{
     )
   }
 
-  public getAllParcellations(atlas: SxplrAtlas): Observable<SxplrParcellation[]> {
+  public getAllParcellations(atlas: SxplrAtlas|null): Observable<SxplrParcellation[]> {
     if (!atlas) {
       return of([])
     }
@@ -360,6 +360,23 @@ export class SAPI{
           switchMap(v => translateV3Entities.translateParcellation(v))
         )
       )
+    )
+  }
+
+  public getAllMaps(atlas: SxplrAtlas|null): Observable<SxplrMap[]> {
+    if (!atlas) {
+      return of([])
+    }
+    const species = translateV3Entities.retrieveAtlas(atlas).species
+    return this.getMaps().pipe(
+      switchMap(maps => 
+        forkJoin(
+          maps
+            .filter(map => !parcBanList.includes(map.parcellation['@id']))
+            .map(map => translateV3Entities.translateMap(map))
+        )
+      ),
+      map(maps => maps.filter(mp => mp.species === species))
     )
   }
 

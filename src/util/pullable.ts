@@ -29,6 +29,9 @@ export class CustomDataSource<T> extends DataSource<T> {
     this.total$.next(val)
     this.#cachedResult = Array.from({ length: this.#total })
     this.#fetchedPages.clear()
+    // re-emit the resized buffer so the viewport learns the new length
+    // and can compute its content size / rendered range
+    this.#datastream.next(this.#cachedResult)
   }
 
   annotations: Record<string, string> = {}

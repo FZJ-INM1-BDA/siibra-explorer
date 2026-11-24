@@ -93,6 +93,8 @@ import { FilterDeprecatedPipe } from "src/util/pipes/filterDep.pipe";
     TPBRCategoryDirective,
     FilterCategoriesPipe,
     SimpleSingleFeatureCmp,
+    FeatureNamePipe,
+    CategoryAccDirective,
   ],
   providers: [
     {

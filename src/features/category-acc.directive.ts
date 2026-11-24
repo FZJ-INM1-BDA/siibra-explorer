@@ -124,6 +124,10 @@ export class CategoryAccDirective implements AfterContentInit, OnDestroy {
   #subscriptions: Subscription[] = []
   #changeSub: Subscription
   ngAfterContentInit(): void {
+    if (!this.listCmps) {
+      console.error(`this.listCmps not found. Did you attach this directive to ng-template?`)
+      return
+    }
     this.#changeSub = this.listCmps.changes.subscribe(() => {
       this.#listCmps$.next(
         Array.from(this.listCmps)

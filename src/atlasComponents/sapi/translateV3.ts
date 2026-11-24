@@ -1,5 +1,6 @@
 import {
-  SxplrAtlas, SxplrParcellation, SxplrTemplate, SxplrRegion, NgLayerSpec, NgPrecompMeshSpec, NgSegLayerSpec, VoiFeature, Point, TThreeMesh, LabelledMap, CorticalFeature, Feature, GenericInfo, BoundingBox, SimpleCompoundFeature
+  SxplrAtlas, SxplrParcellation, SxplrTemplate, SxplrRegion, NgLayerSpec, NgPrecompMeshSpec, NgSegLayerSpec, VoiFeature, Point, TThreeMesh, LabelledMap, CorticalFeature, Feature, GenericInfo, BoundingBox, SimpleCompoundFeature,
+  SxplrMap
 } from "./sxplrTypes"
 import { SapiSpatialFeatureModel, PathReturn, MetaV1Schema, /* CompoundFeature */ } from "./typeV3"
 import { hexToRgb } from 'common/util'
@@ -241,6 +242,53 @@ class TranslateV3 {
       type: "SxplrAtlas",
       name: replacedAtlas.name,
       species: replacedAtlas.species
+    }
+  }
+
+  async translateMap(map: PathReturn<"/maps/{map_id}">): Promise<SxplrMap> {
+    const {
+      ["@id"]: id,
+      name,
+      space: {
+        ["@id"]: spaceId
+      },
+      parcellation: {
+        ["@id"]: parcellationId
+      },
+      aggregation,
+      description,
+      datasets,
+      species,
+      maptype
+    } = map
+
+    let castedMapType: "UNKNOWN" | "LABELLED" | "STATISTICAL" = "UNKNOWN"
+
+    switch (maptype) {
+      case "LABELLED": {
+        castedMapType = maptype
+        break
+      }
+      case "STATISTICAL":
+        castedMapType = maptype
+        break
+    }
+    
+    const dss = await Promise.all((
+      datasets || []
+    ).map(ds => this.translateDs(ds)))
+
+    const link = dss.map(ds => ds.link).flatMap(v => v)
+    return {
+      id,
+      name,
+      spaceId,
+      parcellationId,
+      aggregation,
+      desc: description,
+      link,
+      species,
+      type: castedMapType
     }
   }
 
@@ -584,7 +632,7 @@ class TranslateV3 {
       for (const index of map.indices[regionname]) {
         const { volume:volumeIdx=0, fragment, label } = index
         if (!label) {
-          console.error(`Attempmting to add labelledmap with label '${label}'`)
+          console.error(`Attempmting to add labelledmap with label '${label}'. Debug: ${fragment} ${volumeIdx}`)
         }
         const error = `Attempting to access map volume with idx '${volumeIdx}'`
         if (!map.volumes[volumeIdx]) {

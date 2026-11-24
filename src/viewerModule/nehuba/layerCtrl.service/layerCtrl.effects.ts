@@ -38,13 +38,18 @@ export class LayerCtrlEffects {
       if (viewer !== "NEHUBA") {
         return of(...resetActions)
       }
-      return this.store.pipe(
-        select(atlasSelection.selectors.selectedRegions),
-        distinctUntilChanged(
-          arrayEqual((o, n) => o.name === n.name)
+      return combineLatest([
+        this.store.pipe(
+          select(atlasSelection.selectors.selectedRegions),
+          distinctUntilChanged(
+            arrayEqual((o, n) => o.name === n.name)
+          ),
         ),
-        withLatestFrom(this.#onATP$),
-        // since region selection changed, pmap will definitely be removed. revoke the url resource.
+        // drive off ATP too: the statistical map is space-specific, so a template/parc
+        // change must refetch it even when the selected region (by name) is unchanged
+        this.#onATP$,
+      ]).pipe(
+        // since region selection or ATP changed, pmap will definitely be removed. revoke the url resource.
         switchMap(([regions, { parcellation, template, atlas }]) => {
           if (regions.length !== 1) {
             return of(...resetActions)

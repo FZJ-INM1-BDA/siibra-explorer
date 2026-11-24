@@ -2675,6 +2675,24 @@
   },
   "components": {
     "schemas": {
+      "Aggregation": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "Aggregation"
+      },
       "AxesOrigin": {
         "properties": {
           "@context": {
@@ -3790,6 +3808,9 @@
           "maptype": {
             "type": "string",
             "title": "Maptype"
+          },
+          "aggregation": {
+            "$ref": "#/components/schemas/Aggregation"
           }
         },
         "type": "object",
