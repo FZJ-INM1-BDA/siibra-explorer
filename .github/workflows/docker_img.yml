@@ -241,7 +241,10 @@ jobs:
         
         MR_TITLE="${{ needs.set-vars.outputs.MR_TITLE }}"
 
+        # Accept: application/json header required to bypass anubis (anti-bot)
+        
         curl -fL -X POST \
+          --header "Accept: application/json" \
           --form "token=${{ secrets.GITLAB_TRIGGER_TOKEN }}" \
           --form "ref=main" \
           --form "variables[UPDATE_FILES]=$UPDATE_FILES" \
