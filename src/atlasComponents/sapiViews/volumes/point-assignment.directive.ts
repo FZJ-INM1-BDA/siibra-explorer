@@ -105,23 +105,24 @@ export class PointAssignmentDirective implements OnDestroy, OnInit{
   #assignmentType: Subject<"labelled" | "statistical" | null> = new BehaviorSubject(null)
   assignmentType$ = this.#assignmentType.asObservable()
   
-  #busy$ = new BehaviorSubject<typeof DOING_PROB_ASGMT | typeof DOING_LABEL_ASGMT>(null)
+  #busy$ = new BehaviorSubject<typeof DOING_PROB_ASGMT | typeof DOING_LABEL_ASGMT | null>(null)
   busy$ = this.#busy$.asObservable()
 
-  #error$ = new BehaviorSubject<string>(null)
+  #error$ = new BehaviorSubject<string | null>(null)
   error$ = this.#error$.asObservable()
 
   // TODO consider using debounce like to instant update text, but debounce call to API assign
-  point$ = new BehaviorSubject<TSandsPoint>(null)
+  point$ = new BehaviorSubject<TSandsPoint | null>(null)
   @Input()
   set point(val: TSandsPoint|TFace) {
     if (val?.["@type"] === "siibra-explorer/surface/face") {
       return
     }
+    console.log("point", val)
     this.point$.next(val)
   }
   
-  template$ = new BehaviorSubject<SxplrTemplate>(null)
+  template$ = new BehaviorSubject<SxplrTemplate | null>(null)
   @Input()
   set template(val: SxplrTemplate) {
     this.template$.next(val)
@@ -174,7 +175,7 @@ ${warningMsg}`
     })
   )
 
-  df$: Observable<PathReturn<"/map/assign">> = combineLatest([
+  df$: Observable<null|PathReturn<"/map/assign">> = combineLatest([
     this.point$,
     this.parcellation$,
     this.template$,
@@ -231,6 +232,7 @@ ${warningMsg}`
   )
 
   columns$ = this.df$.pipe(
+    filter(df => !!df),
     map(df => df.columns as string[])
   )
 

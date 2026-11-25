@@ -183,28 +183,6 @@ sxplr-sapiviews-core-rich-regionlistsearch
     text-overflow: ellipsis;
 }
 
-.dataset-viewport
-{
-    height: 100%;
-    flex-direction: column;
-    display: flex;
-    padding: 2rem 1rem;
-    
-    &>h5
-    {
-        flex: 0 0 auto;
-    }
-
-    cdk-virtual-scroll-viewport
-    {
-        flex: 1 1 auto;
-        
-        .virtual-scroll-item
-        {
-            justify-content: start;
-        }
-    }
-}
 
 .title
 {

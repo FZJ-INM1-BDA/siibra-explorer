@@ -35,6 +35,10 @@
     font-size: 125%;
     display: block;
 
+    // do now show more than ~3 lins of title
+    max-height: 2.7lh;
+    overflow: hidden;
+
     &.subtitle
     {
         opacity: 0.7;

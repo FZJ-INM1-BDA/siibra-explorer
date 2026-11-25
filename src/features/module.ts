@@ -10,6 +10,7 @@ import { ScrollingModule } from "@angular/cdk/scrolling";
 import { MarkdownModule } from "src/components/markdown";
 import { FeatureViewComponent } from "./feature-view/feature-view.component";
 import { VoiBboxDirective } from "./voi-bbox.directive";
+import { AnchorHighlightDirective } from "./anchor-highlight.directive";
 import { FilterCategoriesPipe } from "./filterCategories.pipe";
 import { ListDirective } from "./list/list.directive";
 import { FeatureFilterDirective } from "./feature.filter.directive";
@@ -67,6 +68,7 @@ import { FilterDeprecatedPipe } from "src/util/pipes/filterDep.pipe";
     SpatialFeatureCmp,
     ValueStoreDirective,
     FilterDeprecatedPipe,
+    AnchorHighlightDirective,
   ],
   declarations: [
     EntryComponent,
@@ -89,6 +91,7 @@ import { FilterDeprecatedPipe } from "src/util/pipes/filterDep.pipe";
     FeatureViewComponent,
     FeatureViewBase,
     VoiBboxDirective,
+    AnchorHighlightDirective,
     ListDirective,
     TPBRCategoryDirective,
     FilterCategoriesPipe,

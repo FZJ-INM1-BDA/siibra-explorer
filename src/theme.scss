@@ -44,9 +44,13 @@ $typographic-config: mat.m2-define-typography-config();
     {
       pointer-events: all;
       padding: 0.5rem 1rem;
+      transition: background-color 0.15s ease;
+      background-color: none;
+
       &:hover
       {
         cursor: pointer;
+        background-color: mat.m2-get-color-from-palette($foreground, text, 0.2) !important;
       }
     }
 

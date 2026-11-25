@@ -171,3 +171,89 @@ sxplr-feature-entry
     //     background: none;
     // }
 }
+
+
+.dataset-viewport
+{
+    height: 40dvh;
+    flex-direction: column;
+    display: flex;
+
+    tpbr-viewer
+    {
+        margin: 1rem;
+        opacity: 0.5;
+    }
+    
+    &>h5
+    {
+        flex: 0 0 auto;
+    }
+
+    cdk-virtual-scroll-viewport
+    {
+        flex: 1 1 auto;
+        
+        .virtual-scroll-item
+        {
+            justify-content: start;
+        }
+
+        .ws-wrap
+        {
+            max-width: 100%;
+            max-height: 100%;
+            overflow: hidden;
+        }
+
+        button[mat-list-item]
+        {
+            height: 72px;
+
+            &.long-button
+            {
+                // top-align the content so the first line is always shown;
+                // any lines overflowing the fixed 72px height are clipped.
+                // (align-items on the flex button itself, no ::ng-deep needed)
+                align-items: flex-start;
+                overflow: hidden;
+
+                // white-space is inherited, but Material explicitly sets
+                // `white-space: nowrap` on the generated text span, so we have
+                // to pierce encapsulation to let it wrap on whitespace.
+                ::ng-deep .mdc-list-item__primary-text,
+                ::ng-deep .mat-mdc-list-item-unscoped-content
+                {
+                    white-space: normal;
+                    overflow: hidden;
+                }
+
+                ::ng-deep .mdc-list-item__content
+                {
+                    align-self: unset;
+                }
+            }
+        }
+
+        button.no-style
+        {
+            // strip native button chrome
+            appearance: none;
+            background: none;
+            border: none;
+            // margin: 0;
+            // padding: 0 1rem;
+            // font: inherit;
+            // color: inherit;
+            // cursor: pointer;
+
+            // custom style
+            height: 72px;
+            width: 100%;
+            text-align: left;
+
+            padding: 0.5rem 1rem;
+
+        }
+    }
+}

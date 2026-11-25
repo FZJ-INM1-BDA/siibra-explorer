@@ -1,3 +1,7 @@
+@if(busy$ | async){
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
+
 <ng-template [ngIf]="view$ | async" let-view [ngIfElse]="loadingTmpl">
     <section class="section-find-body">
         <section class="section-header">
@@ -56,10 +60,15 @@
 
             <ng-template [ngIf]="view.viewAs.length > 0" [ngIfElse]="fallbackTmpl">
                 @if(view.showExperimentalFlag) {
-                    <mat-form-field class="compact content" appearance="outline">
+                    <mat-form-field class="compact content" appearance="outline"
+                        [ngClass]="{
+                            'sxplr-d-none': view.viewAs.length <= 1
+                        }">
                         <mat-label>Choose a visualization</mat-label>
                         
-                            <mat-select [value]="null" #vizSelect>
+                            <mat-select
+                                [value]="view.viewAs.length === 1 ? view.viewAs[0] : null"
+                                #vizSelect>
                                 <mat-option [value]="null" class="muted">(hide)</mat-option>
 
                                 @for (opt of view.viewAs; track $index) {

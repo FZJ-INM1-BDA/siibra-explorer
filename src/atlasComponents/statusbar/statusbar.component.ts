@@ -27,10 +27,11 @@ import { OnlyShowNewestParc } from "../sapiViews/core/parcellation/onlyShowNewes
 import { AtlasViewerRouterModule } from "src/routerModule";
 import { FlashDirective } from "src/util/directives/flash.directive";
 import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.directive";
-import { AtlasMapReducerXform, CurrentAtlasMapReduceXform, FeatureCategoryBanFilePipe, FilterMapGrpPipe, GatherMapGrpClassifersPipe, MapGridReducerPipe, MapToSpacesPipe, ReducedMapGroup } from "./mapReducer.pipe";
+import { AtlasMapReducerXform, CurrentAtlasMapReduceXform, FeatureCategoryBanFilePipe, GatherMapGrpClassifersPipe, MapGridReducerPipe, MapToSpacesPipe, ReducedMapGroup } from "./mapReducer.pipe";
 import { DatasetAggregator } from "src/features/datasetAggregator.directive";
 import { FeatureModule } from "src/features";
 import { ListDirective } from "src/features/list/list.directive";
+import { DatasetDialogService } from "src/features/datasetDialog.handler";
 
 const allVersionsPipe = new AllVersionsParcs()
 const onlyShowNewestPipe = new OnlyShowNewestParc()
@@ -80,7 +81,7 @@ export class StatusbarCmp {
     return (input as any)?.['type'] === "reducedMapGrp"
   }
 
-  asAny(input: unknown): input is any {
+  asAny(_input: unknown): _input is any {
     return true
   }
 
@@ -99,6 +100,7 @@ export class StatusbarCmp {
 
   #atpDir = inject(AvailableATPDirective)
   #ondestroy$ = inject(DestroyDirective).destroyed$
+  #datasetDialogSvc = inject(DatasetDialogService)
 
   DoiTemplate = DoiTemplate
 
@@ -273,10 +275,6 @@ export class StatusbarCmp {
         )
         return
       }
-      case "features": {
-        const listdir = value as ListDirective
-        break
-      }
       default: {
         console.error(`type ${type} cannot be processed`)
       }
@@ -353,6 +351,15 @@ export class StatusbarCmp {
         feature
       })
     )
+  }
+
+  /**
+   * Delegates presenting the dataset list to the currently registered
+   * {@link DatasetDialogHandler} via the relay service. When no handler is
+   * registered, this is a no-op.
+   */
+  openDatasets(listDir: ListDirective){
+    this.#datasetDialogSvc.showDatasets(listDir)
   }
   
   #keyListenerConfigBase = {

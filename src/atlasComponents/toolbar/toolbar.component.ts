@@ -1,7 +1,7 @@
 import { CommonModule } from "@angular/common";
 import { Component, inject, ViewChild } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { combineLatest } from "rxjs";
+import { BehaviorSubject, combineLatest } from "rxjs";
 import { filter, map, shareReplay, takeUntil } from "rxjs/operators";
 import { AtlasDownloadModule } from "src/atlas-download/atlas-download.module";
 import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.directive";
@@ -24,6 +24,10 @@ import { VolumesModule } from "../sapiViews/volumes/volumes.module";
 import { UtilModule } from "src/util";
 import { SapiViewsCoreSpaceModule } from "../sapiViews/core/space";
 import { BANLIST_CONNECTIVITY, EXPERIMENTAL_CONNECTIVITY, SapiViewsFeatureConnectivityModule, WHITELIST_CONNECTIVITY } from "src/features/connectivity";
+import { DatasetDialogHandler, DatasetDialogService } from "src/features/datasetDialog.handler";
+import { ListDirective } from "src/features/list/list.directive";
+import { Feature } from "../sapi/sxplrTypes";
+import { TFace, TSandsPoint } from "src/util/types";
 
 @Component({
   selector: 'sxplr-tool-bar',
@@ -59,7 +63,11 @@ import { BANLIST_CONNECTIVITY, EXPERIMENTAL_CONNECTIVITY, SapiViewsFeatureConnec
   ]
 })
 
-export class ToolbarCmp {
+export class ToolbarCmp implements DatasetDialogHandler {
+
+  isSands(input: TSandsPoint | TFace): input is TSandsPoint{
+    return input["@type"] === "https://openminds.ebrains.eu/sands/CoordinatePoint" || input["@type"] === "https://openminds.om-i.org/types/CoordinatePoint"
+  }
 
   ICON_LABELS = {
     SEARCH: "explore more",
@@ -72,6 +80,15 @@ export class ToolbarCmp {
   findSwitch: SwitchDirective|undefined
 
   ondestroy$ = inject(DestroyDirective).destroyed$
+
+  #listDir$ = new BehaviorSubject<ListDirective | null>(null)
+
+  showDatasets(listDir: ListDirective): void {
+    this.#listDir$.next(listDir)
+  }
+  clearDataset(){
+    this.#listDir$.next(null)
+  }
 
   #showConnectivity$ = combineLatest([
     this.store.pipe(
@@ -148,9 +165,12 @@ export class ToolbarCmp {
     this.store.pipe(
       select(atlasSelection.selectors.viewerMode)
     ),
+    this.store.pipe(
+      select(atlasSelection.selectors.selectedPoint)
+    )
   ]).pipe(
-    map(([ ATP, selectedRegions, currentViewport, viewerMode ]) => {
-      return { ATP, selectedRegions, currentViewport, viewerMode }
+    map(([ ATP, selectedRegions, currentViewport, viewerMode, selectedPoint ]) => {
+      return { ATP, selectedRegions, currentViewport, viewerMode, selectedPoint }
     }),
     shareReplay(1),
   )
@@ -163,25 +183,31 @@ export class ToolbarCmp {
     this.store.pipe(
       select(atlasAppearance.selectors.useViewer)
     ),
-    this.#showConnectivity$
+    this.#showConnectivity$,
+    this.#listDir$,
   ]).pipe(
-    map(([ { ATP, selectedRegions, currentViewport, viewerMode }, selectedFeature, useViewer, showConnectivity ]) => {
+    map(([ { ATP, selectedRegions, currentViewport, viewerMode, selectedPoint }, selectedFeature, useViewer, showConnectivity, listDir ]) => {
       return {
         selectedAtlas: ATP?.atlas,
         selectedTemplate: ATP?.template,
         selectedParcellation: ATP?.parcellation,
+        selectedPoint,
         selectedRegions: selectedRegions,
         currentViewport,
         selectedFeature,
         viewerMode,
         useViewer,
         showConnectivity,
+        listDir,
       }
     }),
     shareReplay(1),
   )
 
-  constructor(private store: Store){
+  constructor(private store: Store, datasetDialogSvc: DatasetDialogService){
+    datasetDialogSvc.register(this)
+    this.ondestroy$.subscribe(() => datasetDialogSvc.deregister(this))
+
     this.view$.pipe(
       takeUntil(this.ondestroy$),
       map(v => v.selectedFeature),
@@ -193,6 +219,15 @@ export class ToolbarCmp {
     })
   }
 
+  selectFeature(feature: Feature){
+
+    this.store.dispatch(
+      userInteraction.actions.showFeature({
+        feature
+      })
+    )
+  }
+
   clearSelectedFeature(){
     this.store.dispatch(
       userInteraction.actions.clearShownFeature()
@@ -202,6 +237,12 @@ export class ToolbarCmp {
   clearSpecialViewMode(){
     this.store.dispatch(
       atlasSelection.actions.clearViewerMode()
+    )
+  }
+
+  clearSelectedPoint(){
+    this.store.dispatch(
+      atlasSelection.actions.clearSelectedPoint()
     )
   }
 }

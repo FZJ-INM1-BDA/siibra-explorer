@@ -868,6 +868,19 @@ class TranslateV3 {
     return await this.translateBaseFeature(feat)
   }
 
+  async decodeAnchors(feat: PathReturn<"/feature/{feature_id}">){
+    const regions = feat.anchor?.regions || []
+    const anchors = regions.map(async region => {
+      const qualification = region.qualification
+      const translatedRegion = await this.translateRegion(region.region)
+      return {
+        qualification,
+        region: translatedRegion
+      }
+    })
+    return await Promise.all(anchors)
+  }
+
   async translateBaseFeature(feat: PathReturn<"/feature/{feature_id}">): Promise<Feature>{
     const { id, name, category, description, datasets, modality } = feat
     if (!datasets) {
@@ -880,11 +893,15 @@ class TranslateV3 {
       href: v.url,
       text: v.url
     }))
+
+    const anchors = await this.decodeAnchors(feat)
+    
     return {
       id,
       name,
       category,
       modality,
+      anchors,
       desc: dsDescs[0] || description,
       link: urls,
       contributors: datasets.flatMap(ds => ds.contributors.map(b => b.name))
@@ -934,6 +951,7 @@ class TranslateV3 {
       id: feat.id,
       name: feat.name,
       desc: feat.description,
+      anchors: await this.decodeAnchors(feat),
       contributors: feat.datasets.flatMap(ds => ds.contributors.map(d => d.name)),
       link: [
         ...feat.datasets

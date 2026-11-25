@@ -106,11 +106,15 @@
             </div>
         </ng-template> -->
 
-        <div *ngIf="tpbr.parcellation">
-            {{ tpbr.parcellation.name }}
-        </div>
-        <div *ngIf="tpbr.region">
-            {{ tpbr.region.name }}
-        </div>
+        @if(tpbr.parcellation){
+            <div>
+                {{ tpbr.parcellation.name }}
+            </div>
+        }
+        @if(tpbr.region && tpbr.region.name !== tpbr.parcellation.name){
+            <div>
+                {{ tpbr.region.name }}
+            </div>   
+        }
     </ng-template>
 </ng-template>

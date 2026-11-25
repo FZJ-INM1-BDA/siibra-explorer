@@ -1,6 +1,6 @@
 import { Directive, Inject, Input } from "@angular/core";
 import { BehaviorSubject, combineLatest, concat, from, Observable, of } from "rxjs";
-import { catchError, debounceTime, distinctUntilChanged, map, scan, shareReplay, startWith, switchMap, withLatestFrom } from "rxjs/operators";
+import { catchError, debounceTime, distinctUntilChanged, map, scan, shareReplay, startWith, switchMap, tap, withLatestFrom } from "rxjs/operators";
 import { SAPI } from "src/atlasComponents/sapi";
 import { Feature, SimpleCompoundFeature, SxplrRegion, SxplrTemplate, VoiFeature } from "src/atlasComponents/sapi/sxplrTypes";
 import { MetaV1Schema, PathReturn } from "src/atlasComponents/sapi/typeV3";
@@ -132,7 +132,6 @@ type TmpGeomSvcFiber = {
 
 export type ViewAs = VolumesViewAs | PlotlyViewAs | BaseGeomsvcViewAs | TmpGeomSvcFiber
 
-
 @Directive({
   selector: '[feature-view-base]',
   exportAs: 'featureViewBase'
@@ -140,7 +139,8 @@ export type ViewAs = VolumesViewAs | PlotlyViewAs | BaseGeomsvcViewAs | TmpGeomS
 export class FeatureViewBase {
 
   public BUSY_NS = {
-    ADD_VOI: "ADD_VOI"
+    ADD_VOI: "ADD_VOI",
+    REFRESH: "REFRESH"
   } as const
 
   /**
@@ -164,7 +164,7 @@ export class FeatureViewBase {
     })
   }
 
-  nsBusy$ = new BehaviorSubject<Record<string, boolean>>({ [this.BUSY_NS.ADD_VOI]: true })
+  nsBusy$ = new BehaviorSubject<Record<string, boolean>>({})
   busy$ = this.nsBusy$.pipe(
     scan((acc, curr) => ({ ...acc, ...curr })),
     map(record => Object.values(record).some(flag => !!flag))
@@ -182,7 +182,10 @@ export class FeatureViewBase {
       if (!feat) {
         return of(null)
       }
-      return this.sapi.getV3FeatureDetailWithId(feat.id)
+      this.setBusy(this.BUSY_NS.REFRESH, true)
+      return this.sapi.getV3FeatureDetailWithId(feat.id).pipe(
+        tap(() => this.setBusy(this.BUSY_NS.REFRESH, false))
+      )
     }),
     shareReplay(1),
   )

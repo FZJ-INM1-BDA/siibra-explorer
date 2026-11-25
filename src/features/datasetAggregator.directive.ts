@@ -1,8 +1,6 @@
-import { Directive, input, Input, OnChanges, SimpleChanges } from "@angular/core";
+import { Directive, input, OnChanges, SimpleChanges } from "@angular/core";
 import { TPBRCategoryDirective } from "./tpbrCategory.directive";
 import { SAPI } from "src/atlasComponents/sapi";
-import { switchMap } from "rxjs/operators";
-import { merge } from "rxjs";
 import { SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes";
 
 @Directive({

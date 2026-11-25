@@ -826,7 +826,7 @@ how-to-cite img
   pointer-events: none;
 }
 
-.virtual-scroll-viewport > .cdk-virtual-scroll-content-wrapper
+.cdk-virtual-scroll-orientation-vertical > .cdk-virtual-scroll-content-wrapper
 {
   width: 100%;
 }

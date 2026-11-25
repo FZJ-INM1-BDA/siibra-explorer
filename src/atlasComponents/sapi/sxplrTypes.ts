@@ -128,6 +128,10 @@ export type SimpleCompoundFeature<T extends string|Point=string|Point> = {
 
 export type Feature = {
   id: string
+  anchors?: {
+    qualification: string
+    region: SxplrRegion
+  }[]
   name: string
   category?: string
   modality?: string

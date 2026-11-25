@@ -224,46 +224,9 @@
                         </ng-template>
 
                         @if(listDir.total$ | async; as total) {
-                            <button mat-button [sxplr-dialog]="datasetDialogTmpl" sxplr-dialog-size="xl">
+                            <button mat-button (click)="openDatasets(listDir)">
                                 {{ featureType.display_name }} ({{ total }})
                             </button>
-                            <ng-template #datasetDialogTmpl>
-                                
-                                <section class="dataset-viewport">
-                                    <h5>{{ featureType.display_name }} ({{ total }})</h5>
-                                    @if(listDir.datasource$ | async; as ds){
-                                        <cdk-virtual-scroll-viewport itemSize="36">
-                                            <ng-template cdkVirtualFor
-                                                [cdkVirtualForOf]="ds"
-                                                let-feature
-                                                let-last="last"
-                                                >
-                                                
-                                                <!-- n.b. do not introduce mattooltip in scrollable container -->
-                                                <!-- it will override scrollability -->
-                                                <ng-template [ngIf]="feature" [ngIfElse]="fallbackTmpl">
-                                                    <button
-                                                        mat-button
-                                                        class="virtual-scroll-item sxplr-w-100"
-                                                        (click)="selectFeature(feature)">
-                                                        <span class="ws-no-wrap"> {{ feature.name }} </span>
-                                                    </button>
-                                                </ng-template>
-                                                <ng-template #fallbackTmpl>
-                                                    <button
-                                                        disabled
-                                                        mat-button
-                                                        class="virtual-scroll-item sxplr-w-100">
-                                                        <mat-spinner class="sxplr-d-inline-block" [diameter]="14"></mat-spinner> 
-                                                        <span class="ws-no-wrap"> Loading ... </span>
-                                                    </button>
-                                                </ng-template>
-                                            </ng-template>
-                                        </cdk-virtual-scroll-viewport>
-                                    }
-                                    
-                                </section>
-                            </ng-template>
                         }
                     }
                 }
