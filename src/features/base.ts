@@ -59,4 +59,5 @@ export const AllFeatures = {
   Tabular: "Tabular",
   // GeneExpressions: "GeneExpressions",
   Image: "Image",
+  Geom: "Geom",
 } as const

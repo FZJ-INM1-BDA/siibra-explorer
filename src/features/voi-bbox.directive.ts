@@ -33,6 +33,7 @@ type DisplayedBox = {
 
 @Directive({
   selector: '[voiBbox]',
+  standalone: true,
   hostDirectives: [ AnnotationDirective ]
 })
 export class VoiBboxDirective {

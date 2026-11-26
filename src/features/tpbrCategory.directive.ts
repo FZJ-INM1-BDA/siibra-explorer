@@ -38,6 +38,28 @@ export class TPBRCategoryDirective extends FeatureBase{
         )
       )
     ),
+    // monnkey patch geometry features
+    map(features => {
+      return [
+        ...features,
+        {
+          category: "geometry",
+          display_name: "Geometry Features",
+          name: "features.fiction.GeometryFeatures",
+          query_params: [
+            "space_id",
+            "bbox"
+          ],
+          required_query_params: [
+            "space_id"
+          ],
+          optional_query_params: [
+            "bbox"
+          ],
+          path: "/feature/Geom"
+        }
+      ]
+    })
   )
 
   public cateogryCollections$ = this.TPRBbox$.pipe(
@@ -55,7 +77,8 @@ export class TPBRCategoryDirective extends FeatureBase{
             parcellation_id: !!parcellation,
             region_id: !!region,
             bbox: !!bbox
-          }
+          } as Record<string, boolean>
+
           for (const pParam in paramMapped){
             if (requiredParams.includes(pParam) && !paramMapped[pParam]) {
               return false

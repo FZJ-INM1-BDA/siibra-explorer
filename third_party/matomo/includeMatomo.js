@@ -9,11 +9,24 @@ if (MATOMO_URL && MATOMO_ID) {
   
   _paq.push(['trackPageView']);
   _paq.push(['enableLinkTracking']);
+
+  // obtained by
+  // curl 'https://stats.humanbrainproject.eu/matomo.js' | openssl dgst -sha384 -binary | openssl base64 -A
+  const resSha384 = "yGkhmoBpWPCg9IZSGIz64itCivgzaXu+CXflD1GthTMPW3YUjF4FoJ8YUBGDTOF7"
+
   (function() {
     const u=MATOMO_URL;
     _paq.push(['setTrackerUrl', u+'matomo.php']);
     _paq.push(['setSiteId', MATOMO_ID]);
-    const d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-    g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+    const d=document,
+    g=d.createElement('script'),
+    s=d.getElementsByTagName('script')[0];
+    g.type='text/javascript';
+    g.async=true;
+    g.defer=true;
+    g.src=u+'matomo.js';
+    g.integrity=`sha384-${resSha384}`;
+    g.crossOrigin='anonymous'; 
+    s.parentNode.insertBefore(g,s);
   })();
 }

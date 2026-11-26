@@ -69,6 +69,7 @@ import { FilterDeprecatedPipe } from "src/util/pipes/filterDep.pipe";
     ValueStoreDirective,
     FilterDeprecatedPipe,
     AnchorHighlightDirective,
+    VoiBboxDirective,
   ],
   declarations: [
     EntryComponent,
@@ -78,7 +79,6 @@ import { FilterDeprecatedPipe } from "src/util/pipes/filterDep.pipe";
     ListDirective,
 
     CategoryAccDirective,
-    VoiBboxDirective,
 
     FeatureNamePipe,
     GroupFeaturesToName,

@@ -43,6 +43,7 @@
     <ng-template [ngTemplateOutlet]="btnTmpl" [ngTemplateOutletContext]="{
         name: (view.selectedMap | currAtlasMapRed : view.availableMaps : view.allParcVersions)?.name || 'Nothing selected',
         icon: 'map',
+        suffixTmpl: mapSuffixTmpl,
         category: 'map',
         useNewMenu: true,
         menuData: {
@@ -127,6 +128,22 @@
             </div>
         } @else {
             Failed to render mapOptTmpl
+        }
+    </ng-template>
+
+    <ng-template #mapSuffixTmpl>
+        <button mat-icon-button [sxplr-dialog]="DoiTemplate" [sxplr-dialog-size]="null" [sxplr-dialog-data]="{
+                title: view.selectedATP.parcellation.name,
+                desc: view.selectedATP.parcellation.desc,
+                contributors: view.selectedATP.parcellation.contributors | dedup, 
+                actions: view.selectedATP.parcellation | parcTmplDoiPipe
+            }">
+            <mat-icon>info</mat-icon>
+        </button>
+        @if(view.selectedMap.type === "LABELLED"){
+            <button iav-stop="mousedown mouseup click" mat-icon-button (click)="toggleParcellationVisibility()">
+                <mat-icon>{{ view.parcellationVisible ? 'visibility' : 'visibility_off' }}</mat-icon>
+            </button>
         }
     </ng-template>
     
@@ -225,7 +242,9 @@
 
                         @if(listDir.total$ | async; as total) {
                             <button mat-button (click)="openDatasets(listDir)">
-                                {{ featureType.display_name }} ({{ total }})
+                                {{ featureType.display_name }} 
+                                <!-- do NOT show total. total could be misleading, since there is no way 
+                                to calculate total cheaply (consider geometry feature) -->
                             </button>
                         }
                     }

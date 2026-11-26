@@ -5,14 +5,13 @@ import { catchError, distinctUntilChanged, last, map, mergeMap, shareReplay, swi
 import { strToRgb } from "common/util";
 import { atlasAppearance, atlasSelection, userInteraction } from "src/state";
 import { SAPI } from "src/atlasComponents/sapi";
-import { Feature, SxplrRegion, VoiFeature } from "src/atlasComponents/sapi/sxplrTypes";
-import { AnnotationLayer, TNgAnnotationAABBox } from "src/atlasComponents/annotations";
+import { Feature, SxplrRegion } from "src/atlasComponents/sapi/sxplrTypes";
 import { ContextMenuService, TContextMenuReg } from "src/contextMenuModule";
 import { DestroyDirective } from "src/util/directives/destroy.directive";
 import { getUuid } from "src/util/fn";
 import { CustomDataSource } from "src/util/pullable";
 import { TranslatedFeature } from "./list/list.directive";
-import { isVoiData } from "./guards";
+import { VoiBboxDirective } from "./voi-bbox.directive";
 
 export type AnchorHighlightCtxMenuData = {
   /** capped to AnchorHighlightDirective.MAX_CTX_MENU_ITEMS */
@@ -26,11 +25,13 @@ export type AnchorHighlightCtxMenuData = {
   selector: '[anchor-highlight]',
   standalone: true,
   exportAs: "anchorHighlight",
-  hostDirectives: [ DestroyDirective ],
+  // VoiBboxDirective already brings in DestroyDirective transitively (via
+  // AnnotationDirective); adding it again here would match it twice on the
+  // same element. #destroy$ reuses that shared instance.
+  hostDirectives: [ VoiBboxDirective ],
 })
 export class AnchorHighlightDirective {
 
-  static VOI_LAYER_COLOR = "#ffff00"
   static TRANSPARENT: [number, number, number, number] = [255, 255, 255, 0]
 
   static BATCH_SIZE = 10
@@ -40,6 +41,8 @@ export class AnchorHighlightDirective {
   readonly #store = inject(Store)
   readonly #sapi = inject(SAPI)
   readonly #ctxMenuSvc = inject(ContextMenuService)
+  // reuse the VoI bbox/hover/click logic rather than drawing our own
+  readonly #voiBbox = inject(VoiBboxDirective)
 
   /** anchored features keyed by region name, for the context menu lookup */
   readonly #featuresByRegionName = new Map<string, Feature[]>()
@@ -51,12 +54,8 @@ export class AnchorHighlightDirective {
     distinctUntilChanged(),
   )
 
-  /** unique ids so the custom layers can be referenced/removed on cleanup */
+  /** unique id so the custom colormap layer can be referenced/removed on cleanup */
   readonly #colorMapLayerId = `anchor-highlight-colormap-${getUuid()}`
-  readonly #annotationLayerName = `anchor-highlight-voi-${getUuid()}`
-
-  #annotationLayer: AnnotationLayer
-  #annotationIds: string[] = []
 
   readonly #datasource$ = new BehaviorSubject<CustomDataSource<TranslatedFeature>>(null)
 
@@ -151,14 +150,14 @@ export class AnchorHighlightDirective {
     })
 
     /**
-     * features with .bbox (VoiFeature) -> draw an axis-aligned bounding box
-     * via the annotation layer.
+     * features with .bbox (VoiFeature) -> delegate to the VoiBbox host
+     * directive, reusing its bbox drawing + hover/click handling. It filters
+     * to VoiFeatures itself.
      */
     this.#features$.pipe(
-      map(features => features.filter(isVoiData)),
       takeUntil(this.#destroy$),
-    ).subscribe(voiFeatures => {
-      this.#applyAnnotations(voiFeatures)
+    ).subscribe(features => {
+      this.#voiBbox.features = features as Feature[]
     })
 
     /**
@@ -196,7 +195,6 @@ export class AnchorHighlightDirective {
     this.#destroy$.subscribe(() => {
       this.#ctxMenuSvc.deregister(this.#ctxMenuCb)
       this.#removeColorMap()
-      this.#disposeAnnotations()
     })
   }
 
@@ -387,43 +385,4 @@ export class AnchorHighlightDirective {
     )
   }
 
-  #applyAnnotations(voiFeatures: VoiFeature[]) {
-    if (!this.#annotationLayer || this.#annotationLayer.disposed) {
-      this.#annotationLayer = new AnnotationLayer(
-        this.#annotationLayerName,
-        AnchorHighlightDirective.VOI_LAYER_COLOR,
-      )
-    }
-
-    // clear previously drawn boxes before drawing the current set
-    for (const id of this.#annotationIds) {
-      this.#annotationLayer.removeAnnotation({ id })
-    }
-    this.#annotationIds = []
-
-    const annotations = voiFeatures.map(feature => this.#bboxToAABB(feature))
-    this.#annotationIds = annotations.map(ann => ann.id)
-    if (annotations.length > 0) {
-      this.#annotationLayer.addAnnotation(annotations)
-    }
-  }
-
-  #bboxToAABB(feature: VoiFeature): TNgAnnotationAABBox {
-    const { minpoint, maxpoint } = feature.bbox
-    return {
-      id: `${feature.id}-anchor-highlight-box`,
-      type: "aabbox",
-      // bbox is in mm, nehuba annotations expect nm
-      pointA: minpoint.map(v => v * 1e6) as [number, number, number],
-      pointB: maxpoint.map(v => v * 1e6) as [number, number, number],
-    }
-  }
-
-  #disposeAnnotations() {
-    if (this.#annotationLayer && !this.#annotationLayer.disposed) {
-      this.#annotationLayer.dispose()
-    }
-    this.#annotationLayer = null
-    this.#annotationIds = []
-  }
 }
