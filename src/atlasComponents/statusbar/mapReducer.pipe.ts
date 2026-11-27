@@ -273,3 +273,24 @@ export class FeatureCategoryBanFilePipe<T extends HasName> implements PipeTransf
     // return value.filter(m => !BAN_NAME.includes(m.name) )
   }
 }
+
+@Pipe({
+  name: 'aggregateTotalByNames',
+  pure: true,
+  standalone: true
+})
+
+export class AggregteTotalByNamesPipe implements PipeTransform{
+  public transform(totalByName: Record<string, number>, names: string[]) {
+    if (!totalByName) {
+      return 0
+    }
+    let count = 0
+    for (const [ name, total ] of Object.entries(totalByName)){
+      if (names.includes(name)) {
+        count += total
+      }
+    }
+    return count
+  }
+}

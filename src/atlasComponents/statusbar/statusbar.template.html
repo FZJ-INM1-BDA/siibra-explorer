@@ -192,7 +192,7 @@
         [selected-regions]="view.selectedRegions"
         [ngTemplateOutlet]="btnTmpl"
         [ngTemplateOutletContext]="{
-            name: 'datasets',
+            name: view.datasetLabel || 'datasets',
             icon: 'dataset',
             category: 'dataset',
             useNewMenu: true,
@@ -221,9 +221,20 @@
                 }
             }
 
-
+            <mat-action-list>
             @if(dsAggr.cateogryCollections$ | async; as catKeyCol){
-                @for(item of catKeyCol | keyvalue; track item.key){
+                @for(item of catKeyCol | keyvalue; track item.key; let first = $first){
+                    @if(item.value | mapToProperty : 'display_name'; as names){
+                        @if(acc.totalByName$ | async | aggregateTotalByNames : names; as catTotal){
+                            @if(!first){
+                                <mat-divider></mat-divider>
+                            }
+                            <div mat-subheader class="text-muted dataset-category-subheader">
+                                {{ item.key }} ({{ catTotal }})
+                            </div>
+                        }
+                    }
+
                     @for(featureType of item.value | featureCategoryBanFilter; track featureType.display_name){
                         <ng-template
                             #listDir="featureListDirective"
@@ -241,8 +252,13 @@
                         </ng-template>
 
                         @if(listDir.total$ | async; as total) {
-                            <button mat-button (click)="openDatasets(listDir)">
-                                {{ featureType.display_name }} 
+                            <button mat-list-item (click)="openDatasets(listDir, total)">
+                                <span>
+                                    {{ featureType.display_name }}
+                                </span>
+                                <span class="text-muted">
+                                    ({{ total }})
+                                </span>
                                 <!-- do NOT show total. total could be misleading, since there is no way 
                                 to calculate total cheaply (consider geometry feature) -->
                             </button>
@@ -250,6 +266,7 @@
                     }
                 }
             }
+            </mat-action-list>
         </section>
 
     </ng-template>

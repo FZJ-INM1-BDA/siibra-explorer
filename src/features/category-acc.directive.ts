@@ -43,6 +43,34 @@ export class CategoryAccDirective implements AfterContentInit, OnDestroy {
     shareReplay(1)
   )
 
+  public totalByName$ = this.#listCmps$.pipe(
+    switchMap(listCmps =>
+      combineLatest(
+        listCmps.map(cmp =>
+          cmp.total$.pipe(
+            map(total => {
+              return {
+                [cmp.displayName]: total,
+              }
+            })
+          )
+        )
+      ).pipe(
+        map(totals => totals.reduce((acc, curr) => {
+          const returnAcc = { ...acc }
+          for (const [ name, total ] of Object.entries(curr)){
+            if (returnAcc[name]) {
+              console.warn(`totalByName ${name} already exists. overriding`)
+            } 
+            returnAcc[name] = total
+          }
+          return returnAcc
+        })),
+      )
+    ),
+    shareReplay(1)
+  )
+
   public featureMetadata$ = this.#listCmps$.pipe(
     switchMap(listcmps => {
       if (listcmps.length === 0) {

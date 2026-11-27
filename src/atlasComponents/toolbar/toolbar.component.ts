@@ -83,11 +83,17 @@ export class ToolbarCmp implements DatasetDialogHandler {
 
   #listDir$ = new BehaviorSubject<ListDirective | null>(null)
 
-  showDatasets(listDir: ListDirective): void {
+  #clearDsCb: (() => void) | null = null
+  showDatasets(listDir: ListDirective, cb: (() => void) | null = null): void {
     this.#listDir$.next(listDir)
+    this.#clearDsCb = cb
   }
   clearDataset(){
     this.#listDir$.next(null)
+    if (this.#clearDsCb) {
+      this.#clearDsCb()
+      this.#clearDsCb = null
+    }
   }
 
   #showConnectivity$ = combineLatest([

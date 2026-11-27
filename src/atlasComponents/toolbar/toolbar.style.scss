@@ -218,6 +218,11 @@ sxplr-feature-entry
                 align-items: flex-start;
                 overflow: hidden;
 
+                // fade the clipped text out toward the bottom rather than
+                // cutting it off abruptly.
+                mask-image: linear-gradient(to bottom, black 40%, transparent);
+                -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent);
+
                 // white-space is inherited, but Material explicitly sets
                 // `white-space: nowrap` on the generated text span, so we have
                 // to pierce encapsulation to let it wrap on whitespace.
@@ -226,6 +231,10 @@ sxplr-feature-entry
                 {
                     white-space: normal;
                     overflow: hidden;
+
+                    opacity: 0.9;
+                    padding-top: 0.5rem;
+                    display: block;
                 }
 
                 ::ng-deep .mdc-list-item__content

@@ -3,7 +3,7 @@ import { Component, inject } from "@angular/core";
 import { SAPI } from "../sapi";
 import { select, Store } from "@ngrx/store";
 import { atlasAppearance, atlasSelection, userInteraction } from "src/state";
-import { combineLatest, of } from "rxjs";
+import { BehaviorSubject, combineLatest, of } from "rxjs";
 import { map, switchMap, take, takeUntil } from "rxjs/operators";
 import { AngularMaterialModule } from "src/sharedModules";
 import { AvailableATPDirective } from "../sapi/core/availableATP.directive";
@@ -27,7 +27,7 @@ import { OnlyShowNewestParc } from "../sapiViews/core/parcellation/onlyShowNewes
 import { AtlasViewerRouterModule } from "src/routerModule";
 import { FlashDirective } from "src/util/directives/flash.directive";
 import { ExperimentalFlagDirective } from "src/experimental/experimental-flag.directive";
-import { AtlasMapReducerXform, CurrentAtlasMapReduceXform, FeatureCategoryBanFilePipe, GatherMapGrpClassifersPipe, MapGridReducerPipe, MapToSpacesPipe, ReducedMapGroup } from "./mapReducer.pipe";
+import { AggregteTotalByNamesPipe, AtlasMapReducerXform, CurrentAtlasMapReduceXform, FeatureCategoryBanFilePipe, GatherMapGrpClassifersPipe, MapGridReducerPipe, MapToSpacesPipe, ReducedMapGroup } from "./mapReducer.pipe";
 import { DatasetAggregator } from "src/features/datasetAggregator.directive";
 import { FeatureModule } from "src/features";
 import { ListDirective } from "src/features/list/list.directive";
@@ -68,6 +68,7 @@ const onlyShowNewestPipe = new OnlyShowNewestParc()
     DatasetAggregator,
     FeatureModule,
     FeatureCategoryBanFilePipe,
+    AggregteTotalByNamesPipe,
 ],
   hostDirectives: [
     AvailableATPDirective,
@@ -76,6 +77,8 @@ const onlyShowNewestPipe = new OnlyShowNewestParc()
 })
 
 export class StatusbarCmp {
+  
+  #datasetLabel$ = new BehaviorSubject<string|null>(null)
 
   asReducedMapGroup(input: unknown): input is ReducedMapGroup{
     return (input as any)?.['type'] === "reducedMapGrp"
@@ -167,21 +170,36 @@ export class StatusbarCmp {
     select(atlasSelection.selectors.selectedRegions)
   )
 
-  view$ = combineLatest([
-    of(enLabels),
-    this.#atpDir.view$,
+  #atlasCombined$ = combineLatest([
     this.#atlasAppearance$,
     this.#atlasSelection$,
     this.#parcStates$,
+  ]).pipe(
+    map(([ { parcellationVisible }, { position }, { allAvailableRegions, labelMappedRegionNames, leafRegions, branchRegions } ]) => {
+      return {
+        parcellationVisible,
+        position,
+        allAvailableRegions,
+        labelMappedRegionNames,
+        leafRegions,
+        branchRegions,
+      }
+    })
+  )
+
+  view$ = combineLatest([
+    of(enLabels),
+    this.#atpDir.view$,
+    this.#atlasCombined$,
     this.#selectedRegions$,
+    this.#datasetLabel$,
   ]).pipe(
     map(([
       labels,
       {selectedATP, templates, parcellations, atlases, noGroupParcs, groupParcs, maps, mapAggregations},
-      { parcellationVisible },
-      { position },
-      { allAvailableRegions, labelMappedRegionNames, leafRegions, branchRegions },
+      { parcellationVisible, position, allAvailableRegions, labelMappedRegionNames, leafRegions, branchRegions },
       selectedRegions,
+      datasetLabel
     ]) => {
       const allParcVersions = allVersionsPipe.transform(selectedATP.parcellation, parcellations)
       const suitableMaps = maps.filter(m => 
@@ -212,7 +230,8 @@ export class StatusbarCmp {
         selectedMap,
         availableMaps,
         aggregatedMap: mapAggregations,
-        selectedAggregatedMap: selectedMap?.aggregation
+        selectedAggregatedMap: selectedMap?.aggregation,
+        datasetLabel,
       }
     })
   )
@@ -358,8 +377,11 @@ export class StatusbarCmp {
    * {@link DatasetDialogHandler} via the relay service. When no handler is
    * registered, this is a no-op.
    */
-  openDatasets(listDir: ListDirective){
-    this.#datasetDialogSvc.showDatasets(listDir)
+  openDatasets(listDir: ListDirective, total: number){
+    this.#datasetDialogSvc.showDatasets(listDir, () => {
+      this.#datasetLabel$.next(null)  
+    })
+    this.#datasetLabel$.next(`${listDir.displayName} (${total})`)
   }
   
   #keyListenerConfigBase = {

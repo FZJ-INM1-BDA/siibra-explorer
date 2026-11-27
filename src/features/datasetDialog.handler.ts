@@ -6,7 +6,7 @@ import { ListDirective } from "./list/list.directive"
  * (features) of a given type to the user — e.g. `ToolbarCmp`.
  */
 export abstract class DatasetDialogHandler {
-  abstract showDatasets(listDir: ListDirective): void
+  abstract showDatasets(listDir: ListDirective, cb: (() => void)|null): void
 }
 
 /**
@@ -20,9 +20,11 @@ export abstract class DatasetDialogHandler {
 @Injectable({ providedIn: 'root' })
 export class DatasetDialogService {
   #handler: DatasetDialogHandler | null = null
+  #dismiss: (() => void) | null = null
 
   register(handler: DatasetDialogHandler): void {
     this.#handler = handler
+    
   }
 
   deregister(handler: DatasetDialogHandler): void {
@@ -31,7 +33,7 @@ export class DatasetDialogService {
     }
   }
 
-  showDatasets(listDir: ListDirective): void {
-    this.#handler?.showDatasets(listDir)
+  showDatasets(listDir: ListDirective, dismissCb: (() => void) | null = null): void {
+    this.#handler?.showDatasets(listDir, dismissCb)
   }
 }
